@@ -372,256 +372,256 @@ export default function HeroNavbar({
                         >
                           {link.label}
                         </button>
-                    ) : (
-                      <Link
-                        href={link.href || "#"}
-                        data-text={link.label}
-                        className={`nav-link-bold-safe group relative text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans ${isActive
-                          ? "font-bold !text-[#D2E6BC]"
-                          : "font-medium hover:font-bold text-[#DDDDDD] hover:!text-[#D2E6BC]"
-                          }`}
-                        style={{ textDecoration: "none" }}
-                      >
-                        {link.label}
-                      </Link>
-                    )}
-                  </div>
-                );
-              })}
-            </nav>
+                      ) : (
+                        <Link
+                          href={link.href || "#"}
+                          data-text={link.label}
+                          className={`nav-link-bold-safe group relative text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans ${isActive
+                            ? "font-bold !text-[#D2E6BC]"
+                            : "font-medium hover:font-bold text-[#DDDDDD] hover:!text-[#D2E6BC]"
+                            }`}
+                          style={{ textDecoration: "none" }}
+                        >
+                          {link.label}
+                        </Link>
+                      )}
+                    </div>
+                  );
+                })}
+              </nav>
 
-            {/* Center logo */}
-            <Link
-              href="/"
-              className="absolute left-5 md:left-1/2 md:-translate-x-1/2 flex items-center justify-center"
-            >
-              <img
-                src="/assets/logo.png"
-                alt="Kattil — The Homely Reset"
-                className="object-contain h-12 md:h-14.5 lg:h-17 transition-all duration-300 drop-shadow-md"
-              />
-            </Link>
+              {/* Center logo */}
+              <Link
+                href="/"
+                className="absolute left-5 md:left-1/2 md:-translate-x-1/2 flex items-center justify-center"
+              >
+                <img
+                  src="/assets/logo.png"
+                  alt="Kattil — The Homely Reset"
+                  className="object-contain h-12 md:h-14.5 lg:h-17 transition-all duration-300 drop-shadow-md"
+                />
+              </Link>
 
-            {/* Right CTAs */}
-            <div className="hidden lg:flex items-center justify-end gap-6 flex-1">
-              <Link
-                href="/contact-us"
-                data-text="Contact Us"
-                className={`nav-link-bold-safe group relative text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans ${pathname === "/contact-us"
-                  ? "font-bold !text-[#D2E6BC]"
-                  : "font-medium hover:font-bold text-[#DDDDDD] hover:!text-[#D2E6BC]"
-                  }`}
-                style={{
-                  textDecoration: "none",
-                }}
+              {/* Right CTAs */}
+              <div className="hidden lg:flex items-center justify-end gap-6 flex-1">
+                <Link
+                  href="/contact-us"
+                  data-text="Contact Us"
+                  className={`nav-link-bold-safe group relative text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans ${pathname === "/contact-us"
+                    ? "font-bold !text-[#D2E6BC]"
+                    : "font-medium hover:font-bold text-[#DDDDDD] hover:!text-[#D2E6BC]"
+                    }`}
+                  style={{
+                    textDecoration: "none",
+                  }}
+                >
+                  Contact Us
+                </Link>
+                <Link
+                  href="/rooms"
+                  className="w-[122px] h-[40px] rounded-[6px] border-[1px] border-white px-6 text-white text-[14px] leading-none font-medium inline-flex items-center justify-center transition-all duration-300 hover:border-white hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-95 font-sans"
+                >
+                  Book Now
+                </Link>
+              </div>
+
+              {/* Mobile menu button */}
+              <button
+                className="lg:hidden ml-auto relative z-20 flex items-center justify-center w-10 h-10 rounded-full border border-white/10 bg-white/4 transition-all duration-200 hover:border-white/30 hover:bg-white/8"
+                onClick={() => setMobileOpen((prev) => !prev)}
+                aria-label="Toggle Menu"
               >
-                Contact Us
-              </Link>
-              <Link
-                href="/rooms"
-                className="w-[122px] h-[40px] rounded-[6px] border-[1px] border-white px-6 text-white text-[14px] leading-none font-medium inline-flex items-center justify-center transition-all duration-300 hover:border-white hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-95 font-sans"
-              >
-                Book Now
-              </Link>
+                <AnimatePresence mode="wait" initial={false}>
+                  {mobileOpen ? (
+                    <motion.div
+                      key="close"
+                      initial={{ rotate: -90, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      exit={{ rotate: 90, opacity: 0 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                    >
+                      <X size={18} color="white" />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="menu"
+                      initial={{ rotate: 90, opacity: 0 }}
+                      animate={{ rotate: 0, opacity: 1 }}
+                      exit={{ rotate: -90, opacity: 0 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                    >
+                      <Menu size={18} color="white" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </button>
             </div>
 
-            {/* Mobile menu button */}
-            <button
-              className="lg:hidden ml-auto relative z-20 flex items-center justify-center w-10 h-10 rounded-full border border-white/10 bg-white/4 transition-all duration-200 hover:border-white/30 hover:bg-white/8"
-              onClick={() => setMobileOpen((prev) => !prev)}
-              aria-label="Toggle Menu"
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                {mobileOpen ? (
-                  <motion.div
-                    key="close"
-                    initial={{ rotate: -90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: 90, opacity: 0 }}
-                    transition={{ duration: 0.2, ease: "easeOut" }}
-                  >
-                    <X size={18} color="white" />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="menu"
-                    initial={{ rotate: 90, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
-                    exit={{ rotate: -90, opacity: 0 }}
-                    transition={{ duration: 0.2, ease: "easeOut" }}
-                  >
-                    <Menu size={18} color="white" />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </button>
-          </div>
-
-          {/* ── EXPANDED HERO CONTENT (Home page only) ────────────────────────── */}
-          {isHome && (
-            <motion.div
-              animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : -20 }}
-              transition={
-                heroVisible
-                  ? { duration: 0.45, delay: 0.35, ease: [0.22, 1, 0.36, 1] }
-                  : { duration: 0.25, ease: [0.4, 0, 1, 1] }
-              }
-              style={{
-                pointerEvents: heroVisible ? "auto" : "none",
-                willChange: "transform, opacity",
-              }}
-              className="relative z-10 px-5 md:px-12 lg:px-20 pt-2 sm:pt-4 md:pt-[60px] lg:pt-3 pb-6 flex flex-col items-center justify-start text-center flex-1 w-full mt-0 lg:mt-3"
-            >
-              {/* Eyebrow */}
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 10 }}
-                transition={{ delay: 0.4, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                className="text-[11px] sm:text-xs md:text-[13px] font-semibold text-white/90 uppercase tracking-[0.14em] mb-1 sm:mb-1.5 font-sans"
-              >
-                {heroEyebrow || "THE HOMELY RESET"}
-              </motion.p>
-
-              {/* Headline */}
+            {/* ── EXPANDED HERO CONTENT (Home page only) ────────────────────────── */}
+            {isHome && (
               <motion.div
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 14 }}
-                transition={{ delay: 0.48, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="mb-4 sm:mb-5 md:mb-[60px]"
+                animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : -20 }}
+                transition={
+                  heroVisible
+                    ? { duration: 0.45, delay: 0.35, ease: [0.22, 1, 0.36, 1] }
+                    : { duration: 0.25, ease: [0.4, 0, 1, 1] }
+                }
+                style={{
+                  pointerEvents: heroVisible ? "auto" : "none",
+                  willChange: "transform, opacity",
+                }}
+                className="relative z-10 px-5 md:px-12 lg:px-20 pt-2 sm:pt-4 md:pt-0 pb-6 md:pb-8 flex flex-col items-center justify-center text-center flex-1 w-full my-auto"
               >
-                <h1 className="text-white text-[26px] sm:text-[30px] md:text-[42px] lg:text-[46px] leading-[1.14] sm:leading-[1.12] tracking-[-0.5px] sm:tracking-[-1px] text-center">
-
-                  {/* Mobile */}
-                  <span className="sm:hidden">
-                    <span className="block font-sans font-semibold">
-                      {heroLine1 || "Find your perfect"}
-                    </span>
-
-                    <span className="block font-serif italic font-normal mt-0.5">
-                      stay {heroLine2 || "experience"}
-                    </span>
-                  </span>
-
-                  {/* Tablet & Desktop */}
-                  <span className="hidden sm:inline">
-                    <span className="font-sans font-semibold">
-                      {heroLine1 || "Find your perfect"}{" "}
-                    </span>
-
-                    <span className="font-serif italic font-normal">
-                      stay
-                    </span>
-
-                    <span className="block font-serif italic font-normal mt-1 sm:mt-1.5">
-                      {heroLine2 || "experience"}
-                    </span>
-                  </span>
-
-                </h1>
-              </motion.div>
-
-              {/* Booking widget card */}
-              <motion.div
-                initial={{ opacity: 0, y: 22 }}
-                animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 22 }}
-                transition={{ delay: 0.58, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="w-full max-w-4xl"
-              >
-                <BookingBarWidget />
-              </motion.div>
-
-              {/* Trust badges container */}
-              <motion.div
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 14 }}
-                transition={{ delay: 0.68, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="flex justify-center w-full mt-3.5 sm:mt-4 md:mt-4 lg:mt-5"
-              >
-                {/* Mobile: Ticker */}
-                <div className="block md:hidden w-full">
-                  <TrustTicker />
-                </div>
-
-                {/* Desktop: Frosted trust badge */}
-                <div
-                  className="relative hidden md:flex items-center w-full max-w-[750px] h-[67px] gap-[24px] rounded-[18px] overflow-hidden border-[1px] border-white/10 px-[20px] py-[16px]"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.05)",
-                    backdropFilter: "blur(16px)",
-                  }}
-                  role="list"
-                  aria-label="Trust signals"
+                {/* Eyebrow */}
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 10 }}
+                  transition={{ delay: 0.4, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                  className="text-[11px] sm:text-xs md:text-[13px] font-semibold text-white/90 uppercase tracking-[0.14em] mb-1 sm:mb-1.5 font-sans"
                 >
+                  {heroEyebrow || "THE HOMELY RESET"}
+                </motion.p>
+
+                {/* Headline */}
+                <motion.div
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 14 }}
+                  transition={{ delay: 0.48, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  className="mb-4 sm:mb-5 md:mb-[60px]"
+                >
+                  <h1 className="text-white text-[26px] sm:text-[30px] md:text-[42px] lg:text-[46px] leading-[1.14] sm:leading-[1.12] tracking-[-0.5px] sm:tracking-[-1px] text-center">
+
+                    {/* Mobile */}
+                    <span className="sm:hidden">
+                      <span className="block font-sans font-semibold">
+                        {heroLine1 || "Find your perfect"}
+                      </span>
+
+                      <span className="block font-serif italic font-normal mt-0.5">
+                        stay {heroLine2 || "experience"}
+                      </span>
+                    </span>
+
+                    {/* Tablet & Desktop */}
+                    <span className="hidden sm:inline">
+                      <span className="font-sans font-semibold">
+                        {heroLine1 || "Find your perfect"}{" "}
+                      </span>
+
+                      <span className="font-serif italic font-normal">
+                        stay
+                      </span>
+
+                      <span className="block font-serif italic font-normal mt-1 sm:mt-1.5">
+                        {heroLine2 || "experience"}
+                      </span>
+                    </span>
+
+                  </h1>
+                </motion.div>
+
+                {/* Booking widget card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 22 }}
+                  animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 22 }}
+                  transition={{ delay: 0.58, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  className="w-full max-w-4xl"
+                >
+                  <BookingBarWidget />
+                </motion.div>
+
+                {/* Trust badges container */}
+                <motion.div
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 14 }}
+                  transition={{ delay: 0.68, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  className="flex justify-center w-full mt-3.5 sm:mt-4 md:mt-4 lg:mt-5"
+                >
+                  {/* Mobile: Ticker */}
+                  <div className="block md:hidden w-full">
+                    <TrustTicker />
+                  </div>
+
+                  {/* Desktop: Frosted trust badge */}
                   <div
-                    className="absolute inset-0 rounded-[18px] pointer-events-none"
-                    style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.12)" }}
-                    aria-hidden="true"
-                  />
-
-                  {/* 1. Verified */}
-                  <div className="flex-1 min-w-0 flex items-center gap-3" role="listitem">
+                    className="relative hidden md:flex items-center w-full max-w-[750px] h-[67px] gap-[24px] rounded-[18px] overflow-hidden border-[1px] border-white/10 px-[20px] py-[16px]"
+                    style={{
+                      background: "rgba(255, 255, 255, 0.05)",
+                      backdropFilter: "blur(16px)",
+                    }}
+                    role="list"
+                    aria-label="Trust signals"
+                  >
                     <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center border border-white/10 shrink-0"
-                      style={{ background: "#D2E6BC66" }}
-                    >
-                      <ShieldCheck className="w-4 h-4 text-[#D2E6BC]" aria-hidden="true" />
+                      className="absolute inset-0 rounded-[18px] pointer-events-none"
+                      style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.12)" }}
+                      aria-hidden="true"
+                    />
+
+                    {/* 1. Verified */}
+                    <div className="flex-1 min-w-0 flex items-center gap-3" role="listitem">
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center border border-white/10 shrink-0"
+                        style={{ background: "#D2E6BC66" }}
+                      >
+                        <ShieldCheck className="w-4 h-4 text-[#D2E6BC]" aria-hidden="true" />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-[13px] font-semibold text-white leading-tight font-sans">
+                          Verified Hospitality
+                        </p>
+                        <p className="text-[11px] text-white/50 leading-tight mt-0.5 font-sans">
+                          Certified & trusted property
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-left">
-                      <p className="text-[13px] font-semibold text-white leading-tight font-sans">
-                        Verified Hospitality
-                      </p>
-                      <p className="text-[11px] text-white/50 leading-tight mt-0.5 font-sans">
-                        Certified & trusted property
-                      </p>
+
+                    {/* Divider */}
+                    <div className="w-px h-6 bg-white/10 shrink-0" aria-hidden="true" />
+
+                    {/* 2. 10% Benefit */}
+                    <div className="flex-1 min-w-0 flex items-center gap-3" role="listitem">
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center border border-white/10 shrink-0"
+                        style={{ background: "#D2E6BC66" }}
+                      >
+                        <Gem className="w-4 h-4 text-[#D2E6BC]" aria-hidden="true" />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-[13px] font-semibold text-white leading-tight font-sans">
+                          10% Exclusive Benefit
+                        </p>
+                        <p className="text-[11px] text-white/50 leading-tight mt-0.5 font-sans">
+                          Best rate on direct booking
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="w-px h-6 bg-white/10 shrink-0" aria-hidden="true" />
+
+                    {/* 3. Support */}
+                    <div className="flex-1 min-w-0 flex items-center gap-3" role="listitem">
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center border border-white/10 shrink-0"
+                        style={{ background: "#D2E6BC66" }}
+                      >
+                        <Bell className="w-4 h-4 text-[#D2E6BC]" aria-hidden="true" />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-[13px] font-semibold text-white leading-tight font-sans">
+                          Premium Guest Support
+                        </p>
+                        <p className="text-[11px] text-white/50 leading-tight mt-0.5 font-sans">
+                          Always here for you
+                        </p>
+                      </div>
                     </div>
                   </div>
-
-                  {/* Divider */}
-                  <div className="w-px h-6 bg-white/10 shrink-0" aria-hidden="true" />
-
-                  {/* 2. 10% Benefit */}
-                  <div className="flex-1 min-w-0 flex items-center gap-3" role="listitem">
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center border border-white/10 shrink-0"
-                      style={{ background: "#D2E6BC66" }}
-                    >
-                      <Gem className="w-4 h-4 text-[#D2E6BC]" aria-hidden="true" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-[13px] font-semibold text-white leading-tight font-sans">
-                        10% Exclusive Benefit
-                      </p>
-                      <p className="text-[11px] text-white/50 leading-tight mt-0.5 font-sans">
-                        Best rate on direct booking
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Divider */}
-                  <div className="w-px h-6 bg-white/10 shrink-0" aria-hidden="true" />
-
-                  {/* 3. Support */}
-                  <div className="flex-1 min-w-0 flex items-center gap-3" role="listitem">
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center border border-white/10 shrink-0"
-                      style={{ background: "#D2E6BC66" }}
-                    >
-                      <Bell className="w-4 h-4 text-[#D2E6BC]" aria-hidden="true" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-[13px] font-semibold text-white leading-tight font-sans">
-                        Premium Guest Support
-                      </p>
-                      <p className="text-[11px] text-white/50 leading-tight mt-0.5 font-sans">
-                        Always here for you
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                </motion.div>
               </motion.div>
-            </motion.div>
-          )}
-        </motion.div>
+            )}
+          </motion.div>
 
           {/* ── Destinations Mega Menu Dropdown ─────────────────────────────── */}
           <DestinationsDropdown
@@ -693,9 +693,8 @@ export default function HeroNavbar({
                 <Link
                   href="/"
                   onClick={() => setMobileOpen(false)}
-                  className={`flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${
-                    pathname === "/" && isHome ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
-                  }`}
+                  className={`flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname === "/" && isHome ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
+                    }`}
                 >
                   <Home size={20} className={pathname === "/" && isHome ? "text-[#D2E6BC]" : "text-white/80"} />
                   <span>Home</span>
@@ -706,11 +705,10 @@ export default function HeroNavbar({
                   <button
                     type="button"
                     onClick={() => setMobileDestinationsOpen((prev) => !prev)}
-                    className={`flex items-center justify-between w-full text-left font-sans transition-all py-1 cursor-pointer ${
-                      mobileDestinationsOpen || isDestinationsRoute(pathname)
+                    className={`flex items-center justify-between w-full text-left font-sans transition-all py-1 cursor-pointer ${mobileDestinationsOpen || isDestinationsRoute(pathname)
                         ? "text-[#D2E6BC] font-semibold"
                         : "text-white/90 font-medium hover:text-[#D2E6BC]"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center gap-3.5">
                       <MapPin size={20} className={mobileDestinationsOpen || isDestinationsRoute(pathname) ? "text-[#D2E6BC]" : "text-white/80"} />
@@ -732,9 +730,8 @@ export default function HeroNavbar({
                 <Link
                   href="/partners"
                   onClick={() => setMobileOpen(false)}
-                  className={`flex items-center justify-between w-full py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${
-                    pathname.startsWith("/partners") ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
-                  }`}
+                  className={`flex items-center justify-between w-full py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname.startsWith("/partners") ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
+                    }`}
                 >
                   <div className="flex items-center gap-3.5">
                     <Users size={20} className={pathname.startsWith("/partners") ? "text-[#D2E6BC]" : "text-white/80"} />
@@ -760,9 +757,8 @@ export default function HeroNavbar({
                 <Link
                   href="/contact-us"
                   onClick={() => setMobileOpen(false)}
-                  className={`flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${
-                    pathname === "/contact-us" ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
-                  }`}
+                  className={`flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname === "/contact-us" ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
+                    }`}
                 >
                   <Phone size={20} className={pathname === "/contact-us" ? "text-[#D2E6BC]" : "text-white/80"} />
                   <span>Contact Us</span>
