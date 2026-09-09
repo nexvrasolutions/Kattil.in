@@ -341,28 +341,22 @@ shadow-sm active:scale-95 font-sans"         >
                 <Link
                   href="/partners"
                   onClick={() => setMobileOpen(false)}
-                  className={`flex items-center justify-between w-full py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${
+                  className={`flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${
                     pathname.startsWith("/partners") ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
                   }`}
                 >
-                  <div className="flex items-center gap-3.5">
-                    <Users size={20} className={pathname.startsWith("/partners") ? "text-[#D2E6BC]" : "text-white/80"} />
-                    <span>Partners</span>
-                  </div>
-                  <ChevronRight size={18} className="text-white/40" />
+                  <Users size={20} className={pathname.startsWith("/partners") ? "text-[#D2E6BC]" : "text-white/80"} />
+                  <span>Partners</span>
                 </Link>
 
                 {/* 4. Offering */}
                 <Link
                   href="#"
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-between w-full py-1 text-[17px] sm:text-[18px] font-sans font-medium text-white/90 hover:text-[#D2E6BC] transition-colors"
+                  className="flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium text-white/90 hover:text-[#D2E6BC] transition-colors"
                 >
-                  <div className="flex items-center gap-3.5">
-                    <Settings size={20} className="text-white/80" />
-                    <span>Offering</span>
-                  </div>
-                  <ChevronRight size={18} className="text-white/40" />
+                  <Settings size={20} className="text-white/80" />
+                  <span>Offering</span>
                 </Link>
 
                 {/* 5. Contact Us */}

@@ -3,8 +3,7 @@ import { getPropertyDetailsData } from "@/lib/db/rooms";
 import PropertyDetailsView from "@/components/section/rooms/PropertyDetailsView";
 import { SITE_URL } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 interface PageProps {
   params: Promise<{ slug: string }>;

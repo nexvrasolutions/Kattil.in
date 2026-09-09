@@ -138,11 +138,23 @@ function getFallbackRoomOptions(citySlug: string): PropertyRoomOption[] {
   ];
 }
 
+// In-memory cache with 60-second TTL to avoid repeated slow DB queries on every page click
+const propertyDetailsCache = new Map<string, { data: PropertyDetailsData; timestamp: number }>();
+const roomsPageCache = new Map<string, { data: RoomsPageData; timestamp: number }>();
+const CACHE_TTL_MS = 60 * 1000; // 60 seconds
+
 export async function getPropertyDetailsData(
   slug: string,
   fallbackDestination: string = "Kanniyakumari"
 ): Promise<PropertyDetailsData> {
   const cleanSlug = slug.toLowerCase().trim();
+  const cacheKey = cleanSlug;
+
+  const cached = propertyDetailsCache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+    return cached.data;
+  }
+
   const detectedCitySlug = detectCitySlug(cleanSlug);
   const cityConfig = CITY_CONFIGS[detectedCitySlug] || CITY_CONFIGS.kanniyakumari;
 
@@ -231,7 +243,7 @@ export async function getPropertyDetailsData(
             "/assets/ac-double-room.webp",
           ];
 
-    return {
+    const result: PropertyDetailsData = {
       _id: primaryRoom ? String(primaryRoom._id) : undefined,
       name: propertyName,
       slug: cleanSlug,
@@ -248,9 +260,12 @@ export async function getPropertyDetailsData(
       email: city?.email || cityConfig.email,
       rooms: roomOptions,
     };
+
+    propertyDetailsCache.set(cacheKey, { data: result, timestamp: Date.now() });
+    return result;
   } catch (error) {
     console.error(`[getPropertyDetailsData] Failed for slug "${slug}":`, error);
-    return {
+    const fallbackResult: PropertyDetailsData = {
       name: cityConfig.defaultPropertyName,
       slug: cleanSlug,
       destinationName: cityConfig.destinationName,
@@ -267,6 +282,7 @@ export async function getPropertyDetailsData(
       email: cityConfig.email,
       rooms: getFallbackRoomOptions(cityConfig.destinationSlug),
     };
+    return fallbackResult;
   }
 }
 
@@ -297,6 +313,12 @@ export async function getRoomsPageData(
   const cleanProp = (propertyQuery || "").toLowerCase().trim();
   const detectedCitySlug = cleanDest ? detectCitySlug(cleanDest) : (cleanProp ? detectCitySlug(cleanProp) : "");
   const activeSlug = detectedCitySlug || cleanDest || cleanProp;
+  const cacheKey = `rooms-${activeSlug || "all"}`;
+
+  const cached = roomsPageCache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+    return cached.data;
+  }
 
   try {
     await connectDB();
@@ -306,7 +328,7 @@ export async function getRoomsPageData(
     if (activeSlug) {
       const propData = await getPropertyDetailsData(activeSlug);
       const hotelVal = getHotelValueForSlug(propData.destinationSlug || activeSlug);
-      return {
+      const result: RoomsPageData = {
         destinationSlug: propData.destinationSlug || activeSlug,
         destinationName: propData.destinationName,
         propertyName: propData.name,
@@ -314,6 +336,8 @@ export async function getRoomsPageData(
         rooms: propData.rooms,
         allCities,
       };
+      roomsPageCache.set(cacheKey, { data: result, timestamp: Date.now() });
+      return result;
     }
 
     // If no destination specified, return all active rooms
@@ -345,7 +369,7 @@ export async function getRoomsPageData(
       ];
     }
 
-    return {
+    const result: RoomsPageData = {
       destinationSlug: undefined,
       destinationName: undefined,
       propertyName: undefined,
@@ -353,6 +377,8 @@ export async function getRoomsPageData(
       rooms,
       allCities,
     };
+    roomsPageCache.set(cacheKey, { data: result, timestamp: Date.now() });
+    return result;
   } catch (error) {
     console.error("[getRoomsPageData] Error:", error);
     const config = CITY_CONFIGS[activeSlug] || CITY_CONFIGS.madurai;

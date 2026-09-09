@@ -196,6 +196,7 @@ export default function DestinationStaysView({
                       {/* Property Image */}
                       <Link
                         href={targetLink}
+                        prefetch={true}
                         className="relative w-full aspect-[16/10] bg-gray-100 overflow-hidden block"
                       >
                         <Image
@@ -216,7 +217,7 @@ export default function DestinationStaysView({
                           </p>
 
                           {/* Property Title */}
-                          <Link href={targetLink} className="block">
+                          <Link href={targetLink} prefetch={true} className="block">
                             <h3 className="font-sans text-[20px] md:text-[22px] font-semibold text-[#111827] leading-snug tracking-tight group-hover:text-[#526442] transition-colors">
                               {stay.name}
                             </h3>
@@ -240,6 +241,7 @@ export default function DestinationStaysView({
                           {/* View Link */}
                           <Link
                             href={targetLink}
+                            prefetch={true}
                             className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#374151] group-hover:text-[#526442] transition-colors shrink-0"
                           >
                             View <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
