@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Star, ArrowLeft, ArrowRight } from "lucide-react";
+import { Star } from "lucide-react";
 
 interface Testimonial {
   rating: number;
@@ -18,25 +18,25 @@ const TESTIMONIALS_DATA: Testimonial[][] = [
       rating: 5,
       title: "Located where you need to be",
       review:
-        "Central location, clean rooms, and genuinely helpful staff. Walking distance to Connaught Place made it perfect for both business and evening strolls",
+        "Central location, clean rooms, and genuinely helpful staff. Walking distance to Connaught Place made it perfect for both business and evening strolls.",
       author: "Parag",
       location: "Chennai",
     },
     {
       rating: 5,
-      title: "Located where you need to be",
+      title: "Cozy & Modern Ambience",
       review:
-        "Central location, clean rooms, and genuinely helpful staff. Walking distance to Connaught Place made it perfect for both business and evening strolls",
-      author: "Parag",
-      location: "Chennai",
+        "Super convenient location with wonderful hospitality. The room was spotless, comfortable, and the staff was always attentive to every need.",
+      author: "Karthik",
+      location: "Bangalore",
     },
     {
       rating: 5,
-      title: "Located where you need to be",
+      title: "Felt Right at Home",
       review:
-        "Central location, clean rooms, and genuinely helpful staff. Walking distance to Connaught Place made it perfect for both business and evening strolls",
-      author: "Parag",
-      location: "Chennai",
+        "Felt right at home from the moment we checked in. Cozy rooms, delicious South Indian breakfast, and great connectivity to transit points.",
+      author: "Priya",
+      location: "Madurai",
     },
   ],
   [
@@ -119,101 +119,190 @@ const TESTIMONIALS_DATA: Testimonial[][] = [
   ],
 ];
 
+// Cloned list for seamless forward slideshow loop on desktop (0, 1, 2, 3, 0)
+const DESKTOP_SLIDES = [...TESTIMONIALS_DATA, TESTIMONIALS_DATA[0]];
+
 const ALL_TESTIMONIALS = TESTIMONIALS_DATA.flat();
+// 3 repeated sets for continuous seamless infinite forward loop on mobile
+const INFINITE_TESTIMONIALS = [
+  ...ALL_TESTIMONIALS,
+  ...ALL_TESTIMONIALS,
+  ...ALL_TESTIMONIALS,
+];
 
 export default function TestimonialsSection() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
+  // Desktop slideshow state
+  const [desktopSlideIndex, setDesktopSlideIndex] = useState(0);
+  const [isSlideAnimating, setIsSlideAnimating] = useState(true);
+  const [isDesktopPaused, setIsDesktopPaused] = useState(false);
+  const desktopResumeTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Mobile state
+  const [mobileActiveIndex, setMobileActiveIndex] = useState(0);
+  const [isMobilePaused, setIsMobilePaused] = useState(false);
   const mobileScrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+  const mobileResumeTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isAdjustingScrollRef = useRef(false);
 
-  const checkMobileScroll = () => {
-    if (mobileScrollRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = mobileScrollRef.current;
-      setCanScrollLeft(scrollLeft > 10);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
-    }
-  };
-
-  useEffect(() => {
-    checkMobileScroll();
+  // ── DESKTOP SEAMLESS SLIDESHOW ADVANCE ────────────────────────────────────
+  const nextDesktopSlide = useCallback(() => {
+    setIsSlideAnimating(true);
+    setDesktopSlideIndex((prev) => {
+      if (prev >= TESTIMONIALS_DATA.length) {
+        return 1;
+      }
+      return prev + 1;
+    });
   }, []);
 
-  // Auto-slide for desktop every 2 seconds
   useEffect(() => {
-    if (isPaused) return;
+    if (isDesktopPaused) return;
 
     const interval = setInterval(() => {
       if (typeof window !== "undefined" && window.innerWidth >= 768) {
-        setActiveIndex((prev) => (prev + 1) % TESTIMONIALS_DATA.length);
+        nextDesktopSlide();
       }
-    }, 2000);
+    }, 3500);
 
     return () => clearInterval(interval);
-  }, [isPaused]);
+  }, [isDesktopPaused, nextDesktopSlide]);
 
-  // Auto-slide for mobile every 2 seconds
-  useEffect(() => {
-    if (isPaused) return;
-
-    const mobileInterval = setInterval(() => {
-      if (typeof window !== "undefined" && window.innerWidth < 768 && mobileScrollRef.current) {
-        const el = mobileScrollRef.current;
-        if (el.offsetParent === null) return;
-        const maxScroll = el.scrollWidth - el.clientWidth;
-        if (maxScroll <= 0) return;
-        if (el.scrollLeft >= maxScroll - 20) {
-          el.scrollTo({ left: 0, behavior: "smooth" });
-        } else {
-          const firstCard = el.firstElementChild as HTMLElement | null;
-          const step = firstCard ? firstCard.offsetWidth + 16 : el.clientWidth * 0.85;
-          el.scrollBy({ left: step, behavior: "smooth" });
-        }
-        setTimeout(checkMobileScroll, 350);
-      }
-    }, 2000);
-
-    return () => clearInterval(mobileInterval);
-  }, [isPaused]);
-
-  const resumeTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const handleUserInteractionStart = () => {
-    setIsPaused(true);
-    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
-  };
-
-  const handleUserInteractionEnd = () => {
-    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
-    resumeTimerRef.current = setTimeout(() => {
-      setIsPaused(false);
-    }, 2500);
-  };
-
-  const scrollMobile = (direction: "left" | "right") => {
-    if (mobileScrollRef.current) {
-      handleUserInteractionStart();
-      const cardWidth = mobileScrollRef.current.clientWidth * 0.85;
-      mobileScrollRef.current.scrollBy({
-        left: direction === "left" ? -cardWidth : cardWidth,
-        behavior: "smooth",
-      });
-      setTimeout(checkMobileScroll, 350);
-      handleUserInteractionEnd();
+  const handleDesktopAnimationComplete = () => {
+    // When finished sliding into the cloned 1st slide (index 4)
+    if (desktopSlideIndex === TESTIMONIALS_DATA.length) {
+      // Instantly reset to slide 0 without animation
+      setIsSlideAnimating(false);
+      setDesktopSlideIndex(0);
     }
   };
 
-  const currentReviews = TESTIMONIALS_DATA[activeIndex] || TESTIMONIALS_DATA[0];
+  const handleDesktopCardHover = (paused: boolean) => {
+    if (desktopResumeTimerRef.current) clearTimeout(desktopResumeTimerRef.current);
+    if (paused) {
+      setIsDesktopPaused(true);
+    } else {
+      desktopResumeTimerRef.current = setTimeout(() => {
+        setIsDesktopPaused(false);
+      }, 1500);
+    }
+  };
+
+  const goToDesktopSlide = (targetIndex: number) => {
+    setIsSlideAnimating(true);
+    setDesktopSlideIndex(targetIndex);
+    handleDesktopCardHover(true);
+    setTimeout(() => handleDesktopCardHover(false), 2000);
+  };
+
+  // Helper to get mobile single card step width (card width + gap)
+  const getCardStep = useCallback(() => {
+    if (!mobileScrollRef.current) return 0;
+    const firstCard = mobileScrollRef.current.firstElementChild as HTMLElement | null;
+    if (!firstCard || firstCard.offsetWidth === 0) return 0;
+    return firstCard.offsetWidth + 16; // 16px is gap-4
+  }, []);
+
+  // ── MOBILE INITIAL SCROLL (Center on middle set) ──────────────────────────
+  useEffect(() => {
+    const setupInitialPosition = () => {
+      const el = mobileScrollRef.current;
+      if (!el) return;
+      const step = getCardStep();
+      if (step > 0) {
+        const singleSetWidth = step * ALL_TESTIMONIALS.length;
+        isAdjustingScrollRef.current = true;
+        el.scrollLeft = singleSetWidth;
+        setTimeout(() => {
+          isAdjustingScrollRef.current = false;
+        }, 50);
+      }
+    };
+
+    const timer = setTimeout(setupInitialPosition, 100);
+    return () => clearTimeout(timer);
+  }, [getCardStep]);
+
+  // ── MOBILE SCROLL EVENT (Infinite loop & active dot sync) ─────────────────
+  const handleMobileScroll = useCallback(() => {
+    const el = mobileScrollRef.current;
+    if (!el || isAdjustingScrollRef.current) return;
+
+    const step = getCardStep();
+    if (step <= 0) return;
+
+    const singleSetWidth = step * ALL_TESTIMONIALS.length;
+
+    // Boundary check for infinite loop: when scrolled past middle set, seamlessly adjust
+    if (el.scrollLeft >= singleSetWidth * 2) {
+      isAdjustingScrollRef.current = true;
+      el.scrollLeft -= singleSetWidth;
+      setTimeout(() => {
+        isAdjustingScrollRef.current = false;
+      }, 30);
+    } else if (el.scrollLeft <= singleSetWidth * 0.1) {
+      isAdjustingScrollRef.current = true;
+      el.scrollLeft += singleSetWidth;
+      setTimeout(() => {
+        isAdjustingScrollRef.current = false;
+      }, 30);
+    }
+
+    // Calculate current active dot (0 to 11)
+    const rawIndex = Math.round((el.scrollLeft - singleSetWidth) / step);
+    const normalized = ((rawIndex % ALL_TESTIMONIALS.length) + ALL_TESTIMONIALS.length) % ALL_TESTIMONIALS.length;
+    setMobileActiveIndex(normalized);
+  }, [getCardStep]);
+
+  // ── MOBILE AUTO-SCROLL (Continuous forward smooth scroll every 3s) ────────
+  useEffect(() => {
+    if (isMobilePaused) return;
+
+    const interval = setInterval(() => {
+      const el = mobileScrollRef.current;
+      if (!el || typeof window === "undefined" || window.innerWidth >= 768) return;
+      if (el.offsetParent === null) return;
+
+      const step = getCardStep();
+      if (step <= 0) return;
+
+      // Always scroll smoothly to the NEXT card forward (no rewinding!)
+      el.scrollBy({ left: step, behavior: "smooth" });
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [isMobilePaused, getCardStep]);
+
+  // Mobile user touch/interaction handlers
+  const handleMobileInteractionStart = () => {
+    setIsMobilePaused(true);
+    if (mobileResumeTimerRef.current) clearTimeout(mobileResumeTimerRef.current);
+  };
+
+  const handleMobileInteractionEnd = () => {
+    if (mobileResumeTimerRef.current) clearTimeout(mobileResumeTimerRef.current);
+    mobileResumeTimerRef.current = setTimeout(() => {
+      setIsMobilePaused(false);
+    }, 2500);
+  };
+
+  // Scroll directly to a card when mobile dot is tapped
+  const scrollToMobileCard = (targetIndex: number) => {
+    const el = mobileScrollRef.current;
+    if (!el) return;
+    const step = getCardStep();
+    if (step <= 0) return;
+
+    handleMobileInteractionStart();
+    const singleSetWidth = step * ALL_TESTIMONIALS.length;
+    const targetScroll = singleSetWidth + targetIndex * step;
+    el.scrollTo({ left: targetScroll, behavior: "smooth" });
+    handleMobileInteractionEnd();
+  };
+
+  const currentDesktopActiveDot = desktopSlideIndex % TESTIMONIALS_DATA.length;
 
   return (
-    <section
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-      onTouchStart={handleUserInteractionStart}
-      onTouchEnd={handleUserInteractionEnd}
-      onTouchCancel={handleUserInteractionEnd}
-      className="w-full bg-transparent pt-10 pb-16 md:pt-18 md:pb-28 overflow-x-hidden"
-    >
+    <section className="w-full bg-transparent pt-10 pb-16 md:pt-18 md:pb-28 overflow-x-hidden">
       <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
         <div className="px-4 sm:px-6 md:px-8 lg:px-12">
           {/* Section Heading */}
@@ -222,7 +311,7 @@ export default function TestimonialsSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="text-center mb-8 sm:mb-10"
+            className="text-center mb-8 sm:mb-12"
           >
             <h2 className="text-[#0d1b2e] text-[26px] sm:text-[40px] md:text-[44px] font-sans font-normal tracking-tight">
               What our{" "}
@@ -236,7 +325,10 @@ export default function TestimonialsSection() {
           <div className="block md:hidden">
             <div
               ref={mobileScrollRef}
-              onScroll={checkMobileScroll}
+              onScroll={handleMobileScroll}
+              onTouchStart={handleMobileInteractionStart}
+              onTouchEnd={handleMobileInteractionEnd}
+              onTouchCancel={handleMobileInteractionEnd}
               className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-none px-4 -mx-4 pb-2 scroll-smooth"
               style={{
                 scrollbarWidth: "none",
@@ -244,10 +336,10 @@ export default function TestimonialsSection() {
                 WebkitOverflowScrolling: "touch",
               }}
             >
-              {ALL_TESTIMONIALS.map((item, index) => (
+              {INFINITE_TESTIMONIALS.map((item, index) => (
                 <div
                   key={`mobile-${index}`}
-                  className="w-[85vw] max-w-[340px] shrink-0 snap-center bg-white rounded-[18px] p-5 sm:p-6 flex flex-col justify-between shadow-[0_4px_25px_rgba(0,0,0,0.04)] border border-black/[0.04] select-none"
+                  className="w-[84vw] max-w-[330px] shrink-0 snap-center bg-white rounded-[20px] p-5 sm:p-6 flex flex-col justify-between shadow-[0_4px_25px_rgba(0,0,0,0.04)] border border-black/[0.04] select-none min-h-[260px]"
                 >
                   <div>
                     {/* 5 Stars */}
@@ -286,97 +378,103 @@ export default function TestimonialsSection() {
               ))}
             </div>
 
-            {/* Navigation Arrow Buttons (Mobile) */}
-            <div className="flex items-center justify-center gap-3 mt-6">
-              <button
-                type="button"
-                onClick={() => scrollMobile("left")}
-                disabled={!canScrollLeft}
-                aria-label="Previous review"
-                className={`w-11 h-11 rounded-[14px] flex items-center justify-center transition-all duration-200 active:scale-95 ${canScrollLeft
-                  ? "bg-[#EDF5E4] text-[#526442] hover:bg-[#DCEAC8] border border-[#526442]/20 cursor-pointer shadow-xs"
-                  : "bg-[#EDF5E4]/40 text-[#A3B596] border border-black/[0.04] cursor-not-allowed"
+            {/* Pagination Dots (Mobile) */}
+            <div className="flex justify-center items-center gap-1.5 mt-6">
+              {ALL_TESTIMONIALS.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => scrollToMobileCard(i)}
+                  aria-label={`Go to review ${i + 1}`}
+                  className={`transition-all duration-300 cursor-pointer ${
+                    mobileActiveIndex === i
+                      ? "w-6 h-2 bg-[#8EA980] rounded-full"
+                      : "w-2 h-2 bg-[#D1D5DB] hover:bg-gray-400 rounded-full"
                   }`}
-              >
-                <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
-              </button>
-              <button
-                type="button"
-                onClick={() => scrollMobile("right")}
-                disabled={!canScrollRight}
-                aria-label="Next review"
-                className={`w-11 h-11 rounded-[14px] flex items-center justify-center transition-all duration-200 active:scale-95 ${canScrollRight
-                  ? "bg-[#EDF5E4] text-[#526442] hover:bg-[#DCEAC8] border border-[#526442]/20 cursor-pointer shadow-xs"
-                  : "bg-[#EDF5E4]/40 text-[#A3B596] border border-black/[0.04] cursor-not-allowed"
-                  }`}
-              >
-                <ArrowRight className="w-5 h-5 stroke-[2.2]" />
-              </button>
+                />
+              ))}
             </div>
           </div>
 
-          {/* ── Desktop Grid View (>= md) ────────────────────────────────────── */}
+          {/* ── Desktop Slideshow View (>= md) ──────────────────────────────── */}
           <div className="hidden md:block">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {currentReviews.map((item, index) => (
-                <motion.div
-                  key={`${activeIndex}-${index}`}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    delay: index * 0.08,
-                    duration: 0.45,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                  className="bg-white rounded-[18px] p-6 sm:p-7 md:p-8 flex flex-col justify-between shadow-[0_4px_25px_rgba(0,0,0,0.03)] border border-black/[0.03] hover:shadow-[0_10px_32px_rgba(0,0,0,0.06)] transition-all duration-300"
-                >
-                  <div>
-                    {/* 5 Stars */}
-                    <div className="flex items-center gap-1">
-                      {[...Array(item.rating)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className="w-4 h-4 fill-[#FBBF24] text-[#FBBF24]"
-                        />
-                      ))}
-                    </div>
+            <div
+              onMouseEnter={() => handleDesktopCardHover(true)}
+              onMouseLeave={() => handleDesktopCardHover(false)}
+              className="overflow-hidden w-full py-2"
+            >
+              {/* Continuous Forward Horizontal Slideshow Track */}
+              <motion.div
+                className="flex w-full"
+                animate={{ x: `-${desktopSlideIndex * 100}%` }}
+                transition={
+                  isSlideAnimating
+                    ? { duration: 0.7, ease: [0.25, 1, 0.5, 1] }
+                    : { duration: 0 }
+                }
+                onAnimationComplete={handleDesktopAnimationComplete}
+              >
+                {DESKTOP_SLIDES.map((pageReviews, pageIdx) => (
+                  <div
+                    key={pageIdx}
+                    className="w-full shrink-0 grid grid-cols-3 gap-6 px-1"
+                  >
+                    {pageReviews.map((item, index) => (
+                      <div
+                        key={`${pageIdx}-${index}`}
+                        className="bg-white rounded-[20px] p-6 sm:p-7 md:p-8 flex flex-col justify-between shadow-[0_4px_25px_rgba(0,0,0,0.03)] border border-black/[0.03] hover:shadow-[0_12px_36px_rgba(0,0,0,0.07)] transition-all duration-300 min-h-[290px]"
+                      >
+                        <div>
+                          {/* 5 Stars */}
+                          <div className="flex items-center gap-1">
+                            {[...Array(item.rating)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className="w-4 h-4 fill-[#FBBF24] text-[#FBBF24]"
+                              />
+                            ))}
+                          </div>
 
-                    {/* Title */}
-                    <h3 className="text-[20px] font-bold text-[#0d1b2e] mt-4 leading-snug">
-                      {item.title}
-                    </h3>
+                          {/* Title */}
+                          <h3 className="text-[20px] font-bold text-[#0d1b2e] mt-4 leading-snug">
+                            {item.title}
+                          </h3>
 
-                    {/* Review Text */}
-                    <p className="text-gray-600 text-[16px] leading-relaxed mt-4 font-light">
-                      {item.review}
-                    </p>
+                          {/* Review Text */}
+                          <p className="text-gray-600 text-[15.5px] leading-relaxed mt-4 font-light">
+                            {item.review}
+                          </p>
+                        </div>
+
+                        {/* Author Info */}
+                        <div className="mt-6 pt-4 border-t border-gray-100">
+                          <p className="text-[14px] font-bold text-[#0d1b2e]">
+                            {item.author}
+                          </p>
+                          <p className="text-[12px] text-gray-400 mt-0.5">
+                            {item.location}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-
-                  {/* Author Info */}
-                  <div className="mt-6 pt-4 border-t border-gray-100">
-                    <p className="text-[14px] font-bold text-[#0d1b2e]">
-                      {item.author}
-                    </p>
-                    <p className="text-[12px] text-gray-400 mt-0.5">
-                      {item.location}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
+                ))}
+              </motion.div>
             </div>
 
-            {/* Pagination Dots (Desktop) */}
-            <div className="flex justify-center items-center gap-2.5 mt-12">
+            {/* Pagination Dots (Desktop Slideshow) */}
+            <div className="flex justify-center items-center gap-2 mt-10">
               {TESTIMONIALS_DATA.map((_, i) => (
                 <button
                   key={i}
                   type="button"
-                  onClick={() => setActiveIndex(i)}
-                  aria-label={`Go to testimonial page ${i + 1}`}
-                  className={`rounded-full transition-all duration-300 cursor-pointer ${activeIndex === i
-                    ? "w-2.5 h-2.5 bg-[#8EA980] scale-110"
-                    : "w-2.5 h-2.5 bg-[#D1D5DB] hover:bg-gray-400"
-                    }`}
+                  onClick={() => goToDesktopSlide(i)}
+                  aria-label={`Go to testimonial slide ${i + 1}`}
+                  className={`transition-all duration-300 cursor-pointer ${
+                    currentDesktopActiveDot === i
+                      ? "w-7 h-2.5 bg-[#8EA980] rounded-full scale-105"
+                      : "w-2.5 h-2.5 bg-[#D1D5DB] hover:bg-gray-400 rounded-full"
+                  }`}
                 />
               ))}
             </div>
