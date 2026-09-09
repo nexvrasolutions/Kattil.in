@@ -12,15 +12,26 @@ export interface DestinationStaysData {
   properties: PropertyStay[];
 }
 
+// In-memory cache with 60-second TTL to avoid repeated slow DB connections on every page tap
+const staysCache = new Map<string, { data: DestinationStaysData; timestamp: number }>();
+const CACHE_TTL_MS = 60 * 1000; // 60 seconds
+
 export async function getDestinationStaysData(
   slug: string,
   fallbackName: string
 ): Promise<DestinationStaysData> {
+  const cleanSlug = slug.toLowerCase().trim();
+  const cacheKey = cleanSlug;
+
+  const cached = staysCache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
+    return cached.data;
+  }
+
   try {
     await connectDB();
-    const cleanSlug = slug.toLowerCase().trim();
 
-    // 1. Query city by slug, name, or label
+    // 1. Direct query city by slug or regex
     const city = await City.findOne({
       $or: [
         { slug: cleanSlug },
@@ -40,7 +51,7 @@ export async function getDestinationStaysData(
         .lean();
     }
 
-    // If city wasn't found by slug, also search rooms directly by slug/city text
+    // Fallback: search rooms directly
     if (!rooms || rooms.length === 0) {
       const allActiveRooms = await Room.find({ status: { $ne: "inactive" } })
         .populate("city", "name slug")
@@ -68,7 +79,7 @@ export async function getDestinationStaysData(
       occupancy: r.occupancy,
     }));
 
-    return {
+    const result: DestinationStaysData = {
       cityId: city ? String(city._id) : undefined,
       cityName: city?.name || fallbackName,
       citySlug: city?.slug || cleanSlug,
@@ -76,6 +87,9 @@ export async function getDestinationStaysData(
       banner: city?.banner,
       properties,
     };
+
+    staysCache.set(cacheKey, { data: result, timestamp: Date.now() });
+    return result;
   } catch (error) {
     console.error(`[getDestinationStaysData] Failed for slug "${slug}":`, error);
     return {

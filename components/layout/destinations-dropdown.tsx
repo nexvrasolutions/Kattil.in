@@ -55,6 +55,9 @@ export const FALLBACK_DESTINATIONS: DestinationItem[] = [
   },
 ];
 
+// In-memory module cache to eliminate API round-trips when toggling menu
+let cachedDestinations: DestinationItem[] | null = null;
+
 interface DestinationsDropdownProps {
   isOpen: boolean;
   onMouseEnter?: () => void;
@@ -70,14 +73,18 @@ export default function DestinationsDropdown({
   onItemClick,
   topOffset = 76,
 }: DestinationsDropdownProps) {
-  const [destinations, setDestinations] = useState<DestinationItem[]>(FALLBACK_DESTINATIONS);
+  const [destinations, setDestinations] = useState<DestinationItem[]>(
+    cachedDestinations || FALLBACK_DESTINATIONS
+  );
 
   useEffect(() => {
+    if (cachedDestinations && cachedDestinations.length > 0) return;
     let isMounted = true;
     fetch("/api/destinations")
       .then((res) => res.json())
       .then((data) => {
         if (isMounted && data.success && Array.isArray(data.data) && data.data.length > 0) {
+          cachedDestinations = data.data;
           setDestinations(data.data);
         }
       })
@@ -130,6 +137,7 @@ export default function DestinationsDropdown({
                   <Link
                     key={dest._id || dest.slug}
                     href={targetLink}
+                    prefetch={true}
                     onClick={onItemClick}
                     className="group flex items-center gap-4 p-2.5 -m-2.5 rounded-[8px] transition-all duration-200 hover:bg-slate-50/80 active:scale-[0.99]"
                   >
@@ -176,14 +184,18 @@ export function MobileDestinationsList({
 }: {
   onItemClick?: () => void;
 }) {
-  const [destinations, setDestinations] = useState<DestinationItem[]>(FALLBACK_DESTINATIONS);
+  const [destinations, setDestinations] = useState<DestinationItem[]>(
+    cachedDestinations || FALLBACK_DESTINATIONS
+  );
 
   useEffect(() => {
+    if (cachedDestinations && cachedDestinations.length > 0) return;
     let isMounted = true;
     fetch("/api/destinations")
       .then((res) => res.json())
       .then((data) => {
         if (isMounted && data.success && Array.isArray(data.data) && data.data.length > 0) {
+          cachedDestinations = data.data;
           setDestinations(data.data);
         }
       })
@@ -215,6 +227,7 @@ export function MobileDestinationsList({
             <Link
               key={dest._id || dest.slug}
               href={targetLink}
+              prefetch={true}
               onClick={onItemClick}
               className="flex items-center gap-3.5 py-3 px-1.5 rounded-[8px] hover:bg-slate-50 transition-colors group"
             >
@@ -244,6 +257,7 @@ export function MobileDestinationsList({
         <div className="pt-2.5 border-t border-gray-100 mt-1">
           <Link
             href="/rooms"
+            prefetch={true}
             onClick={onItemClick}
             className="flex items-center justify-center gap-2 py-2 text-[#0d1b2e] hover:text-[#526442] font-semibold text-[13.5px] font-sans transition-colors"
           >

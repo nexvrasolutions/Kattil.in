@@ -3,8 +3,7 @@ import { SITE_URL } from "@/lib/seo";
 import { getDestinationStaysData } from "@/lib/db/destinations";
 import DestinationStaysView from "@/components/section/destination/DestinationStaysView";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 60;
 
 const localBusinessJsonLd = {
   "@context": "https://schema.org",

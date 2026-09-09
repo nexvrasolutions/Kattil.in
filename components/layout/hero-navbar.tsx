@@ -721,9 +721,19 @@ export default function HeroNavbar({
                     )}
                   </button>
 
-                  {mobileDestinationsOpen && (
-                    <MobileDestinationsList onItemClick={() => setMobileOpen(false)} />
-                  )}
+                  <AnimatePresence>
+                    {mobileDestinationsOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.22, ease: "easeOut" }}
+                        className="overflow-hidden"
+                      >
+                        <MobileDestinationsList onItemClick={() => setMobileOpen(false)} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
                 {/* 3. Partners */}
