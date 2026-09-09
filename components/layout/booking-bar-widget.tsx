@@ -307,14 +307,6 @@ export default function BookingBarWidget() {
     };
   }, []);
 
-  // Set default hotel on load if none selected
-  useEffect(() => {
-    if (!selectedHotel && hotelsList.length > 0) {
-      const defaultItem = hotelsList.find((h) => h.place.toLowerCase() === "chennai") || hotelsList[0];
-      setSelectedHotel(defaultItem);
-    }
-  }, [hotelsList, selectedHotel]);
-
   // Check Availability / Booking handler
   function handleCheckAvailability() {
     let hasError = false;
@@ -381,25 +373,15 @@ export default function BookingBarWidget() {
     <>
       <style dangerouslySetInnerHTML={{ __html: STYLES }} />
 
-      {/* Hidden input for Flatpickr instance anchoring */}
-      <input
-        ref={dateInputRef}
-        type="text"
-        readOnly
-        className="sr-only pointer-events-none"
-        tabIndex={-1}
-        aria-hidden="true"
-      />
-
-      <div className="w-[92%] sm:w-full max-w-[400px] md:max-w-4xl mx-auto">
-        <div className="bg-white rounded-[16px] md:rounded-[8px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] p-4 sm:p-5 md:p-6 text-left">
+      <div className="w-[92%] sm:w-full max-w-[340px] md:max-w-4xl mx-auto">
+        <div className="bg-white rounded-[20px] md:rounded-[10px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] p-4.5 sm:p-6 md:p-6 text-left">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               handleCheckAvailability();
             }}
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_1fr_236px] items-start gap-3 md:gap-4 w-full min-w-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_1fr_236px] items-start gap-3.5 sm:gap-4 md:gap-4 w-full min-w-0">
 
               {/* ── 1. Choose your stay ────────────────────────────────────────── */}
               <motion.div
@@ -408,8 +390,8 @@ export default function BookingBarWidget() {
                 className="relative w-full"
                 ref={dropdownRef}
               >
-                <div className="flex items-center justify-between mb-1 sm:mb-1.5">
-                  <label className="text-[12px] md:text-[13px] font-semibold text-gray-700 block tracking-tight font-sans">
+                <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                  <label className="text-[12.5px] md:text-[13.5px] font-semibold text-gray-700 block tracking-tight font-sans">
                     Choose your stay
                   </label>
                   {hotelError && (
@@ -422,16 +404,16 @@ export default function BookingBarWidget() {
                 <button
                   type="button"
                   onClick={() => setDropdownOpen((prev) => !prev)}
-                  className={`w-full h-[42px] sm:h-[43px] border-[1px] ${hotelError
+                  className={`w-full h-[48px] sm:h-[50px] md:h-[48px] lg:h-[50px] border-[1px] ${hotelError
                     ? "border-[#0E2E4E] bg-[#0E2E4E]/[0.03] ring-1 ring-[#0E2E4E]/20"
                     : "border-[#E5E7EB] bg-[#F9FAFB] hover:bg-gray-50/80"
-                    } rounded-[8px] md:rounded-[6px] px-3.5 sm:px-[16px] py-0 flex items-center justify-between gap-2 transition-all text-left cursor-pointer`}
+                    } rounded-[10px] md:rounded-[8px] px-3.5 sm:px-[16px] py-0 flex items-center justify-between gap-2 transition-all text-left cursor-pointer`}
                 >
                   <div className="flex items-center gap-2.5 sm:gap-3 overflow-hidden">
-                    <Building2 className={`w-4 h-4 sm:w-5 sm:h-5 ${hotelError ? "text-[#0E2E4E]" : "text-[#0E2E4E]/70"} shrink-0 stroke-[1.6]`} />
+                    <Building2 className={`w-4.5 h-4.5 sm:w-5 sm:h-5 ${hotelError ? "text-[#0E2E4E]" : "text-[#0E2E4E]/70"} shrink-0 stroke-[1.6]`} />
 
                     <span
-                      className={`text-[13px] sm:text-[14px] truncate ${selectedHotel ? "text-gray-900 font-medium" : "text-gray-400"
+                      className={`text-[13.5px] sm:text-[14.5px] truncate ${selectedHotel ? "text-gray-900 font-medium" : "text-gray-400"
                         }`}
                     >
                       {selectedHotel
@@ -485,7 +467,7 @@ export default function BookingBarWidget() {
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search place or hotel..."
-                            className="w-full h-8 pl-8 pr-7 text-[12.5px] sm:text-[13px] bg-gray-50 border border-gray-200 rounded-[6px] outline-none focus:bg-white focus:border-[#0E2E4E] transition-colors text-gray-800 placeholder-gray-400 font-sans"
+                            className="w-full h-8.5 pl-8 pr-7 text-[12.5px] sm:text-[13px] bg-gray-50 border border-gray-200 rounded-[6px] outline-none focus:bg-white focus:border-[#0E2E4E] transition-colors text-gray-800 placeholder-gray-400 font-sans"
                             onClick={(e) => e.stopPropagation()}
                           />
                           {searchQuery && (
@@ -536,7 +518,7 @@ export default function BookingBarWidget() {
                                   setHotelError(null);
                                   setDropdownOpen(false);
                                 }}
-                                className={`w-full px-2.5 py-2 flex items-center justify-between text-left hover:bg-gray-50 transition-all rounded-[6px] cursor-pointer ${isSelected ? "bg-emerald-50 text-gray-900 font-semibold" : "text-gray-700"
+                                className={`w-full px-2.5 py-2.5 flex items-center justify-between text-left hover:bg-gray-50 transition-all rounded-[6px] cursor-pointer ${isSelected ? "bg-emerald-50 text-gray-900 font-semibold" : "text-gray-700"
                                   }`}
                               >
                                 <div className="flex items-center gap-2.5 min-w-0 pr-2">
@@ -569,8 +551,8 @@ export default function BookingBarWidget() {
                 transition={{ duration: 0.25 }}
                 className="relative w-full"
               >
-                <div className="flex items-center justify-between mb-1 sm:mb-1.5">
-                  <label className="text-[12px] md:text-[13px] font-semibold text-gray-700 block tracking-tight font-sans">
+                <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+                  <label className="text-[12.5px] md:text-[13.5px] font-semibold text-gray-700 block tracking-tight font-sans">
                     Check In & Out
                   </label>
                   {dateError && (
@@ -583,16 +565,21 @@ export default function BookingBarWidget() {
                 <div
                   ref={dateBoxRef}
                   onClick={() => fpInstance.current?.open()}
-                  className={`w-full h-[42px] sm:h-[43px] border-[1px] ${dateError
+                  className={`w-full h-[48px] sm:h-[50px] md:h-[48px] lg:h-[50px] border-[1px] ${dateError
                     ? "border-[#0E2E4E] bg-[#0E2E4E]/[0.03] ring-1 ring-[#0E2E4E]/20"
                     : "border-[#E5E7EB] bg-[#F9FAFB] hover:bg-gray-50/80"
-                    } rounded-[8px] md:rounded-[6px] px-3.5 sm:px-[16px] flex items-center gap-2.5 sm:gap-3 transition-all cursor-pointer`}
+                    } rounded-[10px] md:rounded-[8px] px-3.5 sm:px-[16px] flex items-center gap-2.5 sm:gap-3 transition-all cursor-pointer`}
                 >
-                  <Calendar className={`w-4 h-4 sm:w-5 sm:h-5 ${dateError ? "text-[#0E2E4E]" : "text-gray-400"} shrink-0 stroke-[1.6]`} />
+                  <Calendar className={`w-4.5 h-4.5 sm:w-5 sm:h-5 ${dateError ? "text-[#0E2E4E]" : "text-gray-400"} shrink-0 stroke-[1.6]`} />
 
-                  <span className="w-full bg-transparent text-[13px] sm:text-[14px] text-gray-900 font-medium outline-none cursor-pointer truncate font-sans">
-                    {dateDisplay || "Select check-in & check-out"}
-                  </span>
+                  <input
+                    ref={dateInputRef}
+                    type="text"
+                    readOnly
+                    value={dateDisplay}
+                    placeholder="Select check-in & check-out"
+                    className="w-full bg-transparent text-[13.5px] sm:text-[14.5px] text-gray-900 font-medium outline-none cursor-pointer placeholder:text-gray-400 font-sans truncate"
+                  />
                 </div>
 
                 {/* Required Guidance Message */}
@@ -614,7 +601,7 @@ export default function BookingBarWidget() {
 
               {/* ── 3. Check Availability CTA ─────────────────────────────────── */}
               <div className="w-full md:w-auto">
-                <label className="hidden lg:block text-[12px] md:text-[13px] font-semibold opacity-0 select-none mb-1 sm:mb-1.5 font-sans pointer-events-none">
+                <label className="hidden lg:block text-[12.5px] md:text-[13.5px] font-semibold opacity-0 select-none mb-1.5 sm:mb-2 font-sans pointer-events-none">
                   &nbsp;
                 </label>
                 <motion.button
@@ -624,13 +611,13 @@ export default function BookingBarWidget() {
                   transition={{ duration: 0.16 }}
                   className="
                     w-full md:w-[236px]
-                    h-[42px] sm:h-[43px]
+                    h-[48px] sm:h-[50px] md:h-[48px] lg:h-[50px]
                     bg-[#0E2E4E]
                     hover:bg-[#143d66]
                     text-white
-                    text-[13px] sm:text-[14px]
+                    text-[13.5px] sm:text-[14.5px]
                     font-semibold
-                    rounded-[8px] md:rounded-[6px]
+                    rounded-[10px] md:rounded-[8px]
                     px-4 sm:px-[32px]
                     py-2 sm:py-[12px]
                     flex items-center justify-center
@@ -641,7 +628,7 @@ export default function BookingBarWidget() {
                     cursor-pointer
                   "
                 >
-                  <Sparkles className="w-3.5 h-3.5 opacity-80" />
+                  <Sparkles className="w-4 h-4 opacity-80" />
                   Check Availability
                 </motion.button>
               </div>

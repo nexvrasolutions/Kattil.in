@@ -152,7 +152,7 @@ export default function DestinationsDropdown({
 
                     {/* Text Details */}
                     <div className="min-w-0 flex-1">
-                      <h4 className="font-serif text-[17px] md:text-[18px] font-medium text-[#0d1b2e] leading-snug tracking-tight group-hover:text-[#526442] transition-colors truncate">
+                      <h4 className="font-sans text-[15px] md:text-[16px] font-semibold text-[#0d1b2e] leading-snug tracking-tight group-hover:text-[#526442] transition-colors truncate">
                         {dest.name}
                       </h4>
                       <p className="text-[13px] text-[#707070] font-sans mt-0.5 font-normal tracking-normal truncate">
@@ -224,7 +224,7 @@ export function MobileDestinationsList({
               />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="font-serif text-[15px] font-medium text-white leading-tight truncate">
+              <p className="font-sans text-[14.5px] font-semibold text-white leading-tight truncate">
                 {dest.name}
               </p>
               <p className="text-[11.5px] text-white/60 font-sans mt-0.5 truncate">

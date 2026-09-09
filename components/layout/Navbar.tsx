@@ -139,9 +139,9 @@ export default function Navbar() {
                       type="button"
                       data-destinations-trigger="true"
                       onClick={toggleDestinations}
-                      className={`group relative !no-underline text-[14px] leading-[12px] tracking-normal transition-all duration-200 ease-out font-sans cursor-pointer hover:font-bold ${isActive || destinationsOpen
-                        ? "!text-[#D2E6BC] font-bold"
-                        : "text-[#DDDDDD] font-light hover:!text-[#D2E6BC]"
+                      className={`group relative !no-underline text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans cursor-pointer font-medium ${isActive || destinationsOpen
+                        ? "!text-[#D2E6BC]"
+                        : "text-[#DDDDDD] hover:!text-[#D2E6BC]"
                         }`}
                       style={{
                         background: "none",
@@ -155,9 +155,9 @@ export default function Navbar() {
                   ) : (
                     <Link
                       href={link.href || "#"}
-                      className={`group relative !no-underline text-[14px] leading-[12px] tracking-normal transition-all duration-200 ease-out font-sans hover:font-bold ${isActive
-                        ? "!text-[#D2E6BC] font-bold"
-                        : "text-[#DDDDDD] font-light hover:!text-[#D2E6BC]"
+                      className={`group relative !no-underline text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans font-medium ${isActive
+                        ? "!text-[#D2E6BC]"
+                        : "text-[#DDDDDD] hover:!text-[#D2E6BC]"
                         }`}
                       style={{
                         textDecoration: "none",
@@ -187,9 +187,9 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center justify-end gap-6 flex-1">
             <Link
               href="/contact-us"
-              className={`group relative text-[14px] leading-[12px] tracking-normal transition-all duration-200 ease-out font-sans hover:font-bold ${pathname === "/contact-us"
-                ? "!text-[#D2E6BC] font-bold"
-                : "text-[#DDDDDD] font-light hover:!text-[#D2E6BC]"
+              className={`group relative text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans font-medium ${pathname === "/contact-us"
+                ? "!text-[#D2E6BC]"
+                : "text-[#DDDDDD] hover:!text-[#D2E6BC]"
                 }`}
             >
               Contact Us
@@ -200,7 +200,7 @@ export default function Navbar() {
 rounded-[6px]
 border-[1px] border-white/100
 px-6
-text-white text-[14px] leading-none font-light
+text-white text-[14px] leading-none font-medium
 inline-flex items-center justify-center
 transition-all duration-300
 hover:border-white hover:bg-white hover:text-[#0d1b2e]

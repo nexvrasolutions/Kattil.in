@@ -91,13 +91,13 @@ export default function Footer({
   const visibleLocations = locations?.filter((l) => l.address) ?? [];
 
   return (
-    <footer ref={ref} className="relative overflow-hidden bg-primary text-white font-sans">
+    <footer ref={ref} className="relative overflow-hidden bg-primary text-white font-sans px-3 md:px-5">
       <div
         className="absolute inset-0 z-0 pointer-events-none"
         style={{ backgroundImage: "url('/assets/overlay.png')", backgroundPosition: "center", backgroundSize: "cover", opacity: 0.8 }}
       />
 
-      <div className="relative z-10 mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12 xl:px-20 py-14 sm:py-16 lg:py-20">
+      <div className="relative z-10 mx-auto w-full max-w-[1920px] px-5 md:px-8 lg:px-15 py-14 sm:py-16 lg:py-20">
 
         {/* Header — logo + headline */}
         <motion.div variants={topVariants} initial="hidden" animate="visible" className="flex flex-col items-center text-center mb-12">

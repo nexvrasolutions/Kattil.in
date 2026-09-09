@@ -315,9 +315,9 @@ export default function HeroNavbar({
                         type="button"
                         data-destinations-trigger="true"
                         onClick={toggleDestinations}
-                        className={`group relative text-[14px] leading-[12px] tracking-normal transition-all duration-200 ease-out font-sans cursor-pointer hover:font-bold ${isActive || destinationsOpen
-                          ? "!text-[#D2E6BC] font-bold"
-                          : "text-[#DDDDDD] font-light hover:!text-[#D2E6BC]"
+                        className={`group relative text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans cursor-pointer font-medium ${isActive || destinationsOpen
+                          ? "!text-[#D2E6BC]"
+                          : "text-[#DDDDDD] hover:!text-[#D2E6BC]"
                           }`}
                         style={{
                           background: "none",
@@ -331,9 +331,9 @@ export default function HeroNavbar({
                     ) : (
                       <Link
                         href={link.href || "#"}
-                        className={`group relative text-[14px] leading-[12px] tracking-normal transition-all duration-200 ease-out font-sans hover:font-bold ${isActive
-                          ? "!text-[#D2E6BC] font-bold"
-                          : "text-[#DDDDDD] font-light hover:!text-[#D2E6BC]"
+                        className={`group relative text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans font-medium ${isActive
+                          ? "!text-[#D2E6BC]"
+                          : "text-[#DDDDDD] hover:!text-[#D2E6BC]"
                           }`}
                         style={{ textDecoration: "none" }}
                       >
@@ -361,9 +361,9 @@ export default function HeroNavbar({
             <div className="hidden lg:flex items-center justify-end gap-6 flex-1">
               <Link
                 href="/contact-us"
-                className={`group relative text-[14px] leading-[12px] tracking-normal transition-all duration-200 ease-out font-sans hover:font-bold ${pathname === "/contact-us"
-                  ? "!text-[#D2E6BC] font-bold"
-                  : "text-[#DDDDDD] font-light hover:!text-[#D2E6BC]"
+                className={`group relative text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans font-medium ${pathname === "/contact-us"
+                  ? "!text-[#D2E6BC]"
+                  : "text-[#DDDDDD] hover:!text-[#D2E6BC]"
                   }`}
                 style={{
                   textDecoration: "none",
@@ -373,7 +373,7 @@ export default function HeroNavbar({
               </Link>
               <Link
                 href="/rooms"
-                className="w-[122px] h-[40px] rounded-[6px] border-[1px] border-white px-6 text-white text-[14px] leading-none font-light inline-flex items-center justify-center transition-all duration-300 hover:border-white hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-95 font-sans"
+                className="w-[122px] h-[40px] rounded-[6px] border-[1px] border-white px-6 text-white text-[14px] leading-none font-medium inline-flex items-center justify-center transition-all duration-300 hover:border-white hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-95 font-sans"
               >
                 Book Now
               </Link>
@@ -424,7 +424,7 @@ export default function HeroNavbar({
                 pointerEvents: heroVisible ? "auto" : "none",
                 willChange: "transform, opacity",
               }}
-              className="relative z-10 px-4 sm:px-6 md:px-12 lg:px-20 pt-[80px] md:pt-[80px] lg:pt-3 pb-6 flex flex-col items-center justify-start text-center flex-1 w-full mt-0 lg:mt-3"
+              className="relative z-10 px-4 sm:px-6 md:px-12 lg:px-20 pt-1.5 sm:pt-3 md:pt-[60px] lg:pt-3 pb-6 flex flex-col items-center justify-start text-center flex-1 w-full mt-0 lg:mt-3"
             >
               {/* Eyebrow */}
               <motion.p
@@ -441,7 +441,7 @@ export default function HeroNavbar({
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 14 }}
                 transition={{ delay: 0.48, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="mb-2.5 sm:mb-3.5 md:mb-4 lg:mb-5"
+                className="mb-3.5 sm:mb-4 md:mb-[60px]"
               >
                 <h1 className="text-white text-[26px] sm:text-[30px] md:text-[42px] lg:text-[46px] leading-[1.14] sm:leading-[1.12] tracking-[-0.5px] sm:tracking-[-1px] text-center">
 

@@ -177,14 +177,29 @@ export default function TestimonialsSection() {
     return () => clearInterval(mobileInterval);
   }, [isPaused]);
 
+  const resumeTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const handleUserInteractionStart = () => {
+    setIsPaused(true);
+    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+  };
+
+  const handleUserInteractionEnd = () => {
+    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current);
+    resumeTimerRef.current = setTimeout(() => {
+      setIsPaused(false);
+    }, 2500);
+  };
+
   const scrollMobile = (direction: "left" | "right") => {
     if (mobileScrollRef.current) {
+      handleUserInteractionStart();
       const cardWidth = mobileScrollRef.current.clientWidth * 0.85;
       mobileScrollRef.current.scrollBy({
         left: direction === "left" ? -cardWidth : cardWidth,
         behavior: "smooth",
       });
       setTimeout(checkMobileScroll, 350);
+      handleUserInteractionEnd();
     }
   };
 
@@ -194,8 +209,9 @@ export default function TestimonialsSection() {
     <section
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      onTouchStart={() => setIsPaused(true)}
-      onTouchEnd={() => setIsPaused(false)}
+      onTouchStart={handleUserInteractionStart}
+      onTouchEnd={handleUserInteractionEnd}
+      onTouchCancel={handleUserInteractionEnd}
       className="w-full bg-transparent pt-10 pb-16 md:pt-18 md:pb-28 overflow-x-hidden"
     >
       <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
