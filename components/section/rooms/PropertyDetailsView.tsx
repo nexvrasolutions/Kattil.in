@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -24,10 +24,12 @@ import {
   Check,
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
+import RoomStickyBookingWidget from "./RoomStickyBookingWidget";
 
 export interface PropertyRoomOption {
   _id: string;
   name: string;
+  slug?: string;
   badge?: string; // "Private room", "Dormitory", "Luxury Suite"
   description?: string;
   images: string[];
@@ -81,22 +83,16 @@ const AMENITY_ICONS = [
 
 export default function PropertyDetailsView({ data }: { data: PropertyDetailsData }) {
   const [activeSlide, setActiveSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchDeltaX, setTouchDeltaX] = useState(0);
   const [howToReachOpen, setHowToReachOpen] = useState(true);
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState(
-    `${data.destinationName}, ${data.name}`
-  );
 
-  const images =
-    data.heroImages && data.heroImages.length > 0
-      ? data.heroImages
-      : [
-        "/assets/ac-double-room.webp",
-        "/assets/deluxe-garden-suite.webp",
-        "/assets/six-bed-dormitory.webp",
-        "/assets/non-ac-double-room.webp",
-      ];
+  const images = [
+    "/assets/kattil-room-hero.webp",
+    "/assets/deluxe-garden-suite.webp",
+    "/assets/ac-double-room.webp",
+  ];
 
   const handlePrevSlide = () => {
     setActiveSlide((prev) => (prev === 0 ? images.length - 1 : prev - 1));
@@ -104,6 +100,39 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
 
   const handleNextSlide = () => {
     setActiveSlide((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
+
+  // Autoplay with pause on hover
+  useEffect(() => {
+    if (isPaused || images.length <= 1) return;
+    const interval = setInterval(() => {
+      setActiveSlide((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [isPaused, images.length]);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+    setTouchDeltaX(0);
+    setIsPaused(true);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX === null) return;
+    setTouchDeltaX(e.touches[0].clientX - touchStartX);
+  };
+
+  const onTouchEnd = () => {
+    if (touchStartX !== null) {
+      if (touchDeltaX > 50) {
+        handlePrevSlide();
+      } else if (touchDeltaX < -50) {
+        handleNextSlide();
+      }
+    }
+    setTouchStartX(null);
+    setTouchDeltaX(0);
+    setIsPaused(false);
   };
 
   const handleCheckAvailability = () => {
@@ -115,67 +144,96 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-[#111827]">
+    <div className="min-h-screen bg-[#F5F3EB] text-[#111827]">
       {/* Top Navbar */}
       <Navbar />
 
-      <div className="w-full max-w-[1920px] mx-auto px-3 md:px-8">
+      <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
         <div className="px-5 md:px-8 lg:px-15 pt-28 md:pt-36 lg:pt-40 pb-20">
-          {/* ── 1. Top Panoramic Hero Carousel ──────────────────────────────── */}
-          <section className="relative w-full mb-12 md:mb-16">
-            <div className="relative w-full overflow-hidden rounded-[24px] md:rounded-[28px] shadow-[0_8px_30px_rgba(0,0,0,0.06)] bg-gray-100 aspect-[16/9] md:aspect-[21/9] max-h-[560px]">
-              {images.map((img, idx) => (
-                <div
-                  key={idx}
-                  className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${idx === activeSlide ? "opacity-100 z-10" : "opacity-0 pointer-events-none z-0"
-                    }`}
-                >
-                  <Image
-                    src={img}
-                    alt={`${data.name} photo ${idx + 1}`}
-                    fill
-                    priority={idx === 0}
-                    className="object-cover"
-                  />
-                </div>
-              ))}
-
-              {/* Previous / Next Controls */}
-              {images.length > 1 && (
-                <>
-                  <button
-                    type="button"
-                    onClick={handlePrevSlide}
-                    className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/80 hover:bg-white text-gray-900 shadow-md backdrop-blur-sm flex items-center justify-center transition-transform hover:scale-105 active:scale-95 cursor-pointer"
-                    aria-label="Previous image"
+          {/* ── 1. Top Panoramic Hero Carousel (Side-peek Slider) ────────────── */}
+          <section
+            className="relative w-full mb-12 md:mb-16 -mx-5 md:-mx-8 lg:-mx-15 !w-[calc(100%+2.5rem)] md:!w-[calc(100%+4rem)] lg:!w-[calc(100%+7.5rem)] overflow-hidden select-none py-2"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+          >
+            {/* Carousel Slider Track */}
+            <div
+              className="flex items-center transition-transform duration-500 ease-out"
+              style={{
+                transform: `translateX(calc(12% - ${activeSlide * 76}% - ${activeSlide * 16}px + ${touchDeltaX}px))`,
+                gap: "16px",
+              }}
+            >
+              {images.map((img, idx) => {
+                const isActive = idx === activeSlide;
+                return (
+                  <div
+                    key={idx}
+                    onClick={() => setActiveSlide(idx)}
+                    className={`shrink-0 w-[76%] aspect-[16/10] sm:aspect-[16/9] md:aspect-[21/10] max-h-[560px] rounded-[16px] sm:rounded-[20px] md:rounded-[24px] overflow-hidden relative shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-500 cursor-pointer ${isActive
+                      ? "opacity-100 scale-100 ring-1 ring-black/5"
+                      : "opacity-80 hover:opacity-95 scale-[0.985]"
+                      }`}
                   >
-                    <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleNextSlide}
-                    className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/80 hover:bg-white text-gray-900 shadow-md backdrop-blur-sm flex items-center justify-center transition-transform hover:scale-105 active:scale-95 cursor-pointer"
-                    aria-label="Next image"
-                  >
-                    <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
-                  </button>
-
-                  {/* Dot Indicators */}
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/30 backdrop-blur-md">
-                    {images.map((_, dotIdx) => (
-                      <button
-                        key={dotIdx}
-                        type="button"
-                        onClick={() => setActiveSlide(dotIdx)}
-                        className={`h-2 rounded-full transition-all cursor-pointer ${dotIdx === activeSlide ? "w-6 bg-white" : "w-2 bg-white/50"
-                          }`}
-                        aria-label={`Go to slide ${dotIdx + 1}`}
-                      />
-                    ))}
+                    <Image
+                      src={img}
+                      alt={`${data.name} photo ${idx + 1}`}
+                      fill
+                      priority={idx === 0}
+                      className="object-cover transition-transform duration-700 hover:scale-103"
+                    />
                   </div>
-                </>
-              )}
+                );
+              })}
             </div>
+
+            {/* Previous / Next Controls */}
+            {images.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePrevSlide();
+                  }}
+                  className="absolute left-3 sm:left-6 md:left-10 lg:left-14 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 hover:bg-white text-gray-900 shadow-[0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm flex items-center justify-center transition-all hover:scale-108 active:scale-95 cursor-pointer"
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleNextSlide();
+                  }}
+                  className="absolute right-3 sm:right-6 md:right-10 lg:right-14 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 hover:bg-white text-gray-900 shadow-[0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm flex items-center justify-center transition-all hover:scale-108 active:scale-95 cursor-pointer"
+                  aria-label="Next image"
+                >
+                  <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+                </button>
+
+                {/* Dot Indicators */}
+                <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md shadow-sm">
+                  {images.map((_, dotIdx) => (
+                    <button
+                      key={dotIdx}
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveSlide(dotIdx);
+                      }}
+                      className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${dotIdx === activeSlide ? "w-6 bg-white" : "w-2 bg-white/50 hover:bg-white/75"
+                        }`}
+                      aria-label={`Go to slide ${dotIdx + 1}`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
           </section>
 
           {/* ── 2. Main 2-Column Section: All Content on Left, Only Sticky Widget on Right ── */}
@@ -184,15 +242,15 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
             <div className="lg:col-span-8 space-y-16 md:space-y-20">
               {/* ── A. Property Details & Description ── */}
               <div>
-                <p className="font-sans text-[11px] md:text-[12px] font-bold uppercase tracking-[0.25em] text-[#6b7280] mb-2">
+                <p className="font-[Public_Sans] text-[12px] font-bold uppercase tracking-[0.02em] leading-[14px] text-[#222222] mb-1.5 text-left">
                   PROPERTY DETAILS
                 </p>
-                <h1 className="font-sans text-3xl sm:text-4xl md:text-[42px] font-semibold text-[#111827] leading-tight tracking-tight mb-10">
+                <h1 className="font-[Public_Sans] text-3xl sm:text-4xl md:text-[42px] font-medium text-[#111827] leading-tight tracking-tight mb-3.5">
                   {data.name}
                 </h1>
-                <p className="font-sans text-[15px] md:text-[16px] text-[#4b5563] leading-relaxed max-w-3xl">
+                <p className="font-[Public_Sans] text-[15px] md:text-[16px] text-[#556375] font-normal leading-[1.6] max-w-[710px] text-left">
                   {data.description ||
-                    `${data.name} offers thoughtfully designed spaces with modern amenities, warm hospitality, and a vibrant community experience for students and professionals.`}
+                    `${data.name} offers thoughtfully designed spaces with modern amenities, warm hospitality, and a vibrant community experience for students and professionals. vibrant community experience for students and professionals.`}
                 </p>
 
                 {/* Premium Amenities */}
@@ -206,7 +264,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                       const Icon = item.icon;
                       return (
                         <div key={aIdx} className="flex flex-col items-center text-center">
-                          <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#d8e6ce] flex items-center justify-center text-[#3a5535] shadow-xs">
+                          <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#D2E6BC] flex items-center justify-center text-[#3a5535] shadow-xs">
                             <Icon className="w-6 h-6 md:w-7 md:h-7 stroke-[1.75]" />
                           </div>
                           <span className="font-sans text-[12.5px] md:text-[13px] font-medium text-[#374151] mt-3">
@@ -241,65 +299,71 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                       room.amenities && room.amenities.length > 0
                         ? room.amenities
                         : ["Free Wifi", "Restaurant", "Study Desk", "Double Occupancy"];
-                    const bookUrl = room.bookingLink || data.rooms[0]?.bookingLink || "/rooms";
+                    const destParam = encodeURIComponent((data.destinationSlug || data.destinationName || "chennai").toLowerCase());
+                    const propParam = encodeURIComponent(data.slug || data.name || "");
+                    const roomParam = encodeURIComponent(room.slug || room.name || room._id);
+                    const bookUrl = `/rooms?destination=${destParam}&property=${propParam}&room=${roomParam}`;
 
                     return (
                       <div
                         key={room._id || rIdx}
-                        className="bg-white rounded-[22px] overflow-hidden border border-gray-100 shadow-[0_4px_24px_rgba(0,0,0,0.03)] flex flex-col md:flex-row gap-6 p-4 md:p-6 transition-all hover:shadow-[0_12px_32px_rgba(0,0,0,0.06)]"
+                        className="bg-white rounded-[8px] overflow-hidden border border-gray-100 shadow-[0_4px_24px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0_12px_32px_rgba(0,0,0,0.06)]"
                       >
-                        {/* Left Room Image */}
-                        <div className="relative w-full md:w-[320px] lg:w-[340px] xl:w-[360px] aspect-[16/10] md:aspect-[4/3] rounded-xl overflow-hidden bg-gray-100 shrink-0">
-                          <Image
-                            src={roomImg}
-                            alt={room.name}
-                            fill
-                            sizes="(max-width: 768px) 100vw, 360px"
-                            className="object-cover"
-                          />
-                        </div>
+                        <div className="w-full max-w-[865px] h-[290px] flex gap-[26px]">
 
-                        {/* Right Room Info */}
-                        <div className="flex flex-col justify-between flex-1 py-1">
-                          <div>
-                            {/* Badge / Category */}
-                            <p className="font-sans text-[13px] text-[#6b7280] font-normal mb-1">
-                              {roomBadge}
-                            </p>
-
-                            {/* Room Title */}
-                            <h3 className="font-sans text-xl md:text-[22px] font-semibold text-[#111827] leading-snug">
-                              {room.name}
-                            </h3>
-
-                            {/* Room Subtitle */}
-                            <p className="font-sans text-[13px] text-[#6b7280] mt-4 mb-5">
-                              {room.description || "Spacious Double occupancy room with extra comfort"}
-                            </p>
-
-                            {/* Amenities Pills */}
-                            <div className="flex flex-wrap gap-2 mb-6">
-                              {roomAmenities.map((amenity, aIdx) => (
-                                <span
-                                  key={aIdx}
-                                  className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#f3f4f6] text-[12px] font-medium text-[#4b5563]"
-                                >
-                                  {amenity}
-                                </span>
-                              ))}
-                            </div>
+                          {/* Left Room Image */}
+                          <div className="relative w-[405px] h-[290px] rounded-[8px] overflow-hidden shrink-0">
+                            <Image
+                              src={roomImg}
+                              alt={room.name}
+                              fill
+                              sizes="405px"
+                              className="object-cover"
+                            />
                           </div>
 
-                          {/* Book Now Button */}
-                          <div className="pt-2">
-                            <a
-                              href={bookUrl}
-                              target={bookUrl.startsWith("http") ? "_blank" : undefined}
-                              rel={bookUrl.startsWith("http") ? "noopener noreferrer" : undefined}
-                              className="w-full py-3 rounded-xl border border-[#111827] text-[#111827] font-semibold text-[13.5px] hover:bg-[#0d1b2e] hover:text-white transition-all text-center block shadow-xs"
-                            >
-                              Book Now
-                            </a>
+                          {/* Right Room Info */}
+                          <div className="w-[434px] h-[290px] flex flex-col justify-between py-1">
+                            <div className="px-4">
+
+                              {/* Badge / Category */}
+                              <p className="font-[Public_Sans] text-[14px] font-medium leading-[14px] tracking-[-0.5px] text-[#526442] mb-2">
+                                {roomBadge}
+                              </p>
+
+                              {/* Room Title */}
+                              <h3 className="font-[Public_Sans] text-[24px] font-medium text-[#111827] leading-[30px] tracking-[-0.5px]">
+                                {room.name}
+                              </h3>
+
+                              {/* Room Subtitle */}
+                              <p className="font-[Public_Sans] text-[14px] font-normal leading-[18px] tracking-[-0.5px] text-[#6b7280] mt-2 mb-5">
+                                {room.description ||
+                                  "Spacious Double occupancy room with extra comfort"}
+                              </p>
+
+                              {/* Amenities */}
+                              <div className="flex flex-wrap gap-2">
+                                {roomAmenities.map((amenity, aIdx) => (
+                                  <span
+                                    key={aIdx}
+                                    className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#F5F3EB] text-[12px] font-medium text-[#4b5563]"
+                                  >
+                                    {amenity}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Book Now */}
+                            <div className="px-4">
+                              <Link
+                                href={bookUrl}
+                                className="w-full h-[44px] rounded-[8px] border border-[#111827] flex items-center justify-center text-[#111827] font-[Public_Sans] font-medium text-[14px] hover:bg-[#0d1b2e] hover:text-white transition-all text-center"
+                              >
+                                Book Now
+                              </Link>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -314,36 +378,36 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                   Gallery
                 </h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6 max-w-[860px]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6 w-full">
                   {/* Tile 1 */}
-                  <div className="relative w-full max-w-[416px] h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-100 shadow-xs">
+                  <div className="relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-100 shadow-xs">
                     <Image
                       src={DEFAULT_GALLERY_IMAGES[0]}
                       alt="Community group photo"
                       fill
-                      sizes="(max-width: 768px) 100vw, 416px"
+                      sizes="(max-width: 768px) 100vw, 50vw"
                       className="object-cover"
                     />
                   </div>
 
                   {/* Tile 2 */}
-                  <div className="relative w-full max-w-[416px] h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-100 shadow-xs">
+                  <div className="relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-100 shadow-xs">
                     <Image
                       src={DEFAULT_GALLERY_IMAGES[1]}
                       alt="Balcony guest photo"
                       fill
-                      sizes="(max-width: 768px) 100vw, 416px"
+                      sizes="(max-width: 768px) 100vw, 50vw"
                       className="object-cover"
                     />
                   </div>
 
                   {/* Tile 3 */}
-                  <div className="relative w-full max-w-[416px] h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-100 shadow-xs">
+                  <div className="relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-100 shadow-xs">
                     <Image
                       src={DEFAULT_GALLERY_IMAGES[2]}
                       alt="Adventure bikers photo"
                       fill
-                      sizes="(max-width: 768px) 100vw, 416px"
+                      sizes="(max-width: 768px) 100vw, 50vw"
                       className="object-cover"
                     />
                   </div>
@@ -351,13 +415,13 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                   {/* Tile 4: View all with dark overlay */}
                   <Link
                     href="/gallery"
-                    className="group relative w-full max-w-[416px] h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-900 shadow-xs block"
+                    className="group relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-900 shadow-xs block"
                   >
                     <Image
                       src={DEFAULT_GALLERY_IMAGES[3]}
                       alt="More gallery photo"
                       fill
-                      sizes="(max-width: 768px) 100vw, 416px"
+                      sizes="(max-width: 768px) 100vw, 50vw"
                       className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
@@ -539,75 +603,14 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
               </section>
             </div>
 
-            {/* Right Column: Sticky Booking Widget (ONLY this widget, nothing below it, aligned straight down to Book Now) */}
+            {/* Right Column: Sticky Booking Widget (Connected to IPMS247 Booking Engine) */}
             <div className="lg:col-span-4">
-              <div className="sticky top-28 md:top-32 bg-white rounded-2xl p-6 md:p-7 shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-gray-100">
-                <div className="space-y-4">
-                  {/* Location */}
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                      Location
-                    </label>
-                    <div className="relative">
-                      <select
-                        value={selectedLocation}
-                        onChange={(e) => setSelectedLocation(e.target.value)}
-                        className="w-full h-11 px-3.5 pr-9 rounded-xl border border-gray-200 bg-gray-50/70 text-[13.5px] font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0d1b2e] appearance-none"
-                      >
-                        <option value={`${data.destinationName}, ${data.name}`}>
-                          {data.destinationName}, {data.name}
-                        </option>
-                        <option value="Kanniyakumari, Kattil The Sparrow">
-                          Kanniyakumari, Kattil The Sparrow
-                        </option>
-                        <option value="Madurai, Kattil Heritage">Madurai, Kattil Heritage</option>
-                        <option value="Chennai, Kattil Executive">Chennai, Kattil Executive</option>
-                        <option value="Coimbatore, Kattil Stay">Coimbatore, Kattil Stay</option>
-                      </select>
-                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-                    </div>
-                  </div>
-
-                  {/* Check In */}
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                      Check In
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="date"
-                        value={checkIn}
-                        onChange={(e) => setCheckIn(e.target.value)}
-                        className="w-full h-11 px-3.5 rounded-xl border border-gray-200 bg-gray-50/70 text-[13.5px] font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0d1b2e]"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Check Out */}
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-                      Check Out
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="date"
-                        value={checkOut}
-                        onChange={(e) => setCheckOut(e.target.value)}
-                        className="w-full h-11 px-3.5 rounded-xl border border-gray-200 bg-gray-50/70 text-[13.5px] font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0d1b2e]"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Submit button */}
-                  <button
-                    type="button"
-                    onClick={handleCheckAvailability}
-                    className="w-full mt-2 py-3.5 rounded-xl bg-[#0d1b2e] hover:bg-[#162a45] text-white text-sm font-semibold transition-colors shadow-sm cursor-pointer"
-                  >
-                    Check Availability
-                  </button>
-                </div>
-              </div>
+              <RoomStickyBookingWidget
+                initialDestinationName={data.destinationName}
+                initialPropertyName={data.name}
+                initialDestinationSlug={data.destinationSlug}
+                lockedDestination={true}
+              />
             </div>
           </div>
         </div>

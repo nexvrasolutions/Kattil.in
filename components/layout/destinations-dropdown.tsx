@@ -32,7 +32,7 @@ export const FALLBACK_DESTINATIONS: DestinationItem[] = [
     slug: "kanniyakumari",
     image: "/images/destinations/kanyakumari.png",
     hotelCount: "1 hotels",
-    link: "/rooms",
+    link: "/destinations/kanniyakumari",
     order: 2,
   },
   {

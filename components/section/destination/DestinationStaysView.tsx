@@ -53,7 +53,7 @@ export default function DestinationStaysView({
             category: r.category,
             images: Array.isArray(r.images) && r.images.length > 0 ? r.images : ["/assets/ac-double-room.webp"],
             amenities: Array.isArray(r.amenities) && r.amenities.length > 0 ? r.amenities : ["Free Wifi", "Restaurant"],
-            link: r.link?.trim() || `/rooms/${r.slug || r._id}`,
+            link: r.link?.trim() || `/properties/${r.slug || r._id}`,
             description: r.description,
             occupancy: r.occupancy,
           }));
@@ -77,12 +77,12 @@ export default function DestinationStaysView({
 
       {/* ── Sage Green Hero Section with Monument Line-Art ──────────────── */}
       <section className="relative w-full bg-[#9caf88] overflow-hidden pt-36 md:pt-44 lg:pt-52 pb-16 md:pb-24">
-        {/* Background architectural monument sketch */}
-        <div className="absolute right-0 bottom-0 top-auto h-[65%] sm:h-[72%] md:h-[78%] lg:h-[82%] w-[70%] sm:w-[48%] md:w-[40%] lg:w-[34%] max-w-[460px] pointer-events-none z-0 overflow-hidden flex items-end justify-end pr-2 md:pr-6">
+        {/* Background architectural monument sketch - hidden on mobile responsive */}
+        <div className="hidden md:flex absolute right-0 bottom-0 top-auto md:h-[78%] lg:h-[84%] md:w-[42%] lg:w-[36%] max-w-[500px] pointer-events-none z-0 overflow-hidden items-end justify-end md:pr-6">
           <div
-            className="w-full h-full opacity-90 md:opacity-95 bg-no-repeat"
+            className="w-full h-full opacity-85 md:opacity-90 bg-no-repeat"
             style={{
-              backgroundImage: "url('/images/destinations/hero-monument-illustration.png')",
+              backgroundImage: "url('/images/destinations/hero-monument-sketch.png')",
               backgroundSize: "contain",
               backgroundPosition: "right bottom",
             }}
@@ -90,17 +90,32 @@ export default function DestinationStaysView({
         </div>
 
         {/* Hero Content - Aligned exactly with Navbar 'Home' (left) and 'Book Now' (right) */}
-        <div className="relative z-10 w-full max-w-[1920px] mx-auto px-3 md:px-8">
+        <div className="relative z-10 w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="relative px-5 md:px-8 lg:px-15 max-w-3xl">
-            <p className="font-sans text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.28em] text-[#eaf2e1] mb-4 drop-shadow-sm">
+            <p
+              className="
+    font-[Public_Sans]
+    font-semibold
+    text-[14px]
+    sm:text-[12px]
+    leading-[14px]
+    tracking-[0]
+    text-left
+    align-middle
+    uppercase
+    text-[#eaf2e1]
+    mb-4
+    drop-shadow-sm
+  "
+            >
               FIND YOUR PERFECT STAY
             </p>
 
             <h1 className="text-white tracking-tight">
-              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-bold leading-[1.12]">
+              <span className="block font-sans text-[20px] min-[360px]:text-[22px] min-[390px]:text-[24px] sm:text-3xl md:text-4xl lg:text-[42px] font-bold leading-[1.15] whitespace-nowrap">
                 Discover handpicked stays
               </span>
-              <span className="block font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-normal italic text-[#f4f7ef] leading-[1.15] mt-1">
+              <span className="block font-serif text-[20px] min-[360px]:text-[22px] min-[390px]:text-[24px] sm:text-3xl md:text-4xl lg:text-[42px] font-normal italic text-[#f4f7ef] leading-[1.15] mt-1">
                 that feel like home.
               </span>
             </h1>
@@ -110,7 +125,7 @@ export default function DestinationStaysView({
 
       {/* ── Main Properties Listing Grid ─────────────────────────────────── */}
       <main className="flex-1 py-12 md:py-16 lg:py-20">
-        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-8">
+        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15">
             {/* Subheader: Showing 02 Properties in Madurai */}
             <div className="mb-8 md:mb-10 flex items-center justify-between">
@@ -164,10 +179,10 @@ export default function DestinationStaysView({
                           : "Home stay");
                   const targetLink =
                     stay.slug
-                      ? `/rooms/${stay.slug}`
+                      ? `/properties/${stay.slug}`
                       : stay._id
-                        ? `/rooms/${stay._id}`
-                        : "/rooms/kattil-executive-stay";
+                        ? `/properties/${stay._id}`
+                        : "/properties/kattil-executive-stay";
                   const stayAmenities =
                     stay.amenities && stay.amenities.length > 0
                       ? stay.amenities

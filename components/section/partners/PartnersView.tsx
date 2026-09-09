@@ -140,7 +140,7 @@ export default function PartnersView() {
         </div>
 
         {/* Hero Content aligned straight down with Navbar container */}
-        <div className="relative z-10 w-full max-w-[1920px] mx-auto px-3 md:px-8">
+        <div className="relative z-10 w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="relative px-5 md:px-8 lg:px-15 max-w-3xl">
             <p className="font-sans text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.28em] text-[#eaf2e1] mb-4 drop-shadow-sm">
               PARTNER WITH KATTIL
@@ -165,7 +165,7 @@ export default function PartnersView() {
 
       {/* ── 2. Why Partner with Kattil? ───────────────────────────────── */}
       <section className="w-full py-16 md:py-24 bg-[#FAF8F5]">
-        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-8">
+        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15">
             {/* Title */}
             <div className="text-center mb-14 md:mb-18">
@@ -216,7 +216,7 @@ export default function PartnersView() {
 
       {/* ── 3. How It Works: From your property Better performing ───────── */}
       <section className="w-full py-16 md:py-24 bg-[#FAF8F5] scroll-mt-36 md:scroll-mt-44">
-        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-8">
+        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
               {/* Left Column: Heading with gap below floating navbar */}
@@ -271,7 +271,7 @@ export default function PartnersView() {
           background: "linear-gradient(180deg, #F0EAD2 0%, rgba(240, 234, 210, 0) 100%)",
         }}
       >
-        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-8">
+        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15">
             {/* Heading */}
             <div className="text-center mb-12 md:mb-16">
@@ -313,18 +313,18 @@ export default function PartnersView() {
 
       {/* ── 5. A Simple Partnership Model (Deep Navy Card) ─────────────── */}
       <section className="w-full py-8 md:py-12 bg-transparent">
-        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-8">
+        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15">
-            <div className="bg-[#0e273c] text-white rounded-[8px] p-8 sm:p-12 md:p-16 lg:p-20 shadow-[0_12px_40px_rgba(14,39,60,0.2)] relative overflow-hidden">
+            <div className="bg-[#0E2E4E] text-white rounded-[8px] p-8 sm:p-12 md:p-16 lg:p-20 shadow-[0_12px_40px_rgba(14,39,60,0.2)] relative overflow-hidden">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
                 {/* Left Column: Heading + Subtitle */}
                 <div className="lg:col-span-5">
                   <h2 className="text-white tracking-tight leading-tight">
-                    <span className="block font-sans text-3xl sm:text-4xl md:text-[44px] font-normal">
+                    <span className="block font-sans text-3xl sm:text-4xl md:text-[44px] font-normal text-[#d2e6bc]">
                       A simple
                     </span>
                     <span className="block mt-1">
-                      <span className="font-sans text-3xl sm:text-4xl md:text-[44px] font-normal text-white">
+                      <span className="font-sans text-3xl sm:text-4xl md:text-[44px] font-normal text-[#d2e6bc]">
                         partnership{" "}
                       </span>
                       <span className="font-serif text-3xl sm:text-4xl md:text-[46px] font-normal italic text-[#d2e6bc]">
@@ -366,7 +366,7 @@ export default function PartnersView() {
 
       {/* ── 6. Your Property Could Do More (CTA Section) ──────────────── */}
       <section className="w-full py-16 md:py-24 bg-transparent">
-        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-8">
+        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15 text-center max-w-3xl mx-auto">
             <h2 className="text-[#111827] tracking-tight">
               <span className="font-sans text-3xl sm:text-4xl md:text-[42px] font-normal">
@@ -388,14 +388,14 @@ export default function PartnersView() {
                 href="https://wa.me/917448749779?text=Hi%20Kattil%20Team%2C%20I%20am%20interested%20in%20partnering%20with%20you%20for%20my%20property."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-8 py-3.5 rounded-[8px] bg-[#0e273c] text-white font-sans text-[14px] font-semibold hover:bg-[#153a57] transition-colors shadow-sm"
+                className="px-8 py-3.5 rounded-[8px] bg-[#0E2E4E] text-white font-sans text-[14px] font-semibold hover:bg-[#153a57] transition-colors shadow-sm"
               >
                 Partner With us
               </a>
 
               <a
                 href="tel:+917448749779"
-                className="px-8 py-3.5 rounded-[8px] border border-[#0e273c] text-[#0e273c] font-sans text-[14px] font-semibold hover:bg-[#0e273c]/5 transition-colors"
+                className="px-8 py-3.5 rounded-[6px] border border-[#0e273c] text-[#0e273c] font-sans text-[14px] font-semibold hover:bg-[#0e273c]/5 transition-colors"
               >
                 View Broucher
               </a>

@@ -95,9 +95,47 @@ function getHotelValueForSlug(slug: string): string {
   return `kattil${s}`;
 }
 
+export interface BookingBarWidgetProps {
+  initialDestination?: string;
+  initialProperty?: string;
+  lockedDestination?: boolean;
+}
+
 // ── Main Component ────────────────────────────────────────────────────────────
-export default function BookingBarWidget() {
-  const [selectedHotel, setSelectedHotel] = useState<HotelPlaceItem | null>(null);
+export default function BookingBarWidget({
+  initialDestination,
+  initialProperty,
+  lockedDestination = false,
+}: BookingBarWidgetProps = {}) {
+  const [selectedHotel, setSelectedHotel] = useState<HotelPlaceItem | null>(() => {
+    if (!initialDestination && !initialProperty) return null;
+    const destLower = (initialDestination || "").toLowerCase().trim();
+    const propLower = (initialProperty || "").toLowerCase().trim();
+    const match = DEFAULT_HOTEL_PLACES.find((h) => {
+      return (
+        (destLower &&
+          (h.slug.toLowerCase() === destLower ||
+            h.place.toLowerCase() === destLower ||
+            destLower.includes(h.slug.toLowerCase()) ||
+            destLower.includes(h.place.toLowerCase()))) ||
+        (propLower &&
+          (h.name.toLowerCase().includes(propLower) || propLower.includes(h.name.toLowerCase())))
+      );
+    });
+    if (match) return match;
+    if (destLower) {
+      const placeName = destLower.charAt(0).toUpperCase() + destLower.slice(1);
+      return {
+        id: `dest-${destLower}`,
+        name: `Kattil ${placeName}`,
+        place: placeName,
+        state: "Tamil Nadu",
+        slug: destLower,
+        hotelValue: getHotelValueForSlug(destLower),
+      };
+    }
+    return null;
+  });
   const [checkin, setCheckin] = useState<Date | null>(null);
   const [checkout, setCheckout] = useState<Date | null>(null);
   const [dateDisplay, setDateDisplay] = useState("");
@@ -123,6 +161,41 @@ export default function BookingBarWidget() {
       setSearchQuery("");
     }
   }, [dropdownOpen]);
+
+  // Sync selectedHotel when initialDestination or initialProperty prop changes
+  useEffect(() => {
+    if (!initialDestination && !initialProperty) return;
+    const destLower = (initialDestination || "").toLowerCase().trim();
+    const propLower = (initialProperty || "").toLowerCase().trim();
+
+    const match = hotelsList.find((h) => {
+      return (
+        (destLower &&
+          (h.slug.toLowerCase() === destLower ||
+            h.place.toLowerCase() === destLower ||
+            destLower.includes(h.slug.toLowerCase()) ||
+            destLower.includes(h.place.toLowerCase()))) ||
+        (propLower &&
+          (h.name.toLowerCase().includes(propLower) || propLower.includes(h.name.toLowerCase())))
+      );
+    });
+
+    if (match) {
+      setSelectedHotel(match);
+      setHotelError(null);
+    } else if (destLower) {
+      const placeName = destLower.charAt(0).toUpperCase() + destLower.slice(1);
+      setSelectedHotel({
+        id: `dest-${destLower}`,
+        name: `Kattil ${placeName}`,
+        place: placeName,
+        state: "Tamil Nadu",
+        slug: destLower,
+        hotelValue: getHotelValueForSlug(destLower),
+      });
+      setHotelError(null);
+    }
+  }, [initialDestination, initialProperty, hotelsList]);
 
   // Dynamically load active destinations/hotels from database API
   useEffect(() => {
@@ -154,6 +227,27 @@ export default function BookingBarWidget() {
           });
 
           setHotelsList(items);
+
+          // Auto-match if initial destination is provided
+          if (initialDestination || initialProperty) {
+            const destLower = (initialDestination || "").toLowerCase().trim();
+            const propLower = (initialProperty || "").toLowerCase().trim();
+            const matched = items.find((h) => {
+              return (
+                (destLower &&
+                  (h.slug.toLowerCase() === destLower ||
+                    h.place.toLowerCase() === destLower ||
+                    destLower.includes(h.slug.toLowerCase()) ||
+                    destLower.includes(h.place.toLowerCase()))) ||
+                (propLower &&
+                  (h.name.toLowerCase().includes(propLower) ||
+                    propLower.includes(h.name.toLowerCase())))
+              );
+            });
+            if (matched) {
+              setSelectedHotel(matched);
+            }
+          }
         }
       } catch (err) {
         console.warn("Failed to load destinations:", err);
@@ -164,14 +258,40 @@ export default function BookingBarWidget() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [initialDestination, initialProperty]);
 
-  // Filter hotels based on search query
+  // Filter hotels based on lockedDestination and search query
   const filteredHotels = useMemo(() => {
-    const q = searchQuery.toLowerCase().trim();
-    if (!q) return hotelsList;
+    let list = hotelsList;
+    if (lockedDestination && (initialDestination || selectedHotel)) {
+      const lockKey = (
+        initialDestination ||
+        selectedHotel?.slug ||
+        selectedHotel?.place ||
+        ""
+      )
+        .toLowerCase()
+        .trim();
+      const locked = list.filter((item) => {
+        return (
+          item.slug.toLowerCase() === lockKey ||
+          item.place.toLowerCase() === lockKey ||
+          lockKey.includes(item.slug.toLowerCase()) ||
+          lockKey.includes(item.place.toLowerCase()) ||
+          (selectedHotel && item.id === selectedHotel.id)
+        );
+      });
+      if (locked.length > 0) {
+        list = locked;
+      } else if (selectedHotel) {
+        list = [selectedHotel];
+      }
+    }
 
-    return hotelsList.filter((item) => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return list;
+
+    return list.filter((item) => {
       return (
         item.name.toLowerCase().includes(q) ||
         item.place.toLowerCase().includes(q) ||
@@ -179,7 +299,7 @@ export default function BookingBarWidget() {
         item.hotelValue.toLowerCase().includes(q)
       );
     });
-  }, [hotelsList, searchQuery]);
+  }, [hotelsList, searchQuery, lockedDestination, initialDestination, selectedHotel]);
 
   // Close dropdown on click outside
   useEffect(() => {

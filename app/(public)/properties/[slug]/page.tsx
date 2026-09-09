@@ -15,20 +15,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const data = await getPropertyDetailsData(slug);
 
   return {
-    title: `${data.name} in ${data.destinationName} | Rooms & Stays — Kattil`,
-    description: `Book your stay at ${data.name}, ${data.destinationName}. Comfortable rooms, premium amenities, Free WiFi, and authentic hospitality.`,
+    title: `${data.name} in ${data.destinationName} | Property Details — Kattil`,
+    description: `Explore ${data.name} in ${data.destinationName}. Premium amenities, comfortable rooms, and authentic hospitality by Kattil.`,
     alternates: {
-      canonical: `${SITE_URL}/rooms/${slug}`,
+      canonical: `${SITE_URL}/properties/${slug}`,
     },
     openGraph: {
       title: `${data.name} | Kattil Stays`,
       description: data.description,
-      url: `${SITE_URL}/rooms/${slug}`,
+      url: `${SITE_URL}/properties/${slug}`,
     },
   };
 }
 
-export default async function PropertyRoomDetailsPage({ params }: PageProps) {
+export default async function PropertyPage({ params }: PageProps) {
   const { slug } = await params;
   const data = await getPropertyDetailsData(slug);
 

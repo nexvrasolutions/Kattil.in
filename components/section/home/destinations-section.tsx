@@ -20,14 +20,14 @@ const DESTINATIONS: DestinationItem[] = [
     name: "Kanyakumari",
     pillLabel: "Kanyakumari",
     image: "/images/destinations/kanyakumari.png",
-    href: "/rooms",
+    href: "/destinations/kanniyakumari",
   },
   {
     id: "madurai",
     name: "Madurai",
     pillLabel: "Madurai",
     image: "/images/destinations/madurai.png",
-    href: "/rooms",
+    href: "/madurai",
   },
   {
     id: "coimbatore",
@@ -41,7 +41,7 @@ const DESTINATIONS: DestinationItem[] = [
     name: "View all our Destination",
     pillLabel: "",
     image: "/images/destinations/destination-card-bg.png",
-    href: "/rooms",
+    href: "/chennai",
     isViewAll: true,
   },
 ];

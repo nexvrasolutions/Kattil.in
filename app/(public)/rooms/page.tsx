@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { SITE_URL } from "@/lib/seo";
-import { getPropertyDetailsData } from "@/lib/db/rooms";
-import PropertyDetailsView from "@/components/section/rooms/PropertyDetailsView";
+import { getRoomsPageData } from "@/lib/db/rooms";
+import RoomsListingView from "@/components/section/rooms/RoomsListingView";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Rooms & Suites | Kattil — The Homely Hotel",
@@ -15,31 +18,35 @@ export const metadata: Metadata = {
   },
 };
 
-export interface RoomItem {
-  _id: string;
-  name: string;
-  slug: string;
-  images: string[];
-  link?: string;
-  description?: string;
-  city: { name: string; slug: string };
-}
-
-export interface CityTab {
-  _id: string;
-  name: string;
-  slug: string;
-  label?: string;
-}
-
 interface PageProps {
-  searchParams?: Promise<{ property?: string; city?: string; hotel?: string }>;
+  searchParams?: Promise<{
+    destination?: string;
+    city?: string;
+    property?: string;
+    hotel?: string;
+    room?: string;
+  }>;
 }
 
 export default async function RoomsPage({ searchParams }: PageProps) {
   const resolvedParams = searchParams ? await searchParams : {};
-  const querySlug = resolvedParams.property || resolvedParams.hotel || resolvedParams.city || "kattil-the-sparrow";
-  const data = await getPropertyDetailsData(querySlug);
+  const destinationQuery =
+    resolvedParams.destination ||
+    resolvedParams.city ||
+    resolvedParams.hotel ||
+    undefined;
+  const propertyQuery = resolvedParams.property || undefined;
 
-  return <PropertyDetailsView data={data} />;
+  const data = await getRoomsPageData(destinationQuery, propertyQuery);
+
+  return (
+    <RoomsListingView
+      destinationSlug={data.destinationSlug}
+      destinationName={data.destinationName}
+      propertyName={data.propertyName}
+      hotelValue={data.hotelValue}
+      rooms={data.rooms}
+      allCities={data.allCities}
+    />
+  );
 }
