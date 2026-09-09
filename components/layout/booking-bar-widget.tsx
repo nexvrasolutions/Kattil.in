@@ -373,15 +373,15 @@ export default function BookingBarWidget() {
     <>
       <style dangerouslySetInnerHTML={{ __html: STYLES }} />
 
-      <div className="w-[92%] sm:w-full max-w-[340px] md:max-w-4xl mx-auto">
-        <div className="bg-white rounded-[20px] md:rounded-[10px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] p-4.5 sm:p-6 md:p-6 text-left">
+      <div className="w-[92%] sm:w-full max-w-[370px] md:max-w-4xl mx-auto">
+        <div className="bg-white rounded-[22px] md:rounded-[10px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] p-6 sm:p-7 md:p-6 text-left">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               handleCheckAvailability();
             }}
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_1fr_236px] items-start gap-3.5 sm:gap-4 md:gap-4 w-full min-w-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_1fr_236px] items-start gap-5 sm:gap-5.5 md:gap-4 w-full min-w-0">
 
               {/* ── 1. Choose your stay ────────────────────────────────────────── */}
               <motion.div
@@ -390,8 +390,8 @@ export default function BookingBarWidget() {
                 className="relative w-full"
                 ref={dropdownRef}
               >
-                <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-                  <label className="text-[12.5px] md:text-[13.5px] font-semibold text-gray-700 block tracking-tight font-sans">
+                <div className="flex items-center justify-between mb-2.5 md:mb-2">
+                  <label className="text-[13px] sm:text-[13.5px] md:text-[13.5px] font-semibold text-gray-700 block tracking-tight font-sans">
                     Choose your stay
                   </label>
                   {hotelError && (
@@ -404,16 +404,16 @@ export default function BookingBarWidget() {
                 <button
                   type="button"
                   onClick={() => setDropdownOpen((prev) => !prev)}
-                  className={`w-full h-[48px] sm:h-[50px] md:h-[48px] lg:h-[50px] border-[1px] ${hotelError
+                  className={`w-full h-[58px] sm:h-[60px] md:h-[48px] lg:h-[50px] border-[1px] ${hotelError
                     ? "border-[#0E2E4E] bg-[#0E2E4E]/[0.03] ring-1 ring-[#0E2E4E]/20"
                     : "border-[#E5E7EB] bg-[#F9FAFB] hover:bg-gray-50/80"
-                    } rounded-[10px] md:rounded-[8px] px-3.5 sm:px-[16px] py-0 flex items-center justify-between gap-2 transition-all text-left cursor-pointer`}
+                    } rounded-[12px] md:rounded-[8px] px-4 sm:px-[16px] py-0 flex items-center justify-between gap-2 transition-all text-left cursor-pointer`}
                 >
-                  <div className="flex items-center gap-2.5 sm:gap-3 overflow-hidden">
-                    <Building2 className={`w-4.5 h-4.5 sm:w-5 sm:h-5 ${hotelError ? "text-[#0E2E4E]" : "text-[#0E2E4E]/70"} shrink-0 stroke-[1.6]`} />
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <Building2 className={`w-5 h-5 ${hotelError ? "text-[#0E2E4E]" : "text-[#0E2E4E]/70"} shrink-0 stroke-[1.6]`} />
 
                     <span
-                      className={`text-[13.5px] sm:text-[14.5px] truncate ${selectedHotel ? "text-gray-900 font-medium" : "text-gray-400"
+                      className={`text-[14.5px] sm:text-[15px] md:text-[14px] lg:text-[14.5px] truncate ${selectedHotel ? "text-gray-900 font-medium" : "text-gray-400"
                         }`}
                     >
                       {selectedHotel
@@ -423,7 +423,7 @@ export default function BookingBarWidget() {
                   </div>
 
                   <ChevronDown
-                    className={`w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""
+                    className={`w-4.5 h-4.5 text-gray-400 shrink-0 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""
                       }`}
                   />
                 </button>
@@ -436,7 +436,7 @@ export default function BookingBarWidget() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -4 }}
                       transition={{ duration: 0.15 }}
-                      className="text-[11.5px] sm:text-xs text-[#0E2E4E] mt-1 sm:mt-1.5 font-medium flex items-center gap-1.5 font-sans"
+                      className="text-[11.5px] sm:text-xs text-[#0E2E4E] mt-1.5 font-medium flex items-center gap-1.5 font-sans"
                     >
                       <Info className="w-3.5 h-3.5 shrink-0 text-[#0E2E4E]" />
                       <span>{hotelError}</span>
@@ -455,7 +455,7 @@ export default function BookingBarWidget() {
                       transition={{ duration: 0.16, ease: "easeOut" }}
                       onWheel={(e) => e.stopPropagation()}
                       onTouchMove={(e) => e.stopPropagation()}
-                      className="absolute left-0 right-0 top-full mt-1.5 sm:mt-2 bg-white rounded-[10px] md:rounded-[8px] shadow-[0_16px_40px_-8px_rgba(0,0,0,0.22)] border border-gray-100 py-1.5 z-50 overflow-hidden"
+                      className="absolute left-0 right-0 top-full mt-1.5 sm:mt-2 bg-white rounded-[12px] md:rounded-[8px] shadow-[0_16px_40px_-8px_rgba(0,0,0,0.22)] border border-gray-100 py-1.5 z-50 overflow-hidden"
                     >
                       {/* Search Bar */}
                       <div className="px-2.5 pb-1.5 pt-0.5 border-b border-gray-100">
@@ -467,7 +467,7 @@ export default function BookingBarWidget() {
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search place or hotel..."
-                            className="w-full h-8.5 pl-8 pr-7 text-[12.5px] sm:text-[13px] bg-gray-50 border border-gray-200 rounded-[6px] outline-none focus:bg-white focus:border-[#0E2E4E] transition-colors text-gray-800 placeholder-gray-400 font-sans"
+                            className="w-full h-9 pl-8 pr-7 text-[12.5px] sm:text-[13px] bg-gray-50 border border-gray-200 rounded-[6px] outline-none focus:bg-white focus:border-[#0E2E4E] transition-colors text-gray-800 placeholder-gray-400 font-sans"
                             onClick={(e) => e.stopPropagation()}
                           />
                           {searchQuery && (
@@ -551,8 +551,8 @@ export default function BookingBarWidget() {
                 transition={{ duration: 0.25 }}
                 className="relative w-full"
               >
-                <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-                  <label className="text-[12.5px] md:text-[13.5px] font-semibold text-gray-700 block tracking-tight font-sans">
+                <div className="flex items-center justify-between mb-2.5 md:mb-2">
+                  <label className="text-[13px] sm:text-[13.5px] md:text-[13.5px] font-semibold text-gray-700 block tracking-tight font-sans">
                     Check In & Out
                   </label>
                   {dateError && (
@@ -565,12 +565,12 @@ export default function BookingBarWidget() {
                 <div
                   ref={dateBoxRef}
                   onClick={() => fpInstance.current?.open()}
-                  className={`w-full h-[48px] sm:h-[50px] md:h-[48px] lg:h-[50px] border-[1px] ${dateError
+                  className={`w-full h-[58px] sm:h-[60px] md:h-[48px] lg:h-[50px] border-[1px] ${dateError
                     ? "border-[#0E2E4E] bg-[#0E2E4E]/[0.03] ring-1 ring-[#0E2E4E]/20"
                     : "border-[#E5E7EB] bg-[#F9FAFB] hover:bg-gray-50/80"
-                    } rounded-[10px] md:rounded-[8px] px-3.5 sm:px-[16px] flex items-center gap-2.5 sm:gap-3 transition-all cursor-pointer`}
+                    } rounded-[12px] md:rounded-[8px] px-4 sm:px-[16px] flex items-center gap-3 transition-all cursor-pointer`}
                 >
-                  <Calendar className={`w-4.5 h-4.5 sm:w-5 sm:h-5 ${dateError ? "text-[#0E2E4E]" : "text-gray-400"} shrink-0 stroke-[1.6]`} />
+                  <Calendar className={`w-5 h-5 ${dateError ? "text-[#0E2E4E]" : "text-gray-400"} shrink-0 stroke-[1.6]`} />
 
                   <input
                     ref={dateInputRef}
@@ -578,7 +578,7 @@ export default function BookingBarWidget() {
                     readOnly
                     value={dateDisplay}
                     placeholder="Select check-in & check-out"
-                    className="w-full bg-transparent text-[13.5px] sm:text-[14.5px] text-gray-900 font-medium outline-none cursor-pointer placeholder:text-gray-400 font-sans truncate"
+                    className="w-full bg-transparent text-[14.5px] sm:text-[15px] md:text-[14px] lg:text-[14.5px] text-gray-900 font-medium outline-none cursor-pointer placeholder:text-gray-400 font-sans truncate"
                   />
                 </div>
 
@@ -590,7 +590,7 @@ export default function BookingBarWidget() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -4 }}
                       transition={{ duration: 0.15 }}
-                      className="text-[11.5px] sm:text-xs text-[#0E2E4E] mt-1 sm:mt-1.5 font-medium flex items-center gap-1.5 font-sans"
+                      className="text-[11.5px] sm:text-xs text-[#0E2E4E] mt-1.5 font-medium flex items-center gap-1.5 font-sans"
                     >
                       <Info className="w-3.5 h-3.5 shrink-0 text-[#0E2E4E]" />
                       <span>{dateError}</span>
@@ -601,7 +601,7 @@ export default function BookingBarWidget() {
 
               {/* ── 3. Check Availability CTA ─────────────────────────────────── */}
               <div className="w-full md:w-auto">
-                <label className="hidden lg:block text-[12.5px] md:text-[13.5px] font-semibold opacity-0 select-none mb-1.5 sm:mb-2 font-sans pointer-events-none">
+                <label className="hidden lg:block text-[12.5px] md:text-[13.5px] font-semibold opacity-0 select-none mb-2 font-sans pointer-events-none">
                   &nbsp;
                 </label>
                 <motion.button
@@ -611,13 +611,13 @@ export default function BookingBarWidget() {
                   transition={{ duration: 0.16 }}
                   className="
                     w-full md:w-[236px]
-                    h-[48px] sm:h-[50px] md:h-[48px] lg:h-[50px]
+                    h-[58px] sm:h-[60px] md:h-[48px] lg:h-[50px]
                     bg-[#0E2E4E]
                     hover:bg-[#143d66]
                     text-white
-                    text-[13.5px] sm:text-[14.5px]
+                    text-[15px] sm:text-[15.5px] md:text-[14px] lg:text-[14.5px]
                     font-semibold
-                    rounded-[10px] md:rounded-[8px]
+                    rounded-[12px] md:rounded-[8px]
                     px-4 sm:px-[32px]
                     py-2 sm:py-[12px]
                     flex items-center justify-center
@@ -628,7 +628,7 @@ export default function BookingBarWidget() {
                     cursor-pointer
                   "
                 >
-                  <Sparkles className="w-4 h-4 opacity-80" />
+                  <Sparkles className="w-4.5 h-4.5 opacity-80" />
                   Check Availability
                 </motion.button>
               </div>

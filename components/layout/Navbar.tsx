@@ -137,11 +137,12 @@ export default function Navbar() {
                   {isDestinations ? (
                     <button
                       type="button"
+                      data-text={link.label}
                       data-destinations-trigger="true"
                       onClick={toggleDestinations}
-                      className={`group relative !no-underline text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans cursor-pointer font-medium ${isActive || destinationsOpen
-                        ? "!text-[#D2E6BC]"
-                        : "text-[#DDDDDD] hover:!text-[#D2E6BC]"
+                      className={`nav-link-bold-safe group relative !no-underline text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans cursor-pointer ${isActive || destinationsOpen
+                        ? "font-bold !text-[#D2E6BC]"
+                        : "font-medium hover:font-bold text-[#DDDDDD] hover:!text-[#D2E6BC]"
                         }`}
                       style={{
                         background: "none",
@@ -155,9 +156,10 @@ export default function Navbar() {
                   ) : (
                     <Link
                       href={link.href || "#"}
-                      className={`group relative !no-underline text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans font-medium ${isActive
-                        ? "!text-[#D2E6BC]"
-                        : "text-[#DDDDDD] hover:!text-[#D2E6BC]"
+                      data-text={link.label}
+                      className={`nav-link-bold-safe group relative !no-underline text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans ${isActive
+                        ? "font-bold !text-[#D2E6BC]"
+                        : "font-medium hover:font-bold text-[#DDDDDD] hover:!text-[#D2E6BC]"
                         }`}
                       style={{
                         textDecoration: "none",
@@ -187,9 +189,10 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center justify-end gap-6 flex-1">
             <Link
               href="/contact-us"
-              className={`group relative text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans font-medium ${pathname === "/contact-us"
-                ? "!text-[#D2E6BC]"
-                : "text-[#DDDDDD] hover:!text-[#D2E6BC]"
+              data-text="Contact Us"
+              className={`nav-link-bold-safe group relative text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans ${pathname === "/contact-us"
+                ? "font-bold !text-[#D2E6BC]"
+                : "font-medium hover:font-bold text-[#DDDDDD] hover:!text-[#D2E6BC]"
                 }`}
             >
               Contact Us

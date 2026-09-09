@@ -112,6 +112,14 @@ export default function HeroNavbar({
   const navRowRef = useRef<HTMLDivElement>(null);
   const [navRowHeight, setNavRowHeight] = useState(74);
 
+  // Enable native smooth scrolling
+  useEffect(() => {
+    document.documentElement.style.scrollBehavior = "smooth";
+    return () => {
+      document.documentElement.style.scrollBehavior = "";
+    };
+  }, []);
+
   useEffect(() => {
     const measure = () => {
       if (navRowRef.current) {
@@ -199,14 +207,18 @@ export default function HeroNavbar({
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const currentY = window.scrollY;
-          setScrolled(currentY > 20);
+          setScrolled((prev) => {
+            const next = currentY > 20;
+            return prev === next ? prev : next;
+          });
           if (isHome) {
             if (currentY > 80) {
-              setHeroVisible(false);
+              setHeroVisible((prev) => (prev ? false : prev));
             } else if (currentY <= 5) {
-              setHeroVisible(true);
+              setHeroVisible((prev) => (!prev ? true : prev));
             }
           }
+          lastScrollY.current = currentY;
           ticking = false;
         });
         ticking = true;
@@ -313,11 +325,12 @@ export default function HeroNavbar({
                     {isDestinations ? (
                       <button
                         type="button"
+                        data-text={link.label}
                         data-destinations-trigger="true"
                         onClick={toggleDestinations}
-                        className={`group relative text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans cursor-pointer font-medium ${isActive || destinationsOpen
-                          ? "!text-[#D2E6BC]"
-                          : "text-[#DDDDDD] hover:!text-[#D2E6BC]"
+                        className={`nav-link-bold-safe group relative text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans cursor-pointer ${isActive || destinationsOpen
+                          ? "font-bold !text-[#D2E6BC]"
+                          : "font-medium hover:font-bold text-[#DDDDDD] hover:!text-[#D2E6BC]"
                           }`}
                         style={{
                           background: "none",
@@ -331,9 +344,10 @@ export default function HeroNavbar({
                     ) : (
                       <Link
                         href={link.href || "#"}
-                        className={`group relative text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans font-medium ${isActive
-                          ? "!text-[#D2E6BC]"
-                          : "text-[#DDDDDD] hover:!text-[#D2E6BC]"
+                        data-text={link.label}
+                        className={`nav-link-bold-safe group relative text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans ${isActive
+                          ? "font-bold !text-[#D2E6BC]"
+                          : "font-medium hover:font-bold text-[#DDDDDD] hover:!text-[#D2E6BC]"
                           }`}
                         style={{ textDecoration: "none" }}
                       >
@@ -361,9 +375,10 @@ export default function HeroNavbar({
             <div className="hidden lg:flex items-center justify-end gap-6 flex-1">
               <Link
                 href="/contact-us"
-                className={`group relative text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans font-medium ${pathname === "/contact-us"
-                  ? "!text-[#D2E6BC]"
-                  : "text-[#DDDDDD] hover:!text-[#D2E6BC]"
+                data-text="Contact Us"
+                className={`nav-link-bold-safe group relative text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans ${pathname === "/contact-us"
+                  ? "font-bold !text-[#D2E6BC]"
+                  : "font-medium hover:font-bold text-[#DDDDDD] hover:!text-[#D2E6BC]"
                   }`}
                 style={{
                   textDecoration: "none",
@@ -424,7 +439,7 @@ export default function HeroNavbar({
                 pointerEvents: heroVisible ? "auto" : "none",
                 willChange: "transform, opacity",
               }}
-              className="relative z-10 px-4 sm:px-6 md:px-12 lg:px-20 pt-1.5 sm:pt-3 md:pt-[60px] lg:pt-3 pb-6 flex flex-col items-center justify-start text-center flex-1 w-full mt-0 lg:mt-3"
+              className="relative z-10 px-4 sm:px-6 md:px-12 lg:px-20 pt-2 sm:pt-4 md:pt-[60px] lg:pt-3 pb-6 flex flex-col items-center justify-start text-center flex-1 w-full mt-0 lg:mt-3"
             >
               {/* Eyebrow */}
               <motion.p
@@ -441,7 +456,7 @@ export default function HeroNavbar({
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 14 }}
                 transition={{ delay: 0.48, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="mb-3.5 sm:mb-4 md:mb-[60px]"
+                className="mb-4 sm:mb-5 md:mb-[60px]"
               >
                 <h1 className="text-white text-[26px] sm:text-[30px] md:text-[42px] lg:text-[46px] leading-[1.14] sm:leading-[1.12] tracking-[-0.5px] sm:tracking-[-1px] text-center">
 
@@ -489,7 +504,7 @@ export default function HeroNavbar({
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: heroVisible ? 1 : 0, y: heroVisible ? 0 : 14 }}
                 transition={{ delay: 0.68, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="flex justify-center w-full mt-2.5 sm:mt-3 md:mt-4 lg:mt-5"
+                className="flex justify-center w-full mt-3.5 sm:mt-4 md:mt-4 lg:mt-5"
               >
                 {/* Mobile: Ticker */}
                 <div className="block md:hidden w-full">
