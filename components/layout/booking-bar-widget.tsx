@@ -307,6 +307,14 @@ export default function BookingBarWidget() {
     };
   }, []);
 
+  // Set default hotel on load if none selected
+  useEffect(() => {
+    if (!selectedHotel && hotelsList.length > 0) {
+      const defaultItem = hotelsList.find((h) => h.place.toLowerCase() === "chennai") || hotelsList[0];
+      setSelectedHotel(defaultItem);
+    }
+  }, [hotelsList, selectedHotel]);
+
   // Check Availability / Booking handler
   function handleCheckAvailability() {
     let hasError = false;
@@ -321,15 +329,11 @@ export default function BookingBarWidget() {
 
     if (!checkin && !checkout) {
       setDateError("Please select check-in and check-out dates");
-      if (selectedHotel) {
-        fpInstance.current?.open();
-      }
+      fpInstance.current?.open();
       hasError = true;
     } else if (!checkin || !checkout) {
       setDateError("Please select both check-in and check-out dates");
-      if (selectedHotel) {
-        fpInstance.current?.open();
-      }
+      fpInstance.current?.open();
       hasError = true;
     } else {
       setDateError(null);
@@ -343,32 +347,59 @@ export default function BookingBarWidget() {
     const ci = checkin!;
     const co = checkout!;
 
-    const form = document.getElementById("_resBBBox") as HTMLFormElement;
-    if (!form) return;
-    (document.getElementById("h_chkin") as HTMLInputElement).value = forPost(ci);
-    (document.getElementById("h_chkout") as HTMLInputElement).value = forPost(co);
-    (document.getElementById("h_hotel") as HTMLInputElement).value = targetHotel;
-    (document.getElementById("h_room") as HTMLInputElement).value = "";
+    const form = document.createElement("form");
+    form.method = "post";
+    form.target = "_blank";
     form.action = `https://live.ipms247.com/booking/book-rooms-${targetHotel}`;
+
+    const fields: Record<string, string> = {
+      eZ_chkin: forPost(ci),
+      eZ_chkout: forPost(co),
+      select_hotel: targetHotel,
+      roomtypeunkid: "",
+      eZ_adult: "1",
+      eZ_child: "0",
+      eZ_Nights: "1",
+      eZ_room: "1",
+      calformat: "dd-mm-yy",
+    };
+
+    for (const [key, value] of Object.entries(fields)) {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = key;
+      input.value = value;
+      form.appendChild(input);
+    }
+
+    document.body.appendChild(form);
     form.submit();
+    document.body.removeChild(form);
   }
 
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: STYLES }} />
 
-      <div className="w-[88%] sm:w-[92%] md:w-full max-w-4xl mx-auto">
-        <div className="bg-white rounded-[8px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] p-3 sm:p-4.5 md:p-6 text-left">
+      {/* Hidden input for Flatpickr instance anchoring */}
+      <input
+        ref={dateInputRef}
+        type="text"
+        readOnly
+        className="sr-only pointer-events-none"
+        tabIndex={-1}
+        aria-hidden="true"
+      />
+
+      <div className="w-[92%] sm:w-full max-w-[400px] md:max-w-4xl mx-auto">
+        <div className="bg-white rounded-[16px] md:rounded-[8px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] p-4 sm:p-5 md:p-6 text-left">
           <form
-            id="_resBBBox"
-            method="post"
-            target="_blank"
             onSubmit={(e) => {
               e.preventDefault();
               handleCheckAvailability();
             }}
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_1fr_236px] items-start gap-2.5 sm:gap-3 md:gap-4 w-full min-w-0">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_1fr_236px] items-start gap-3 md:gap-4 w-full min-w-0">
 
               {/* ── 1. Choose your stay ────────────────────────────────────────── */}
               <motion.div
@@ -378,7 +409,7 @@ export default function BookingBarWidget() {
                 ref={dropdownRef}
               >
                 <div className="flex items-center justify-between mb-1 sm:mb-1.5">
-                  <label className="text-[11px] sm:text-xs md:text-[13px] font-semibold text-gray-700 block tracking-tight font-sans">
+                  <label className="text-[12px] md:text-[13px] font-semibold text-gray-700 block tracking-tight font-sans">
                     Choose your stay
                   </label>
                   {hotelError && (
@@ -391,19 +422,17 @@ export default function BookingBarWidget() {
                 <button
                   type="button"
                   onClick={() => setDropdownOpen((prev) => !prev)}
-                  className={`w-full h-[39px] sm:h-[43px] border-[1px] ${
-                    hotelError
-                      ? "border-[#0E2E4E] bg-[#0E2E4E]/[0.03] ring-1 ring-[#0E2E4E]/20"
-                      : "border-[#E5E7EB] bg-[#F9FAFB] hover:bg-gray-50/80"
-                  } rounded-[6px] px-3.5 sm:px-[16px] py-0 flex items-center justify-between gap-2 transition-all text-left`}
+                  className={`w-full h-[42px] sm:h-[43px] border-[1px] ${hotelError
+                    ? "border-[#0E2E4E] bg-[#0E2E4E]/[0.03] ring-1 ring-[#0E2E4E]/20"
+                    : "border-[#E5E7EB] bg-[#F9FAFB] hover:bg-gray-50/80"
+                    } rounded-[8px] md:rounded-[6px] px-3.5 sm:px-[16px] py-0 flex items-center justify-between gap-2 transition-all text-left cursor-pointer`}
                 >
                   <div className="flex items-center gap-2.5 sm:gap-3 overflow-hidden">
                     <Building2 className={`w-4 h-4 sm:w-5 sm:h-5 ${hotelError ? "text-[#0E2E4E]" : "text-[#0E2E4E]/70"} shrink-0 stroke-[1.6]`} />
 
                     <span
-                      className={`text-[13px] sm:text-[14px] truncate ${
-                        selectedHotel ? "text-gray-900 font-medium" : "text-gray-400"
-                      }`}
+                      className={`text-[13px] sm:text-[14px] truncate ${selectedHotel ? "text-gray-900 font-medium" : "text-gray-400"
+                        }`}
                     >
                       {selectedHotel
                         ? `${selectedHotel.name} (${selectedHotel.place})`
@@ -412,9 +441,8 @@ export default function BookingBarWidget() {
                   </div>
 
                   <ChevronDown
-                    className={`w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200 ${
-                      dropdownOpen ? "rotate-180" : ""
-                    }`}
+                    className={`w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
 
@@ -445,7 +473,7 @@ export default function BookingBarWidget() {
                       transition={{ duration: 0.16, ease: "easeOut" }}
                       onWheel={(e) => e.stopPropagation()}
                       onTouchMove={(e) => e.stopPropagation()}
-                      className="absolute left-0 right-0 top-full mt-1.5 sm:mt-2 bg-white rounded-[8px] shadow-[0_16px_40px_-8px_rgba(0,0,0,0.22)] border border-gray-100 py-1.5 z-50 overflow-hidden"
+                      className="absolute left-0 right-0 top-full mt-1.5 sm:mt-2 bg-white rounded-[10px] md:rounded-[8px] shadow-[0_16px_40px_-8px_rgba(0,0,0,0.22)] border border-gray-100 py-1.5 z-50 overflow-hidden"
                     >
                       {/* Search Bar */}
                       <div className="px-2.5 pb-1.5 pt-0.5 border-b border-gray-100">
@@ -457,7 +485,7 @@ export default function BookingBarWidget() {
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search place or hotel..."
-                            className="w-full h-8 pl-8 pr-7 text-[12.5px] sm:text-[13px] bg-gray-50 border border-gray-200 rounded-[8px] outline-none focus:bg-white focus:border-[#0E2E4E] transition-colors text-gray-800 placeholder-gray-400 font-sans"
+                            className="w-full h-8 pl-8 pr-7 text-[12.5px] sm:text-[13px] bg-gray-50 border border-gray-200 rounded-[6px] outline-none focus:bg-white focus:border-[#0E2E4E] transition-colors text-gray-800 placeholder-gray-400 font-sans"
                             onClick={(e) => e.stopPropagation()}
                           />
                           {searchQuery && (
@@ -468,7 +496,7 @@ export default function BookingBarWidget() {
                                 setSearchQuery("");
                                 searchInputRef.current?.focus();
                               }}
-                              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5"
+                              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5 cursor-pointer"
                             >
                               <X className="w-3.5 h-3.5" />
                             </button>
@@ -508,11 +536,11 @@ export default function BookingBarWidget() {
                                   setHotelError(null);
                                   setDropdownOpen(false);
                                 }}
-                                className={`w-full px-2.5 py-2 flex items-center justify-between text-left hover:bg-gray-50 transition-all rounded-[8px] ${isSelected ? "bg-emerald-50 text-gray-900 font-semibold" : "text-gray-700"
+                                className={`w-full px-2.5 py-2 flex items-center justify-between text-left hover:bg-gray-50 transition-all rounded-[6px] cursor-pointer ${isSelected ? "bg-emerald-50 text-gray-900 font-semibold" : "text-gray-700"
                                   }`}
                               >
                                 <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                                  <div className="w-7 h-7 rounded-[8px] bg-[#0E2E4E]/10 flex items-center justify-center shrink-0">
+                                  <div className="w-7 h-7 rounded-[6px] bg-[#0E2E4E]/10 flex items-center justify-center shrink-0">
                                     <MapPin className="w-3.5 h-3.5 text-[#0E2E4E]" />
                                   </div>
                                   <div className="flex flex-col min-w-0">
@@ -542,7 +570,7 @@ export default function BookingBarWidget() {
                 className="relative w-full"
               >
                 <div className="flex items-center justify-between mb-1 sm:mb-1.5">
-                  <label className="text-[11px] sm:text-xs md:text-[13px] font-semibold text-gray-700 block tracking-tight font-sans">
+                  <label className="text-[12px] md:text-[13px] font-semibold text-gray-700 block tracking-tight font-sans">
                     Check In & Out
                   </label>
                   {dateError && (
@@ -555,22 +583,16 @@ export default function BookingBarWidget() {
                 <div
                   ref={dateBoxRef}
                   onClick={() => fpInstance.current?.open()}
-                  className={`w-full h-[39px] sm:h-[43px] border-[1px] ${
-                    dateError
-                      ? "border-[#0E2E4E] bg-[#0E2E4E]/[0.03] ring-1 ring-[#0E2E4E]/20"
-                      : "border-[#E5E7EB] bg-[#F9FAFB] hover:bg-gray-50/80"
-                  } rounded-[6px] px-3.5 sm:px-[16px] flex items-center gap-2.5 sm:gap-3 transition-all cursor-pointer`}
+                  className={`w-full h-[42px] sm:h-[43px] border-[1px] ${dateError
+                    ? "border-[#0E2E4E] bg-[#0E2E4E]/[0.03] ring-1 ring-[#0E2E4E]/20"
+                    : "border-[#E5E7EB] bg-[#F9FAFB] hover:bg-gray-50/80"
+                    } rounded-[8px] md:rounded-[6px] px-3.5 sm:px-[16px] flex items-center gap-2.5 sm:gap-3 transition-all cursor-pointer`}
                 >
                   <Calendar className={`w-4 h-4 sm:w-5 sm:h-5 ${dateError ? "text-[#0E2E4E]" : "text-gray-400"} shrink-0 stroke-[1.6]`} />
 
-                  <input
-                    ref={dateInputRef}
-                    type="text"
-                    readOnly
-                    value={dateDisplay}
-                    placeholder="Select check-in & check-out"
-                    className="w-full bg-transparent text-[13px] sm:text-[14px] text-gray-900 font-medium outline-none cursor-pointer placeholder-gray-400 font-sans"
-                  />
+                  <span className="w-full bg-transparent text-[13px] sm:text-[14px] text-gray-900 font-medium outline-none cursor-pointer truncate font-sans">
+                    {dateDisplay || "Select check-in & check-out"}
+                  </span>
                 </div>
 
                 {/* Required Guidance Message */}
@@ -592,7 +614,7 @@ export default function BookingBarWidget() {
 
               {/* ── 3. Check Availability CTA ─────────────────────────────────── */}
               <div className="w-full md:w-auto">
-                <label className="hidden lg:block text-[11px] sm:text-xs md:text-[13px] font-semibold opacity-0 select-none mb-1 sm:mb-1.5 font-sans pointer-events-none">
+                <label className="hidden lg:block text-[12px] md:text-[13px] font-semibold opacity-0 select-none mb-1 sm:mb-1.5 font-sans pointer-events-none">
                   &nbsp;
                 </label>
                 <motion.button
@@ -602,13 +624,13 @@ export default function BookingBarWidget() {
                   transition={{ duration: 0.16 }}
                   className="
                     w-full md:w-[236px]
-                    h-[39px] sm:h-[43px]
+                    h-[42px] sm:h-[43px]
                     bg-[#0E2E4E]
                     hover:bg-[#143d66]
                     text-white
                     text-[13px] sm:text-[14px]
                     font-semibold
-                    rounded-[6px]
+                    rounded-[8px] md:rounded-[6px]
                     px-4 sm:px-[32px]
                     py-2 sm:py-[12px]
                     flex items-center justify-center
@@ -625,27 +647,6 @@ export default function BookingBarWidget() {
               </div>
 
             </div>
-
-            {/* Hidden POST fields for IPMS engine */}
-            <input type="hidden" id="h_chkin" name="eZ_chkin" />
-            <input type="hidden" id="h_chkout" name="eZ_chkout" />
-            <input
-              type="hidden"
-              id="h_hotel"
-              name="select_hotel"
-              value={selectedHotel?.hotelValue || "kattilchennai"}
-            />
-            <input
-              type="hidden"
-              id="h_room"
-              name="roomtypeunkid"
-              value=""
-            />
-            <input type="hidden" name="eZ_adult" value="1" />
-            <input type="hidden" name="eZ_child" value="0" />
-            <input type="hidden" name="eZ_Nights" value="1" />
-            <input type="hidden" name="eZ_room" value="1" />
-            <input type="hidden" name="calformat" value="dd-mm-yy" />
           </form>
         </div>
       </div>

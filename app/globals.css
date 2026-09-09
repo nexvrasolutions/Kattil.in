@@ -28,53 +28,53 @@
    ───────────────────────────────────────────────────────────────────────────── */
 .admin-root {
   /* Surfaces — warm cream derived from #F5F3EB */
-  --adm-background:          44 22% 96%;
-  --adm-foreground:          215 54% 13%;
-  --adm-card:                44 30% 99%;
-  --adm-card-foreground:     215 54% 13%;
-  --adm-popover:             44 30% 99%;
-  --adm-popover-foreground:  215 54% 13%;
+  --adm-background: 44 22% 96%;
+  --adm-foreground: 215 54% 13%;
+  --adm-card: 44 30% 99%;
+  --adm-card-foreground: 215 54% 13%;
+  --adm-popover: 44 30% 99%;
+  --adm-popover-foreground: 215 54% 13%;
 
   /* Brand — dark sage #526442 as primary interactive on cream */
-  --adm-primary:             95 20% 34%;
-  --adm-primary-foreground:  44 30% 99%;
-  --adm-secondary:           100 22% 90%;
-  --adm-secondary-foreground:95 20% 34%;
+  --adm-primary: 95 20% 34%;
+  --adm-primary-foreground: 44 30% 99%;
+  --adm-secondary: 100 22% 90%;
+  --adm-secondary-foreground: 95 20% 34%;
 
   /* Neutrals — sage-tinted */
-  --adm-muted:               100 18% 93%;
-  --adm-muted-foreground:    215 18% 44%;
-  --adm-accent:              100 22% 91%;
-  --adm-accent-foreground:   215 54% 13%;
+  --adm-muted: 100 18% 93%;
+  --adm-muted-foreground: 215 18% 44%;
+  --adm-accent: 100 22% 91%;
+  --adm-accent-foreground: 215 54% 13%;
 
   /* Semantic */
-  --adm-destructive:         4 68% 52%;
+  --adm-destructive: 4 68% 52%;
   --adm-destructive-foreground: 0 0% 100%;
-  --adm-success:             95 35% 36%;
-  --adm-success-foreground:  0 0% 100%;
-  --adm-warning:             38 88% 48%;
-  --adm-warning-foreground:  0 0% 100%;
+  --adm-success: 95 35% 36%;
+  --adm-success-foreground: 0 0% 100%;
+  --adm-warning: 38 88% 48%;
+  --adm-warning-foreground: 0 0% 100%;
 
   /* Forms */
-  --adm-border:              100 14% 84%;
-  --adm-input:               100 14% 84%;
-  --adm-ring:                95 20% 34%;
+  --adm-border: 100 14% 84%;
+  --adm-input: 100 14% 84%;
+  --adm-ring: 95 20% 34%;
 
   /* Chart palette — sage/navy family */
-  --adm-chart-1:             95 20% 34%;
-  --adm-chart-2:             89 19% 55%;
-  --adm-chart-3:             100 20% 70%;
-  --adm-chart-4:             215 40% 32%;
-  --adm-chart-5:             44 22% 65%;
+  --adm-chart-1: 95 20% 34%;
+  --adm-chart-2: 89 19% 55%;
+  --adm-chart-3: 100 20% 70%;
+  --adm-chart-4: 215 40% 32%;
+  --adm-chart-5: 44 22% 65%;
 
   /* Sidebar — slightly deeper cream */
-  --adm-sidebar:             44 16% 92%;
-  --adm-sidebar-foreground:  215 54% 13%;
-  --adm-sidebar-primary:     95 20% 34%;
+  --adm-sidebar: 44 16% 92%;
+  --adm-sidebar-foreground: 215 54% 13%;
+  --adm-sidebar-primary: 95 20% 34%;
   --adm-sidebar-primary-foreground: 44 30% 99%;
-  --adm-sidebar-accent:      100 22% 87%;
-  --adm-sidebar-accent-foreground:  215 54% 13%;
-  --adm-sidebar-border:      100 14% 82%;
+  --adm-sidebar-accent: 100 22% 87%;
+  --adm-sidebar-accent-foreground: 215 54% 13%;
+  --adm-sidebar-border: 100 14% 82%;
 
   /* Shadows — warm sage-tinted */
   --adm-shadow-xs: 0 1px 3px 0 hsl(100 20% 20% / 0.06), 0 1px 2px -1px hsl(100 20% 20% / 0.04);
@@ -84,12 +84,12 @@
   --adm-shadow-xl: 0 16px 40px 0 hsl(100 20% 20% / 0.14), 0 6px 12px -3px hsl(100 20% 20% / 0.09);
 
   /* Layout */
-  --adm-radius:         0.625rem;
-  --adm-header-height:  4rem;
-  --adm-sidebar-width:  16rem;
-  --adm-font-sans:      Inter, system-ui, sans-serif;
-  --adm-font-mono:      "JetBrains Mono", monospace;
-  --adm-logo-filter:    none;
+  --adm-radius: 0.625rem;
+  --adm-header-height: 4rem;
+  --adm-sidebar-width: 16rem;
+  --adm-font-sans: Inter, system-ui, sans-serif;
+  --adm-font-mono: "JetBrains Mono", monospace;
+  --adm-logo-filter: none;
 
   background-color: hsl(var(--adm-background));
   color: hsl(var(--adm-foreground));
@@ -104,53 +104,53 @@
    ───────────────────────────────────────────────────────────────────────────── */
 .dark .admin-root {
   /* Surfaces — deep navy family derived from #0d1b2e */
-  --adm-background:          215 55% 8%;
-  --adm-foreground:          44 22% 93%;
-  --adm-card:                215 48% 11%;
-  --adm-card-foreground:     44 22% 93%;
-  --adm-popover:             215 48% 11%;
-  --adm-popover-foreground:  44 22% 93%;
+  --adm-background: 215 55% 8%;
+  --adm-foreground: 44 22% 93%;
+  --adm-card: 215 48% 11%;
+  --adm-card-foreground: 44 22% 93%;
+  --adm-popover: 215 48% 11%;
+  --adm-popover-foreground: 44 22% 93%;
 
   /* Brand — sage green #9CAF88 shines on deep navy */
-  --adm-primary:             89 19% 60%;
-  --adm-primary-foreground:  215 55% 8%;
-  --adm-secondary:           215 40% 17%;
-  --adm-secondary-foreground:100 20% 72%;
+  --adm-primary: 89 19% 60%;
+  --adm-primary-foreground: 215 55% 8%;
+  --adm-secondary: 215 40% 17%;
+  --adm-secondary-foreground: 100 20% 72%;
 
   /* Neutrals — navy-tinted muted tones */
-  --adm-muted:               215 44% 14%;
-  --adm-muted-foreground:    44 12% 57%;
-  --adm-accent:              215 42% 17%;
-  --adm-accent-foreground:   44 22% 93%;
+  --adm-muted: 215 44% 14%;
+  --adm-muted-foreground: 44 12% 57%;
+  --adm-accent: 215 42% 17%;
+  --adm-accent-foreground: 44 22% 93%;
 
   /* Semantic */
-  --adm-destructive:         4 68% 58%;
+  --adm-destructive: 4 68% 58%;
   --adm-destructive-foreground: 0 0% 100%;
-  --adm-success:             89 40% 46%;
-  --adm-success-foreground:  0 0% 100%;
-  --adm-warning:             38 88% 54%;
-  --adm-warning-foreground:  215 55% 8%;
+  --adm-success: 89 40% 46%;
+  --adm-success-foreground: 0 0% 100%;
+  --adm-warning: 38 88% 54%;
+  --adm-warning-foreground: 215 55% 8%;
 
   /* Forms */
-  --adm-border:              215 38% 21%;
-  --adm-input:               215 38% 21%;
-  --adm-ring:                89 19% 60%;
+  --adm-border: 215 38% 21%;
+  --adm-input: 215 38% 21%;
+  --adm-ring: 89 19% 60%;
 
   /* Chart palette — sage/navy family */
-  --adm-chart-1:             89 19% 60%;
-  --adm-chart-2:             100 20% 72%;
-  --adm-chart-3:             44 22% 78%;
-  --adm-chart-4:             215 35% 36%;
-  --adm-chart-5:             89 19% 46%;
+  --adm-chart-1: 89 19% 60%;
+  --adm-chart-2: 100 20% 72%;
+  --adm-chart-3: 44 22% 78%;
+  --adm-chart-4: 215 35% 36%;
+  --adm-chart-5: 89 19% 46%;
 
   /* Sidebar — darkest navy */
-  --adm-sidebar:             215 56% 7%;
-  --adm-sidebar-foreground:  44 22% 93%;
-  --adm-sidebar-primary:     89 19% 60%;
+  --adm-sidebar: 215 56% 7%;
+  --adm-sidebar-foreground: 44 22% 93%;
+  --adm-sidebar-primary: 89 19% 60%;
   --adm-sidebar-primary-foreground: 215 55% 8%;
-  --adm-sidebar-accent:      215 44% 14%;
-  --adm-sidebar-accent-foreground:  44 22% 93%;
-  --adm-sidebar-border:      215 40% 18%;
+  --adm-sidebar-accent: 215 44% 14%;
+  --adm-sidebar-accent-foreground: 44 22% 93%;
+  --adm-sidebar-border: 215 40% 18%;
 
   /* Shadows — deep navy-tinted */
   --adm-shadow-xs: 0 1px 3px 0 hsl(215 55% 4% / 0.35), 0 1px 2px -1px hsl(215 55% 4% / 0.25);
@@ -166,24 +166,40 @@
 }
 
 /* Admin custom scrollbar */
-.admin-root ::-webkit-scrollbar { width: 6px; height: 6px; }
-.admin-root ::-webkit-scrollbar-track { background: transparent; }
-.admin-root ::-webkit-scrollbar-thumb { background: hsl(var(--adm-border)); border-radius: 999px; }
-.admin-root ::-webkit-scrollbar-thumb:hover { background: hsl(var(--adm-muted-foreground)); }
+.admin-root ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.admin-root ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-root ::-webkit-scrollbar-thumb {
+  background: hsl(var(--adm-border));
+  border-radius: 999px;
+}
+
+.admin-root ::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--adm-muted-foreground));
+}
 
 /* Admin shimmer skeleton animation */
 @keyframes adm-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .admin-root .adm-skeleton {
-  background: linear-gradient(
-    90deg,
-    hsl(var(--adm-muted)) 25%,
-    hsl(var(--adm-accent)) 37%,
-    hsl(var(--adm-muted)) 63%
-  );
+  background: linear-gradient(90deg,
+      hsl(var(--adm-muted)) 25%,
+      hsl(var(--adm-accent)) 37%,
+      hsl(var(--adm-muted)) 63%);
   background-size: 400% 100%;
   animation: adm-shimmer 2.5s infinite linear;
   border-radius: calc(var(--adm-radius) - 2px);

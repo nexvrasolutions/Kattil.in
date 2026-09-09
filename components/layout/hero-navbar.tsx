@@ -192,7 +192,7 @@ export default function HeroNavbar({
     heroVisibleRef.current = heroVisible;
   }, [heroVisible]);
 
-  // Buttery-smooth scroll handler — manages scrolled shadow + hero expand/collapse without hijacking gestures
+  // Smooth scroll handler — manages scrolled shadow + hero expand/collapse cleanly without jitter
   useEffect(() => {
     let ticking = false;
     const onScroll = () => {
@@ -201,13 +201,11 @@ export default function HeroNavbar({
           const currentY = window.scrollY;
           setScrolled(currentY > 20);
           if (isHome) {
-            const scrollingDown = currentY > lastScrollY.current;
-            if (scrollingDown && currentY > 60) {
+            if (currentY > 80) {
               setHeroVisible(false);
-            } else if (!scrollingDown && currentY < 25) {
+            } else if (currentY <= 5) {
               setHeroVisible(true);
             }
-            lastScrollY.current = currentY;
           }
           ticking = false;
         });
