@@ -219,9 +219,21 @@ export default function HeroNavbar({
     return () => window.removeEventListener("scroll", onScroll);
   }, [isHome]);
 
-  // Reset hero visibility when navigating to/from home
+  // Reset hero visibility and scroll position when navigating to/from home or refreshing
   useEffect(() => {
-    setHeroVisible(isHome);
+    if (typeof window !== "undefined") {
+      if ("scrollRestoration" in window.history) {
+        window.history.scrollRestoration = "manual";
+      }
+      if (isHome) {
+        window.scrollTo(0, 0);
+        lastScrollY.current = 0;
+        setHeroVisible(true);
+        setScrolled(false);
+      } else {
+        setHeroVisible(false);
+      }
+    }
   }, [isHome]);
 
   // Lock body scroll when mobile menu is open

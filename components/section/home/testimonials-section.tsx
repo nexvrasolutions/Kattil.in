@@ -123,6 +123,7 @@ const ALL_TESTIMONIALS = TESTIMONIALS_DATA.flat();
 
 export default function TestimonialsSection() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const mobileScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -139,6 +140,43 @@ export default function TestimonialsSection() {
     checkMobileScroll();
   }, []);
 
+  // Auto-slide for desktop every 2 seconds
+  useEffect(() => {
+    if (isPaused) return;
+
+    const interval = setInterval(() => {
+      if (typeof window !== "undefined" && window.innerWidth >= 768) {
+        setActiveIndex((prev) => (prev + 1) % TESTIMONIALS_DATA.length);
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [isPaused]);
+
+  // Auto-slide for mobile every 2 seconds
+  useEffect(() => {
+    if (isPaused) return;
+
+    const mobileInterval = setInterval(() => {
+      if (typeof window !== "undefined" && window.innerWidth < 768 && mobileScrollRef.current) {
+        const el = mobileScrollRef.current;
+        if (el.offsetParent === null) return;
+        const maxScroll = el.scrollWidth - el.clientWidth;
+        if (maxScroll <= 0) return;
+        if (el.scrollLeft >= maxScroll - 20) {
+          el.scrollTo({ left: 0, behavior: "smooth" });
+        } else {
+          const firstCard = el.firstElementChild as HTMLElement | null;
+          const step = firstCard ? firstCard.offsetWidth + 16 : el.clientWidth * 0.85;
+          el.scrollBy({ left: step, behavior: "smooth" });
+        }
+        setTimeout(checkMobileScroll, 350);
+      }
+    }, 2000);
+
+    return () => clearInterval(mobileInterval);
+  }, [isPaused]);
+
   const scrollMobile = (direction: "left" | "right") => {
     if (mobileScrollRef.current) {
       const cardWidth = mobileScrollRef.current.clientWidth * 0.85;
@@ -153,7 +191,13 @@ export default function TestimonialsSection() {
   const currentReviews = TESTIMONIALS_DATA[activeIndex] || TESTIMONIALS_DATA[0];
 
   return (
-    <section className="w-full bg-transparent pt-10 pb-16 md:pt-18 md:pb-28 overflow-x-hidden">
+    <section
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onTouchStart={() => setIsPaused(true)}
+      onTouchEnd={() => setIsPaused(false)}
+      className="w-full bg-transparent pt-10 pb-16 md:pt-18 md:pb-28 overflow-x-hidden"
+    >
       <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
         <div className="px-4 sm:px-6 md:px-8 lg:px-12">
           {/* Section Heading */}
@@ -233,11 +277,10 @@ export default function TestimonialsSection() {
                 onClick={() => scrollMobile("left")}
                 disabled={!canScrollLeft}
                 aria-label="Previous review"
-                className={`w-11 h-11 rounded-[14px] flex items-center justify-center transition-all duration-200 active:scale-95 ${
-                  canScrollLeft
-                    ? "bg-[#EDF5E4] text-[#526442] hover:bg-[#DCEAC8] border border-[#526442]/20 cursor-pointer shadow-xs"
-                    : "bg-[#EDF5E4]/40 text-[#A3B596] border border-black/[0.04] cursor-not-allowed"
-                }`}
+                className={`w-11 h-11 rounded-[14px] flex items-center justify-center transition-all duration-200 active:scale-95 ${canScrollLeft
+                  ? "bg-[#EDF5E4] text-[#526442] hover:bg-[#DCEAC8] border border-[#526442]/20 cursor-pointer shadow-xs"
+                  : "bg-[#EDF5E4]/40 text-[#A3B596] border border-black/[0.04] cursor-not-allowed"
+                  }`}
               >
                 <ArrowLeft className="w-5 h-5 stroke-[2.2]" />
               </button>
@@ -246,11 +289,10 @@ export default function TestimonialsSection() {
                 onClick={() => scrollMobile("right")}
                 disabled={!canScrollRight}
                 aria-label="Next review"
-                className={`w-11 h-11 rounded-[14px] flex items-center justify-center transition-all duration-200 active:scale-95 ${
-                  canScrollRight
-                    ? "bg-[#EDF5E4] text-[#526442] hover:bg-[#DCEAC8] border border-[#526442]/20 cursor-pointer shadow-xs"
-                    : "bg-[#EDF5E4]/40 text-[#A3B596] border border-black/[0.04] cursor-not-allowed"
-                }`}
+                className={`w-11 h-11 rounded-[14px] flex items-center justify-center transition-all duration-200 active:scale-95 ${canScrollRight
+                  ? "bg-[#EDF5E4] text-[#526442] hover:bg-[#DCEAC8] border border-[#526442]/20 cursor-pointer shadow-xs"
+                  : "bg-[#EDF5E4]/40 text-[#A3B596] border border-black/[0.04] cursor-not-allowed"
+                  }`}
               >
                 <ArrowRight className="w-5 h-5 stroke-[2.2]" />
               </button>
@@ -315,11 +357,10 @@ export default function TestimonialsSection() {
                   type="button"
                   onClick={() => setActiveIndex(i)}
                   aria-label={`Go to testimonial page ${i + 1}`}
-                  className={`rounded-full transition-all duration-300 cursor-pointer ${
-                    activeIndex === i
-                      ? "w-2.5 h-2.5 bg-[#8EA980] scale-110"
-                      : "w-2.5 h-2.5 bg-[#D1D5DB] hover:bg-gray-400"
-                  }`}
+                  className={`rounded-full transition-all duration-300 cursor-pointer ${activeIndex === i
+                    ? "w-2.5 h-2.5 bg-[#8EA980] scale-110"
+                    : "w-2.5 h-2.5 bg-[#D1D5DB] hover:bg-gray-400"
+                    }`}
                 />
               ))}
             </div>
