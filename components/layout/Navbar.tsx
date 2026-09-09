@@ -4,7 +4,18 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import {
+  Menu,
+  X,
+  Home,
+  MapPin,
+  Users,
+  Settings,
+  Phone,
+  ChevronUp,
+  ChevronDown,
+  ChevronRight,
+} from "lucide-react";
 import { navLinks } from "@/lib/data";
 import DestinationsDropdown, { MobileDestinationsList } from "./destinations-dropdown";
 
@@ -27,14 +38,28 @@ export default function Navbar() {
   const [mobileDestinationsOpen, setMobileDestinationsOpen] = useState(false);
   const [destinationsOpen, setDestinationsOpen] = useState(false);
   const navRowRef = useRef<HTMLDivElement>(null);
+  const destinationsTriggerRef = useRef<HTMLButtonElement>(null);
+  const headerContainerRef = useRef<HTMLDivElement>(null);
   const [navRowHeight, setNavRowHeight] = useState(84);
+  const [destinationsLeft, setDestinationsLeft] = useState<number>(0);
+
+  const updateDestinationsPosition = useCallback(() => {
+    if (destinationsTriggerRef.current && headerContainerRef.current) {
+      const triggerRect = destinationsTriggerRef.current.getBoundingClientRect();
+      const containerRect = headerContainerRef.current.getBoundingClientRect();
+      const offset = triggerRect.left - containerRect.left;
+      setDestinationsLeft(Math.max(0, Math.round(offset)));
+    }
+  }, []);
+
   const toggleDestinations = useCallback((e?: React.MouseEvent) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
+    updateDestinationsPosition();
     setDestinationsOpen((prev) => !prev);
-  }, []);
+  }, [updateDestinationsPosition]);
 
   useEffect(() => {
     if (!destinationsOpen) return;
@@ -60,11 +85,12 @@ export default function Navbar() {
   useEffect(() => {
     const measure = () => {
       if (navRowRef.current) setNavRowHeight(navRowRef.current.offsetHeight);
+      updateDestinationsPosition();
     };
     measure();
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
-  }, []);
+  }, [updateDestinationsPosition]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -88,71 +114,73 @@ export default function Navbar() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.55, ease: EASE }}
       style={{ willChange: "transform, opacity" }}
-      className="fixed top-0 left-0 right-0 z-70 mt-2 md:mt-3 lg:mt-4 px-3 md:px-5"
+      className="fixed top-0 left-0 right-0 z-70 mt-2 md:mt-3 lg:mt-4 px-3 md:px-5 pointer-events-none flex justify-center"
     >
-      {/* ── Expanding container ───────────────────────────────────────────────── */}
-      <motion.div
-        animate={{ height: mobileOpen ? "calc(100svh - 32px)" : navRowHeight }}
-        transition={{ duration: 0.55, ease: EASE, delay: mobileOpen ? 0 : 0.15 }}
-        className="relative mx-auto overflow-hidden rounded-[12px] border border-white/5 flex flex-col"
-        style={{
-          backgroundColor: scrolled && !mobileOpen ? "rgba(13, 27, 46, 0.92)" : "#0d1b2e",
-          backdropFilter: scrolled && !mobileOpen ? "blur(16px)" : "none",
-          maxWidth: "1920px",
-          boxShadow: scrolled && !mobileOpen ? "0 8px 32px rgba(0,0,0,0.35)" : "none",
-          willChange: "height",
-        }}
-      >
-        {/* Overlay texture */}
-        <div
-          className="absolute inset-0 pointer-events-none z-0"
+      <div ref={headerContainerRef} className="relative w-full max-w-[1920px] mx-auto pointer-events-none">
+        {/* ── Expanding container ───────────────────────────────────────────────── */}
+        <motion.div
+          animate={{ height: mobileOpen ? "calc(100svh - 32px)" : navRowHeight }}
+          transition={{ duration: 0.55, ease: EASE, delay: mobileOpen ? 0 : 0.15 }}
+          className="relative mx-auto overflow-hidden rounded-[12px] border border-white/5 flex flex-col pointer-events-auto"
           style={{
-            backgroundImage: "url('/assets/overlay.png')",
-            backgroundPosition: "center",
-            backgroundSize: "cover",
+            backgroundColor: scrolled && !mobileOpen ? "rgba(13, 27, 46, 0.92)" : "#0d1b2e",
+            backdropFilter: scrolled && !mobileOpen ? "blur(16px)" : "none",
+            maxWidth: "1920px",
+            boxShadow: scrolled && !mobileOpen ? "0 8px 32px rgba(0,0,0,0.35)" : "none",
+            willChange: "height",
           }}
-        />
+        >
+          {/* Overlay texture */}
+          <div
+            className="absolute inset-0 pointer-events-none z-0"
+            style={{
+              backgroundImage: "url('/assets/overlay.png')",
+              backgroundPosition: "center",
+              backgroundSize: "cover",
+            }}
+          />
 
-        {/* ── Nav row (always visible) ─────────────────────────────────────── */}
-        <div ref={navRowRef} className="relative z-10 shrink-0 flex items-center justify-between h-[74px] sm:h-[82px] md:h-[90px] lg:h-[94px] px-5 md:px-8 lg:px-15">
+          {/* ── Nav row (always visible) ─────────────────────────────────────── */}
+          <div ref={navRowRef} className="relative z-10 shrink-0 flex items-center justify-between h-[74px] sm:h-[82px] md:h-[90px] lg:h-[94px] px-5 md:px-8 lg:px-15">
 
-          {/* Left navigation */}
-          <nav className="hidden lg:flex items-center gap-8 flex-1">
-            {[
-              { label: "Home", href: "/" },
-              { label: "Destinations", href: "/rooms" },
-              { label: "Partners", href: "/partners" },
-              { label: "Offering", href: "" },
-            ].map((link) => {
-              const isDestinations = link.label === "Destinations";
-              const isActive = isDestinations
-                ? isDestinationsRoute(pathname)
-                : link.href !== "" &&
-                  (link.href === "/"
-                    ? pathname === "/"
-                    : pathname.startsWith(link.href));
+            {/* Left navigation */}
+            <nav className="hidden lg:flex items-center gap-8 flex-1">
+              {[
+                { label: "Home", href: "/" },
+                { label: "Destinations", href: "/rooms" },
+                { label: "Partners", href: "/partners" },
+                { label: "Offering", href: "" },
+              ].map((link) => {
+                const isDestinations = link.label === "Destinations";
+                const isActive = isDestinations
+                  ? isDestinationsRoute(pathname)
+                  : link.href !== "" &&
+                    (link.href === "/"
+                      ? pathname === "/"
+                      : pathname.startsWith(link.href));
 
-              return (
-                <div key={link.label} className="relative py-2">
-                  {isDestinations ? (
-                    <button
-                      type="button"
-                      data-text={link.label}
-                      data-destinations-trigger="true"
-                      onClick={toggleDestinations}
-                      className={`nav-link-bold-safe group relative !no-underline text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans cursor-pointer ${isActive || destinationsOpen
-                        ? "font-bold !text-[#D2E6BC]"
-                        : "font-medium hover:font-bold text-[#DDDDDD] hover:!text-[#D2E6BC]"
-                        }`}
-                      style={{
-                        background: "none",
-                        border: "none",
-                        padding: 0,
-                        textDecoration: "none",
-                      }}
-                    >
-                      {link.label}
-                    </button>
+                return (
+                  <div key={link.label} className="relative py-2">
+                    {isDestinations ? (
+                      <button
+                        ref={destinationsTriggerRef}
+                        type="button"
+                        data-text={link.label}
+                        data-destinations-trigger="true"
+                        onClick={toggleDestinations}
+                        className={`nav-link-bold-safe group relative !no-underline text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans cursor-pointer ${isActive || destinationsOpen
+                          ? "font-bold !text-[#D2E6BC]"
+                          : "font-medium hover:font-bold text-[#DDDDDD] hover:!text-[#D2E6BC]"
+                          }`}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          padding: 0,
+                          textDecoration: "none",
+                        }}
+                      >
+                        {link.label}
+                      </button>
                   ) : (
                     <Link
                       href={link.href || "#"}
@@ -256,99 +284,115 @@ shadow-sm active:scale-95 font-sans"         >
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.12 }}
-              className="lg:hidden relative z-10 flex flex-col flex-1 px-8 pb-10 border-t border-white/10"
+              className="lg:hidden relative z-10 flex flex-col flex-1 px-6 sm:px-8 pb-8 border-t border-white/10 overflow-y-auto"
             >
               {/* Links */}
-              <nav className="flex flex-col gap-6 mt-8">
-                {[
-                  { label: "Home", href: "/" },
-                  { label: "Destinations", href: "/rooms" },
-                  { label: "Partners", href: "/partners" },
-                  { label: "Offering", href: "" },
-                ].map((link, index) => {
-                  const isDestinations = link.label === "Destinations";
-                  const isActive = isDestinations
-                    ? isDestinationsRoute(pathname)
-                    : (link.href === "/" && pathname === "/") ||
-                      (link.href !== "" && link.href !== "/" && pathname.startsWith(link.href));
-                  return (
-                    <motion.div
-                      key={link.label}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 + index * 0.06, duration: 0.35, ease: EASE }}
-                    >
-                      {isDestinations ? (
-                        <div>
-                          <button
-                            type="button"
-                            onClick={() => setMobileDestinationsOpen((prev) => !prev)}
-                            className={`flex items-center justify-between w-full text-left text-[24px] sm:text-[28px] font-sans focus:outline-none transition-all hover:font-bold ${
-                              isActive ? "text-emerald-400 font-bold" : "text-white/80 font-medium"
-                            }`}
-                          >
-                            <span>{link.label}</span>
-                            <span className="text-xs text-[#D2E6BC] font-sans px-2 py-1 rounded bg-white/5">
-                              {mobileDestinationsOpen ? "Close ▲" : "View ▼"}
-                            </span>
-                          </button>
-                          {mobileDestinationsOpen && (
-                            <MobileDestinationsList onItemClick={() => setMobileOpen(false)} />
-                          )}
-                        </div>
-                      ) : (
-                        <Link
-                          href={link.href}
-                          onClick={() => setMobileOpen(false)}
-                          className={`relative inline-block text-[24px] sm:text-[28px] transition-all font-sans hover:font-bold ${isActive ? "text-emerald-400 font-bold" : "text-white/80 font-medium"
-                            }`}
-                        >
-                          {link.label}
-                        </Link>
-                      )}
-                    </motion.div>
-                  );
-                })}
+              <nav className="flex flex-col gap-4.5 mt-6">
+                {/* 1. Home */}
+                <Link
+                  href="/"
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${
+                    pathname === "/" ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
+                  }`}
+                >
+                  <Home size={20} className={pathname === "/" ? "text-[#D2E6BC]" : "text-white/80"} />
+                  <span>Home</span>
+                </Link>
+
+                {/* 2. Destinations */}
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setMobileDestinationsOpen((prev) => !prev)}
+                    className={`flex items-center justify-between w-full text-left font-sans transition-all py-1 cursor-pointer ${
+                      mobileDestinationsOpen || isDestinationsRoute(pathname)
+                        ? "text-[#D2E6BC] font-semibold"
+                        : "text-white/90 font-medium hover:text-[#D2E6BC]"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3.5">
+                      <MapPin size={20} className={mobileDestinationsOpen || isDestinationsRoute(pathname) ? "text-[#D2E6BC]" : "text-white/80"} />
+                      <span className="text-[17px] sm:text-[18px]">Destinations</span>
+                    </div>
+                    {mobileDestinationsOpen ? (
+                      <ChevronUp size={20} className="text-[#D2E6BC]" />
+                    ) : (
+                      <ChevronDown size={20} className="text-white/60" />
+                    )}
+                  </button>
+
+                  {mobileDestinationsOpen && (
+                    <MobileDestinationsList onItemClick={() => setMobileOpen(false)} />
+                  )}
+                </div>
+
+                {/* 3. Partners */}
+                <Link
+                  href="/partners"
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex items-center justify-between w-full py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${
+                    pathname.startsWith("/partners") ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
+                  }`}
+                >
+                  <div className="flex items-center gap-3.5">
+                    <Users size={20} className={pathname.startsWith("/partners") ? "text-[#D2E6BC]" : "text-white/80"} />
+                    <span>Partners</span>
+                  </div>
+                  <ChevronRight size={18} className="text-white/40" />
+                </Link>
+
+                {/* 4. Offering */}
+                <Link
+                  href="#"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-between w-full py-1 text-[17px] sm:text-[18px] font-sans font-medium text-white/90 hover:text-[#D2E6BC] transition-colors"
+                >
+                  <div className="flex items-center gap-3.5">
+                    <Settings size={20} className="text-white/80" />
+                    <span>Offering</span>
+                  </div>
+                  <ChevronRight size={18} className="text-white/40" />
+                </Link>
+
+                {/* 5. Contact Us */}
+                <Link
+                  href="/contact-us"
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${
+                    pathname === "/contact-us" ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
+                  }`}
+                >
+                  <Phone size={20} className={pathname === "/contact-us" ? "text-[#D2E6BC]" : "text-white/80"} />
+                  <span>Contact Us</span>
+                </Link>
               </nav>
 
-              <div className="flex-1" />
+              <div className="flex-1 min-h-[36px]" />
 
               {/* CTAs */}
-              <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.38, duration: 0.4, ease: EASE }}
-                className="flex flex-col gap-3"
-              >
+              <div className="pt-4">
                 <Link
                   href="/rooms"
-                  className="flex items-center justify-center w-full
-                    bg-white text-[#0d1b2e] rounded-xl py-4 text-[14px]
-                    font-semibold tracking-wide transition-all shadow-lg font-sans"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center justify-center w-full border border-white/40 hover:border-white text-white rounded-xl py-3.5 text-[15px] font-semibold tracking-wide transition-all font-sans hover:bg-white/5 active:scale-[0.99]"
                 >
                   Book Now
                 </Link>
-                <Link
-                  href="/contact-us"
-                  className="flex items-center justify-center w-full
-                    border border-white/30 text-white rounded-xl py-4 text-[14px]
-                    font-medium tracking-wide transition-all font-sans"
-                >
-                  Contact Us
-                </Link>
-              </motion.div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
 
       </motion.div>
 
-      {/* ── Destinations Mega Menu Dropdown ─────────────────────────────── */}
-      <DestinationsDropdown
-        isOpen={destinationsOpen}
-        topOffset={navRowHeight + 14}
-        onItemClick={() => setDestinationsOpen(false)}
-      />
+        {/* ── Destinations Mega Menu Dropdown ─────────────────────────────── */}
+        <DestinationsDropdown
+          isOpen={destinationsOpen}
+          topOffset={navRowHeight + 14}
+          onItemClick={() => setDestinationsOpen(false)}
+        />
+      </div>
     </motion.header>
   );
 }

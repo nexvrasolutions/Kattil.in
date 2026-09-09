@@ -10,7 +10,6 @@ import {
   Search,
   X,
   MapPin,
-  Sparkles,
   Info,
 } from "lucide-react";
 
@@ -373,7 +372,7 @@ export default function BookingBarWidget() {
     <>
       <style dangerouslySetInnerHTML={{ __html: STYLES }} />
 
-      <div className="w-[92%] sm:w-full max-w-[370px] md:max-w-4xl mx-auto">
+      <div className="w-full max-w-none md:max-w-4xl mx-auto">
         <div className="bg-white rounded-[22px] md:rounded-[10px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] p-6 sm:p-7 md:p-6 text-left">
           <form
             onSubmit={(e) => {
@@ -628,7 +627,6 @@ export default function BookingBarWidget() {
                     cursor-pointer
                   "
                 >
-                  <Sparkles className="w-4.5 h-4.5 opacity-80" />
                   Check Availability
                 </motion.button>
               </div>

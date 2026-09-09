@@ -101,14 +101,14 @@ export default function DestinationsDropdown({
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
           style={{ top: `${topOffset}px` }}
-          className="absolute left-0 right-0 z-80 mx-auto w-full max-w-[1280px] px-3 md:px-5 pointer-events-auto"
+          className="absolute left-0 right-0 z-80 mx-auto w-full max-w-[1280px] px-3 md:px-5 pointer-events-auto flex justify-center"
         >
           {/* Bridge padding zone */}
           <div className="absolute -top-6 left-0 right-0 h-6 bg-transparent" />
 
           {/* White Mega Menu Card */}
           <div
-            className="w-full rounded-[8px] bg-white border border-slate-100 p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.18)]"
+            className="w-full rounded-[10px] bg-white border border-slate-100 p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.18)]"
             style={{
               backgroundColor: "#ffffff",
             }}
@@ -120,10 +120,10 @@ export default function DestinationsDropdown({
                   (dest.slug === "chennai"
                     ? "/chennai"
                     : dest.slug === "coimbatore"
-                    ? "/coimbatore"
-                    : dest.slug === "madurai"
-                    ? "/madurai"
-                    : `/destinations/${dest.slug}`);
+                      ? "/coimbatore"
+                      : dest.slug === "madurai"
+                        ? "/madurai"
+                        : `/destinations/${dest.slug}`);
                 const imgSrc = dest.image?.trim() || "/images/destinations/kanyakumari.png";
 
                 return (
@@ -187,53 +187,71 @@ export function MobileDestinationsList({
           setDestinations(data.data);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
     return () => {
       isMounted = false;
     };
   }, []);
 
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3 pl-2">
-      {destinations.map((dest) => {
-        const targetLink =
-          dest.link?.trim() ||
-          (dest.slug === "chennai"
-            ? "/chennai"
-            : dest.slug === "coimbatore"
-            ? "/coimbatore"
-            : dest.slug === "madurai"
-            ? "/madurai"
-            : `/destinations/${dest.slug}`);
-        const imgSrc = dest.image?.trim() || "/images/destinations/kanyakumari.png";
+  const displayedDestinations = destinations.slice(0, 4);
+  const hasMore = destinations.length > 4;
 
-        return (
+  return (
+    <div className="mt-3.5 bg-white rounded-[16px] p-3 sm:p-4 shadow-xl border border-gray-100/90 overflow-hidden text-left">
+      <div className="divide-y divide-gray-100">
+        {displayedDestinations.map((dest) => {
+          const targetLink =
+            dest.link?.trim() ||
+            (dest.slug === "chennai"
+              ? "/chennai"
+              : dest.slug === "coimbatore"
+                ? "/coimbatore"
+                : dest.slug === "madurai"
+                  ? "/madurai"
+                  : `/destinations/${dest.slug}`);
+          const imgSrc = dest.image?.trim() || "/images/destinations/kanyakumari.png";
+
+          return (
+            <Link
+              key={dest._id || dest.slug}
+              href={targetLink}
+              onClick={onItemClick}
+              className="flex items-center gap-3.5 py-3 px-1.5 rounded-[8px] hover:bg-slate-50 transition-colors group"
+            >
+              <div className="relative w-13 h-13 rounded-[10px] overflow-hidden bg-slate-100 shrink-0 border border-slate-100 shadow-xs">
+                <Image
+                  src={imgSrc}
+                  alt={dest.name}
+                  fill
+                  sizes="52px"
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-sans text-[15.5px] font-semibold text-gray-900 leading-tight truncate group-hover:text-[#0d1b2e]">
+                  {dest.name}
+                </p>
+                <p className="text-[12.5px] text-gray-500 font-sans mt-1 truncate font-normal">
+                  {dest.hotelCount || "1 hotels"}
+                </p>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+
+      {hasMore && (
+        <div className="pt-2.5 border-t border-gray-100 mt-1">
           <Link
-            key={dest._id || dest.slug}
-            href={targetLink}
+            href="/rooms"
             onClick={onItemClick}
-            className="flex items-center gap-3 p-2 rounded-[8px] bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+            className="flex items-center justify-center gap-2 py-2 text-[#0d1b2e] hover:text-[#526442] font-semibold text-[13.5px] font-sans transition-colors"
           >
-            <div className="relative w-11 h-11 rounded-[8px] overflow-hidden bg-white/10 shrink-0">
-              <Image
-                src={imgSrc}
-                alt={dest.name}
-                fill
-                sizes="44px"
-                className="object-cover"
-              />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="font-sans text-[14.5px] font-semibold text-white leading-tight truncate">
-                {dest.name}
-              </p>
-              <p className="text-[11.5px] text-white/60 font-sans mt-0.5 truncate">
-                {dest.hotelCount || "1 hotels"}
-              </p>
-            </div>
+            <span>View all destinations ({destinations.length})</span>
+            <span className="text-[14px]">→</span>
           </Link>
-        );
-      })}
+        </div>
+      )}
     </div>
   );
 }
