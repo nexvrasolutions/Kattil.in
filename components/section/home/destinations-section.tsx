@@ -41,11 +41,24 @@ export default function DestinationsSection() {
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Heading */}
+        {/*
+          NOTE: Changed from `whileInView` to `animate` (mount-triggered).
+          The previous `whileInView` + `once: true` setup could permanently
+          fail to fire: while HeroNavbar's hero-collapse animation is still
+          resizing the page layout (spacer height animating from 100svh
+          down to navbarH+32px), the IntersectionObserver behind
+          `whileInView` can sample this heading's position mid-reflow and
+          decide it hasn't crossed the visibility threshold yet. Because
+          `once: true` marks the trigger as "used" after that first (missed)
+          check, the heading would then stay at opacity: 0 forever on scroll.
+          Since this heading sits near the top of the page anyway, there's
+          no real benefit to scroll-triggering it — animating on mount
+          removes the dependency on scroll position/timing entirely.
+        */}
         <motion.div
           initial={{ opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.1 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           className="text-center mb-6 sm:mb-10"
         >
           <h2 className="text-[#0d1b2e] text-[26px] sm:text-[36px] md:text-[44px] font-sans font-normal tracking-tight">
@@ -63,7 +76,7 @@ export default function DestinationsSection() {
               key={dest.name}
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.1 }}
+              viewport={{ once: true, amount: 0, margin: "0px 0px 200px 0px" }}
               transition={{
                 delay: index * 0.08,
                 duration: 0.45,
@@ -117,7 +130,7 @@ export default function DestinationsSection() {
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.1 }}
+            viewport={{ once: true, amount: 0, margin: "0px 0px 200px 0px" }}
             transition={{
               delay: 0.25,
               duration: 0.45,
