@@ -505,7 +505,7 @@ export default function BookingBarWidget({
       <style dangerouslySetInnerHTML={{ __html: STYLES }} />
 
       <div className="w-full max-w-none md:max-w-4xl mx-auto">
-        <div className="bg-white rounded-[22px] md:rounded-[10px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] p-6 sm:p-7 md:p-6 text-left">
+        <div className="bg-white rounded-[8px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] p-6 sm:p-7 md:p-6 text-left">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -538,7 +538,7 @@ export default function BookingBarWidget({
                   className={`w-full h-[58px] sm:h-[60px] md:h-[48px] lg:h-[50px] border-[1px] ${hotelError
                     ? "border-[#0E2E4E] bg-[#0E2E4E]/[0.03] ring-1 ring-[#0E2E4E]/20"
                     : "border-[#E5E7EB] bg-[#F9FAFB] hover:bg-gray-50/80"
-                    } rounded-[12px] md:rounded-[8px] px-4 sm:px-[16px] py-0 flex items-center justify-between gap-2 transition-all text-left cursor-pointer`}
+                    } rounded-[8px] px-4 sm:px-[16px] py-0 flex items-center justify-between gap-2 transition-all text-left cursor-pointer`}
                 >
                   <div className="flex items-center gap-3 overflow-hidden">
                     <Building2 className={`w-5 h-5 ${hotelError ? "text-[#0E2E4E]" : "text-[#0E2E4E]/70"} shrink-0 stroke-[1.6]`} />
@@ -586,7 +586,7 @@ export default function BookingBarWidget({
                       transition={{ duration: 0.16, ease: "easeOut" }}
                       onWheel={(e) => e.stopPropagation()}
                       onTouchMove={(e) => e.stopPropagation()}
-                      className="absolute left-0 right-0 top-full mt-1.5 sm:mt-2 bg-white rounded-[12px] md:rounded-[8px] shadow-[0_16px_40px_-8px_rgba(0,0,0,0.22)] border border-gray-100 py-1.5 z-50 overflow-hidden"
+                      className="absolute left-0 right-0 top-full mt-1.5 sm:mt-2 bg-white rounded-[8px] shadow-[0_16px_40px_-8px_rgba(0,0,0,0.22)] border border-gray-100 py-1.5 z-50 overflow-hidden"
                     >
                       {/* Search Bar */}
                       <div className="px-2.5 pb-1.5 pt-0.5 border-b border-gray-100">
@@ -628,7 +628,7 @@ export default function BookingBarWidget({
                       {/* Scrollable Hotels / Places List */}
                       <div
                         data-prevent-hero-scroll="true"
-                        className="booking-dropdown-scrollbar max-h-[175px] sm:max-h-[195px] md:max-h-[210px] overflow-y-auto overscroll-contain px-1.5 pt-1 pb-1.5 space-y-0.5"
+                        className="booking-dropdown-scrollbar max-h-[300px] sm:max-h-[320px] md:max-h-[340px] overflow-y-auto overscroll-contain px-1.5 pt-1 pb-1.5 space-y-0.5"
                         onWheel={(e) => e.stopPropagation()}
                         onTouchMove={(e) => e.stopPropagation()}
                       >
@@ -702,7 +702,7 @@ export default function BookingBarWidget({
                   className={`w-full h-[58px] sm:h-[60px] md:h-[48px] lg:h-[50px] border-[1px] ${dateError
                     ? "border-[#0E2E4E] bg-[#0E2E4E]/[0.03] ring-1 ring-[#0E2E4E]/20"
                     : "border-[#E5E7EB] bg-[#F9FAFB] hover:bg-gray-50/80"
-                    } rounded-[12px] md:rounded-[8px] px-4 sm:px-[16px] flex items-center gap-3 transition-all cursor-pointer select-none`}
+                    } rounded-[8px] px-4 sm:px-[16px] flex items-center gap-3 transition-all cursor-pointer select-none`}
                 >
                   <Calendar className={`w-5 h-5 ${dateError ? "text-[#0E2E4E]" : "text-gray-400"} shrink-0 stroke-[1.6] pointer-events-none`} />
 
@@ -755,7 +755,7 @@ export default function BookingBarWidget({
                     text-white
                     text-[15px] sm:text-[15.5px] md:text-[14px] lg:text-[14.5px]
                     font-semibold
-                    rounded-[12px] md:rounded-[8px]
+                    rounded-[8px]
                     px-4 sm:px-[32px]
                     py-2 sm:py-[12px]
                     flex items-center justify-center

@@ -50,9 +50,9 @@ export default function DestinationsSection() {
   return (
     <section
       id="destinations"
-      className="bg-transparent pt-20 sm:pt-24 md:pt-28 pb-10 md:pb-20 lg:pb-24 scroll-mt-[120px] 2xl:scroll-mt-[140px]"
+      className="bg-transparent pt-20 sm:pt-24 md:pt-28 pb-10 md:pb-20 lg:pb-24 scroll-mt-[120px] 2xl:scroll-mt-[140px] px-3 md:px-5"
     >
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8">
         {/* Section Heading */}
         <motion.div
           initial={{ opacity: 0, y: 14 }}
@@ -69,7 +69,7 @@ export default function DestinationsSection() {
         </motion.div>
 
         {/* 4 Static Destination Cards (Clean grid, No slideshow, No shadow, No stroke) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 justify-items-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 justify-items-stretch">
           {DESTINATIONS.map((dest, index) => (
             <motion.div
               key={dest.id}
@@ -81,7 +81,7 @@ export default function DestinationsSection() {
                 duration: 0.45,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="w-full max-w-[320px] sm:max-w-none"
+              className="w-full"
             >
               {dest.isViewAll ? (
                 /* 4th Card: View all our Destination (Matches Desktop on Mobile) */

@@ -304,7 +304,7 @@ export default function TestimonialsSection() {
   return (
     <section className="w-full bg-transparent pt-10 pb-16 md:pt-18 md:pb-28 overflow-x-hidden">
       <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
-        <div className="px-4 sm:px-6 md:px-8 lg:px-12">
+        <div className="px-5 md:px-8 lg:px-12">
           {/* Section Heading */}
           <motion.div
             initial={{ opacity: 0, y: 18 }}
@@ -329,7 +329,7 @@ export default function TestimonialsSection() {
               onTouchStart={handleMobileInteractionStart}
               onTouchEnd={handleMobileInteractionEnd}
               onTouchCancel={handleMobileInteractionEnd}
-              className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-none px-4 -mx-4 pb-2 scroll-smooth"
+              className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-none px-5 -mx-5 pb-2 scroll-smooth"
               style={{
                 scrollbarWidth: "none",
                 msOverflowStyle: "none",
@@ -339,7 +339,7 @@ export default function TestimonialsSection() {
               {INFINITE_TESTIMONIALS.map((item, index) => (
                 <div
                   key={`mobile-${index}`}
-                  className="w-[84vw] max-w-[330px] shrink-0 snap-center bg-white rounded-[20px] p-5 sm:p-6 flex flex-col justify-between shadow-[0_4px_25px_rgba(0,0,0,0.04)] border border-black/[0.04] select-none min-h-[260px]"
+                  className="w-[calc(100vw-64px)] max-w-[340px] shrink-0 snap-start bg-white rounded-[20px] p-5 sm:p-6 flex flex-col justify-between shadow-[0_4px_25px_rgba(0,0,0,0.04)] border border-black/[0.04] select-none min-h-[260px]"
                 >
                   <div>
                     {/* 5 Stars */}

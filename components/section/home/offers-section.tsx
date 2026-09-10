@@ -19,7 +19,7 @@ export default function OffersSection() {
             lg:h-[465px]
             lg:min-h-[465px]
             flex items-center
-            px-4
+            px-5
             sm:px-6
             md:px-8
             lg:px-14

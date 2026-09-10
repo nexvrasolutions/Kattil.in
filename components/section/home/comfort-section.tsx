@@ -32,12 +32,12 @@ const FEATURES: ComfortFeature[] = [
 export default function ComfortSection() {
   return (
     <section
-      className="w-full flex items-center justify-center"
+      className="w-full flex items-center justify-center px-3 md:px-5"
       style={{
         background: "linear-gradient(180deg, rgba(240, 234, 210, 0.8) 0%, rgba(240, 234, 210, 0) 100%)",
       }}
     >
-      <div className="w-full max-w-[1560px] 2xl:max-w-[1680px] mx-auto min-h-[500px] lg:min-h-[540px] flex items-center pt-12 pb-20 sm:pt-16 sm:pb-24 lg:pt-[85px] lg:pb-[70px] px-6 sm:px-10 lg:px-14 xl:px-20 box-border">
+      <div className="w-full max-w-[1560px] 2xl:max-w-[1680px] mx-auto min-h-[500px] lg:min-h-[540px] flex items-center pt-12 pb-20 sm:pt-16 sm:pb-24 lg:pt-[85px] lg:pb-[70px] px-5 sm:px-10 lg:px-14 xl:px-20 box-border">
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 xl:gap-12 items-center">
           {/* Left Column: Community Dining Image */}
           <motion.div
@@ -47,7 +47,7 @@ export default function ComfortSection() {
             transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
             className="lg:col-span-5"
           >
-            <div className="relative w-full max-w-[432px] aspect-[432/340] rounded-[8px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.08)]">              <Image
+            <div className="relative w-full max-w-full lg:max-w-[432px] aspect-[432/340] rounded-[8px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.08)]">              <Image
               src="/images/home/dining-community.png"
               alt="Community and comfort at Kattil"
               fill

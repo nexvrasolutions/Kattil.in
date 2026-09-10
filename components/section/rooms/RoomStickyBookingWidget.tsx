@@ -408,7 +408,7 @@ export default function RoomStickyBookingWidget({
                 className="absolute left-0 right-0 top-full mt-2 z-50 bg-white rounded-xl border border-gray-200 shadow-xl overflow-hidden p-2"
               >
                 {/* List of Destinations & Hotels */}
-                <div className="max-h-56 overflow-y-auto space-y-1">
+                <div className="max-h-72 sm:max-h-80 overflow-y-auto space-y-1">
                   {(lockedDestination
                     ? hotelsList.filter(
                       (h) =>

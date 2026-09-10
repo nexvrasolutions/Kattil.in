@@ -1,175 +1,110 @@
 "use client";
 
+import { useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRef } from "react";
-import { usePageView } from "@/hooks/usePageView";
-import { motion, useInView } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import Navbar from "@/components/layout/Navbar";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
+import { Calendar, Clock, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import Navbar from "@/components/layout/Navbar";
+import { usePageView } from "@/hooks/usePageView";
 import type { BlogPost } from "./page";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-function AnimatedWords({ text, delay = 0, className }: { text: string; delay?: number; className?: string }) {
-  return (
-    <span className={className}>
-      {text.split(" ").map((word, i) => (
-        <motion.span
-          key={i}
-          initial={{ opacity: 0, filter: "blur(8px)" }}
-          animate={{ opacity: 1, filter: "blur(0px)" }}
-          transition={{ duration: 0.5, delay: delay + i * 0.07, ease: "easeOut" }}
-          style={{ display: "inline-block", marginRight: "0.28em" }}
-        >
-          {word}
-        </motion.span>
-      ))}
-    </span>
-  );
-}
+const FALLBACK_FEATURED: BlogPost = {
+  _id: "featured-1",
+  slug: "art-of-a-perfect-weekend",
+  title: "The Art of a Perfect Weekend\nYour Comfort",
+  category: "Stay Experience",
+  excerpt:
+    "From serene Morning to breathtaking sunsets a weeekend at our resort is all about you",
+  image: "/assets/kattil-room-hero.webp",
+  readTime: "6 mins",
+  date: "August 20,2025",
+  featured: true,
+  content: "",
+};
 
-function BlogCard({ post, index }: { post: BlogPost; index: number }) {
-  const ref = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px 0px 0px 0px" });
-  return (
-    <motion.article
-      ref={ref}
-      initial={{ opacity: 0, y: 40 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, ease: EASE, delay: (index % 3) * 0.12 }}
-      className="group flex flex-col"
-    >
-      <Link href={`/blog/${post.slug}`} className="flex flex-col flex-1">
-        <div className="relative aspect-[16/10] overflow-hidden rounded-xl mb-5">
-          {post.image ? (
-            <Image
-              src={post.image}
-              alt={post.title}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-              unoptimized={post.image.startsWith("https://")}
-            />
-          ) : (
-            <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-              <span className="text-white/30 text-sm font-sans">No image</span>
-            </div>
-          )}
-          <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors duration-500" />
-        </div>
-        <motion.p
-          initial={{ opacity: 0, x: -8 }}
-          animate={inView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.45, ease: EASE, delay: (index % 3) * 0.12 + 0.15 }}
-          className="font-sans text-[10px] font-bold uppercase tracking-[0.25em] text-[#526442] mb-2.5"
-        >
-          {post.category}
-        </motion.p>
-        <h3 className="font-serif text-base md:text-[1.05rem] text-primary leading-snug transition-colors duration-300 group-hover:text-[#3d5a2e] mb-1.5">
-          {post.title}
-        </h3>
-        {post.author && (
-          <p className="font-sans text-[11px] text-primary/50 mt-auto pt-2">
-            By {post.author}
-            {post.readTime && <span className="mx-1.5 opacity-50">·</span>}
-            {post.readTime}
-          </p>
-        )}
-      </Link>
-    </motion.article>
-  );
-}
+const FALLBACK_BLOGS: BlogPost[] = [
+  {
+    _id: "post-1",
+    slug: "morning-calm-by-the-pool",
+    title: "Morning Calm by the Pool",
+    category: "Stay",
+    excerpt: "Experience the tranquil early mornings with gentle waters, soft breezes, and golden sunrise light.",
+    image: "/assets/kattil-room-hero.webp",
+    readTime: "5 min read",
+    date: "August 10",
+    featured: false,
+    content: "",
+  },
+  {
+    _id: "post-2",
+    slug: "a-taste-of-the-coast",
+    title: "A Taste of the Coast",
+    category: "Dining",
+    excerpt: "Indulge in freshly prepared coastal flavours rooted in authentic South Indian spice traditions.",
+    image: "/assets/deluxe-garden-suite.webp",
+    readTime: "4 min read",
+    date: "August 11",
+    featured: false,
+    content: "",
+  },
+  {
+    _id: "post-3",
+    slug: "wellness-reimagined",
+    title: "Wellness, Reimagined",
+    category: "Wellness",
+    excerpt: "Holistic self-care routines, mindful rituals, and rejuvenating spaces crafted for modern travellers.",
+    image: "/assets/gallery.png",
+    readTime: "7 min read",
+    date: "August 12",
+    featured: false,
+    content: "",
+  },
+  {
+    _id: "post-4",
+    slug: "heritage-walk-temple-city-secrets",
+    title: "Heritage Walk & Temple City Secrets",
+    category: "Local Guide",
+    excerpt: "Uncover centuries of history, vibrant markets, and timeless architectural wonders in Madurai.",
+    image: "/assets/ac-double-room.webp",
+    readTime: "6 min read",
+    date: "August 08",
+    featured: false,
+    content: "",
+  },
+  {
+    _id: "post-5",
+    slug: "modern-comfort-heart-of-chennai",
+    title: "Modern Comfort in the Heart of Chennai",
+    category: "Stay",
+    excerpt: "Thoughtfully designed rooms and peaceful retreats nestled amidst Chennai's bustling vibrant hubs.",
+    image: "/assets/kattil-room-hero.webp",
+    readTime: "5 min read",
+    date: "August 06",
+    featured: false,
+    content: "",
+  },
+  {
+    _id: "post-6",
+    slug: "culinary-traditions-of-tamil-nadu",
+    title: "Culinary Traditions of Tamil Nadu",
+    category: "Dining",
+    excerpt: "From authentic filter coffee to traditional feasts, explore the distinct culinary heritage of the South.",
+    image: "/images/home/dining-community.png",
+    readTime: "4 min read",
+    date: "August 04",
+    featured: false,
+    content: "",
+  },
+];
 
-// ─── Category Tabs ────────────────────────────────────────────────────────────
-function CategoryTabs({ categories, current }: { categories: string[]; current: string }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
+const DEFAULT_CATEGORIES = ["All Stories", "Stay", "Dining", "Wellness", "Local Guide"];
 
-  const navigate = (cat: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (cat) params.set("category", cat);
-    else params.delete("category");
-    params.delete("page");
-    router.push(`${pathname}?${params.toString()}`);
-  };
-
-  if (categories.length === 0) return null;
-
-  return (
-    <div className="flex flex-wrap items-center gap-2 mb-10 md:mb-12">
-      {["", ...categories].map((cat) => (
-        <button
-          key={cat || "all"}
-          onClick={() => navigate(cat)}
-          className={`font-sans text-[10px] font-bold uppercase tracking-[0.2em] px-4 py-2 rounded-full border transition-all duration-200 ${
-            current === cat
-              ? "bg-primary text-white border-primary"
-              : "text-primary/70 border-primary/20 hover:border-primary/50 hover:text-primary"
-          }`}
-        >
-          {cat || "All"}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-// ─── Pagination ───────────────────────────────────────────────────────────────
-function Pagination({ page, totalPages }: { page: number; totalPages: number }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  if (totalPages <= 1) return null;
-
-  const go = (p: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("page", String(p));
-    router.push(`${pathname}?${params.toString()}`);
-  };
-
-  return (
-    <div className="flex items-center justify-center gap-4 mt-14 md:mt-16">
-      <button
-        onClick={() => go(page - 1)}
-        disabled={page <= 1}
-        className="flex items-center gap-1.5 font-sans text-[11px] font-bold uppercase tracking-[0.18em] text-primary/60 disabled:opacity-30 hover:text-primary transition-colors"
-      >
-        <ChevronLeft className="h-4 w-4" /> Prev
-      </button>
-      <div className="flex items-center gap-2">
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-          <button
-            key={p}
-            onClick={() => go(p)}
-            className={`w-8 h-8 rounded-full font-sans text-xs font-bold transition-all ${
-              p === page
-                ? "bg-primary text-white"
-                : "text-primary/50 hover:text-primary hover:bg-primary/10"
-            }`}
-          >
-            {p}
-          </button>
-        ))}
-      </div>
-      <button
-        onClick={() => go(page + 1)}
-        disabled={page >= totalPages}
-        className="flex items-center gap-1.5 font-sans text-[11px] font-bold uppercase tracking-[0.18em] text-primary/60 disabled:opacity-30 hover:text-primary transition-colors"
-      >
-        Next <ChevronRight className="h-4 w-4" />
-      </button>
-    </div>
-  );
-}
-
-// ─── Main component ───────────────────────────────────────────────────────────
 export default function BlogContent({
-  posts,
-  categories,
+  posts: initialPosts,
   currentCategory,
   currentPage,
   totalPages,
@@ -182,140 +117,320 @@ export default function BlogContent({
   total: number;
 }) {
   usePageView();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  const isFirstPage = currentPage === 1 && !currentCategory;
-  const featured = isFirstPage ? (posts.find((p) => p.featured) ?? posts[0]) : null;
-  const gridPosts = featured ? posts.filter((p) => p !== featured) : posts;
+  // Core 5 categories matching mockup
+  const allCategories = DEFAULT_CATEGORIES;
 
-  if (posts.length === 0) {
-    return (
-      <>
-        <Navbar />
-        <section className="bg-secondary min-h-screen">
-          <div className="mx-auto max-w-480 px-5 md:px-8 lg:px-20 pt-28 md:pt-36 lg:pt-44 pb-28">
-            <div className="text-center mb-10 md:mb-14 lg:mb-16">
-              <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.05, ease: "easeOut" }} className="font-sans text-[10px] font-bold uppercase tracking-[0.35em] text-white/55 mb-4">
-                Journal
-              </motion.p>
-              <h1 className="font-serif text-4xl md:text-5xl lg:text-[2.8rem] 2xl:text-[3.5rem] font-normal text-white leading-[1.1] tracking-tight">
-                <AnimatedWords text="Essays on Living Well" delay={0.12} />
-              </h1>
-            </div>
-            {categories.length > 0 && (
-              <CategoryTabs categories={categories} current={currentCategory} />
-            )}
-            <p className="font-sans text-white/60 text-base text-center pt-16">
-              {currentCategory ? `No posts in "${currentCategory}" yet.` : "No blog posts published yet."}
-            </p>
-          </div>
-        </section>
-      </>
+  // Combine initial posts with fallbacks if DB has limited entries
+  const allPosts = useMemo(() => {
+    if (initialPosts && initialPosts.length >= 7) {
+      return initialPosts;
+    }
+    if (initialPosts && initialPosts.length > 0) {
+      const existingSlugs = new Set(initialPosts.map((p) => p.slug.toLowerCase()));
+      const fillers = [FALLBACK_FEATURED, ...FALLBACK_BLOGS].filter(
+        (p) => !existingSlugs.has(p.slug.toLowerCase())
+      );
+      return [...initialPosts, ...fillers];
+    }
+    return [FALLBACK_FEATURED, ...FALLBACK_BLOGS];
+  }, [initialPosts]);
+
+  // Filter posts based on active category
+  const filteredPosts = useMemo(() => {
+    if (!currentCategory || currentCategory === "All Stories" || currentCategory === "All") {
+      return allPosts;
+    }
+    const lower = currentCategory.toLowerCase();
+    return allPosts.filter(
+      (p) =>
+        p.category?.toLowerCase() === lower ||
+        p.category?.toLowerCase().includes(lower) ||
+        lower.includes(p.category?.toLowerCase() || "")
     );
-  }
+  }, [allPosts, currentCategory]);
+
+  // Determine featured post and grid items
+  const featuredPost = useMemo(() => {
+    if (currentCategory && currentCategory !== "All Stories" && currentCategory !== "All") {
+      return null;
+    }
+    return filteredPosts.find((p) => p.featured) || filteredPosts[0] || FALLBACK_FEATURED;
+  }, [filteredPosts, currentCategory]);
+
+  const gridPosts = useMemo(() => {
+    if (featuredPost) {
+      return filteredPosts.filter((p) => p._id !== featuredPost._id && p.slug !== featuredPost.slug);
+    }
+    return filteredPosts;
+  }, [filteredPosts, featuredPost]);
+
+  const handleCategorySelect = (category: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (category && category !== "All Stories" && category !== "All") {
+      params.set("category", category);
+    } else {
+      params.delete("category");
+    }
+    params.delete("page");
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", String(page));
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  const activeCategory = currentCategory || "All Stories";
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col bg-[#FAF8F5]">
+      {/* ── Top Fixed Navbar ──────────────────────────────────────────────── */}
       <Navbar />
 
-      {/* ── Hero / Featured ── */}
-      <section className="bg-secondary pt-28 md:pt-36 lg:pt-44 pb-16 md:pb-20 lg:pb-28">
-        <div className="mx-auto max-w-480 px-5 md:px-8 lg:px-20">
-          <div className="text-center mb-10 md:mb-14 lg:mb-16">
-            <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.05, ease: "easeOut" }} className="font-sans text-[10px] font-bold uppercase tracking-[0.35em] text-white/55 mb-4">
-              Journal
-            </motion.p>
-            <h1 className="font-serif text-4xl md:text-5xl lg:text-[2.8rem] 2xl:text-[3.5rem] font-normal text-white leading-[1.1] tracking-tight">
-              <AnimatedWords text="Essays on Living Well" delay={0.12} />
+      {/* ── 1. Hero Header Section (Sage Green) ───────────────────────────── */}
+      <section className="relative w-full bg-[#9caf88] overflow-hidden pt-36 md:pt-44 lg:pt-50 pb-16 md:pb-22">
+        {/* Right Background Monument Skyline Silhouette */}
+        <div className="absolute right-0 bottom-0 top-auto h-[65%] sm:h-[72%] md:h-[78%] lg:h-[82%] w-[70%] sm:w-[48%] md:w-[40%] lg:w-[34%] max-w-[460px] pointer-events-none z-0 overflow-hidden flex items-end justify-end pr-2 md:pr-6">
+          <div
+            className="w-full h-full opacity-85 md:opacity-90 bg-no-repeat"
+            style={{
+              backgroundImage: "url('/images/partners/hero-skyline.png')",
+              backgroundSize: "contain",
+              backgroundPosition: "right bottom",
+            }}
+          />
+        </div>
+
+        {/* Hero Content aligned straight down with Navbar container */}
+        <div className="relative z-10 w-full max-w-[1920px] mx-auto px-3 md:px-5">
+          <div className="relative px-5 md:px-8 lg:px-15 max-w-3xl">
+            <p className="font-[Public_Sans] font-semibold text-[14px] leading-[14px] tracking-normal text-left align-middle uppercase text-white/95 mb-3 drop-shadow-xs">
+              LET US EXPLORE
+            </p>
+            <h1 className="text-white tracking-tight">
+              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-bold leading-[1.12]">
+                Stories Beyond
+              </span>
+              <span className="block font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-normal italic text-[#f4f7ef] leading-[1.15] mt-1">
+                Your Stay
+              </span>
             </h1>
           </div>
-
-          {/* Category filter tabs */}
-          {categories.length > 0 && (
-            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3, ease: "easeOut" }}>
-              <CategoryTabs categories={categories} current={currentCategory} />
-            </motion.div>
-          )}
-
-          {/* Featured post — only on first page with no category filter */}
-          {featured && (
-            <div className="grid grid-cols-1 lg:grid-cols-[57%_43%] gap-8 lg:gap-10 items-center">
-              <motion.div
-                initial={{ clipPath: "inset(0 100% 0 0)", opacity: 0 }}
-                animate={{ clipPath: "inset(0 0% 0 0)", opacity: 1 }}
-                transition={{ duration: 1.0, ease: EASE, delay: 0.28 }}
-                className="relative overflow-hidden rounded-lg"
-                style={{ aspectRatio: "738 / 384" }}
-              >
-                {featured.image ? (
-                  <Image
-                    src={featured.image}
-                    alt={featured.title}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 58vw"
-                    className="object-cover transition-transform duration-700 ease-out hover:scale-105"
-                    priority
-                    unoptimized={featured.image.startsWith("https://")}
-                  />
-                ) : (
-                  <div className="absolute inset-0 bg-primary/20" />
-                )}
-              </motion.div>
-
-              <div className="flex flex-col gap-6 lg:gap-7">
-                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.55, delay: 0.6, ease: EASE }} className="flex items-center gap-4 flex-wrap">
-                  <span className="font-sans text-[10px] font-semibold uppercase tracking-[0.2em] text-primary border border-[#D2E6BC] bg-[#D2E6BC] px-4 py-2 rounded-full">{featured.category}</span>
-                  {featured.readTime && <span className="font-sans text-[10px] font-semibold uppercase tracking-[0.18em] text-white/60">{featured.readTime}</span>}
-                </motion.div>
-
-                <motion.h2 initial={{ opacity: 0, filter: "blur(6px)", y: 14 }} animate={{ opacity: 1, filter: "blur(0px)", y: 0 }} transition={{ duration: 0.7, delay: 0.7, ease: EASE }} className="font-serif text-4xl md:text-[2.6rem] 2xl:text-[2.8rem] font-normal text-white leading-[1.15] tracking-tight">
-                  {featured.title}
-                </motion.h2>
-
-                <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.82, ease: "easeOut" }} className="font-sans text-base text-white/75 leading-relaxed">
-                  {featured.excerpt}
-                </motion.p>
-
-                {featured.author && (
-                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 0.9 }} className="font-sans text-[11px] text-white/40 uppercase tracking-[0.15em]">
-                    By {featured.author}
-                  </motion.p>
-                )}
-
-                <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.94, ease: "easeOut" }}>
-                  <Link href={`/blog/${featured.slug}`} className="group/cta inline-flex items-center gap-3 font-sans text-[11px] font-bold uppercase tracking-[0.25em] text-white">
-                    <span className="relative">
-                      Read Article
-                      <span className="absolute left-0 -bottom-px h-px w-0 bg-white/60 transition-all duration-300 ease-out group-hover/cta:w-full" />
-                    </span>
-                    <motion.span animate={{ x: [0, 5, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }} className="text-lg leading-none">→</motion.span>
-                  </Link>
-                </motion.div>
-              </div>
-            </div>
-          )}
         </div>
       </section>
 
-      {/* ── Grid posts ── */}
-      {gridPosts.length > 0 && (
-        <section className="bg-[#ECE8DA] py-16 md:py-20 lg:py-28">
-          <div className="mx-auto max-w-480 px-5 md:px-8 lg:px-20">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12 lg:gap-10">
-              {gridPosts.map((post, i) => <BlogCard key={String(post._id)} post={post} index={i} />)}
-            </div>
-            <Pagination page={currentPage} totalPages={totalPages} />
-          </div>
-        </section>
-      )}
+      {/* ── 2. Main Blog Section ─────────────────────────────────────────── */}
+      <section className="w-full py-10 sm:py-12 md:py-16 bg-[#FAF8F5]">
+        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
+          <div className="px-5 md:px-8 lg:px-15">
+            {/* Category Filter Tabs */}
+            <div className="mb-8 sm:mb-10">
+              <div className="flex items-center gap-7 sm:gap-9 md:gap-11 overflow-x-auto pb-1 scrollbar-none">
+                {allCategories.map((cat) => {
+                  const isSelected =
+                    (cat === "All Stories" && (!currentCategory || currentCategory === "All Stories" || currentCategory === "All")) ||
+                    cat.toLowerCase() === currentCategory.toLowerCase();
 
-      {/* Pagination when featured takes the whole page */}
-      {gridPosts.length === 0 && totalPages > 1 && (
-        <section className="bg-[#ECE8DA] py-12">
-          <div className="mx-auto max-w-480 px-5 md:px-8 lg:px-20">
-            <Pagination page={currentPage} totalPages={totalPages} />
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => handleCategorySelect(cat)}
+                      className={`font-sans text-[14.5px] sm:text-[15.5px] transition-colors whitespace-nowrap cursor-pointer ${isSelected
+                        ? "font-bold text-[#2d3134]"
+                        : "font-medium text-[#9ca3af] hover:text-[#4b5563]"
+                        }`}
+                    >
+                      {cat}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* ── 3. Featured Hero Card (2-Column Banner) ───────────────────── */}
+            {featuredPost && (
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, ease: EASE }}
+                className="mb-16 md:mb-20"
+              >
+                <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-[40px]">
+                  {/* Left: Featured Image */}
+                  <Link
+                    href={`/blog/${featuredPost.slug}`}
+                    className="group shrink-0 block relative w-full lg:w-[564px] h-[260px] sm:h-[280px] lg:h-[290px] rounded-[8px] overflow-hidden bg-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.04)]"
+                  >
+                    <Image
+                      src={featuredPost.image || "/assets/kattil-room-hero.webp"}
+                      alt={featuredPost.title.replace("\n", " ")}
+                      fill
+                      sizes="564px"
+                      className="object-cover object-center group-hover:scale-[1.04] transition-transform duration-700 ease-out"
+                      priority
+                    />
+                  </Link>
+
+                  {/* Right: Featured Text Details */}
+                  <div className="flex-1 flex flex-col justify-center text-left">
+                    <p className="font-[Public_Sans] font-normal text-[14px] leading-[18px] text-[#202020] mb-2.5">
+                      {featuredPost.category || "Stay Experience"}
+                    </p>
+
+                    <Link href={`/blog/${featuredPost.slug}`} className="group mb-[24px]">
+                      <h2 className="font-[Public_Sans] font-normal text-[28px] sm:text-[32px] lg:text-[34px] xl:text-[36px] leading-[1.18] tracking-[-0.5px] text-[#202020]  transition-colors">
+                        <span className="block">The Art of a Perfect Weekend</span>
+                        <span className="block">Your Comfort</span>
+                      </h2>
+                    </Link>
+
+                    <p className="font-[Public_Sans] font-normal text-[14.5px] sm:text-[15.5px] leading-[1.45] text-[#5e6670] max-w-[430px] mb-8">
+                      From serene Morning to breathtaking sunsets a weeekend at our resort is all about you
+                    </p>
+
+                    {/* Meta Row: Date, Read time, Read More */}
+                    <div className="flex items-center justify-between gap-4 flex-wrap pt-2">
+                      <div className="flex items-center gap-7 text-[13.5px] font-[Public_Sans] text-[#4b5563]">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-[#526e4e] stroke-[1.5]" />
+                          <span>{featuredPost.date || "August 20,2025"}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-[#526e4e] stroke-[1.5]" />
+                          <span>{featuredPost.readTime || "6 mins"}</span>
+                        </div>
+                      </div>
+
+                      <Link
+                        href={`/blog/${featuredPost.slug}`}
+                        className="inline-flex items-center gap-1.5 font-[Public_Sans] text-[13.5px] text-[#333] hover:text-black border-b border-[#333] hover:border-black pb-0.5 transition-colors"
+                      >
+                        <span>Read More</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* ── 4. "Our Blogs" Section & 3-Column Grid ─────────────────────── */}
+            <div>
+              <h2 className="font-[Public_Sans] font-normal text-[32px] leading-[20px] tracking-[-0.5px] text-[#202020] mb-8 sm:mb-10">
+                Our Blogs
+              </h2>
+
+              {gridPosts.length === 0 ? (
+                <div className="py-16 text-center text-gray-500 font-sans">
+                  No blog stories found in &ldquo;{activeCategory}&rdquo;.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 md:gap-8">
+                  {gridPosts.map((post, idx) => (
+                    <motion.article
+                      key={post._id || post.slug || idx}
+                      initial={{ opacity: 0, y: 16 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{ duration: 0.45, delay: (idx % 3) * 0.08, ease: EASE }}
+                      className="group flex flex-col bg-white rounded-[12px] overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.07)] transition-all duration-300"
+                    >
+                      <Link href={`/blog/${post.slug}`} className="block flex flex-col flex-1">
+                        {/* Card Image */}
+                        <div className="relative w-full h-[240px] sm:h-[260px] overflow-hidden bg-gray-100 rounded-t-[12px]">
+                          <Image
+                            src={post.image || "/assets/deluxe-garden-suite.webp"}
+                            alt={post.title}
+                            fill
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            className="object-cover object-center group-hover:scale-[1.04] transition-transform duration-500 ease-out"
+                          />
+                        </div>
+                        {/* Card Content */}
+                        <div className="p-5 sm:p-6 flex flex-col flex-1">
+                          <p className="font-sans text-[14px] sm:text-[14.5px] font-normal text-[#737373] mb-1.5">
+                            {post.category || "Stay"}
+                          </p>
+
+                          <h3 className="font-sans text-[24px] sm:text-[25px] text-[#1a1a1a] leading-snug tracking-tight group-hover:text-[#526442] transition-colors line-clamp-2 mb-4">
+                            {post.title}
+                          </h3>
+
+                          {/* Bottom Meta Row */}
+                          <div className="mt-auto flex items-center justify-between gap-3 pt-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              {post.date && (
+                                <span className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#f0eee9] text-[11px] font-medium text-[#5c5a55] font-sans">
+                                  {post.date}
+                                </span>
+                              )}
+                              {post.readTime && (
+                                <span className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#f0eee9] text-[11px] font-medium text-[#5c5a55] font-sans">
+                                  {post.readTime}
+                                </span>
+                              )}
+                            </div>
+
+                            <span className="text-[12.5px] font-medium text-[#4a4a4a] group-hover:text-black inline-flex items-center gap-1 transition-colors shrink-0">
+                              <span>View</span>
+                              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
+                    </motion.article>
+                  ))}
+                </div>
+              )}
+
+              {/* ── 5. Pagination ────────────────────────────────────────────── */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-3 mt-14 sm:mt-16">
+                  <button
+                    type="button"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage <= 1}
+                    className="px-4 py-2 rounded-[6px] border border-gray-200 text-xs font-semibold text-gray-700 disabled:opacity-30 hover:bg-gray-50 transition-colors flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5" /> Prev
+                  </button>
+
+                  <div className="flex items-center gap-1.5">
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => handlePageChange(p)}
+                        className={`w-8 h-8 rounded-[6px] text-xs font-semibold transition-colors cursor-pointer ${p === currentPage
+                          ? "bg-[#0d1b2e] text-white"
+                          : "border border-gray-200 text-gray-700 hover:bg-gray-50"
+                          }`}
+                      >
+                        {p}
+                      </button>
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage >= totalPages}
+                    className="px-4 py-2 rounded-[6px] border border-gray-200 text-xs font-semibold text-gray-700 disabled:opacity-30 hover:bg-gray-50 transition-colors flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed"
+                  >
+                    Next <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-        </section>
-      )}
-    </>
+        </div>
+      </section>
+    </div>
   );
 }
