@@ -265,12 +265,7 @@ export default function PartnersView() {
       </section>
 
       {/* ── 4. What Properties Can Partner with Us? ───────────────────── */}
-      <section
-        className="w-full py-16 md:py-24"
-        style={{
-          background: "linear-gradient(180deg, rgba(240, 234, 210, 0) 0%, #F0EAD2 100%)",
-        }}
-      >
+      <section className="w-full py-16 md:py-24 bg-[#F0EAD2]">
         <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15">
             {/* Heading: 2 centered lines */}
