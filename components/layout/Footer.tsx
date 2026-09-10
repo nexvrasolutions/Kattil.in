@@ -57,7 +57,7 @@ function LocationBlock({ location }: { location: FooterLocation }) {
           </h5>
           <a
             href={`tel:${location.phone.replace(/\s/g, "")}`}
-            className="block text-[14px] sm:text-[15px] text-[#E6E2D4CC]/80 hover:text-white transition-colors duration-200"
+            className="block text-[14px] sm:text-[15px] font-medium text-[#E6E2D4CC]/80 hover:text-[#D2E6BC] hover:font-bold transition-all duration-200"
           >
             {location.phone}
           </a>
@@ -70,7 +70,7 @@ function LocationBlock({ location }: { location: FooterLocation }) {
           </h5>
           <a
             href={`mailto:${location.email}`}
-            className="block text-[14px] sm:text-[15px] text-[#E6E2D4CC]/80 hover:text-white transition-colors duration-200 break-all"
+            className="block text-[14px] sm:text-[15px] font-medium text-[#E6E2D4CC]/80 hover:text-[#D2E6BC] hover:font-bold transition-all duration-200 break-all"
           >
             {location.email}
           </a>
@@ -141,12 +141,9 @@ export default function Footer({
                       href={link.href}
                       target={link.newTab ? "_blank" : undefined}
                       rel={link.newTab ? "noopener noreferrer" : undefined}
-                      className="group inline-block text-[14px] sm:text-[15px] text-[#E6E2D4CC]/80 hover:text-white transition-colors duration-200"
+                      className="inline-block text-[14px] sm:text-[15px] font-medium text-[#E6E2D4CC]/80 hover:text-[#D2E6BC] hover:font-bold transition-all duration-200"
                     >
-                      <span className="relative">
-                        {link.label}
-                        <span className="absolute left-0 -bottom-px h-px w-0 bg-white/50 transition-all duration-300 group-hover:w-full" />
-                      </span>
+                      {link.label}
                     </Link>
                   </li>
                 ))}

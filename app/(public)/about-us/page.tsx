@@ -59,5 +59,10 @@ export async function generateMetadata(): Promise<Metadata> {
 // ── Page ─────────────────────────────────────────────────────────────────────
 export default async function AboutPage() {
   const about = await getAbout();
-  return <AboutContent about={about} />;
+
+  const plainAbout = about
+    ? JSON.parse(JSON.stringify(about))
+    : null;
+
+  return <AboutContent about={plainAbout} />;
 }

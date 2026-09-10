@@ -5,36 +5,6 @@ import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import SkylineSilhouette from "@/components/ui/SkylineSilhouette";
 
-// Custom 2-door cabinet / nightstand icon matching the exact design uploaded by user
-function FurnitureIcon({ className = "w-6 h-6 text-[#4a583d]" }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      {/* Top rounded lid / counter */}
-      <path d="M4 6.5C4 5.12 5.12 4 6.5 4H17.5C18.88 4 20 5.12 20 6.5V7H4V6.5Z" />
-      {/* Main cabinet body */}
-      <path d="M4 7H20V16C20 17.6569 18.6569 19 17 19H7C5.34315 19 4 17.6569 4 16V7Z" />
-      {/* Center vertical split */}
-      <line x1="12" y1="7" x2="12" y2="19" />
-      {/* Left door handle */}
-      <line x1="8.5" y1="11.5" x2="8.5" y2="14.5" strokeWidth="2.4" strokeLinecap="round" />
-      {/* Right door handle */}
-      <line x1="15.5" y1="11.5" x2="15.5" y2="14.5" strokeWidth="2.4" strokeLinecap="round" />
-      {/* Left leg */}
-      <line x1="6.5" y1="19" x2="5.5" y2="21.5" strokeWidth="2" strokeLinecap="round" />
-      {/* Right leg */}
-      <line x1="17.5" y1="19" x2="18.5" y2="21.5" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 const WHY_PARTNER_ITEMS = [
   {
     title: "More Bookings",
@@ -147,14 +117,14 @@ export default function PartnersView() {
             </p>
 
             <h1 className="text-white tracking-tight">
-              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-bold leading-[1.12]">
+              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-bold leading-[1.12]">
                 Your Property. Our
               </span>
               <span className="block mt-1">
-                <span className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[54px] font-bold text-white">
+                <span className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-bold text-white">
                   Expertise.{" "}
                 </span>
-                <span className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[56px] font-normal italic text-[#f4f7ef] leading-[1.15]">
+                <span className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-normal italic text-[#f4f7ef] leading-[1.15]">
                   Shared Growth.
                 </span>
               </span>
@@ -184,8 +154,14 @@ export default function PartnersView() {
               {WHY_PARTNER_ITEMS.map((item, idx) => (
                 <div key={idx} className="flex flex-col items-start text-left">
                   {/* Round Icon Badge */}
-                  <div className="w-14 h-14 rounded-full bg-[#FFFFFF] flex items-center justify-center mb-5">
-                    <FurnitureIcon className="w-6 h-6 text-[#4a583d]" />
+                  <div className="w-14 h-14 rounded-full bg-[#FFFFFF] flex items-center justify-center mb-5 shadow-xs">
+                    <Image
+                      src="/images/partners/cabinet-icon.png"
+                      alt={item.title}
+                      width={24}
+                      height={24}
+                      className="w-6 h-6 object-contain"
+                    />
                   </div>
 
                   <h3 className="font-sans font-semibold text-[17px] md:text-[18px] text-[#111827] mb-2">
@@ -264,53 +240,54 @@ export default function PartnersView() {
         </div>
       </section>
 
-      {/* ── 4. What Properties Can Partner with Us? ───────────────────── */}
-      <section className="w-full py-16 md:py-24 bg-[#F0EAD2]">
-        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
-          <div className="px-5 md:px-8 lg:px-15">
-            {/* Heading: 2 centered lines */}
-            <div className="text-center mb-12 md:mb-16">
-              <h2 className="text-[#111827] tracking-tight">
-                <span className="block font-sans text-3xl sm:text-4xl md:text-[42px] font-normal">
-                  What properties can
-                </span>
-                <span className="block font-serif text-3xl sm:text-4xl md:text-[44px] font-normal italic mt-1 text-[#111827]">
-                  Partner with us?
-                </span>
-              </h2>
-            </div>
+      {/* ── 4, 5, 6. Gradient Container from "What properties" to "Your property" ── */}
+      <div style={{ background: "linear-gradient(180deg, #F0EAD2 0%, rgba(240, 234, 210, 0) 100%)" }}>
+        {/* ── 4. What Properties Can Partner with Us? ───────────────────── */}
+        <section className="w-full py-16 md:py-24">
+          <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
+            <div className="px-5 md:px-8 lg:px-15">
+              {/* Heading: 2 centered lines */}
+              <div className="text-center mb-12 md:mb-16">
+                <h2 className="text-[#111827] tracking-tight">
+                  <span className="block font-sans text-3xl sm:text-4xl md:text-[42px] font-normal">
+                    What properties can
+                  </span>
+                  <span className="block font-serif text-3xl sm:text-4xl md:text-[44px] font-normal italic mt-1 text-[#111827]">
+                    Partner with us?
+                  </span>
+                </h2>
+              </div>
 
-            {/* 4 Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7">
-              {PROPERTY_TYPES.map((prop, idx) => (
-                <div key={idx} className="group flex flex-col text-left">
-                  {/* Card Image */}
-                  <div className="relative w-full aspect-[4/5] rounded-[10px] md:rounded-[12px] overflow-hidden bg-[#e5e7eb] shadow-xs">
-                    <Image
-                      src={prop.image}
-                      alt={prop.title}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-103"
-                    />
+              {/* 4 Cards Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7">
+                {PROPERTY_TYPES.map((prop, idx) => (
+                  <div key={idx} className="group flex flex-col text-left">
+                    {/* Card Image */}
+                    <div className="relative w-full aspect-[4/5] rounded-[10px] md:rounded-[12px] overflow-hidden bg-[#e5e7eb] shadow-xs">
+                      <Image
+                        src={prop.image}
+                        alt={prop.title}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-103"
+                      />
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="font-sans text-[16px] md:text-[17px] font-medium text-[#111827] mt-3.5 text-left">
+                      {prop.title}
+                    </h3>
                   </div>
-
-                  {/* Title */}
-                  <h3 className="font-sans text-[16px] md:text-[17px] font-medium text-[#111827] mt-3.5 text-left">
-                    {prop.title}
-                  </h3>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── 5. A Simple Partnership Model (Deep Navy Card) ─────────────── */}
-      <section className="w-full py-8 md:py-12 bg-[#F0EAD2]">
-        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
-          <div className="px-5 md:px-8 lg:px-15">
-            <div className="bg-[#0E2E4E] text-white rounded-[8px] p-8 sm:p-12 md:p-16 lg:p-20 shadow-[0_12px_40px_rgba(14,39,60,0.2)] relative overflow-hidden">
+        {/* ── 5. A Simple Partnership Model (Deep Navy Card) ─────────────── */}
+        <section className="w-full py-8 md:py-12">
+          <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
+            <div className="bg-[#0E2E4E] text-white rounded-[12px] px-5 md:px-8 lg:px-15 py-12 sm:py-16 md:py-20 shadow-[0_12px_40px_rgba(14,39,60,0.2)] relative overflow-hidden">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
                 {/* Left Column: Heading + Subtitle */}
                 <div className="lg:col-span-5">
@@ -340,7 +317,13 @@ export default function PartnersView() {
                     <div key={idx} className="flex flex-col">
                       {/* White Circular Badge */}
                       <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center mb-4 shadow-sm">
-                        <FurnitureIcon className="w-5 h-5 text-[#0e273c]" />
+                        <Image
+                          src="/images/partners/cabinet-icon.png"
+                          alt={model.title}
+                          width={24}
+                          height={24}
+                          className="w-6 h-6 object-contain"
+                        />
                       </div>
 
                       <h3 className="font-sans font-semibold text-[17px] md:text-[18px] text-white mb-1.5">
@@ -356,48 +339,64 @@ export default function PartnersView() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── 6. Your Property Could Do More (CTA Section) ──────────────── */}
-      <section className="w-full py-16 md:py-24 bg-[#F0EAD2]">
-        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
-          <div className="px-5 md:px-8 lg:px-15 text-center max-w-3xl mx-auto">
-            <h2 className="text-[#111827] tracking-tight">
-              <span className="font-sans text-3xl sm:text-4xl md:text-[42px] font-normal">
-                Your property could{" "}
-              </span>
-              <span className="font-serif text-3xl sm:text-4xl md:text-[44px] font-normal italic">
-                Do more.
-              </span>
-            </h2>
+        {/* ── 6. Your Property Could Do More (CTA Section) ──────────────── */}
+        <section className="w-full py-16 md:py-24">
+          <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
+            <div className="px-5 md:px-8 lg:px-15 text-center max-w-3xl mx-auto">
+              <h2 className="text-[#111827] tracking-tight">
+                <span className="font-sans text-3xl sm:text-4xl md:text-[42px] font-normal">
+                  Your property could{" "}
+                </span>
+                <span className="font-serif text-3xl sm:text-4xl md:text-[44px] font-normal italic">
+                  Do more.
+                </span>
+              </h2>
 
-            <p className="font-sans text-[14px] md:text-[16px] text-[#6b7280] leading-relaxed mt-4 max-w-xl mx-auto">
-              If your property has potential but you&apos;re struggling with bookings, staff,
-              operations or revenue, let&apos;s talk.
-            </p>
+              <p className="font-sans text-[14px] md:text-[16px] text-[#6b7280] leading-relaxed mt-4 max-w-xl mx-auto">
+                If your property has potential but you&apos;re struggling with bookings, staff,
+                operations or revenue, let&apos;s talk.
+              </p>
 
-            {/* Buttons */}
-            <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
-              <a
-                href="https://wa.me/917448749779?text=Hi%20Kattil%20Team%2C%20I%20am%20interested%20in%20partnering%20with%20you%20for%20my%20property."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-8 py-3.5 rounded-[8px] bg-[#0E2E4E] text-white font-sans text-[14px] font-semibold hover:bg-[#153a57] transition-colors shadow-sm"
-              >
-                Partner With us
-              </a>
+              {/* Buttons */}
+              <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
+                <a
+                  href="https://wa.me/917448749779?text=Hi%20Kattil%20Team%2C%20I%20am%20interested%20in%20partnering%20with%20you%20for%20my%20property."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-[157px] h-[40px] rounded-[6px] bg-[#0E2E4E] text-white hover:bg-[#153a57] transition-colors shadow-sm inline-flex items-center justify-center text-center"
+                  style={{
+                    width: "157px",
+                    height: "40px",
+                    borderRadius: "6px",
+                    paddingTop: "12px",
+                    paddingRight: "24px",
+                    paddingBottom: "12px",
+                    paddingLeft: "32px",
+                    fontFamily: "Public Sans, sans-serif",
+                    fontWeight: 400,
+                    fontSize: "14px",
+                    lineHeight: "12px",
+                    letterSpacing: "0%",
+                    textAlign: "center",
+                    verticalAlign: "middle",
+                  }}
+                >
+                  Partner With us
+                </a>
 
-              <a
-                href="tel:+917448749779"
-                className="px-8 py-3.5 rounded-[6px] border border-[#0e273c] text-[#0e273c] font-sans text-[14px] font-semibold hover:bg-[#0e273c]/5 transition-colors"
-              >
-                View Broucher
-              </a>
+                <a
+                  href="tel:+917448749779"
+                  className="h-[40px] px-6 rounded-[6px] border border-[#0e273c] text-[#0e273c] font-sans text-[14px] font-semibold hover:bg-[#0e273c]/5 transition-colors inline-flex items-center justify-center leading-none"
+                >
+                  View Brochure
+                </a>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   );
 }

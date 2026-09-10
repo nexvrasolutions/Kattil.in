@@ -264,13 +264,25 @@ export default function RoomStickyBookingWidget({
           minDate: today,
           defaultDate: [checkin, checkout],
           disableMobile: true,
+          allowInput: false,
+          clickOpens: true,
           position: "below left",
           positionElement: dateBoxRef.current || dateInputRef.current,
           appendTo: document.body,
           onReady(selectedDates: Date[], dateStr: string, instance: any) {
+            if (instance._input) {
+              instance._input.setAttribute("inputmode", "none");
+              instance._input.setAttribute("readonly", "readonly");
+            }
             repositionCalendar(instance);
           },
           onOpen(selectedDates: Date[], dateStr: string, instance: any) {
+            if (instance._input) {
+              instance._input.blur();
+            }
+            if (dateInputRef.current) {
+              dateInputRef.current.blur();
+            }
             repositionCalendar(instance);
             requestAnimationFrame(() => repositionCalendar(instance));
             setTimeout(() => repositionCalendar(instance), 10);
@@ -470,21 +482,28 @@ export default function RoomStickyBookingWidget({
           </label>
           <div
             ref={dateBoxRef}
-            onClick={openCalendar}
+            onClick={() => {
+              openCalendar();
+              dateInputRef.current?.blur();
+            }}
             className={`w-full h-11 px-3.5 rounded-xl border ${dateError
               ? "border-red-400 bg-red-50/50 ring-1 ring-red-400/20"
               : "border-gray-200 bg-gray-50/70 hover:bg-gray-100/70"
-              } text-[13.5px] font-medium text-gray-800 flex items-center justify-between cursor-pointer transition-colors`}
+              } text-[13.5px] font-medium text-gray-800 flex items-center justify-between cursor-pointer transition-colors select-none`}
           >
-            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            <div className="flex items-center gap-2.5 min-w-0 flex-1 pointer-events-none">
               <Calendar className={`w-4 h-4 ${dateError ? "text-red-500" : "text-gray-500"} shrink-0`} />
               <input
                 ref={dateInputRef}
                 type="text"
                 readOnly
+                inputMode="none"
+                tabIndex={-1}
+                autoComplete="off"
                 value={dateDisplay}
+                onFocus={(e) => e.target.blur()}
                 placeholder="Select check-in & check-out"
-                className="w-full bg-transparent text-[13.5px] text-gray-900 font-medium outline-none cursor-pointer placeholder:text-gray-400 truncate font-sans"
+                className="w-full bg-transparent text-[13.5px] text-gray-900 font-medium outline-none cursor-pointer placeholder:text-gray-400 truncate font-sans pointer-events-none select-none"
               />
             </div>
           </div>

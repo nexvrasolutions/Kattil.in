@@ -1,5 +1,5 @@
 export default function HeroScratchPreview() {
-  const heroLine1 = "Find Your Perfect Stay";
+  const heroLine1 = "Find your Perfect Stay";
   const heroLine2 = "Experience";
   return (
     <div className="m-3 md:m-5">

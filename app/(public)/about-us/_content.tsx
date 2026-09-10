@@ -81,11 +81,11 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
               transition={{ duration: 0.7, ease: EASE }}
               className="max-w-xl text-left relative z-10"
             >
-              <p className="font-sans text-[11px] sm:text-[12px] md:text-[13px] font-bold tracking-[0.14em] uppercase text-white/85 mb-4">
+              <p className="font-sans text-[14px] sm:text-[15px] md:text-[14px] uppercase text-white/85 mb-[28px]">
                 WHO WE ARE
               </p>
 
-              <h1 className="text-white text-[34px] sm:text-[40px] md:text-[46px] lg:text-[50px] leading-[1.08] tracking-tight">
+              <h1 className="text-white text-[36px] sm:text-[42px] md:text-[48px] lg:text-[52px] leading-[1.08] tracking-tight">
                 <span className="font-sans font-bold">The Story </span>
                 <span className="font-serif italic font-normal">Behind</span>
                 <span className="block font-serif italic font-normal mt-1 sm:mt-1.5">

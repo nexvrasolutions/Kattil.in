@@ -373,14 +373,26 @@ export default function BookingBarWidget({
           dateFormat: "d M Y",
           minDate: today,
           disableMobile: true,
+          allowInput: false,
+          clickOpens: true,
           position: "below left",
           positionElement: dateBoxRef.current || dateInputRef.current,
           appendTo: document.body,
           showMonths: 1,
           onReady(selectedDates: Date[], dateStr: string, instance: any) {
+            if (instance._input) {
+              instance._input.setAttribute("inputmode", "none");
+              instance._input.setAttribute("readonly", "readonly");
+            }
             repositionCalendar(instance);
           },
           onOpen(selectedDates: Date[], dateStr: string, instance: any) {
+            if (instance._input) {
+              instance._input.blur();
+            }
+            if (dateInputRef.current) {
+              dateInputRef.current.blur();
+            }
             repositionCalendar(instance);
             requestAnimationFrame(() => repositionCalendar(instance));
             setTimeout(() => repositionCalendar(instance), 10);
@@ -683,21 +695,28 @@ export default function BookingBarWidget({
 
                 <div
                   ref={dateBoxRef}
-                  onClick={() => fpInstance.current?.open()}
+                  onClick={() => {
+                    fpInstance.current?.open();
+                    dateInputRef.current?.blur();
+                  }}
                   className={`w-full h-[58px] sm:h-[60px] md:h-[48px] lg:h-[50px] border-[1px] ${dateError
                     ? "border-[#0E2E4E] bg-[#0E2E4E]/[0.03] ring-1 ring-[#0E2E4E]/20"
                     : "border-[#E5E7EB] bg-[#F9FAFB] hover:bg-gray-50/80"
-                    } rounded-[12px] md:rounded-[8px] px-4 sm:px-[16px] flex items-center gap-3 transition-all cursor-pointer`}
+                    } rounded-[12px] md:rounded-[8px] px-4 sm:px-[16px] flex items-center gap-3 transition-all cursor-pointer select-none`}
                 >
-                  <Calendar className={`w-5 h-5 ${dateError ? "text-[#0E2E4E]" : "text-gray-400"} shrink-0 stroke-[1.6]`} />
+                  <Calendar className={`w-5 h-5 ${dateError ? "text-[#0E2E4E]" : "text-gray-400"} shrink-0 stroke-[1.6] pointer-events-none`} />
 
                   <input
                     ref={dateInputRef}
                     type="text"
                     readOnly
+                    inputMode="none"
+                    tabIndex={-1}
+                    autoComplete="off"
                     value={dateDisplay}
+                    onFocus={(e) => e.target.blur()}
                     placeholder="Select check-in & check-out"
-                    className="w-full bg-transparent text-[14.5px] sm:text-[15px] md:text-[14px] lg:text-[14.5px] text-gray-900 font-medium outline-none cursor-pointer placeholder:text-gray-400 font-sans truncate"
+                    className="w-full bg-transparent text-[14.5px] sm:text-[15px] md:text-[14px] lg:text-[14.5px] text-gray-900 font-medium outline-none cursor-pointer placeholder:text-gray-400 font-sans truncate pointer-events-none select-none"
                   />
                 </div>
 

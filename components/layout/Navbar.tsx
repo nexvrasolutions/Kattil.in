@@ -40,6 +40,7 @@ export default function Navbar() {
   const navRowRef = useRef<HTMLDivElement>(null);
   const destinationsTriggerRef = useRef<HTMLButtonElement>(null);
   const headerContainerRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [navRowHeight, setNavRowHeight] = useState(84);
   const [destinationsLeft, setDestinationsLeft] = useState<number>(0);
 
@@ -52,14 +53,44 @@ export default function Navbar() {
     }
   }, []);
 
+  const handleDestinationsMouseEnter = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    updateDestinationsPosition();
+    setDestinationsOpen(true);
+  }, [updateDestinationsPosition]);
+
+  const handleDestinationsMouseLeave = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      setDestinationsOpen(false);
+    }, 180);
+  }, []);
+
   const toggleDestinations = useCallback((e?: React.MouseEvent) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
     updateDestinationsPosition();
     setDestinationsOpen((prev) => !prev);
   }, [updateDestinationsPosition]);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!destinationsOpen) return;
@@ -140,6 +171,42 @@ export default function Navbar() {
             }}
           />
 
+          {/* ═══════════════════════════════════════════════════════════════
+              BLACK FADE WHEN DESTINATIONS IS OPEN
+
+              8% opacity
+              No blur
+              Pure black
+              Dropdown remains sharp
+          ═══════════════════════════════════════════════════════════════ */}
+
+          <AnimatePresence>
+            {destinationsOpen && (
+              <motion.div
+                initial={{
+                  opacity: 0,
+                }}
+                animate={{
+                  opacity: 0.08,
+                }}
+                exit={{
+                  opacity: 0,
+                }}
+                transition={{
+                  duration: 0.25,
+                  ease: "easeOut",
+                }}
+                className="
+                  absolute
+                  inset-0
+                  bg-black
+                  pointer-events-none
+                  z-[5]
+                "
+              />
+            )}
+          </AnimatePresence>
+
           {/* ── Nav row (always visible) ─────────────────────────────────────── */}
           <div ref={navRowRef} className="relative z-10 shrink-0 flex items-center justify-between h-[74px] sm:h-[82px] md:h-[90px] lg:h-[94px] px-5 md:px-8 lg:px-15">
 
@@ -155,12 +222,20 @@ export default function Navbar() {
                 const isActive = isDestinations
                   ? isDestinationsRoute(pathname)
                   : link.href !== "" &&
-                    (link.href === "/"
-                      ? pathname === "/"
-                      : pathname.startsWith(link.href));
+                  (link.href === "/"
+                    ? pathname === "/"
+                    : pathname.startsWith(link.href));
 
                 return (
-                  <div key={link.label} className="relative py-2">
+                  <div
+                    key={link.label}
+                    className="relative py-2"
+                    onMouseEnter={isDestinations ? handleDestinationsMouseEnter : () => {
+                      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+                      setDestinationsOpen(false);
+                    }}
+                    onMouseLeave={isDestinations ? handleDestinationsMouseLeave : undefined}
+                  >
                     {isDestinations ? (
                       <button
                         ref={destinationsTriggerRef}
@@ -181,53 +256,53 @@ export default function Navbar() {
                       >
                         {link.label}
                       </button>
-                  ) : (
-                    <Link
-                      href={link.href || "#"}
-                      data-text={link.label}
-                      className={`nav-link-bold-safe group relative !no-underline text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans ${isActive
-                        ? "font-bold !text-[#D2E6BC]"
-                        : "font-medium hover:font-bold text-[#DDDDDD] hover:!text-[#D2E6BC]"
-                        }`}
-                      style={{
-                        textDecoration: "none",
-                      }}
-                    >
-                      {link.label}
-                    </Link>
-                  )}
-                </div>
-              );
-            })}
-          </nav>
+                    ) : (
+                      <Link
+                        href={link.href || "#"}
+                        data-text={link.label}
+                        className={`nav-link-bold-safe group relative !no-underline text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans ${isActive
+                          ? "font-bold !text-[#D2E6BC]"
+                          : "font-medium hover:font-bold text-[#DDDDDD] hover:!text-[#D2E6BC]"
+                          }`}
+                        style={{
+                          textDecoration: "none",
+                        }}
+                      >
+                        {link.label}
+                      </Link>
+                    )}
+                  </div>
+                );
+              })}
+            </nav>
 
-          {/* Center logo */}
-          <Link
-            href="/"
-            className="absolute left-5 md:left-1/2 md:-translate-x-1/2 flex items-center justify-center"
-          >
-            <img
-              src="/assets/logo.png"
-              alt="Kattil — The Homely Reset"
-              className="object-contain h-12 md:h-14.5 lg:h-17 transition-all duration-300 drop-shadow-md"
-            />
-          </Link>
-
-          {/* Right CTA */}
-          <div className="hidden lg:flex items-center justify-end gap-6 flex-1">
+            {/* Center logo */}
             <Link
-              href="/contact-us"
-              data-text="Contact Us"
-              className={`nav-link-bold-safe group relative text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans ${pathname === "/contact-us"
-                ? "font-bold !text-[#D2E6BC]"
-                : "font-medium hover:font-bold text-[#DDDDDD] hover:!text-[#D2E6BC]"
-                }`}
+              href="/"
+              className="absolute left-5 md:left-1/2 md:-translate-x-1/2 flex items-center justify-center"
             >
-              Contact Us
+              <img
+                src="/assets/logo.png"
+                alt="Kattil — The Homely Reset"
+                className="object-contain h-12 md:h-14.5 lg:h-17 transition-all duration-300 drop-shadow-md"
+              />
             </Link>
-            <Link
-              href="/rooms"
-              className="w-[122px] h-[40px]
+
+            {/* Right CTA */}
+            <div className="hidden lg:flex items-center justify-end gap-6 flex-1">
+              <Link
+                href="/contact-us"
+                data-text="Contact Us"
+                className={`nav-link-bold-safe group relative text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans ${pathname === "/contact-us"
+                  ? "font-bold !text-[#D2E6BC]"
+                  : "font-medium hover:font-bold text-[#DDDDDD] hover:!text-[#D2E6BC]"
+                  }`}
+              >
+                Contact Us
+              </Link>
+              <Link
+                href="/rooms"
+                className="w-[122px] h-[40px]
 rounded-[6px]
 border-[1px] border-white/100
 px-6
@@ -236,165 +311,169 @@ inline-flex items-center justify-center
 transition-all duration-300
 hover:border-white hover:bg-white hover:text-[#0d1b2e]
 shadow-sm active:scale-95 font-sans"         >
-              Book Now
-            </Link>
+                Book Now
+              </Link>
+            </div>
+
+            {/* Mobile menu toggle */}
+            <button
+              className="lg:hidden ml-auto relative z-20 flex items-center justify-center w-10 h-10 rounded-full
+              border border-white/10 bg-white/4 transition-all duration-200 hover:border-white/30 hover:bg-white/8"
+              onClick={() => setMobileOpen((prev) => !prev)}
+              aria-label="Toggle Menu"
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                {mobileOpen ? (
+                  <motion.div
+                    key="close"
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: 90, opacity: 0 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    style={{ willChange: "transform, opacity" }}
+                  >
+                    <X size={18} color="white" />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="menu"
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: -90, opacity: 0 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    style={{ willChange: "transform, opacity" }}
+                  >
+                    <Menu size={18} color="white" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </button>
           </div>
 
-          {/* Mobile menu toggle */}
-          <button
-            className="lg:hidden ml-auto relative z-20 flex items-center justify-center w-10 h-10 rounded-full
-              border border-white/10 bg-white/4 transition-all duration-200 hover:border-white/30 hover:bg-white/8"
-            onClick={() => setMobileOpen((prev) => !prev)}
-            aria-label="Toggle Menu"
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              {mobileOpen ? (
-                <motion.div
-                  key="close"
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
-                  style={{ willChange: "transform, opacity" }}
-                >
-                  <X size={18} color="white" />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="menu"
-                  initial={{ rotate: 90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: -90, opacity: 0 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
-                  style={{ willChange: "transform, opacity" }}
-                >
-                  <Menu size={18} color="white" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </button>
-        </div>
+          {/* ── Expanded menu content ─────────────────────────────────────────── */}
+          <AnimatePresence>
+            {mobileOpen && (
+              <motion.div
+                key="menu-content"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.12 }}
+                className="lg:hidden relative z-10 flex flex-col flex-1 px-6 sm:px-8 pb-8 border-t border-white/10 overflow-y-auto"
+              >
+                {/* Links */}
+                <nav className="flex flex-col gap-4.5 mt-6">
+                  {/* 1. Home */}
+                  <Link
+                    href="/"
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname === "/" ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
+                      }`}
+                  >
+                    <Home size={20} className={pathname === "/" ? "text-[#D2E6BC]" : "text-white/80"} />
+                    <span>Home</span>
+                  </Link>
 
-        {/* ── Expanded menu content ─────────────────────────────────────────── */}
-        <AnimatePresence>
-          {mobileOpen && (
-            <motion.div
-              key="menu-content"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.12 }}
-              className="lg:hidden relative z-10 flex flex-col flex-1 px-6 sm:px-8 pb-8 border-t border-white/10 overflow-y-auto"
-            >
-              {/* Links */}
-              <nav className="flex flex-col gap-4.5 mt-6">
-                {/* 1. Home */}
-                <Link
-                  href="/"
-                  onClick={() => setMobileOpen(false)}
-                  className={`flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${
-                    pathname === "/" ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
-                  }`}
-                >
-                  <Home size={20} className={pathname === "/" ? "text-[#D2E6BC]" : "text-white/80"} />
-                  <span>Home</span>
-                </Link>
-
-                {/* 2. Destinations */}
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => setMobileDestinationsOpen((prev) => !prev)}
-                    className={`flex items-center justify-between w-full text-left font-sans transition-all py-1 cursor-pointer ${
-                      mobileDestinationsOpen || isDestinationsRoute(pathname)
+                  {/* 2. Destinations */}
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setMobileDestinationsOpen((prev) => !prev)}
+                      className={`flex items-center justify-between w-full text-left font-sans transition-all py-1 cursor-pointer ${mobileDestinationsOpen || isDestinationsRoute(pathname)
                         ? "text-[#D2E6BC] font-semibold"
                         : "text-white/90 font-medium hover:text-[#D2E6BC]"
-                    }`}
+                        }`}
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <MapPin size={20} className={mobileDestinationsOpen || isDestinationsRoute(pathname) ? "text-[#D2E6BC]" : "text-white/80"} />
+                        <span className="text-[17px] sm:text-[18px]">Destinations</span>
+                      </div>
+                      {mobileDestinationsOpen ? (
+                        <ChevronUp size={20} className="text-[#D2E6BC]" />
+                      ) : (
+                        <ChevronDown size={20} className="text-white/60" />
+                      )}
+                    </button>
+
+                    <AnimatePresence>
+                      {mobileDestinationsOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.22, ease: "easeOut" }}
+                          className="overflow-hidden"
+                        >
+                          <MobileDestinationsList onItemClick={() => setMobileOpen(false)} />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* 3. Partners */}
+                  <Link
+                    href="/partners"
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname.startsWith("/partners") ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
+                      }`}
                   >
-                    <div className="flex items-center gap-3.5">
-                      <MapPin size={20} className={mobileDestinationsOpen || isDestinationsRoute(pathname) ? "text-[#D2E6BC]" : "text-white/80"} />
-                      <span className="text-[17px] sm:text-[18px]">Destinations</span>
-                    </div>
-                    {mobileDestinationsOpen ? (
-                      <ChevronUp size={20} className="text-[#D2E6BC]" />
-                    ) : (
-                      <ChevronDown size={20} className="text-white/60" />
-                    )}
-                  </button>
+                    <Users size={20} className={pathname.startsWith("/partners") ? "text-[#D2E6BC]" : "text-white/80"} />
+                    <span>Partners</span>
+                  </Link>
 
-                  <AnimatePresence>
-                    {mobileDestinationsOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.22, ease: "easeOut" }}
-                        className="overflow-hidden"
-                      >
-                        <MobileDestinationsList onItemClick={() => setMobileOpen(false)} />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  {/* 4. Offering */}
+                  <Link
+                    href="#"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium text-white/90 hover:text-[#D2E6BC] transition-colors"
+                  >
+                    <Settings size={20} className="text-white/80" />
+                    <span>Offering</span>
+                  </Link>
+
+                  {/* 5. Contact Us */}
+                  <Link
+                    href="/contact-us"
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname === "/contact-us" ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
+                      }`}
+                  >
+                    <Phone size={20} className={pathname === "/contact-us" ? "text-[#D2E6BC]" : "text-white/80"} />
+                    <span>Contact Us</span>
+                  </Link>
+                </nav>
+
+                <div className="flex-1 min-h-[36px]" />
+
+                {/* CTAs */}
+                <div className="pt-4">
+                  <Link
+                    href="/rooms"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-center w-full border border-white/40 hover:border-white text-white rounded-xl py-3.5 text-[15px] font-semibold tracking-wide transition-all font-sans hover:bg-white/5 active:scale-[0.99]"
+                  >
+                    Book Now
+                  </Link>
                 </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-                {/* 3. Partners */}
-                <Link
-                  href="/partners"
-                  onClick={() => setMobileOpen(false)}
-                  className={`flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${
-                    pathname.startsWith("/partners") ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
-                  }`}
-                >
-                  <Users size={20} className={pathname.startsWith("/partners") ? "text-[#D2E6BC]" : "text-white/80"} />
-                  <span>Partners</span>
-                </Link>
-
-                {/* 4. Offering */}
-                <Link
-                  href="#"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium text-white/90 hover:text-[#D2E6BC] transition-colors"
-                >
-                  <Settings size={20} className="text-white/80" />
-                  <span>Offering</span>
-                </Link>
-
-                {/* 5. Contact Us */}
-                <Link
-                  href="/contact-us"
-                  onClick={() => setMobileOpen(false)}
-                  className={`flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${
-                    pathname === "/contact-us" ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
-                  }`}
-                >
-                  <Phone size={20} className={pathname === "/contact-us" ? "text-[#D2E6BC]" : "text-white/80"} />
-                  <span>Contact Us</span>
-                </Link>
-              </nav>
-
-              <div className="flex-1 min-h-[36px]" />
-
-              {/* CTAs */}
-              <div className="pt-4">
-                <Link
-                  href="/rooms"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-center w-full border border-white/40 hover:border-white text-white rounded-xl py-3.5 text-[15px] font-semibold tracking-wide transition-all font-sans hover:bg-white/5 active:scale-[0.99]"
-                >
-                  Book Now
-                </Link>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-      </motion.div>
+        </motion.div>
 
         {/* ── Destinations Mega Menu Dropdown ─────────────────────────────── */}
         <DestinationsDropdown
           isOpen={destinationsOpen}
           topOffset={navRowHeight + 14}
-          onItemClick={() => setDestinationsOpen(false)}
+          onMouseEnter={handleDestinationsMouseEnter}
+          onMouseLeave={handleDestinationsMouseLeave}
+          onItemClick={() => {
+            if (timeoutRef.current) {
+              clearTimeout(timeoutRef.current);
+              timeoutRef.current = null;
+            }
+            setDestinationsOpen(false);
+          }}
         />
       </div>
     </motion.header>

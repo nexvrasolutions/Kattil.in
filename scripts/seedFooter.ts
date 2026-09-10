@@ -22,7 +22,18 @@ export async function seedFooter() {
           ],
         },
         {
-          section: "Legal", order: 1,
+          section: "Navigation", order: 1,
+          links: [
+            { label: "Home",     href: "/",           newTab: false, order: 0 },
+            { label: "About Us", href: "/about-us",   newTab: false, order: 1 },
+            { label: "Rooms",    href: "/rooms",      newTab: false, order: 2 },
+            { label: "Gallery",  href: "/gallery",    newTab: false, order: 3 },
+            { label: "Blog",     href: "/blog",       newTab: false, order: 4 },
+            { label: "Contact",  href: "/contact-us", newTab: false, order: 5 },
+          ],
+        },
+        {
+          section: "Legal", order: 2,
           links: [
             { label: "Privacy Policy",     href: "/privacy-policy",   newTab: false, order: 0 },
             { label: "Refund Policy",      href: "/refund-policy",    newTab: false, order: 1 },
@@ -95,7 +106,18 @@ export async function seedFooter() {
           ],
         },
         {
-          section: "Legal", order: 1,
+          section: "Navigation", order: 1,
+          links: [
+            { label: "Home",     href: "/",           newTab: false, order: 0 },
+            { label: "About Us", href: "/about-us",   newTab: false, order: 1 },
+            { label: "Rooms",    href: "/rooms",      newTab: false, order: 2 },
+            { label: "Gallery",  href: "/gallery",    newTab: false, order: 3 },
+            { label: "Blog",     href: "/blog",       newTab: false, order: 4 },
+            { label: "Contact",  href: "/contact-us", newTab: false, order: 5 },
+          ],
+        },
+        {
+          section: "Legal", order: 2,
           links: [
             { label: "Privacy Policy",     href: "/privacy-policy",   newTab: false, order: 0 },
             { label: "Refund Policy",      href: "/refund-policy",    newTab: false, order: 1 },

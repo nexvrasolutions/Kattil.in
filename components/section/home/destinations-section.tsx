@@ -41,7 +41,7 @@ const DESTINATIONS: DestinationItem[] = [
     name: "View all our Destination",
     pillLabel: "",
     image: "/images/destinations/destination-card-bg.png",
-    href: "/chennai",
+    href: "/destinations",
     isViewAll: true,
   },
 ];

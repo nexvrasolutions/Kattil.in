@@ -71,20 +71,22 @@ export default function OffersSection() {
                 </span>
               </h2>
               <p
-                className=" 
-    text-white/75 
-    text-[14px] 
-    font-['Public_Sans'] 
-    font-normal 
-    leading-[18px] 
-    tracking-[-0.5px] 
-    max-w-[320px] 
-    mt-5
-  "
+                className="
+                  text-white/80
+                  text-[14px]
+                  md:text-[15px]
+                  font-sans
+                  font-normal
+                  leading-[22px]
+                  md:leading-[24px]
+                  tracking-[-0.2px]
+                  max-w-[440px]
+                  mt-5
+                "
               >
-                Discover thoughtfully curated offers designed to make your
-                stay more rewarding, from special rates to exclusive
-                experiences.
+                Discover thoughtfully curated offers designed to
+                <br className="hidden sm:inline" /> make your stay more rewarding, from special rates
+                <br className="hidden sm:inline" /> to exclusive experiences.
               </p>
               <div className="mt-6 sm:mt-8 md:mt-10 lg:mt-[80px]">
                 <Link

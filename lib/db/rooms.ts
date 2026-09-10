@@ -111,7 +111,7 @@ function getFallbackRoomOptions(citySlug: string): PropertyRoomOption[] {
       description: r.description || "Spacious room with modern amenities and extra comfort",
       images: r.image ? [r.image, "/assets/gallery.png"] : ["/assets/ac-double-room.webp"],
       amenities: ["Free Wifi", "Restaurant", "Study Desk", "AC"],
-      bookingLink: `/rooms/${r.slug}`,
+      bookingLink: r.external_url || `https://live.ipms247.com/booking/book-rooms-${citySlug === "madurai" || citySlug === "kanniyakumari" ? "kattil" : `kattil${citySlug}`}`,
       price: r.price ? `₹${r.price.toLocaleString("en-IN")}` : undefined,
     }));
   }
@@ -124,7 +124,7 @@ function getFallbackRoomOptions(citySlug: string): PropertyRoomOption[] {
       description: "Spacious Double occupancy room with extra comfort",
       images: ["/assets/ac-double-room.webp", "/assets/gallery.png"],
       amenities: ["Free Wifi", "Restaurant", "Study Desk", "Double Occupancy"],
-      bookingLink: "/rooms",
+      bookingLink: "https://live.ipms247.com/booking/book-rooms-kattil",
     },
     {
       _id: "default-room-2",
@@ -133,7 +133,7 @@ function getFallbackRoomOptions(citySlug: string): PropertyRoomOption[] {
       description: "Spacious dormitory with individual pods and extra comfort",
       images: ["/assets/six-bed-dormitory.webp", "/assets/gallery.png"],
       amenities: ["Free Wifi", "Restaurant", "Study Desk", "Double Occupancy"],
-      bookingLink: "/rooms",
+      bookingLink: "https://live.ipms247.com/booking/book-rooms-kattil",
     },
   ];
 }
@@ -224,7 +224,7 @@ export async function getPropertyDetailsData(
         description: r.description || "Spacious Double occupancy room with extra comfort",
         images: Array.isArray(r.images) && r.images.length > 0 ? r.images : ["/assets/ac-double-room.webp"],
         amenities: Array.isArray(r.amenities) && r.amenities.length > 0 ? r.amenities : ["Free Wifi", "Restaurant", "Study Desk", "Double Occupancy"],
-        bookingLink: r.link?.trim() || r.cta?.url?.trim() || `/rooms/${r.slug}`,
+        bookingLink: r.link?.trim() || r.cta?.url?.trim() || undefined,
         price: r.pricing?.[0]?.value,
       }));
     } else {

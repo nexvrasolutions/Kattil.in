@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import RoomStickyBookingWidget from "./RoomStickyBookingWidget";
+import { locationRooms } from "@/lib/data";
 
 export interface PropertyRoomOption {
   _id: string;
@@ -368,10 +369,36 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                       room.amenities && room.amenities.length > 0
                         ? room.amenities
                         : ["Free Wifi", "Restaurant", "Study Desk", "Double Occupancy"];
-                    const destParam = encodeURIComponent((data.destinationSlug || data.destinationName || "chennai").toLowerCase());
-                    const propParam = encodeURIComponent(data.slug || data.name || "");
-                    const roomParam = encodeURIComponent(room.slug || room.name || room._id);
-                    const bookUrl = `/rooms?destination=${destParam}&property=${propParam}&room=${roomParam}`;
+                    const destSlug = (data.destinationSlug || data.destinationName || "kanniyakumari").toLowerCase().trim();
+                    const roomNameLower = (room.name || "").toLowerCase().trim();
+                    const roomSlugLower = (room.slug || "").toLowerCase().trim();
+
+                    // Determine external booking URL
+                    let externalBookUrl = "";
+                    if (room.bookingLink && (room.bookingLink.startsWith("http://") || room.bookingLink.startsWith("https://"))) {
+                      externalBookUrl = room.bookingLink;
+                    } else {
+                      const staticRooms = (locationRooms as Record<string, any[]>)[destSlug];
+                      const matched = staticRooms?.find(
+                        (sr) =>
+                          (sr.slug && roomSlugLower && sr.slug.toLowerCase() === roomSlugLower) ||
+                          (sr.name && roomNameLower && sr.name.toLowerCase() === roomNameLower) ||
+                          (sr.name && roomNameLower && (roomNameLower.includes(sr.name.toLowerCase()) || sr.name.toLowerCase().includes(roomNameLower)))
+                      );
+                      if (matched?.external_url) {
+                        externalBookUrl = matched.external_url;
+                      } else if (destSlug === "chennai") {
+                        externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattilchennai";
+                      } else if (destSlug === "madurai") {
+                        externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattil";
+                      } else if (destSlug === "coimbatore") {
+                        externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattilcoimbatore";
+                      } else if (destSlug === "colachel") {
+                        externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattilcolachel";
+                      } else {
+                        externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattil";
+                      }
+                    }
 
                     return (
                       <div
@@ -426,12 +453,14 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
 
                             {/* Book Now */}
                             <div className="mt-5 sm:mt-0 sm:mb-1">
-                              <Link
-                                href={bookUrl}
+                              <a
+                                href={externalBookUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="w-full h-[44px] rounded-[8px] border border-[#111827] flex items-center justify-center text-[#111827] font-[Public_Sans] font-medium text-[14px] hover:bg-[#0d1b2e] hover:text-white transition-all text-center"
                               >
                                 Book Now
-                              </Link>
+                              </a>
                             </div>
                           </div>
                         </div>
