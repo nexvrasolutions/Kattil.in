@@ -69,6 +69,11 @@ function formatDateForDisplay(d: Date | null): string {
   return `${day}-${month}-${year}`;
 }
 
+function formatDateDisplay(d: Date): string {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${d.getDate()} ${months[d.getMonth()]}`;
+}
+
 function getHotelValueForSlug(slug: string): string {
   const s = slug.toLowerCase().trim();
   if (s === "chennai") return "kattilchennai";
@@ -131,11 +136,19 @@ export default function RoomStickyBookingWidget({
     d.setHours(0, 0, 0, 0);
     return d;
   });
+  const [dateDisplay, setDateDisplay] = useState<string>(() => {
+    const d1 = new Date();
+    d1.setDate(d1.getDate() + 1);
+    const d2 = new Date();
+    d2.setDate(d2.getDate() + 2);
+    return `${formatDateDisplay(d1)} - ${formatDateDisplay(d2)}`;
+  });
 
   const [dateError, setDateError] = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const dateInputHiddenRef = useRef<HTMLInputElement>(null);
+  const dateBoxRef = useRef<HTMLDivElement>(null);
+  const dateInputRef = useRef<HTMLInputElement>(null);
   const fpRef = useRef<any>(null);
 
   // Fetch live active destinations from database API
@@ -170,7 +183,7 @@ export default function RoomStickyBookingWidget({
           }
         }
       })
-      .catch(() => {});
+      .catch(() => { });
 
     return () => {
       isMounted = false;
@@ -196,6 +209,23 @@ export default function RoomStickyBookingWidget({
   // Initialize Flatpickr range picker
   useEffect(() => {
     let alive = true;
+
+    function repositionCalendar(instance: any) {
+      const box = dateBoxRef.current || dateInputRef.current;
+      if (!box || !instance?.calendarContainer) return;
+      const rect = box.getBoundingClientRect();
+      instance.calendarContainer.style.position = "absolute";
+      instance.calendarContainer.style.top = `${rect.bottom + window.scrollY + 6}px`;
+      instance.calendarContainer.style.left = `${rect.left + window.scrollX}px`;
+      instance.calendarContainer.style.width = `${rect.width}px`;
+      instance.calendarContainer.style.minWidth = `${rect.width}px`;
+      instance.calendarContainer.style.maxWidth = `${rect.width}px`;
+      instance.calendarContainer.style.boxSizing = "border-box";
+      instance.calendarContainer.style.bottom = "auto";
+      instance.calendarContainer.style.right = "auto";
+      instance.calendarContainer.classList.remove("arrowBottom");
+      instance.calendarContainer.classList.add("arrowTop");
+    }
 
     function injectStyle(href: string) {
       if (document.querySelector(`link[href="${href}"]`)) return;
@@ -223,18 +253,29 @@ export default function RoomStickyBookingWidget({
       try {
         injectStyle("https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css");
         await injectScript("https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.js");
-        if (!alive || !window.flatpickr || !dateInputHiddenRef.current) return;
+        if (!alive || !window.flatpickr || !dateInputRef.current) return;
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        fpRef.current = window.flatpickr(dateInputHiddenRef.current, {
+        fpRef.current = window.flatpickr(dateInputRef.current, {
           mode: "range",
-          dateFormat: "d-m-Y",
+          dateFormat: "d M Y",
           minDate: today,
           defaultDate: [checkin, checkout],
           disableMobile: true,
           position: "below left",
+          positionElement: dateBoxRef.current || dateInputRef.current,
+          appendTo: document.body,
+          onReady(selectedDates: Date[], dateStr: string, instance: any) {
+            repositionCalendar(instance);
+          },
+          onOpen(selectedDates: Date[], dateStr: string, instance: any) {
+            repositionCalendar(instance);
+            requestAnimationFrame(() => repositionCalendar(instance));
+            setTimeout(() => repositionCalendar(instance), 10);
+            setTimeout(() => repositionCalendar(instance), 50);
+          },
           onChange(dates: Date[]) {
             if (dates.length === 2) {
               const d1 = new Date(dates[0]);
@@ -243,11 +284,13 @@ export default function RoomStickyBookingWidget({
               d2.setHours(0, 0, 0, 0);
               setCheckin(d1);
               setCheckout(d2);
+              setDateDisplay(`${formatDateDisplay(d1)} - ${formatDateDisplay(d2)}`);
               setDateError(null);
             } else if (dates.length === 1) {
               const d1 = new Date(dates[0]);
               d1.setHours(0, 0, 0, 0);
               setCheckin(d1);
+              setDateDisplay(`${formatDateDisplay(d1)} - Select Check-out`);
             }
           },
         });
@@ -256,8 +299,18 @@ export default function RoomStickyBookingWidget({
       }
     })();
 
+    const handleScrollOrResize = () => {
+      if (fpRef.current?.isOpen) {
+        repositionCalendar(fpRef.current);
+      }
+    };
+    window.addEventListener("scroll", handleScrollOrResize, { passive: true });
+    window.addEventListener("resize", handleScrollOrResize, { passive: true });
+
     return () => {
       alive = false;
+      window.removeEventListener("scroll", handleScrollOrResize);
+      window.removeEventListener("resize", handleScrollOrResize);
       fpRef.current?.destroy();
     };
   }, []);
@@ -308,33 +361,31 @@ export default function RoomStickyBookingWidget({
   };
 
   return (
-    <div className="sticky top-28 md:top-32 bg-white rounded-2xl p-6 md:p-7 shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-gray-100">
+    <>
+      <style dangerouslySetInnerHTML={{ __html: STYLES }} />
+      <div className="sticky top-28 md:top-32 bg-white rounded-[8px] p-6 md:p-7 shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-gray-100">
       <div className="space-y-4">
-        {/* Hidden Flatpickr range input */}
-        <input ref={dateInputHiddenRef} type="text" className="sr-only pointer-events-none" />
-
         {/* Location Dropdown (Clean, No Search, Instant Selection) */}
         <div className="relative" ref={dropdownRef}>
-          <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+          <label className="block text-xs font-semibold text-gray-700 mb-1.5 font-sans">
             Location
           </label>
 
           <button
             type="button"
             onClick={() => setDropdownOpen((prev) => !prev)}
-            className="w-full h-11 px-3.5 pr-9 rounded-xl border border-gray-200 bg-gray-50/70 text-[13.5px] font-medium text-gray-800 flex items-center justify-between text-left transition-colors hover:bg-gray-100/70 focus:outline-none focus:ring-2 focus:ring-[#0d1b2e] cursor-pointer"
+            className="w-full h-11 px-3.5 pr-9 rounded-xl border border-gray-200 bg-gray-50/70 text-[13.5px] font-medium text-gray-800 flex items-center justify-between text-left transition-colors hover:bg-gray-100/70 focus:outline-none focus:ring-2 focus:ring-[#0d1b2e] cursor-pointer font-sans"
           >
             <span className="truncate">
               {selectedHotel.place}, {selectedHotel.name}
             </span>
             <ChevronDown
-              className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
-                dropdownOpen ? "rotate-180" : ""
-              }`}
+              className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""
+                }`}
             />
           </button>
 
-          {/* Animated Dropdown Menu without search bar */}
+          {/* Animated Dropdown Menu */}
           <AnimatePresence>
             {dropdownOpen && (
               <motion.div
@@ -348,13 +399,13 @@ export default function RoomStickyBookingWidget({
                 <div className="max-h-56 overflow-y-auto space-y-1">
                   {(lockedDestination
                     ? hotelsList.filter(
-                        (h) =>
-                          h.id === selectedHotel.id ||
-                          h.slug.toLowerCase() === selectedHotel.slug.toLowerCase() ||
-                          h.place.toLowerCase() === selectedHotel.place.toLowerCase() ||
-                          (initialDestinationSlug &&
-                            h.slug.toLowerCase() === initialDestinationSlug.toLowerCase())
-                      )
+                      (h) =>
+                        h.id === selectedHotel.id ||
+                        h.slug.toLowerCase() === selectedHotel.slug.toLowerCase() ||
+                        h.place.toLowerCase() === selectedHotel.place.toLowerCase() ||
+                        (initialDestinationSlug &&
+                          h.slug.toLowerCase() === initialDestinationSlug.toLowerCase())
+                    )
                     : hotelsList
                   ).length === 0 ? (
                     <div className="px-3 py-2 text-xs text-gray-500">
@@ -363,13 +414,13 @@ export default function RoomStickyBookingWidget({
                   ) : (
                     (lockedDestination
                       ? hotelsList.filter(
-                          (h) =>
-                            h.id === selectedHotel.id ||
-                            h.slug.toLowerCase() === selectedHotel.slug.toLowerCase() ||
-                            h.place.toLowerCase() === selectedHotel.place.toLowerCase() ||
-                            (initialDestinationSlug &&
-                              h.slug.toLowerCase() === initialDestinationSlug.toLowerCase())
-                        )
+                        (h) =>
+                          h.id === selectedHotel.id ||
+                          h.slug.toLowerCase() === selectedHotel.slug.toLowerCase() ||
+                          h.place.toLowerCase() === selectedHotel.place.toLowerCase() ||
+                          (initialDestinationSlug &&
+                            h.slug.toLowerCase() === initialDestinationSlug.toLowerCase())
+                      )
                       : hotelsList
                     ).map((h) => {
                       const isSelected =
@@ -384,17 +435,15 @@ export default function RoomStickyBookingWidget({
                             setSelectedHotel(h);
                             setDropdownOpen(false);
                           }}
-                          className={`w-full px-3 py-2.5 rounded-lg text-left text-xs flex items-center justify-between transition-colors cursor-pointer ${
-                            isSelected
-                              ? "bg-[#edf5e4] text-[#2d3f27] font-semibold"
-                              : "text-gray-700 hover:bg-gray-50"
-                          }`}
+                          className={`w-full px-3 py-2.5 rounded-lg text-left text-xs flex items-center justify-between transition-colors cursor-pointer ${isSelected
+                            ? "bg-[#edf5e4] text-[#2d3f27] font-semibold"
+                            : "text-gray-700 hover:bg-gray-50"
+                            }`}
                         >
                           <div className="flex items-center gap-2.5 truncate">
                             <MapPin
-                              className={`w-3.5 h-3.5 shrink-0 ${
-                                isSelected ? "text-[#526442]" : "text-gray-400"
-                              }`}
+                              className={`w-3.5 h-3.5 shrink-0 ${isSelected ? "text-[#526442]" : "text-gray-400"
+                                }`}
                             />
                             <span className="truncate">
                               <span className="font-semibold text-gray-900">{h.place}</span>
@@ -414,37 +463,36 @@ export default function RoomStickyBookingWidget({
           </AnimatePresence>
         </div>
 
-        {/* Check In Date */}
+        {/* Check In & Out (Single unified field as in home page) */}
         <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-            Check In
+          <label className="block text-xs font-semibold text-gray-700 mb-1.5 font-sans">
+            Check In & Out
           </label>
           <div
+            ref={dateBoxRef}
             onClick={openCalendar}
-            className="w-full h-11 px-3.5 rounded-xl border border-gray-200 bg-gray-50/70 text-[13.5px] font-medium text-gray-800 flex items-center justify-between cursor-pointer hover:bg-gray-100/70 transition-colors"
+            className={`w-full h-11 px-3.5 rounded-xl border ${dateError
+              ? "border-red-400 bg-red-50/50 ring-1 ring-red-400/20"
+              : "border-gray-200 bg-gray-50/70 hover:bg-gray-100/70"
+              } text-[13.5px] font-medium text-gray-800 flex items-center justify-between cursor-pointer transition-colors`}
           >
-            <span>{formatDateForDisplay(checkin) || "Select Date"}</span>
-            <Calendar className="w-4 h-4 text-gray-700" />
-          </div>
-        </div>
-
-        {/* Check Out Date */}
-        <div>
-          <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-            Check Out
-          </label>
-          <div
-            onClick={openCalendar}
-            className="w-full h-11 px-3.5 rounded-xl border border-gray-200 bg-gray-50/70 text-[13.5px] font-medium text-gray-800 flex items-center justify-between cursor-pointer hover:bg-gray-100/70 transition-colors"
-          >
-            <span>{formatDateForDisplay(checkout) || "Select Date"}</span>
-            <Calendar className="w-4 h-4 text-gray-700" />
+            <div className="flex items-center gap-2.5 min-w-0 flex-1">
+              <Calendar className={`w-4 h-4 ${dateError ? "text-red-500" : "text-gray-500"} shrink-0`} />
+              <input
+                ref={dateInputRef}
+                type="text"
+                readOnly
+                value={dateDisplay}
+                placeholder="Select check-in & check-out"
+                className="w-full bg-transparent text-[13.5px] text-gray-900 font-medium outline-none cursor-pointer placeholder:text-gray-400 truncate font-sans"
+              />
+            </div>
           </div>
         </div>
 
         {/* Error message */}
         {dateError && (
-          <p className="text-[12px] text-red-500 font-medium">{dateError}</p>
+          <p className="text-[12px] text-red-500 font-medium font-sans">{dateError}</p>
         )}
 
         {/* Check Availability CTA */}
@@ -452,12 +500,153 @@ export default function RoomStickyBookingWidget({
           <button
             type="button"
             onClick={handleCheckAvailability}
-            className="w-full py-3.5 rounded-xl bg-[#0d1b2e] hover:bg-[#162840] text-white font-semibold text-[14px] shadow-sm transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center"
+            className="w-full py-3.5 rounded-[6px] bg-[#0d1b2e] hover:bg-[#162840] text-white font-semibold text-[14px] shadow-sm transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center font-sans"
           >
             Check Availability
           </button>
         </div>
       </div>
     </div>
+    </>
   );
 }
+
+// ── Custom brand styling matching home page ────────────────────────────────
+const STYLES = `
+  .flatpickr-calendar {
+    border-radius: 8px !important;
+    box-shadow: 0 20px 50px -10px rgba(0,0,0,0.22), 0 10px 24px -5px rgba(0,0,0,0.08) !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
+    font-family: var(--font-public-sans), system-ui, sans-serif !important;
+    padding: 6px 8px !important;
+    box-sizing: border-box !important;
+    z-index: 99999 !important;
+  }
+  .flatpickr-calendar:before,
+  .flatpickr-calendar:after,
+  .flatpickr-calendar.arrowTop:before,
+  .flatpickr-calendar.arrowTop:after,
+  .flatpickr-calendar.arrowBottom:before,
+  .flatpickr-calendar.arrowBottom:after { 
+    display: none !important; 
+  }
+
+  .flatpickr-innerContainer,
+  .flatpickr-rContainer,
+  .flatpickr-days,
+  .dayContainer {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .dayContainer {
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    justify-items: center !important;
+    align-items: center !important;
+  }
+
+  .flatpickr-months {
+    background: transparent !important;
+    margin-bottom: 2px !important;
+    width: 100% !important;
+  }
+  .flatpickr-month {
+    height: 28px !important;
+    color: #0d1b2e !important;
+  }
+
+  .flatpickr-current-month {
+    font-size: 13.5px !important;
+    font-weight: 700 !important;
+    color: #0d1b2e !important;
+    padding-top: 0px !important;
+  }
+  .flatpickr-current-month .flatpickr-monthDropdown-months,
+  .flatpickr-current-month input.cur-year {
+    color: #0d1b2e !important;
+    font-weight: 700 !important;
+  }
+
+  .flatpickr-prev-month, .flatpickr-next-month {
+    fill: #0d1b2e !important;
+    color: #0d1b2e !important;
+    padding: 2px 4px !important;
+    border-radius: 4px !important;
+  }
+  .flatpickr-prev-month:hover, .flatpickr-next-month:hover {
+    background: #f1f5f9 !important;
+  }
+
+  .flatpickr-weekdays {
+    background: transparent !important;
+    margin-bottom: 2px !important;
+    width: 100% !important;
+    display: flex !important;
+  }
+  .flatpickr-weekdaycontainer {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(7, 1fr) !important;
+    justify-items: center !important;
+  }
+  .flatpickr-weekday {
+    color: #94a3b8 !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .flatpickr-day {
+    font-size: 11.5px !important;
+    font-weight: 500 !important;
+    border-radius: 6px !important;
+    color: #1e293b !important;
+    height: 26px !important;
+    width: 26px !important;
+    max-width: 26px !important;
+    line-height: 26px !important;
+    margin: 0.5px 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  @media (max-width: 640px) {
+    .flatpickr-day {
+      height: 24px !important;
+      width: 24px !important;
+      max-width: 24px !important;
+      line-height: 24px !important;
+      font-size: 11px !important;
+    }
+  }
+  .flatpickr-day:hover {
+    background: #f1f5f9 !important;
+    color: #0d1b2e !important;
+  }
+  .flatpickr-day.selected,
+  .flatpickr-day.startRange,
+  .flatpickr-day.endRange {
+    background: #0d1b2e !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    border-color: #0d1b2e !important;
+  }
+  .flatpickr-day.inRange {
+    background: #e2e8f0 !important;
+    color: #0d1b2e !important;
+    box-shadow: -5px 0 0 #e2e8f0, 5px 0 0 #e2e8f0 !important;
+  }
+  .flatpickr-day.today {
+    border: 1.5px solid #0d1b2e !important;
+  }
+  .flatpickr-day.disabled,
+  .flatpickr-day.prevMonthDay,
+  .flatpickr-day.nextMonthDay {
+    color: #cbd5e1 !important;
+  }
+`;
+

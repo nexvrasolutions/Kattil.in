@@ -142,7 +142,7 @@ export default function PartnersView() {
         {/* Hero Content aligned straight down with Navbar container */}
         <div className="relative z-10 w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="relative px-5 md:px-8 lg:px-15 max-w-3xl">
-            <p className="font-sans text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.28em] text-[#eaf2e1] mb-4 drop-shadow-sm">
+            <p className="font-sans text-[14px] sm:text-[15px]  uppercase text-[#FFFFFF] mb-4 drop-shadow-sm">
               PARTNER WITH KATTIL
             </p>
 
@@ -180,11 +180,11 @@ export default function PartnersView() {
             </div>
 
             {/* 4 Feature Columns */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10 text-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10 text-left">
               {WHY_PARTNER_ITEMS.map((item, idx) => (
-                <div key={idx} className="flex flex-col items-center">
+                <div key={idx} className="flex flex-col items-start text-left">
                   {/* Round Icon Badge */}
-                  <div className="w-14 h-14 rounded-full bg-[#eef2e7] border border-[#d9e2d0] flex items-center justify-center mb-5 shadow-sm">
+                  <div className="w-14 h-14 rounded-full bg-[#FFFFFF] flex items-center justify-center mb-5">
                     <FurnitureIcon className="w-6 h-6 text-[#4a583d]" />
                   </div>
 
@@ -240,10 +240,10 @@ export default function PartnersView() {
                 {HOW_IT_WORKS_STEPS.map((step, idx) => (
                   <div
                     key={idx}
-                    className="py-10 md:py-14 first:pt-2 last:pb-2 flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8 transition-colors"
+                    className="py-10 md:py-14 first:pt-0 lg:first:pt-[30px] last:pb-2 flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8 transition-colors"
                   >
                     {/* Number */}
-                    <span className="font-mono text-[13px] md:text-[14px] font-semibold text-[#9ca3af] tracking-wider shrink-0 pt-0.5">
+                    <span className="font-mono text-[13px] md:text-[14px] font-semibold text-[#9ca3af] tracking-wider shrink-0 pt-1">
                       {step.step}
                     </span>
 
@@ -268,40 +268,40 @@ export default function PartnersView() {
       <section
         className="w-full py-16 md:py-24"
         style={{
-          background: "linear-gradient(180deg, #F0EAD2 0%, rgba(240, 234, 210, 0) 100%)",
+          background: "linear-gradient(180deg, rgba(240, 234, 210, 0) 0%, #F0EAD2 100%)",
         }}
       >
         <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15">
-            {/* Heading */}
+            {/* Heading: 2 centered lines */}
             <div className="text-center mb-12 md:mb-16">
               <h2 className="text-[#111827] tracking-tight">
-                <span className="font-sans text-3xl sm:text-4xl md:text-[40px] font-normal">
-                  What properties can{" "}
+                <span className="block font-sans text-3xl sm:text-4xl md:text-[42px] font-normal">
+                  What properties can
                 </span>
-                <span className="font-serif text-3xl sm:text-4xl md:text-[42px] font-normal italic">
+                <span className="block font-serif text-3xl sm:text-4xl md:text-[44px] font-normal italic mt-1 text-[#111827]">
                   Partner with us?
                 </span>
               </h2>
             </div>
 
             {/* 4 Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7">
               {PROPERTY_TYPES.map((prop, idx) => (
-                <div key={idx} className="group flex flex-col">
+                <div key={idx} className="group flex flex-col text-left">
                   {/* Card Image */}
-                  <div className="relative w-full aspect-[4/5] rounded-[8px] overflow-hidden bg-[#e5e7eb] shadow-[0_4px_20px_rgba(0,0,0,0.04)] group-hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] transition-all duration-300">
+                  <div className="relative w-full aspect-[4/5] rounded-[10px] md:rounded-[12px] overflow-hidden bg-[#e5e7eb] shadow-xs">
                     <Image
                       src={prop.image}
                       alt={prop.title}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-103"
                     />
                   </div>
 
                   {/* Title */}
-                  <h3 className="font-sans text-[17px] md:text-[19px] font-medium text-[#111827] mt-4 pl-1">
+                  <h3 className="font-sans text-[16px] md:text-[17px] font-medium text-[#111827] mt-3.5 text-left">
                     {prop.title}
                   </h3>
                 </div>
@@ -312,7 +312,7 @@ export default function PartnersView() {
       </section>
 
       {/* ── 5. A Simple Partnership Model (Deep Navy Card) ─────────────── */}
-      <section className="w-full py-8 md:py-12 bg-transparent">
+      <section className="w-full py-8 md:py-12 bg-[#F0EAD2]">
         <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15">
             <div className="bg-[#0E2E4E] text-white rounded-[8px] p-8 sm:p-12 md:p-16 lg:p-20 shadow-[0_12px_40px_rgba(14,39,60,0.2)] relative overflow-hidden">
@@ -365,7 +365,7 @@ export default function PartnersView() {
       </section>
 
       {/* ── 6. Your Property Could Do More (CTA Section) ──────────────── */}
-      <section className="w-full py-16 md:py-24 bg-transparent">
+      <section className="w-full py-16 md:py-24 bg-[#F0EAD2]">
         <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15 text-center max-w-3xl mx-auto">
             <h2 className="text-[#111827] tracking-tight">

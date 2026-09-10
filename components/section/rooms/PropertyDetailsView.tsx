@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -82,34 +82,97 @@ const AMENITY_ICONS = [
 ];
 
 export default function PropertyDetailsView({ data }: { data: PropertyDetailsData }) {
-  const [activeSlide, setActiveSlide] = useState(0);
+  const [howToReachOpen, setHowToReachOpen] = useState(true);
+
+  // 1. Prepare Base Hero Images
+  const baseImages = useMemo(() => {
+    if (data.heroImages && data.heroImages.length > 0) {
+      return data.heroImages;
+    }
+    return [
+      "/assets/kattil-room-hero.webp",
+      "/assets/deluxe-garden-suite.webp",
+      "/assets/ac-double-room.webp",
+    ];
+  }, [data.heroImages]);
+
+  // Ensure minimum 3 items for full side-peek wrapping
+  const images = useMemo(() => {
+    if (baseImages.length === 2) {
+      return [...baseImages, ...baseImages];
+    }
+    return baseImages;
+  }, [baseImages]);
+
+  // Triple set for infinite looping buffer
+  const extendedImages = useMemo(() => {
+    if (images.length <= 1) return images;
+    return [...images, ...images, ...images];
+  }, [images]);
+
+  // Start with middle set so slide 0 is in center with left & right peeks
+  const [currentIndex, setCurrentIndex] = useState(() => (images.length > 1 ? images.length : 0));
+  const [isTransitioning, setIsTransitioning] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchDeltaX, setTouchDeltaX] = useState(0);
-  const [howToReachOpen, setHowToReachOpen] = useState(true);
 
-  const images = [
-    "/assets/kattil-room-hero.webp",
-    "/assets/deluxe-garden-suite.webp",
-    "/assets/ac-double-room.webp",
-  ];
+  // Keep currentIndex synced if images change
+  useEffect(() => {
+    if (images.length > 1) {
+      setCurrentIndex(images.length);
+    } else {
+      setCurrentIndex(0);
+    }
+  }, [images.length]);
+
+  const activeDotIndex = images.length > 0 ? currentIndex % images.length : 0;
 
   const handlePrevSlide = () => {
-    setActiveSlide((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    if (images.length <= 1) return;
+    setIsTransitioning(true);
+    setCurrentIndex((prev) => prev - 1);
   };
 
   const handleNextSlide = () => {
-    setActiveSlide((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    if (images.length <= 1) return;
+    setIsTransitioning(true);
+    setCurrentIndex((prev) => prev + 1);
   };
 
-  // Autoplay with pause on hover
+  // Autoplay slideshow with smooth 3.5s interval
   useEffect(() => {
     if (isPaused || images.length <= 1) return;
     const interval = setInterval(() => {
-      setActiveSlide((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-    }, 4500);
+      setIsTransitioning(true);
+      setCurrentIndex((prev) => prev + 1);
+    }, 3500);
     return () => clearInterval(interval);
   }, [isPaused, images.length]);
+
+  // Handle seamless infinite loop bounds
+  const handleTransitionEnd = () => {
+    if (images.length <= 1) return;
+    if (currentIndex >= images.length * 2) {
+      setIsTransitioning(false);
+      setCurrentIndex(currentIndex - images.length);
+    } else if (currentIndex < images.length) {
+      setIsTransitioning(false);
+      setCurrentIndex(currentIndex + images.length);
+    }
+  };
+
+  // Re-enable CSS transitions on next frame after silent jump
+  useEffect(() => {
+    if (!isTransitioning) {
+      const raf = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setIsTransitioning(true);
+        });
+      });
+      return () => cancelAnimationFrame(raf);
+    }
+  }, [isTransitioning]);
 
   const onTouchStart = (e: React.TouchEvent) => {
     setTouchStartX(e.touches[0].clientX);
@@ -150,29 +213,34 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
 
       <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
         <div className="px-5 md:px-8 lg:px-15 pt-28 md:pt-36 lg:pt-40 pb-20">
-          {/* ── 1. Top Panoramic Hero Carousel (Side-peek Slider) ────────────── */}
+          {/* ── 1. Top Panoramic Hero Carousel (Infinite Side-peek Slideshow) ── */}
           <section
             className="relative w-full mb-12 md:mb-16 -mx-5 md:-mx-8 lg:-mx-15 !w-[calc(100%+2.5rem)] md:!w-[calc(100%+4rem)] lg:!w-[calc(100%+7.5rem)] overflow-hidden select-none py-2"
-            onMouseEnter={() => setIsPaused(true)}
-            onMouseLeave={() => setIsPaused(false)}
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
           >
             {/* Carousel Slider Track */}
             <div
-              className="flex items-center transition-transform duration-500 ease-out"
+              className="flex items-center"
               style={{
-                transform: `translateX(calc(12% - ${activeSlide * 76}% - ${activeSlide * 16}px + ${touchDeltaX}px))`,
+                transform: `translateX(calc(12% - ${currentIndex * 76}% - ${currentIndex * 16}px + ${touchDeltaX}px))`,
                 gap: "16px",
+                transition: isTransitioning
+                  ? "transform 650ms cubic-bezier(0.25, 1, 0.5, 1)"
+                  : "none",
               }}
+              onTransitionEnd={handleTransitionEnd}
             >
-              {images.map((img, idx) => {
-                const isActive = idx === activeSlide;
+              {extendedImages.map((img, idx) => {
+                const isActive = idx === currentIndex;
                 return (
                   <div
                     key={idx}
-                    onClick={() => setActiveSlide(idx)}
+                    onClick={() => {
+                      setIsTransitioning(true);
+                      setCurrentIndex(idx);
+                    }}
                     className={`shrink-0 w-[76%] aspect-[16/10] sm:aspect-[16/9] md:aspect-[21/10] max-h-[560px] rounded-[16px] sm:rounded-[20px] md:rounded-[24px] overflow-hidden relative shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-500 cursor-pointer ${isActive
                       ? "opacity-100 scale-100 ring-1 ring-black/5"
                       : "opacity-80 hover:opacity-95 scale-[0.985]"
@@ -180,9 +248,9 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                   >
                     <Image
                       src={img}
-                      alt={`${data.name} photo ${idx + 1}`}
+                      alt={`${data.name} photo ${(idx % images.length) + 1}`}
                       fill
-                      priority={idx === 0}
+                      priority={idx === images.length}
                       className="object-cover transition-transform duration-700 hover:scale-103"
                     />
                   </div>
@@ -224,9 +292,10 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        setActiveSlide(dotIdx);
+                        setIsTransitioning(true);
+                        setCurrentIndex(images.length + dotIdx);
                       }}
-                      className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${dotIdx === activeSlide ? "w-6 bg-white" : "w-2 bg-white/50 hover:bg-white/75"
+                      className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${dotIdx === activeDotIndex ? "w-6 bg-white" : "w-2 bg-white/50 hover:bg-white/75"
                         }`}
                       aria-label={`Go to slide ${dotIdx + 1}`}
                     />
@@ -309,45 +378,45 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                         key={room._id || rIdx}
                         className="bg-white rounded-[8px] overflow-hidden border border-gray-100 shadow-[0_4px_24px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0_12px_32px_rgba(0,0,0,0.06)]"
                       >
-                        <div className="w-full max-w-[865px] h-[290px] flex gap-[26px]">
+                        <div className="w-full max-w-[865px] flex flex-col sm:flex-row gap-0 sm:gap-[20px] md:gap-[26px] h-auto sm:h-[290px]">
 
-                          {/* Left Room Image */}
-                          <div className="relative w-[405px] h-[290px] rounded-[8px] overflow-hidden shrink-0">
+                          {/* Room Image (Full width on mobile, side-by-side on sm/md/lg) */}
+                          <div className="relative w-full sm:w-[320px] md:w-[405px] h-[220px] sm:h-full rounded-t-[8px] sm:rounded-l-[8px] sm:rounded-tr-none overflow-hidden shrink-0">
                             <Image
                               src={roomImg}
                               alt={room.name}
                               fill
-                              sizes="405px"
+                              sizes="(max-width: 640px) 100vw, 405px"
                               className="object-cover"
                             />
                           </div>
 
-                          {/* Right Room Info */}
-                          <div className="w-[434px] h-[290px] flex flex-col justify-between py-1">
-                            <div className="px-4">
+                          {/* Room Info (Below image on mobile, right side on sm/md/lg) */}
+                          <div className="w-full sm:flex-1 md:w-[434px] flex flex-col justify-between p-5 sm:p-0 sm:pt-6 sm:pb-5 sm:pr-4">
+                            <div>
 
                               {/* Badge / Category */}
-                              <p className="font-[Public_Sans] text-[14px] font-medium leading-[14px] tracking-[-0.5px] text-[#526442] mb-2">
+                              <p className="font-[Public_Sans] text-[13.5px] sm:text-[14px] font-medium leading-[14px] tracking-[-0.5px] text-[#526442] mb-1.5 sm:mb-2">
                                 {roomBadge}
                               </p>
 
                               {/* Room Title */}
-                              <h3 className="font-[Public_Sans] text-[24px] font-medium text-[#111827] leading-[30px] tracking-[-0.5px]">
+                              <h3 className="font-[Public_Sans] text-[22px] sm:text-[24px] font-medium text-[#111827] leading-[28px] sm:leading-[30px] tracking-[-0.5px]">
                                 {room.name}
                               </h3>
 
                               {/* Room Subtitle */}
-                              <p className="font-[Public_Sans] text-[14px] font-normal leading-[18px] tracking-[-0.5px] text-[#6b7280] mt-2 mb-5">
+                              <p className="font-[Public_Sans] text-[13.5px] sm:text-[14px] font-normal leading-[18px] tracking-[-0.5px] text-[#6b7280] mt-1.5 sm:mt-2 mb-3.5 sm:mb-4">
                                 {room.description ||
                                   "Spacious Double occupancy room with extra comfort"}
                               </p>
 
                               {/* Amenities */}
-                              <div className="flex flex-wrap gap-2">
+                              <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                 {roomAmenities.map((amenity, aIdx) => (
                                   <span
                                     key={aIdx}
-                                    className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#F5F3EB] text-[12px] font-medium text-[#4b5563]"
+                                    className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#F5F3EB] text-[11.5px] sm:text-[12px] font-medium text-[#4b5563]"
                                   >
                                     {amenity}
                                   </span>
@@ -356,7 +425,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                             </div>
 
                             {/* Book Now */}
-                            <div className="px-4">
+                            <div className="mt-5 sm:mt-0 sm:mb-1">
                               <Link
                                 href={bookUrl}
                                 className="w-full h-[44px] rounded-[8px] border border-[#111827] flex items-center justify-center text-[#111827] font-[Public_Sans] font-medium text-[14px] hover:bg-[#0d1b2e] hover:text-white transition-all text-center"
@@ -439,9 +508,9 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                   Location
                 </h2>
 
-                <div className="bg-[#ede7d8] rounded-2xl overflow-hidden border border-[#dfd7c3] shadow-xs">
+                <div className="bg-[#F0EAD2] rounded-[8px] overflow-hidden border border-[#e3dcbf] shadow-xs">
                   {/* Top address bar */}
-                  <div className="p-6 md:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#dfd7c3]">
+                  <div className="p-6 md:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e3dcbf]">
                     <p className="font-sans text-[15px] md:text-[16px] text-[#374151]">
                       {data.address || "Karzu Road, Near circuit house, Karzu-194101"}
                     </p>
@@ -450,7 +519,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                         href={data.mapLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-block px-5 py-2 rounded-lg border border-[#374151] text-[#1f2937] text-xs font-semibold hover:bg-black/5 transition-colors self-start sm:self-auto text-center"
+                        className="inline-block px-5 py-2 rounded-[8px] border border-[#374151] text-[#1f2937] text-xs font-semibold hover:bg-black/5 transition-colors self-start sm:self-auto text-center"
                       >
                         View on map
                       </a>
@@ -463,7 +532,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                             "_blank"
                           )
                         }
-                        className="px-5 py-2 rounded-lg border border-[#374151] text-[#1f2937] text-xs font-semibold hover:bg-black/5 transition-colors self-start sm:self-auto cursor-pointer"
+                        className="px-5 py-2 rounded-[8px] border border-[#374151] text-[#1f2937] text-xs font-semibold hover:bg-black/5 transition-colors self-start sm:self-auto cursor-pointer"
                       >
                         View on map
                       </button>
@@ -474,7 +543,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                   <button
                     type="button"
                     onClick={() => setHowToReachOpen((prev) => !prev)}
-                    className="w-full px-6 md:px-8 py-4 flex items-center justify-between bg-[#ede7d8] hover:bg-[#e7e0cf] transition-colors text-left cursor-pointer"
+                    className="w-full px-6 md:px-8 py-4 flex items-center justify-between bg-[#F0EAD2] hover:bg-[#e8e2ca] transition-colors text-left cursor-pointer"
                   >
                     <span className="font-sans text-[17px] md:text-[18px] font-semibold text-[#1f2937]">
                       How to reach
@@ -488,7 +557,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
 
                   {/* Accordion body */}
                   {howToReachOpen && (
-                    <div className="p-6 md:p-8 bg-white border-t border-[#dfd7c3] space-y-4 text-xs md:text-sm text-[#4b5563] leading-relaxed">
+                    <div className="p-6 md:p-8 bg-white border-t border-[#e3dcbf] space-y-4 text-xs md:text-sm text-[#4b5563] leading-relaxed">
                       <h4 className="font-bold text-gray-900 text-sm md:text-[15px] mb-2">
                         Travel Directions
                       </h4>
@@ -557,7 +626,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                   Contact
                 </h2>
 
-                <div className="bg-[#ede7d8] rounded-2xl p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-[#dfd7c3]">
+                <div className="bg-[#F0EAD2] rounded-[8px] p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-[#e3dcbf]">
                   {/* Phone & Email */}
                   <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-8">
                     {/* Phone */}
@@ -593,7 +662,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                       href={`https://wa.me/${(data.whatsapp || data.phone || "917448749779").replace(/[^0-9]/g, "")}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl border border-[#374151] bg-white/40 hover:bg-white text-gray-900 text-sm font-semibold transition-colors shadow-xs"
+                      className="inline-flex items-center gap-2 px-6 py-2.5 rounded-[8px] border border-[#374151] bg-white/40 hover:bg-white text-gray-900 text-sm font-semibold transition-colors shadow-xs"
                     >
                       <MessageCircle className="w-4 h-4 text-[#25D366] fill-[#25D366]" />
                       <span>Whatsapp</span>
@@ -604,7 +673,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
             </div>
 
             {/* Right Column: Sticky Booking Widget (Connected to IPMS247 Booking Engine) */}
-            <div className="lg:col-span-4">
+            <div className="lg:col-span-4 lg:sticky lg:top-28 xl:top-32 z-30">
               <RoomStickyBookingWidget
                 initialDestinationName={data.destinationName}
                 initialPropertyName={data.name}

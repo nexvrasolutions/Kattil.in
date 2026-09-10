@@ -104,13 +104,21 @@ function RoomCard({ room, index, branch }: { room: RoomItem; index: number; bran
 export default function RoomsContent({
   cities,
   grouped,
+  initialCity,
 }: {
   cities: CityTab[];
   grouped: Record<string, RoomItem[]>;
+  initialCity?: string;
 }) {
   usePageView();
   const tabs = cities.length > 0 ? cities.map((c) => c.slug) : [];
-  const [activeTab, setActiveTab] = useState<string>(tabs[0] ?? "");
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    if (initialCity) {
+      const match = tabs.find((t) => t.toLowerCase() === initialCity.toLowerCase());
+      if (match) return match;
+    }
+    return tabs[0] ?? "";
+  });
   const dirRef = useRef(0);
 
   function handleTabChange(slug: string) {
