@@ -1,9 +1,11 @@
 import { NextRequest } from "next/server";
+import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db/mongodb";
 import Room from "@/lib/models/Room";
 import { apiSuccess, apiError, handleApiError, slugify } from "@/lib/utils/api";
 import { deleteUploadedFiles } from "@/lib/utils/fileCleanup";
 import { updateRoomSchema } from "@/lib/validations";
+import { clearDestinationsCache } from "@/lib/db/destinations";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -55,7 +57,9 @@ export async function PUT(request: NextRequest, { params }: Params) {
       }
 
       const conflict = await Room.findOne({ slug: newSlug, city: effectiveCity, _id: { $ne: id } });
-      if (conflict) return apiError("A room with this name already exists in this property", 409);
+      if (conflict) {
+        updateData.slug = `${newSlug}-${Date.now().toString().slice(-4)}`;
+      }
     }
 
     const room = await Room.findByIdAndUpdate(
@@ -65,6 +69,17 @@ export async function PUT(request: NextRequest, { params }: Params) {
     ).populate("city", "name slug");
 
     if (!room) return apiError("Room not found", 404);
+
+    clearDestinationsCache();
+    try {
+      revalidatePath("/chennai");
+      revalidatePath("/madurai");
+      revalidatePath("/coimbatore");
+      revalidatePath("/destinations");
+      revalidatePath("/rooms");
+      revalidatePath("/");
+    } catch {}
+
     return apiSuccess(room);
   } catch (error) {
     console.error("[PUT /api/admin/rooms/[id]]", error);
@@ -79,6 +94,17 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
     const room = await Room.findByIdAndDelete(id);
     if (!room) return apiError("Room not found", 404);
     await deleteUploadedFiles(room.images ?? []);
+
+    clearDestinationsCache();
+    try {
+      revalidatePath("/chennai");
+      revalidatePath("/madurai");
+      revalidatePath("/coimbatore");
+      revalidatePath("/destinations");
+      revalidatePath("/rooms");
+      revalidatePath("/");
+    } catch {}
+
     return apiSuccess({ deleted: true });
   } catch (error) {
     console.error("[DELETE /api/admin/rooms/[id]]", error);

@@ -149,10 +149,10 @@ export default function RoomsPage() {
 
   return (
     <div>
-      <PageHeader title="Rooms" subtitle="Manage your hotel room inventory">
+      <PageHeader title="Properties & Rooms" subtitle="Manage properties and rooms across Chennai, Madurai, Coimbatore and other destinations">
         <Link href="/admin/rooms/new">
           <AdminButton variant="default">
-            <Plus className="h-4 w-4" /> Add Room
+            <Plus className="h-4 w-4" /> Add Property / Room
           </AdminButton>
         </Link>
       </PageHeader>

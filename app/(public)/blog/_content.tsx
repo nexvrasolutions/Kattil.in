@@ -213,7 +213,7 @@ export default function BlogContent({
               LET US EXPLORE
             </p>
             <h1 className="text-white tracking-tight">
-              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-bold leading-[1.12]">
+              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] leading-[1.12]">
                 Stories Beyond
               </span>
               <span className="block font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-normal italic text-[#f4f7ef] leading-[1.15] mt-1">

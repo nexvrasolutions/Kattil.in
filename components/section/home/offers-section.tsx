@@ -90,7 +90,7 @@ export default function OffersSection() {
               </p>
               <div className="mt-6 sm:mt-8 md:mt-10 lg:mt-[80px]">
                 <Link
-                  href="/rooms"
+                  href=""
                   className="
       inline-block  
       text-[#D2E6BC]  

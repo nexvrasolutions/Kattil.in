@@ -17,6 +17,14 @@ export interface DestinationStaysData {
 const staysCache = new Map<string, { data: DestinationStaysData; timestamp: number }>();
 const CACHE_TTL_MS = 60 * 1000; // 60 seconds
 
+export function clearDestinationsCache(slug?: string) {
+  if (slug) {
+    staysCache.delete(slug.toLowerCase().trim());
+  } else {
+    staysCache.clear();
+  }
+}
+
 function getFallbackProperties(citySlug: string): PropertyStay[] {
   const staticRooms = (locationRooms as Record<string, any[]>)[citySlug.toLowerCase()];
   if (staticRooms && staticRooms.length > 0) {

@@ -119,7 +119,7 @@ export default function BlogDetailContent({
               {post.category || "Hotel Story"}
             </p>
 
-            <h1 className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[44px] font-bold text-white leading-[1.18] tracking-tight">
+            <h1 className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] text-white leading-[1.18] tracking-tight">
               {post.title}
             </h1>
           </div>

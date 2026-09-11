@@ -72,7 +72,7 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
       {/* ================= 1. HERO SECTION (SAGE GREEN) ================= */}
       <section className="relative w-full bg-[#8E9F78] overflow-hidden min-h-[300px] sm:min-h-[400px] md:min-h-[450px] lg:min-h-[500px] flex flex-col justify-end pt-28 sm:pt-32 md:pt-34 lg:pt-36 pb-8 sm:pb-9 md:pb-10 lg:pb-12">
         {/* Hero Content - Aligned exactly with Navbar 'Home' and 'Book Now' */}
-        <div className="relative z-10 w-full max-w-[1920px] mx-auto px-3 md:px-8">
+        <div className="relative z-10 w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="relative px-5 md:px-8 lg:px-15 flex items-end justify-between">
             {/* Left Content */}
             <motion.div
@@ -85,8 +85,8 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
                 WHO WE ARE
               </p>
 
-              <h1 className="text-white text-[36px] sm:text-[42px] md:text-[48px] lg:text-[52px] leading-[1.08] tracking-tight">
-                <span className="font-sans font-bold">The Story </span>
+              <h1 className="text-white text-[28px] sm:text-[32px] md:text-[36px] lg:text-[40px] leading-[1.08] tracking-tight">
+                <span className="font-sans">The Story </span>
                 <span className="font-serif italic font-normal">Behind</span>
                 <span className="block font-serif italic font-normal mt-1 sm:mt-1.5">
                   Kattil
@@ -121,7 +121,7 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
 
       {/* ================= 2. STORY SECTION (WARM CREAM) ================= */}
       <section className="relative z-20 rounded-t-[20px] bg-[#FAF8F2] overflow-hidden -mt-2">
-        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-8 pt-20 sm:pt-24 md:pt-28 lg:pt-32 pb-14 sm:pb-18 md:pb-24">
+        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5 pt-20 sm:pt-24 md:pt-28 lg:pt-32 pb-14 sm:pb-18 md:pb-24">
           <div className="px-5 md:px-8 lg:px-15">
             {/* Top Story: Text on Left, Photo on Right aligned with Book Now */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-12 lg:gap-12 xl:gap-16 items-center mt-8">              {/* Left Text */}
@@ -195,7 +195,7 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
                 mt-14 sm:mt-18 md:mt-24
                 w-full
                 bg-[#F0EAD2]
-                rounded-[20px] sm:rounded-[24px] md:rounded-[28px]
+                rounded-[8px] sm:rounded-[12px] md:rounded-[16px]
                 px-6 sm:px-8 md:px-10 lg:px-12 xl:px-14
                 py-8 sm:py-10 md:py-12
               "

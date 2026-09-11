@@ -123,26 +123,10 @@ export default function RoomStickyBookingWidget({
   const [hotelsList, setHotelsList] = useState<HotelOption[]>(DEFAULT_HOTEL_OPTIONS);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // Dates (default tomorrow and day after tomorrow)
-  const [checkin, setCheckin] = useState<Date>(() => {
-    const d = new Date();
-    d.setDate(d.getDate() + 1);
-    d.setHours(0, 0, 0, 0);
-    return d;
-  });
-  const [checkout, setCheckout] = useState<Date>(() => {
-    const d = new Date();
-    d.setDate(d.getDate() + 2);
-    d.setHours(0, 0, 0, 0);
-    return d;
-  });
-  const [dateDisplay, setDateDisplay] = useState<string>(() => {
-    const d1 = new Date();
-    d1.setDate(d1.getDate() + 1);
-    const d2 = new Date();
-    d2.setDate(d2.getDate() + 2);
-    return `${formatDateDisplay(d1)} - ${formatDateDisplay(d2)}`;
-  });
+  // Dates (empty by default)
+  const [checkin, setCheckin] = useState<Date | null>(null);
+  const [checkout, setCheckout] = useState<Date | null>(null);
+  const [dateDisplay, setDateDisplay] = useState<string>("");
 
   const [dateError, setDateError] = useState<string | null>(null);
 
@@ -262,7 +246,6 @@ export default function RoomStickyBookingWidget({
           mode: "range",
           dateFormat: "d M Y",
           minDate: today,
-          defaultDate: [checkin, checkout],
           disableMobile: true,
           allowInput: false,
           clickOpens: true,
@@ -302,7 +285,12 @@ export default function RoomStickyBookingWidget({
               const d1 = new Date(dates[0]);
               d1.setHours(0, 0, 0, 0);
               setCheckin(d1);
+              setCheckout(null);
               setDateDisplay(`${formatDateDisplay(d1)} - Select Check-out`);
+            } else {
+              setCheckin(null);
+              setCheckout(null);
+              setDateDisplay("");
             }
           },
         });

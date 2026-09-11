@@ -216,8 +216,7 @@ export default function DestinationStaysView({
                   min-[390px]:text-[24px]
                   sm:text-3xl
                   md:text-4xl
-                  lg:text-[42px]
-                  font-bold
+                  lg:text-[40px]
                   leading-[1.15]
                   whitespace-nowrap
                 "
@@ -446,11 +445,15 @@ export default function DestinationStaysView({
                      PROPERTY LINK
                   --------------------------------------------- */
                   const targetLink =
-                    stay.slug
-                      ? `/properties/${stay.slug}`
-                      : stay._id
-                        ? `/properties/${stay._id}`
-                        : "/properties/kattil-executive-stay";
+                    stay.link && stay.link.startsWith("http")
+                      ? stay.link
+                      : stay.link && stay.link.trim().length > 0
+                        ? (stay.link.includes("?") ? `${stay.link}&city=${encodeURIComponent(citySlug)}` : `${stay.link}?city=${encodeURIComponent(citySlug)}`)
+                        : stay.slug
+                          ? `/properties/${stay.slug}?city=${encodeURIComponent(citySlug)}`
+                          : stay._id
+                            ? `/properties/${stay._id}?city=${encodeURIComponent(citySlug)}`
+                            : `/properties/kattil-executive-stay?city=${encodeURIComponent(citySlug)}`;
 
                   /* ---------------------------------------------
                      AMENITIES
@@ -601,14 +604,16 @@ export default function DestinationStaysView({
                           "
                         >
 
-                          {/* Amenities: Free Wifi and Restaurant */}
+                          {/* Amenities: dynamic badges from stay */}
                           <div className="flex flex-wrap items-center gap-2 min-w-0">
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#F5F3EB] text-[12px] font-medium text-[#526442] whitespace-nowrap">
-                              Free Wifi
-                            </span>
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#F5F3EB] text-[12px] font-medium text-[#526442] whitespace-nowrap">
-                              Restaurant
-                            </span>
+                            {stayAmenities.slice(0, 2).map((amenity, aIdx) => (
+                              <span
+                                key={aIdx}
+                                className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#F5F3EB] text-[12px] font-medium text-[#526442] whitespace-nowrap"
+                              >
+                                {amenity}
+                              </span>
+                            ))}
                           </div>
 
                           {/* View */}

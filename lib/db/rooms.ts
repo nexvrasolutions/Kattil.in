@@ -234,14 +234,14 @@ export async function getPropertyDetailsData(
     const heroImages =
       primaryRoom?.images && primaryRoom.images.length > 0
         ? [
-            "/assets/kattil-room-hero.webp",
-            ...primaryRoom.images.filter((i: string) => i !== "/assets/kattil-room-hero.webp"),
-          ].slice(0, 3)
+          "/assets/kattil-room-hero.webp",
+          ...primaryRoom.images.filter((i: string) => i !== "/assets/kattil-room-hero.webp"),
+        ].slice(0, 3)
         : [
-            "/assets/kattil-room-hero.webp",
-            "/assets/deluxe-garden-suite.webp",
-            "/assets/ac-double-room.webp",
-          ];
+          "/assets/kattil-room-hero.webp",
+          "/assets/deluxe-garden-suite.webp",
+          "/assets/ac-double-room.webp",
+        ];
 
     const result: PropertyDetailsData = {
       _id: primaryRoom ? String(primaryRoom._id) : undefined,

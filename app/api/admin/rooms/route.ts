@@ -1,8 +1,10 @@
 import { NextRequest } from "next/server";
+import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db/mongodb";
 import Room from "@/lib/models/Room";
 import { apiSuccess, apiError, handleApiError, slugify, getPaginationParams } from "@/lib/utils/api";
 import { roomSchema } from "@/lib/validations";
+import { clearDestinationsCache } from "@/lib/db/destinations";
 
 export async function GET(request: NextRequest) {
   try {
@@ -59,12 +61,26 @@ export async function POST(request: NextRequest) {
       Object.entries({ ...rest, city: cityId }).filter(([, v]) => v !== undefined)
     );
 
-    const slug = slugify(rest.name);
+    let slug = slugify(rest.name);
     const existing = await Room.findOne({ slug, city: cityId });
-    if (existing) return apiError("A room with this name already exists in this property", 409);
+    if (existing) {
+      slug = `${slug}-${Date.now().toString().slice(-4)}`;
+    }
 
     const room = await Room.create({ ...createData, slug });
     const populated = await room.populate("city", "name slug");
+
+    // Invalidate destination caches and revalidate public routes
+    clearDestinationsCache();
+    try {
+      revalidatePath("/chennai");
+      revalidatePath("/madurai");
+      revalidatePath("/coimbatore");
+      revalidatePath("/destinations");
+      revalidatePath("/rooms");
+      revalidatePath("/");
+    } catch {}
+
     return apiSuccess(populated, 201);
   } catch (error) {
     console.error("[POST /api/admin/rooms]", error);

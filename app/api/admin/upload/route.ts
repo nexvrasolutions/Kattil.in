@@ -25,7 +25,7 @@ const GALLERY_FOLDERS = new Set(["madurai-gallery", "chennai-gallery"]);
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const file   = formData.get("file") as File | null;
+    const file = formData.get("file") as File | null;
     const folder = (formData.get("folder") as string | null) ?? "general";
 
     if (!file) {
@@ -39,8 +39,8 @@ export async function POST(request: NextRequest) {
     }
 
     const safeFolder = VALID_FOLDERS.has(folder) ? folder : "general";
-    const ext        = extname(file.name).toLowerCase() || `.${file.type.split("/")[1]}`;
-    const filename   = `${Date.now()}_${randomUUID().split("-")[0]}${ext}`;
+    const ext = extname(file.name).toLowerCase() || `.${file.type.split("/")[1]}`;
+    const filename = `${Date.now()}_${randomUUID().split("-")[0]}${ext}`;
 
     // ── Vercel Blob (production) ──────────────────────────────────────────────
     if (process.env.BLOB_READ_WRITE_TOKEN) {
@@ -53,10 +53,10 @@ export async function POST(request: NextRequest) {
     let publicPath: string;
 
     if (GALLERY_FOLDERS.has(safeFolder)) {
-      uploadDir  = join(process.cwd(), "public", "images", safeFolder);
+      uploadDir = join(process.cwd(), "public", "images", safeFolder);
       publicPath = `/images/${safeFolder}/${filename}`;
     } else {
-      uploadDir  = join(process.cwd(), "public", "uploads", safeFolder);
+      uploadDir = join(process.cwd(), "public", "uploads", safeFolder);
       publicPath = `/uploads/${safeFolder}/${filename}`;
     }
 

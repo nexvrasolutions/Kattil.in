@@ -20,7 +20,7 @@ const navSections: NavSection[] = [
   {
     title: "Content Management",
     items: [
-      { label: "Rooms", href: "/admin/rooms", icon: BedDouble },
+      { label: "Properties & Rooms", href: "/admin/rooms", icon: BedDouble },
       { label: "Gallery", href: "/admin/gallery", icon: Images },
       { label: "Gallery Categories", href: "/admin/gallery-categories", icon: Tag },
       { label: "Amenities", href: "/admin/amenities", icon: Sparkles },

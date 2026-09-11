@@ -117,11 +117,11 @@ export default function PartnersView() {
             </p>
 
             <h1 className="text-white tracking-tight">
-              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-bold leading-[1.12]">
+              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] leading-[1.12]">
                 Your Property. Our
               </span>
               <span className="block mt-1">
-                <span className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-bold text-white">
+                <span className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] text-white">
                   Expertise.{" "}
                 </span>
                 <span className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-normal italic text-[#f4f7ef] leading-[1.15]">

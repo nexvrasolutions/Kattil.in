@@ -203,7 +203,7 @@ export default function GalleryContent({
               CAPTURE OUR MOMENTS
             </p>
             <h1 className="text-white tracking-tight">
-              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-bold leading-[1.12]">
+              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] leading-[1.12]">
                 Moments to{" "}
                 <span className="font-serif font-normal italic text-[#f4f7ef]">
                   Remember our
