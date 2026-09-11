@@ -135,7 +135,7 @@ export default function PartnersView() {
               transition={{ duration: 0.65, ease: EASE, delay: 0.2 }}
               className="text-white tracking-tight"
             >
-              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] leading-[1.12]">
+              <span className="block font-sans min[390px]:text-[24px] min[360px]:text-[22px] text-20px sm:text34xl md:text-4xl lg:text-[40px] leading-[1.12]">
                 Your Property. Our
               </span>
               <span className="block mt-1">
@@ -152,7 +152,7 @@ export default function PartnersView() {
       </section>
 
       {/* ── 2. Why Partner with Kattil? ───────────────────────────────── */}
-      <section className="relative z-20 w-full py-16 md:py-24 bg-[#FAF8F5] rounded-t-[20px] md:rounded-t-[24px] overflow-hidden -mt-3 md:-mt-4">
+      <section className="relative z-20 w-full pt-16 md:pt-24 pb-0 bg-[#FAF8F5] rounded-t-[20px] md:rounded-t-[24px] overflow-hidden -mt-3 md:-mt-4">
         <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15">
             {/* Title */}
@@ -229,7 +229,7 @@ export default function PartnersView() {
       </section>
 
       {/* ── 3. How It Works: From your property Better performing ───────── */}
-      <section className="w-full py-16 md:py-24 bg-[#FAF8F5] scroll-mt-36 md:scroll-mt-44">
+      <section className="w-full pt-16 md:pt-[122px] pb-16 md:pb-24 bg-[#FAF8F5] scroll-mt-36 md:scroll-mt-44">
         <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
@@ -347,7 +347,7 @@ export default function PartnersView() {
         </section>
 
         {/* ── 5. A Simple Partnership Model (Deep Navy Card) ─────────────── */}
-        <section className="w-full py-8 md:py-12">
+        <section className="w-full pt-8 md:pt-12 pb-0">
           <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
             <motion.div
               initial={{ opacity: 0, y: 28 }}
@@ -417,7 +417,7 @@ export default function PartnersView() {
         </section>
 
         {/* ── 6. Your Property Could Do More (CTA Section) ──────────────── */}
-        <section className="w-full py-16 md:py-24">
+        <section className="w-full pt-16 md:pt-[120px] pb-16 md:pb-24">
           <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
