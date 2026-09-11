@@ -301,7 +301,7 @@ export default function Navbar() {
                 Contact Us
               </Link>
               <Link
-                href="/rooms"
+                href="/"
                 className="w-[122px] h-[40px] rounded-[8px] border border-white px-6 text-white text-[14px] leading-none font-medium inline-flex items-center justify-center transition-all duration-300 hover:border-white hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-95 font-sans"
               >
                 Book Now
@@ -441,7 +441,7 @@ export default function Navbar() {
                 {/* CTAs */}
                 <div className="pt-4">
                   <Link
-                    href="/rooms"
+                    href="/"
                     onClick={() => setMobileOpen(false)}
                     className="flex items-center justify-center w-full border border-white hover:border-white text-white rounded-[8px] py-3.5 text-[15px] font-semibold tracking-wide transition-all duration-300 font-sans hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-[0.99]"
                   >
