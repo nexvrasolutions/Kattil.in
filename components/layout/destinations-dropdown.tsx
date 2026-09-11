@@ -45,6 +45,26 @@ interface DestinationsDropdownProps {
   topOffset?: number;
 }
 
+let cachedDestinations: DestinationItem[] | null = null;
+let destinationsFetchPromise: Promise<DestinationItem[]> | null = null;
+
+async function getCachedDestinations(): Promise<DestinationItem[]> {
+  if (cachedDestinations) return cachedDestinations;
+  if (!destinationsFetchPromise) {
+    destinationsFetchPromise = fetch("/api/destinations")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.success && Array.isArray(data.data) && data.data.length > 0) {
+          cachedDestinations = data.data;
+          return data.data;
+        }
+        return FALLBACK_DESTINATIONS;
+      })
+      .catch(() => FALLBACK_DESTINATIONS);
+  }
+  return destinationsFetchPromise;
+}
+
 export default function DestinationsDropdown({
   isOpen,
   onMouseEnter,
@@ -52,20 +72,17 @@ export default function DestinationsDropdown({
   onItemClick,
   topOffset = 76,
 }: DestinationsDropdownProps) {
-  const [destinations, setDestinations] = useState<DestinationItem[]>(FALLBACK_DESTINATIONS);
+  const [destinations, setDestinations] = useState<DestinationItem[]>(
+    cachedDestinations || FALLBACK_DESTINATIONS
+  );
 
   useEffect(() => {
     let isMounted = true;
-    fetch("/api/destinations")
-      .then((res) => res.json())
-      .then((data) => {
-        if (isMounted && data.success && Array.isArray(data.data) && data.data.length > 0) {
-          setDestinations(data.data);
-        }
-      })
-      .catch((err) => {
-        console.warn("Failed to fetch destinations, using fallback:", err);
-      });
+    getCachedDestinations().then((data) => {
+      if (isMounted && data && data.length > 0) {
+        setDestinations(data);
+      }
+    });
     return () => {
       isMounted = false;
     };
@@ -179,18 +196,17 @@ export function MobileDestinationsList({
 }: {
   onItemClick?: () => void;
 }) {
-  const [destinations, setDestinations] = useState<DestinationItem[]>(FALLBACK_DESTINATIONS);
+  const [destinations, setDestinations] = useState<DestinationItem[]>(
+    cachedDestinations || FALLBACK_DESTINATIONS
+  );
 
   useEffect(() => {
     let isMounted = true;
-    fetch("/api/destinations")
-      .then((res) => res.json())
-      .then((data) => {
-        if (isMounted && data.success && Array.isArray(data.data) && data.data.length > 0) {
-          setDestinations(data.data);
-        }
-      })
-      .catch(() => { });
+    getCachedDestinations().then((data) => {
+      if (isMounted && data && data.length > 0) {
+        setDestinations(data);
+      }
+    });
     return () => {
       isMounted = false;
     };

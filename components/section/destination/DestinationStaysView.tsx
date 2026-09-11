@@ -3,8 +3,11 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { ArrowRight, MapPin } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
+
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export interface PropertyStay {
   _id: string;
@@ -116,17 +119,30 @@ export default function DestinationStaysView({
         className="
           relative
           w-full
-          bg-[#9caf88]
+          bg-[#8E9F78]
           overflow-hidden
-          pt-36
-          md:pt-44
-          lg:pt-52
-          pb-16
-          md:pb-24
+          min-h-[300px]
+          sm:min-h-[400px]
+          md:min-h-[450px]
+          lg:min-h-[500px]
+          flex
+          flex-col
+          justify-end
+          pt-28
+          sm:pt-32
+          md:pt-34
+          lg:pt-36
+          pb-8
+          sm:pb-9
+          md:pb-10
+          lg:pb-12
         "
       >
         {/* Background Monument Illustration */}
-        <div
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 0.9, x: 0 }}
+          transition={{ duration: 0.85, ease: EASE, delay: 0.2 }}
           className="
             hidden
             md:flex
@@ -151,8 +167,6 @@ export default function DestinationStaysView({
             className="
               w-full
               h-full
-              opacity-85
-              md:opacity-90
               bg-no-repeat
             "
             style={{
@@ -162,7 +176,7 @@ export default function DestinationStaysView({
               backgroundPosition: "right bottom",
             }}
           />
-        </div>
+        </motion.div>
 
         {/* Hero Content */}
         <div
@@ -186,7 +200,10 @@ export default function DestinationStaysView({
             "
           >
             {/* Eyebrow */}
-            <p
+            <motion.p
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: EASE, delay: 0.1 }}
               className="
                 font-[Public_Sans]
                 font-semibold
@@ -202,10 +219,15 @@ export default function DestinationStaysView({
               "
             >
               FIND YOUR PERFECT
-            </p>
+            </motion.p>
 
             {/* Hero Heading */}
-            <h1 className="text-white tracking-tight">
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, ease: EASE, delay: 0.2 }}
+              className="text-white tracking-tight"
+            >
 
               <span
                 className="
@@ -244,7 +266,7 @@ export default function DestinationStaysView({
                 that feel like home.
               </span>
 
-            </h1>
+            </motion.h1>
           </div>
         </div>
       </section>
@@ -252,7 +274,7 @@ export default function DestinationStaysView({
       {/* =====================================================
           PROPERTIES SECTION
       ===================================================== */}
-      <main className="flex-1 py-12 md:py-16 lg:py-20">
+      <main className="relative z-20 flex-1 py-12 md:py-16 lg:py-20 bg-[#FAF8F5] rounded-t-[20px] md:rounded-t-[24px] overflow-hidden -mt-3 md:-mt-4">
 
         <div
           className="
@@ -469,8 +491,13 @@ export default function DestinationStaysView({
                     /* =================================================
                        PROPERTY CARD
                     ================================================= */
-                    <div
+                    <motion.div
                       key={stay._id || idx}
+                      initial={{ opacity: 0, y: 24 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{ duration: 0.5, delay: idx * 0.08, ease: EASE }}
+                      whileHover={{ y: -6, transition: { duration: 0.25 } }}
                       className="
                         group
                         w-full
@@ -516,9 +543,9 @@ export default function DestinationStaysView({
                           "
                           className="
                             object-cover
-                            group-hover:scale-[1.03]
+                            group-hover:scale-[1.04]
                             transition-transform
-                            duration-500
+                            duration-700
                             ease-out
                           "
                         />
@@ -526,15 +553,6 @@ export default function DestinationStaysView({
 
                       {/* =================================================
                           CARD CONTENT
-
-                          Figma:
-                          Width: 413px
-                          Height: 114px
-                          Padding Top: 12px
-                          Padding Right: 16px
-                          Padding Bottom: 16px
-                          Padding Left: 16px
-                          Gap: 10px
                       ================================================= */}
                       <div
                         className="
@@ -655,7 +673,7 @@ export default function DestinationStaysView({
 
                       </div>
 
-                    </div>
+                    </motion.div>
                   );
                 })}
 

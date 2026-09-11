@@ -484,11 +484,24 @@ body {
   color: #0d1b2e !important;
   box-shadow: -5px 0 0 #e2e8f0, 5px 0 0 #e2e8f0 !important;
 }
-.flatpickr-day.today {
-  border: 1.5px solid #0d1b2e !important;
-}
 .flatpickr-day.disabled,
 .flatpickr-day.prevMonthDay,
 .flatpickr-day.nextMonthDay {
   color: #cbd5e1 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Cross-Browser Scrollbar Hiding Utilities
+   ═══════════════════════════════════════════════════════════════════════════ */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.no-scrollbar,
+.scrollbar-none {
+  -ms-overflow-style: none !important; /* IE and Edge */
+  scrollbar-width: none !important; /* Firefox */
 }

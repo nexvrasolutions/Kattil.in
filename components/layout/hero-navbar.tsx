@@ -10,11 +10,6 @@ import {
   ShieldCheck,
   Gem,
   Bell,
-  Home,
-  MapPin,
-  Users,
-  Settings,
-  Phone,
   ChevronUp,
   ChevronDown,
 } from "lucide-react";
@@ -203,9 +198,6 @@ export default function HeroNavbar({
   const [navRowHeight, setNavRowHeight] =
     useState(NAVBAR_H_DEFAULT);
 
-  const [destinationsLeft, setDestinationsLeft] =
-    useState<number>(0);
-
   // ───────────────────────────────────────────────────────────────────────────
   // Native Smooth Scrolling
   // ───────────────────────────────────────────────────────────────────────────
@@ -216,30 +208,6 @@ export default function HeroNavbar({
     return () => {
       document.documentElement.style.scrollBehavior = "";
     };
-  }, []);
-
-  // ───────────────────────────────────────────────────────────────────────────
-  // Calculate Destination Dropdown Position
-  // ───────────────────────────────────────────────────────────────────────────
-
-  const updateDestinationsPosition = useCallback(() => {
-    if (
-      destinationsTriggerRef.current &&
-      headerContainerRef.current
-    ) {
-      const triggerRect =
-        destinationsTriggerRef.current.getBoundingClientRect();
-
-      const containerRect =
-        headerContainerRef.current.getBoundingClientRect();
-
-      const offset =
-        triggerRect.left - containerRect.left;
-
-      setDestinationsLeft(
-        Math.max(0, Math.round(offset))
-      );
-    }
   }, []);
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -263,8 +231,6 @@ export default function HeroNavbar({
           setNavRowHeight(94);
         }
       }
-
-      updateDestinationsPosition();
     };
 
     measure();
@@ -274,7 +240,7 @@ export default function HeroNavbar({
     return () => {
       window.removeEventListener("resize", measure);
     };
-  }, [updateDestinationsPosition]);
+  }, []);
 
   const navbarH = navRowHeight;
 
@@ -289,9 +255,8 @@ export default function HeroNavbar({
         timeoutRef.current = null;
       }
 
-      updateDestinationsPosition();
       setDestinationsOpen(true);
-    }, [updateDestinationsPosition]);
+    }, []);
 
   const handleDestinationsMouseLeave =
     useCallback(() => {
@@ -320,11 +285,9 @@ export default function HeroNavbar({
         timeoutRef.current = null;
       }
 
-      updateDestinationsPosition();
-
       setDestinationsOpen((prev) => !prev);
     },
-    [updateDestinationsPosition]
+    []
   );
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -394,6 +357,8 @@ export default function HeroNavbar({
     heroVisibleRef.current = heroVisible;
   }, [heroVisible]);
 
+  const isScrollingToTopRef = useRef(false);
+
   // ───────────────────────────────────────────────────────────────────────────
   // Scroll Handler
   // ───────────────────────────────────────────────────────────────────────────
@@ -413,14 +378,22 @@ export default function HeroNavbar({
           });
 
           if (isHome) {
-            if (currentY > 80) {
-              setHeroVisible((prev) =>
-                prev ? false : prev
-              );
-            } else if (currentY <= 5) {
-              setHeroVisible((prev) =>
-                !prev ? true : prev
-              );
+            if (isScrollingToTopRef.current) {
+              if (currentY <= 15) {
+                isScrollingToTopRef.current = false;
+                setHeroVisible(true);
+                setScrolled(false);
+              }
+            } else {
+              if (currentY > 80) {
+                setHeroVisible((prev) =>
+                  prev ? false : prev
+                );
+              } else if (currentY <= 5) {
+                setHeroVisible((prev) =>
+                  !prev ? true : prev
+                );
+              }
             }
           }
 
@@ -486,9 +459,46 @@ export default function HeroNavbar({
   // Close Mobile Menu On Route Change
   // ───────────────────────────────────────────────────────────────────────────
 
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
+  const handleBookNowClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (isHome) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        setMobileOpen(false);
+        document.body.style.overflow = "";
+        document.documentElement.style.overflow = "";
+
+        if (window.scrollY > 0) {
+          isScrollingToTopRef.current = true;
+          window.scrollTo({ top: 0, behavior: "smooth" });
+
+          const checkArrival = setInterval(() => {
+            if (window.scrollY <= 15) {
+              clearInterval(checkArrival);
+              isScrollingToTopRef.current = false;
+              setHeroVisible(true);
+              setScrolled(false);
+            }
+          }, 30);
+
+          setTimeout(() => {
+            clearInterval(checkArrival);
+            if (isScrollingToTopRef.current) {
+              isScrollingToTopRef.current = false;
+              window.scrollTo(0, 0);
+              setHeroVisible(true);
+              setScrolled(false);
+            }
+          }, 1200);
+        } else {
+          setHeroVisible(true);
+          setScrolled(false);
+        }
+      }
+    },
+    [isHome]
+  );
 
   const isExpanded = isHome && heroVisible;
 
@@ -785,6 +795,14 @@ export default function HeroNavbar({
 
               <Link
                 href="/"
+                onClick={(e) => {
+                  if (isHome) {
+                    e.preventDefault();
+                    setHeroVisible(true);
+                    setScrolled(false);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }
+                }}
                 className="
                   absolute
                   left-5
@@ -841,6 +859,7 @@ export default function HeroNavbar({
 
                 <Link
                   href="/"
+                  onClick={handleBookNowClick}
                   className="
                     w-[122px]
                     h-[40px]
@@ -923,8 +942,8 @@ export default function HeroNavbar({
                       }}
                     >
                       <X
-                        size={18}
-                        color="white"
+                        className="w-5 h-5 text-white"
+                        strokeWidth={2}
                       />
                     </motion.div>
                   ) : (
@@ -948,8 +967,8 @@ export default function HeroNavbar({
                       }}
                     >
                       <Menu
-                        size={18}
-                        color="white"
+                        className="w-5 h-5 text-white"
+                        strokeWidth={2}
                       />
                     </motion.div>
                   )}
@@ -1581,8 +1600,6 @@ export default function HeroNavbar({
                 shrink-0
               "
             >
-              <div className="w-10" />
-
               <Link
                 href="/"
                 onClick={() =>
@@ -1591,7 +1608,6 @@ export default function HeroNavbar({
                 className="
                   flex
                   items-center
-                  justify-center
                 "
               >
                 <img
@@ -1612,6 +1628,7 @@ export default function HeroNavbar({
                 }
                 aria-label="Close Menu"
                 className="
+                  ml-auto
                   flex
                   items-center
                   justify-center
@@ -1628,8 +1645,8 @@ export default function HeroNavbar({
                 "
               >
                 <X
-                  size={20}
-                  color="white"
+                  className="w-5 h-5 text-white"
+                  strokeWidth={2}
                 />
               </button>
             </div>
@@ -1654,10 +1671,10 @@ export default function HeroNavbar({
                   flex
                   flex-col
                   gap-4.5
-                  mt-4
+                  mt-6
                 "
               >
-                {/* Home */}
+                {/* 1. Home */}
 
                 <Link
                   href="/"
@@ -1665,9 +1682,6 @@ export default function HeroNavbar({
                     setMobileOpen(false)
                   }
                   className={`
-                    flex
-                    items-center
-                    gap-3.5
                     py-1
                     text-[17px]
                     sm:text-[18px]
@@ -1681,20 +1695,10 @@ export default function HeroNavbar({
                     }
                   `}
                 >
-                  <Home
-                    size={20}
-                    className={
-                      pathname === "/" &&
-                        isHome
-                        ? "text-[#D2E6BC]"
-                        : "text-white/80"
-                    }
-                  />
-
-                  <span>Home</span>
+                  Home
                 </Link>
 
-                {/* Destinations */}
+                {/* 2. Destinations */}
 
                 <div>
                   <button
@@ -1723,23 +1727,9 @@ export default function HeroNavbar({
                       }
                     `}
                   >
-                    <div className="flex items-center gap-3.5">
-                      <MapPin
-                        size={20}
-                        className={
-                          mobileDestinationsOpen ||
-                            isDestinationsRoute(
-                              pathname
-                            )
-                            ? "text-[#D2E6BC]"
-                            : "text-white/80"
-                        }
-                      />
-
-                      <span className="text-[17px] sm:text-[18px]">
-                        Destinations
-                      </span>
-                    </div>
+                    <span className="text-[17px] sm:text-[18px]">
+                      Destinations
+                    </span>
 
                     {mobileDestinationsOpen ? (
                       <ChevronUp
@@ -1785,7 +1775,7 @@ export default function HeroNavbar({
                   </AnimatePresence>
                 </div>
 
-                {/* Partners */}
+                {/* 3. Partners */}
 
                 <Link
                   href="/partners"
@@ -1793,9 +1783,6 @@ export default function HeroNavbar({
                     setMobileOpen(false)
                   }
                   className={`
-                    flex
-                    items-center
-                    gap-3.5
                     py-1
                     text-[17px]
                     sm:text-[18px]
@@ -1810,21 +1797,10 @@ export default function HeroNavbar({
                     }
                   `}
                 >
-                  <Users
-                    size={20}
-                    className={
-                      pathname.startsWith(
-                        "/partners"
-                      )
-                        ? "text-[#D2E6BC]"
-                        : "text-white/80"
-                    }
-                  />
-
-                  <span>Partners</span>
+                  Partners
                 </Link>
 
-                {/* Offering */}
+                {/* 4. Offering */}
 
                 <Link
                   href="#"
@@ -1832,9 +1808,6 @@ export default function HeroNavbar({
                     setMobileOpen(false)
                   }
                   className="
-                    flex
-                    items-center
-                    gap-3.5
                     py-1
                     text-[17px]
                     sm:text-[18px]
@@ -1845,15 +1818,10 @@ export default function HeroNavbar({
                     transition-colors
                   "
                 >
-                  <Settings
-                    size={20}
-                    className="text-white/80"
-                  />
-
-                  <span>Offering</span>
+                  Offering
                 </Link>
 
-                {/* Contact Us */}
+                {/* 5. Contact Us */}
 
                 <Link
                   href="/contact-us"
@@ -1861,9 +1829,6 @@ export default function HeroNavbar({
                     setMobileOpen(false)
                   }
                   className={`
-                    flex
-                    items-center
-                    gap-3.5
                     py-1
                     text-[17px]
                     sm:text-[18px]
@@ -1877,17 +1842,7 @@ export default function HeroNavbar({
                     }
                   `}
                 >
-                  <Phone
-                    size={20}
-                    className={
-                      pathname ===
-                        "/contact-us"
-                        ? "text-[#D2E6BC]"
-                        : "text-white/80"
-                    }
-                  />
-
-                  <span>Contact Us</span>
+                  Contact Us
                 </Link>
               </nav>
 
@@ -1898,9 +1853,7 @@ export default function HeroNavbar({
               <div className="pt-4">
                 <Link
                   href="/"
-                  onClick={() =>
-                    setMobileOpen(false)
-                  }
+                  onClick={handleBookNowClick}
                   className="
                     flex
                     items-center

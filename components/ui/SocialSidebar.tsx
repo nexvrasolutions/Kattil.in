@@ -71,15 +71,15 @@ export default function SocialSidebar({ icons }: { icons?: SidebarIconData[] }) 
 
   useEffect(() => {
     if (!isHome) {
-      setInHero(false);
+      setInHero((prev) => (prev ? false : prev));
       return;
     }
 
     const checkScroll = () => {
       const inHeroSection = window.scrollY < 80;
-      setInHero(inHeroSection);
+      setInHero((prev) => (prev !== inHeroSection ? inHeroSection : prev));
       if (inHeroSection) {
-        setOpenMenu(null);
+        setOpenMenu((prev) => (prev ? null : prev));
       }
     };
 

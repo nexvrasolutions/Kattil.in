@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeft,
   ChevronRight,
@@ -26,6 +27,8 @@ import {
 import Navbar from "@/components/layout/Navbar";
 import RoomStickyBookingWidget from "./RoomStickyBookingWidget";
 import { locationRooms } from "@/lib/data";
+
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export interface PropertyRoomOption {
   _id: string;
@@ -242,7 +245,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                       setIsTransitioning(true);
                       setCurrentIndex(idx);
                     }}
-                    className={`shrink-0 w-[76%] aspect-[16/10] sm:aspect-[16/9] md:aspect-[21/10] max-h-[560px] rounded-[16px] sm:rounded-[20px] md:rounded-[24px] overflow-hidden relative shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-500 cursor-pointer ${isActive
+                    className={`shrink-0 w-[76%] aspect-[16/10] sm:aspect-[16/9] md:aspect-[21/10] max-h-[560px] rounded-[16px] sm:rounded-[20px] md:rounded-[24px] overflow-hidden relative transition-all duration-500 cursor-pointer ${isActive
                       ? "opacity-100 scale-100 ring-1 ring-black/5"
                       : "opacity-80 hover:opacity-95 scale-[0.985]"
                       }`}
@@ -262,7 +265,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
             {/* Previous / Next Controls */}
             {images.length > 1 && (
               <>
-                <button
+                {/* <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -272,8 +275,8 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                   aria-label="Previous image"
                 >
                   <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
-                </button>
-                <button
+                </button> */}
+                {/* <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -283,9 +286,9 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                   aria-label="Next image"
                 >
                   <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
-                </button>
+                </button> */}
 
-                {/* Dot Indicators */}
+                {/* Dot Indicators
                 <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md shadow-sm">
                   {images.map((_, dotIdx) => (
                     <button
@@ -301,7 +304,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                       aria-label={`Go to slide ${dotIdx + 1}`}
                     />
                   ))}
-                </div>
+                </div> */}
               </>
             )}
           </section>
@@ -311,7 +314,12 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
             {/* Left Column: All Page Content (Adjusted to Left) */}
             <div className="lg:col-span-8 space-y-16 md:space-y-20">
               {/* ── A. Property Details & Description ── */}
-              <div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.6, ease: EASE }}
+              >
                 <p className="font-[Public_Sans] text-[12px] font-bold uppercase tracking-[0.02em] leading-[14px] text-[#222222] mb-1.5 text-left">
                   PROPERTY DETAILS
                 </p>
@@ -333,25 +341,39 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                     {AMENITY_ICONS.map((item, aIdx) => {
                       const Icon = item.icon;
                       return (
-                        <div key={aIdx} className="flex flex-col items-center text-center">
-                          <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#D2E6BC] flex items-center justify-center text-[#3a5535] shadow-xs">
+                        <motion.div
+                          key={aIdx}
+                          initial={{ opacity: 0, scale: 0.85 }}
+                          whileInView={{ opacity: 1, scale: 1 }}
+                          viewport={{ once: true, margin: "-40px" }}
+                          transition={{ duration: 0.45, delay: aIdx * 0.06, ease: EASE }}
+                          whileHover={{ y: -4, scale: 1.05, transition: { duration: 0.2 } }}
+                          className="flex flex-col items-center text-center cursor-default group"
+                        >
+                          <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#D2E6BC] flex items-center justify-center text-[#3a5535] shadow-xs group-hover:bg-[#c3dab0] transition-colors">
                             <Icon className="w-6 h-6 md:w-7 md:h-7 stroke-[1.75]" />
                           </div>
                           <span className="font-sans text-[12.5px] md:text-[13px] font-medium text-[#374151] mt-3">
                             {item.label}
                           </span>
-                        </div>
+                        </motion.div>
                       );
                     })}
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
               {/* ── B. Select Room ── */}
               <section>
-                <h2 className="font-sans text-2xl md:text-3xl font-semibold text-[#111827] mb-10">
+                <motion.h2
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.5, ease: EASE }}
+                  className="font-sans text-2xl md:text-3xl font-semibold text-[#111827] mb-10"
+                >
                   Select Room
-                </h2>
+                </motion.h2>
 
                 <div className="space-y-6">
                   {data.rooms.map((room, rIdx) => {
@@ -401,9 +423,14 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                     }
 
                     return (
-                      <div
+                      <motion.div
                         key={room._id || rIdx}
-                        className="bg-white rounded-[8px] overflow-hidden border border-gray-100 shadow-[0_4px_24px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0_12px_32px_rgba(0,0,0,0.06)]"
+                        initial={{ opacity: 0, y: 24 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-40px" }}
+                        transition={{ duration: 0.5, delay: rIdx * 0.09, ease: EASE }}
+                        whileHover={{ y: -4, transition: { duration: 0.25 } }}
+                        className="bg-white rounded-[8px] overflow-hidden border border-gray-100 shadow-[0_4px_24px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0_12px_32px_rgba(0,0,0,0.06)] group"
                       >
                         <div className="w-full max-w-[865px] flex flex-col sm:flex-row gap-0 sm:gap-[20px] md:gap-[26px] h-auto sm:h-[290px]">
 
@@ -414,7 +441,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                               alt={room.name}
                               fill
                               sizes="(max-width: 640px) 100vw, 405px"
-                              className="object-cover"
+                              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                             />
                           </div>
 
@@ -428,7 +455,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                               </p>
 
                               {/* Room Title */}
-                              <h3 className="font-[Public_Sans] text-[22px] sm:text-[24px] font-medium text-[#111827] leading-[28px] sm:leading-[30px] tracking-[-0.5px]">
+                              <h3 className="font-[Public_Sans] text-[22px] sm:text-[24px] font-medium text-[#111827] leading-[28px] sm:leading-[30px] tracking-[-0.5px] group-hover:text-[#526442] transition-colors">
                                 {room.name}
                               </h3>
 
@@ -453,18 +480,20 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
 
                             {/* Book Now */}
                             <div className="mt-5 sm:mt-0 sm:mb-1">
-                              <a
+                              <motion.a
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
                                 href={externalBookUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-full h-[44px] rounded-[8px] border border-[#111827] flex items-center justify-center text-[#111827] font-[Public_Sans] font-medium text-[14px] hover:bg-[#0d1b2e] hover:text-white transition-all text-center"
                               >
                                 Book Now
-                              </a>
+                              </motion.a>
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
                     );
                   })}
                 </div>
@@ -472,72 +501,119 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
 
               {/* ── C. Gallery ── */}
               <section>
-                <h2 className="font-sans text-2xl md:text-3xl font-semibold text-[#111827] mb-10">
+                <motion.h2
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.5, ease: EASE }}
+                  className="font-sans text-2xl md:text-3xl font-semibold text-[#111827] mb-10"
+                >
                   Gallery
-                </h2>
+                </motion.h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6 w-full">
                   {/* Tile 1 */}
-                  <div className="relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-100 shadow-xs">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ duration: 0.5, delay: 0.05, ease: EASE }}
+                    whileHover={{ y: -4 }}
+                    className="relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-100 shadow-xs group"
+                  >
                     <Image
                       src={DEFAULT_GALLERY_IMAGES[0]}
                       alt="Community group photo"
                       fill
                       sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-cover"
+                      className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                     />
-                  </div>
+                  </motion.div>
 
                   {/* Tile 2 */}
-                  <div className="relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-100 shadow-xs">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ duration: 0.5, delay: 0.1, ease: EASE }}
+                    whileHover={{ y: -4 }}
+                    className="relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-100 shadow-xs group"
+                  >
                     <Image
                       src={DEFAULT_GALLERY_IMAGES[1]}
                       alt="Balcony guest photo"
                       fill
                       sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-cover"
+                      className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                     />
-                  </div>
+                  </motion.div>
 
                   {/* Tile 3 */}
-                  <div className="relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-100 shadow-xs">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ duration: 0.5, delay: 0.15, ease: EASE }}
+                    whileHover={{ y: -4 }}
+                    className="relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-100 shadow-xs group"
+                  >
                     <Image
                       src={DEFAULT_GALLERY_IMAGES[2]}
                       alt="Adventure bikers photo"
                       fill
                       sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-cover"
+                      className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                     />
-                  </div>
+                  </motion.div>
 
                   {/* Tile 4: View all with dark overlay */}
-                  <Link
-                    href="/gallery"
-                    className="group relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-900 shadow-xs block"
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ duration: 0.5, delay: 0.2, ease: EASE }}
+                    whileHover={{ y: -4 }}
                   >
-                    <Image
-                      src={DEFAULT_GALLERY_IMAGES[3]}
-                      alt="More gallery photo"
-                      fill
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                      <span className="font-sans text-[15px] md:text-[16px] font-medium text-white flex items-center gap-2 group-hover:translate-x-1 transition-transform">
-                        View all <ArrowRight className="w-4 h-4" />
-                      </span>
-                    </div>
-                  </Link>
+                    <Link
+                      href="/gallery"
+                      className="group relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-900 shadow-xs block"
+                    >
+                      <Image
+                        src={DEFAULT_GALLERY_IMAGES[3]}
+                        alt="More gallery photo"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-700 ease-out"
+                      />
+                      <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                        <span className="font-sans text-[15px] md:text-[16px] font-medium text-white flex items-center gap-2 group-hover:translate-x-1 transition-transform">
+                          View all <ArrowRight className="w-4 h-4" />
+                        </span>
+                      </div>
+                    </Link>
+                  </motion.div>
                 </div>
               </section>
 
               {/* ── D. Location & How to reach ── */}
               <section>
-                <h2 className="font-sans text-2xl md:text-3xl font-semibold text-[#111827] mb-10">
+                <motion.h2
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.5, ease: EASE }}
+                  className="font-sans text-2xl md:text-3xl font-semibold text-[#111827] mb-10"
+                >
                   Location
-                </h2>
+                </motion.h2>
 
-                <div className="bg-[#F0EAD2] rounded-[8px] overflow-hidden border border-[#e3dcbf] shadow-xs">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.55, ease: EASE }}
+                  className="bg-[#F0EAD2] rounded-[8px] overflow-hidden border border-[#e3dcbf] shadow-xs"
+                >
                   {/* Top address bar */}
                   <div className="p-6 md:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#e3dcbf]">
                     <p className="font-sans text-[15px] md:text-[16px] text-[#374151]">
@@ -585,77 +661,97 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                   </button>
 
                   {/* Accordion body */}
-                  {howToReachOpen && (
-                    <div className="p-6 md:p-8 bg-white border-t border-[#e3dcbf] space-y-4 text-xs md:text-sm text-[#4b5563] leading-relaxed">
-                      <h4 className="font-bold text-gray-900 text-sm md:text-[15px] mb-2">
-                        Travel Directions
-                      </h4>
+                  <AnimatePresence initial={false}>
+                    {howToReachOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.35, ease: EASE }}
+                        className="p-6 md:p-8 bg-white border-t border-[#e3dcbf] space-y-4 text-xs md:text-sm text-[#4b5563] leading-relaxed overflow-hidden"
+                      >
+                        <h4 className="font-bold text-gray-900 text-sm md:text-[15px] mb-2">
+                          Travel Directions
+                        </h4>
 
-                      <div>
-                        <p className="font-bold text-gray-800">
-                          From {data.destinationName} Railway Station:
-                        </p>
-                        <p>
-                          {data.directions?.railway ||
-                            `${data.name} is located close to ${data.destinationName} Railway Station and is easily accessible by auto, taxi, or local transport.`}
-                        </p>
-                      </div>
+                        <div>
+                          <p className="font-bold text-gray-800">
+                            From {data.destinationName} Railway Station:
+                          </p>
+                          <p>
+                            {data.directions?.railway ||
+                              `${data.name} is located close to ${data.destinationName} Railway Station and is easily accessible by auto, taxi, or local transport.`}
+                          </p>
+                        </div>
 
-                      <div>
-                        <p className="font-bold text-gray-800">
-                          From {data.destinationName} Bus Stand:
-                        </p>
-                        <p>
-                          {data.directions?.busStand ||
-                            `The property is just a short drive from ${data.destinationName} Bus Stand. Guests can take a local auto or taxi to reach ${data.name}.`}
-                        </p>
-                      </div>
+                        <div>
+                          <p className="font-bold text-gray-800">
+                            From {data.destinationName} Bus Stand:
+                          </p>
+                          <p>
+                            {data.directions?.busStand ||
+                              `The property is just a short drive from ${data.destinationName} Bus Stand. Guests can take a local auto or taxi to reach ${data.name}.`}
+                          </p>
+                        </div>
 
-                      <div>
-                        <p className="font-bold text-gray-800">
-                          From {data.destinationName} Landmark / Center:
-                        </p>
-                        <p>
-                          {data.directions?.landmark ||
-                            `${data.name} is located near key local attractions. Follow the main access road towards the property.`}
-                        </p>
-                      </div>
+                        <div>
+                          <p className="font-bold text-gray-800">
+                            From {data.destinationName} Landmark / Center:
+                          </p>
+                          <p>
+                            {data.directions?.landmark ||
+                              `${data.name} is located near key local attractions. Follow the main access road towards the property.`}
+                          </p>
+                        </div>
 
-                      <div>
-                        <p className="font-bold text-gray-800">By Car:</p>
-                        <p>
-                          {data.directions?.byCar ||
-                            `Drive towards ${data.destinationName} and continue along the main road. Follow the directions to ${data.name} using Google Maps. Parking is available at the property, subject to availability.`}
-                        </p>
-                      </div>
+                        <div>
+                          <p className="font-bold text-gray-800">By Car:</p>
+                          <p>
+                            {data.directions?.byCar ||
+                              `Drive towards ${data.destinationName} and continue along the main road. Follow the directions to ${data.name} using Google Maps. Parking is available at the property, subject to availability.`}
+                          </p>
+                        </div>
 
-                      <div className="pt-2">
-                        <p className="font-bold text-gray-800">Important:</p>
-                        <p>
-                          {data.directions?.important ||
-                            `As the property is located in a popular area, traffic and parking availability may vary during weekends, holidays, and peak tourist seasons. We recommend using Google Maps for the most convenient route.`}
-                        </p>
-                      </div>
+                        <div className="pt-2">
+                          <p className="font-bold text-gray-800">Important:</p>
+                          <p>
+                            {data.directions?.important ||
+                              `As the property is located in a popular area, traffic and parking availability may vary during weekends, holidays, and peak tourist seasons. We recommend using Google Maps for the most convenient route.`}
+                          </p>
+                        </div>
 
-                      <div className="pt-1">
-                        <p className="font-bold text-gray-800">Need Help Finding Us?</p>
-                        <p>
-                          {data.directions?.helpText ||
-                            `If you need assistance with directions or transportation, please contact our property team. We'll be happy to guide you to ${data.name}.`}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                        <div className="pt-1">
+                          <p className="font-bold text-gray-800">Need Help Finding Us?</p>
+                          <p>
+                            {data.directions?.helpText ||
+                              `If you need assistance with directions or transportation, please contact our property team. We'll be happy to guide you to ${data.name}.`}
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
               </section>
 
               {/* ── E. Contact ── */}
               <section>
-                <h2 className="font-sans text-2xl md:text-3xl font-semibold text-[#111827] mb-10">
+                <motion.h2
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.5, ease: EASE }}
+                  className="font-sans text-2xl md:text-3xl font-semibold text-[#111827] mb-10"
+                >
                   Contact
-                </h2>
+                </motion.h2>
 
-                <div className="bg-[#F0EAD2] rounded-[8px] p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-[#e3dcbf]">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.55, ease: EASE }}
+                  className="bg-[#F0EAD2] rounded-[8px] p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-[#e3dcbf]"
+                >
                   {/* Phone & Email */}
                   <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-8">
                     {/* Phone */}
@@ -697,7 +793,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                       <span>Whatsapp</span>
                     </a>
                   </div>
-                </div>
+                </motion.div>
               </section>
             </div>
 
@@ -716,3 +812,4 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
     </div>
   );
 }
+

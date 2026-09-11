@@ -40,8 +40,8 @@ export default function ContactContent({ locations }: { locations: LocationItem[
       <Navbar />
 
       {/* ── Header section ─────────────────────────────────────────────── */}
-      <section className="bg-secondary pt-28 md:pt-36 lg:pt-45 pb-8 md:pb-14">
-        <div className="mx-auto max-w-480 px-5 md:px-8 lg:px-20">
+      <section className="relative w-full bg-[#8E9F78] overflow-hidden min-h-[300px] sm:min-h-[400px] md:min-h-[450px] lg:min-h-[500px] flex flex-col justify-end pt-28 sm:pt-32 md:pt-34 lg:pt-36 pb-8 sm:pb-9 md:pb-10 lg:pb-12">
+        <div className="mx-auto max-w-480 px-5 md:px-8 lg:px-20 w-full">
 
           <motion.p
             initial={{ opacity: 0, y: 10 }}
@@ -86,7 +86,7 @@ export default function ContactContent({ locations }: { locations: LocationItem[
       </section>
 
       {/* ── Map + Contact info section ─────────────────────────────────── */}
-      <section className="bg-teritary py-10 md:py-14 lg:py-20">
+      <section className="relative z-20 bg-[#FAF8F5] py-10 md:py-14 lg:py-20 rounded-t-[20px] md:rounded-t-[24px] overflow-hidden -mt-3 md:-mt-4">
         <div className="mx-auto max-w-480 px-5 md:px-8 lg:px-20">
 
           <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-4">

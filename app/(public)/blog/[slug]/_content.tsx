@@ -68,6 +68,70 @@ function RelatedCard({ post, index }: { post: RelatedPost; index: number }) {
   );
 }
 
+interface FormattedTitle {
+  line1: string;
+  line2Sans?: string;
+  line2Italic?: string;
+  line2?: string;
+}
+
+function formatBlogTitle(title: string): FormattedTitle {
+  const clean = (title || "").trim();
+  if (clean.toLowerCase().includes("weekend your comfort")) {
+    return {
+      line1: "The Art of a Perfect",
+      line2Sans: "Weekend",
+      line2Italic: "Your Comfort",
+    };
+  }
+  if (clean.includes("\n")) {
+    const parts = clean.split("\n");
+    return {
+      line1: parts[0].trim(),
+      line2Italic: parts.slice(1).join(" ").trim(),
+    };
+  }
+  if (clean.includes(":")) {
+    const parts = clean.split(":");
+    return {
+      line1: parts[0].trim(),
+      line2Italic: parts.slice(1).join(":").trim(),
+    };
+  }
+  if (clean.includes(",")) {
+    const parts = clean.split(",");
+    return {
+      line1: parts[0].trim() + ",",
+      line2Italic: parts.slice(1).join(",").trim(),
+    };
+  }
+  if (clean.includes("—") || clean.includes(" - ")) {
+    const sep = clean.includes("—") ? "—" : " - ";
+    const parts = clean.split(sep);
+    return {
+      line1: parts[0].trim(),
+      line2Italic: parts.slice(1).join(sep).trim(),
+    };
+  }
+  const words = clean.split(" ");
+  if (words.length >= 4) {
+    const mid = Math.ceil(words.length / 2);
+    return {
+      line1: words.slice(0, mid).join(" "),
+      line2Italic: words.slice(mid).join(" "),
+    };
+  }
+  if (words.length > 1) {
+    return {
+      line1: words[0],
+      line2Italic: words.slice(1).join(" "),
+    };
+  }
+  return {
+    line1: clean,
+  };
+}
+
 export default function BlogDetailContent({
   post,
   related,
@@ -77,6 +141,7 @@ export default function BlogDetailContent({
 }) {
   usePageView();
   const [copied, setCopied] = useState(false);
+  const { line1, line2Sans, line2Italic, line2 } = formatBlogTitle(post.title);
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href).then(() => {
@@ -91,43 +156,80 @@ export default function BlogDetailContent({
       <Navbar />
 
       {/* ── 1. Hero Header Section (Sage Green) ───────────────────────────── */}
-      <section className="relative w-full bg-[#9caf88] overflow-hidden pt-36 md:pt-44 lg:pt-50 pb-16 md:pb-22">
+      <section className="relative w-full bg-[#8E9F78] overflow-hidden min-h-[300px] sm:min-h-[400px] md:min-h-[450px] lg:min-h-[500px] flex flex-col justify-end pt-28 sm:pt-32 md:pt-34 lg:pt-36 pb-8 sm:pb-9 md:pb-10 lg:pb-12">
         {/* Right Background Monument Skyline Silhouette */}
-        <div className="hidden md:flex absolute right-0 bottom-0 top-auto md:h-[78%] lg:h-[82%] md:w-[40%] lg:w-[34%] max-w-[460px] pointer-events-none z-0 overflow-hidden items-end justify-end pr-2 md:pr-6">
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 0.9, x: 0 }}
+          transition={{ duration: 0.85, ease: EASE, delay: 0.2 }}
+          className="hidden md:flex absolute right-0 bottom-0 top-auto md:h-[78%] lg:h-[82%] md:w-[40%] lg:w-[34%] max-w-[460px] pointer-events-none z-0 overflow-hidden items-end justify-end pr-2 md:pr-6"
+        >
           <div
-            className="w-full h-full opacity-85 md:opacity-90 bg-no-repeat"
+            className="w-full h-full bg-no-repeat"
             style={{
               backgroundImage: "url('/images/partners/hero-skyline.png')",
               backgroundSize: "contain",
               backgroundPosition: "right bottom",
             }}
           />
-        </div>
+        </motion.div>
 
         {/* Hero Content aligned straight down with Navbar container */}
         <div className="relative z-10 w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="relative px-5 md:px-8 lg:px-15 max-w-4xl">
             {/* Back link */}
-            <Link
-              href="/blog"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-white/80 hover:text-white transition-colors mb-4"
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, ease: EASE }}
             >
-              <ArrowLeft className="w-3.5 h-3.5" /> Back to all stories
-            </Link>
+              <Link
+                href="/blog"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-white/80 hover:text-white transition-colors mb-4"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" /> Back to all stories
+              </Link>
+            </motion.div>
 
-            <p className="font-sans text-[12.5px] sm:text-[13px] font-semibold uppercase tracking-[0.18em] text-[#f4f7ef] mb-3">
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: EASE, delay: 0.1 }}
+              className="font-sans text-[12.5px] sm:text-[13px] font-semibold uppercase tracking-[0.18em] text-[#f4f7ef] mb-3"
+            >
               {post.category || "Hotel Story"}
-            </p>
+            </motion.p>
 
-            <h1 className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] text-white leading-[1.18] tracking-tight">
-              {post.title}
-            </h1>
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, ease: EASE, delay: 0.2 }}
+              className="text-white tracking-tight"
+            >
+              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] leading-[1.12]">
+                {line1}
+              </span>
+              {(line2Sans || line2Italic || line2) && (
+                <span className="block mt-1">
+                  {line2Sans && (
+                    <span className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] text-white leading-[1.12]">
+                      {line2Sans}{" "}
+                    </span>
+                  )}
+                  {(line2Italic || line2) && (
+                    <span className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-normal italic text-[#f4f7ef] leading-[1.15]">
+                      {line2Italic || line2}
+                    </span>
+                  )}
+                </span>
+              )}
+            </motion.h1>
           </div>
         </div>
       </section>
 
       {/* ── 2. Article Content Section ────────────────────────────────────── */}
-      <section className="w-full py-12 md:py-16 bg-[#FAF8F5]">
+      <section className="relative z-20 w-full py-12 md:py-16 bg-[#FAF8F5] rounded-t-[20px] md:rounded-t-[24px] overflow-hidden -mt-3 md:-mt-4">
         <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15">
             {/* Main Featured Image Banner */}

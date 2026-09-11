@@ -95,7 +95,10 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
             </motion.div>
 
             {/* Background Monument Skyline Silhouette - Aligned straight down to Book Now */}
-            <div
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 0.6, x: 0 }}
+              transition={{ duration: 0.85, ease: EASE, delay: 0.2 }}
               className="
                 hidden lg:block
                 absolute right-5 md:right-8 lg:right-15 bottom-0
@@ -106,7 +109,7 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
               "
             >
               <div
-                className="w-full h-full opacity-60 mix-blend-multiply"
+                className="w-full h-full mix-blend-multiply"
                 style={{
                   backgroundImage: "url('/images/destinations/hero-monument-illustration.png')",
                   backgroundSize: "contain",
@@ -114,7 +117,7 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
                   backgroundRepeat: "no-repeat",
                 }}
               />
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -202,9 +205,17 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 xl:gap-8">
                 {VALUES_DATA.map((item, idx) => (
-                  <div key={idx} className="flex flex-col text-left">
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: 0.1 + idx * 0.08, ease: EASE }}
+                    whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                    className="flex flex-col text-left group"
+                  >
                     {/* Icon Badge */}
-                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white flex items-center justify-center text-[#0d1b2e] shadow-sm mb-4 sm:mb-5">
+                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white flex items-center justify-center text-[#0d1b2e] shadow-sm mb-4 sm:mb-5 group-hover:scale-105 transition-transform">
                       <LockerIcon />
                     </div>
 
@@ -217,7 +228,7 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
                     <p className="font-sans text-[#0d1b2e]/65 text-[13px] sm:text-[13.5px] leading-relaxed">
                       {item.description}
                     </p>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </motion.div>

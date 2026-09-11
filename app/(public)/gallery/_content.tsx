@@ -44,59 +44,59 @@ export const STATIC_ITEMS: PublicGalleryItem[] = [
   },
   {
     id: "g-2",
-    src: "/images/gallery/luxury-suite-bedroom.jpg",
-    alt: "Luxury Hotel Bedroom Suite",
-    caption: "Curved Cove Ceiling & Serene Bedding",
+    src: "/images/gallery/sunny-balcony-guest.jpg",
+    alt: "Sunny Resort Balcony Space",
+    caption: "Sunlit Resort Balcony & Serene Views",
     category: "resort",
   },
   {
     id: "g-3",
-    src: "/images/gallery/luxury-suite-bedroom.jpg",
-    alt: "Luxury Hotel Bedroom Suite",
-    caption: "Contemporary Hotel Suite Overview",
-    category: "rooms",
+    src: "/images/home/dining-community.png",
+    alt: "Homely Dining Experience",
+    caption: "Artisan Flavors & Authentic Homely Dining",
+    category: "dining",
   },
   {
     id: "g-4",
-    src: "/images/gallery/luxury-suite-bedroom.jpg",
-    alt: "Luxury Hotel Bedroom Suite",
-    caption: "Serene Boutique Bedroom Space",
+    src: "/images/gallery/bikers-adventure.jpg",
+    alt: "Travelers and Bikers Adventure",
+    caption: "Community Excursions & Local Explorations",
     category: "experience",
   },
   {
     id: "g-5",
-    src: "/images/gallery/luxury-suite-bedroom.jpg",
-    alt: "Luxury Hotel Bedroom Suite",
-    caption: "Handcrafted Wood Accents & Woven Decor",
-    category: "dining",
-  },
-  {
-    id: "g-6",
-    src: "/images/gallery/luxury-suite-bedroom.jpg",
-    alt: "Luxury Hotel Bedroom Suite",
-    caption: "Ambient Lighting & Relaxed Lounge",
+    src: "/images/gallery/luxury-suite-mockup.jpg",
+    alt: "Executive King Room",
+    caption: "Handcrafted Wood Accents & Ambient Suite",
     category: "rooms",
   },
   {
-    id: "g-7",
-    src: "/images/gallery/luxury-suite-bedroom.jpg",
-    alt: "Luxury Hotel Bedroom Suite",
-    caption: "Warmly Lit Bedroom Architecture",
+    id: "g-6",
+    src: "/images/gallery/community-group.jpg",
+    alt: "Friendly Gatherings & Common Lounge",
+    caption: "Memorable Gatherings in the Lounge",
     category: "experience",
   },
   {
+    id: "g-7",
+    src: "/images/home/ocean-sunset.png",
+    alt: "Coastal Resort Panorama",
+    caption: "Golden Sunset & Relaxing Stays",
+    category: "resort",
+  },
+  {
     id: "g-8",
-    src: "/images/gallery/luxury-suite-bedroom.jpg",
-    alt: "Luxury Hotel Bedroom Suite",
-    caption: "Modern Suite with Ensuite Lounge",
+    src: "/images/home/temple-offer.png",
+    alt: "Heritage Architecture at Kattil",
+    caption: "Heritage Architectural Beauty & Surroundings",
     category: "resort",
   },
   {
     id: "g-9",
-    src: "/images/gallery/luxury-suite-bedroom.jpg",
-    alt: "Luxury Hotel Bedroom Suite",
-    caption: "Signature Kattil Hospitality Space",
-    category: "dining",
+    src: "/images/home/hills-offer.png",
+    alt: "Nature Getaway Stay",
+    caption: "Signature Kattil Hospitality in Nature",
+    category: "experience",
   },
 ];
 
@@ -140,21 +140,6 @@ export default function GalleryContent({
     );
   }, [allItems, activeCategory]);
 
-  // Split into 3 columns for staggered masonry layout
-  const columns = useMemo(() => {
-    const col1: PublicGalleryItem[] = [];
-    const col2: PublicGalleryItem[] = [];
-    const col3: PublicGalleryItem[] = [];
-
-    filteredItems.forEach((item, idx) => {
-      if (idx % 3 === 0) col1.push(item);
-      else if (idx % 3 === 1) col2.push(item);
-      else col3.push(item);
-    });
-
-    return [col1, col2, col3];
-  }, [filteredItems]);
-
   // Lightbox keyboard navigation
   const handlePrev = useCallback(() => {
     if (lightboxIndex === null) return;
@@ -183,47 +168,67 @@ export default function GalleryContent({
       <Navbar />
 
       {/* ── 1. Hero Header Section (Sage Green) ───────────────────────────── */}
-      <section className="relative w-full bg-[#9caf88] overflow-hidden pt-36 md:pt-44 lg:pt-50 pb-16 md:pb-22">
+      <section className="relative w-full bg-[#8E9F78] overflow-hidden min-h-[300px] sm:min-h-[400px] md:min-h-[450px] lg:min-h-[500px] flex flex-col justify-end pt-28 sm:pt-32 md:pt-34 lg:pt-36 pb-8 sm:pb-9 md:pb-10 lg:pb-12">
         {/* Right Background Monument Skyline Silhouette */}
-        <div className="hidden md:flex absolute right-0 bottom-0 top-auto md:h-[78%] lg:h-[82%] md:w-[40%] lg:w-[34%] max-w-[460px] pointer-events-none z-0 overflow-hidden items-end justify-end pr-2 md:pr-6">
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 0.9, x: 0 }}
+          transition={{ duration: 0.85, ease: EASE, delay: 0.2 }}
+          className="hidden md:flex absolute right-0 bottom-0 top-auto md:h-[78%] lg:h-[82%] md:w-[40%] lg:w-[34%] max-w-[460px] pointer-events-none z-0 overflow-hidden items-end justify-end pr-2 md:pr-6"
+        >
           <div
-            className="w-full h-full opacity-85 md:opacity-90 bg-no-repeat"
+            className="w-full h-full bg-no-repeat"
             style={{
               backgroundImage: "url('/images/partners/hero-skyline.png')",
               backgroundSize: "contain",
               backgroundPosition: "right bottom",
             }}
           />
-        </div>
+        </motion.div>
 
         {/* Hero Content aligned straight down with Navbar container */}
         <div className="relative z-10 w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="relative px-5 md:px-8 lg:px-15 max-w-3xl">
-            <p className="font-[Public_Sans] font-semibold text-[14px] leading-[14px] tracking-normal text-left align-middle uppercase text-white/95 mb-3 drop-shadow-xs">
+            <motion.p
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: EASE, delay: 0.1 }}
+              className="font-[Public_Sans] font-semibold text-[14px] leading-[14px] tracking-normal text-left align-middle uppercase text-white/95 mb-3 drop-shadow-xs"
+            >
               CAPTURE OUR MOMENTS
-            </p>
-            <h1 className="text-white tracking-tight">
+            </motion.p>
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, ease: EASE, delay: 0.2 }}
+              className="text-white tracking-tight"
+            >
               <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] leading-[1.12]">
                 Moments to{" "}
                 <span className="font-serif font-normal italic text-[#f4f7ef]">
-                  Remember our
+                  Remember
                 </span>
               </span>
-              <span className="block font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-normal italic text-[#f4f7ef] leading-[1.15] mt-1">
-                hotel
+              <span className="block font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-normal italic text-[#f4f7ef] leading-[1.15] mt-1 whitespace-nowrap">
+                our hotel
               </span>
-            </h1>
+            </motion.h1>
           </div>
         </div>
       </section>
 
       {/* ── 2. Gallery Content Section ────────────────────────────────────── */}
-      <section className="w-full py-10 sm:py-12 md:py-16 bg-[#FAF8F5]">
+      <section className="relative z-20 w-full py-10 sm:py-12 md:py-16 bg-[#FAF8F5] rounded-t-[20px] md:rounded-t-[24px] overflow-hidden -mt-3 md:-mt-4">
         <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15">
             {/* Category Filter Tabs */}
-            <div className="mb-10 sm:mb-12">
-              <div className="flex items-center gap-3 sm:gap-4 overflow-x-auto pb-2 scrollbar-none">
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: EASE, delay: 0.3 }}
+              className="mb-8 sm:mb-10"
+            >
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 no-scrollbar scrollbar-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {categoriesList.map((cat) => {
                   const isSelected =
                     (cat.slug === "all" && (!activeCategory || activeCategory === "all")) ||
@@ -234,10 +239,10 @@ export default function GalleryContent({
                       key={cat.slug}
                       type="button"
                       onClick={() => setActiveCategory(cat.slug)}
-                      className={`font-[Public_Sans] text-[13px] sm:text-[13.5px] transition-all whitespace-nowrap cursor-pointer px-4 py-1.5 rounded-[6px] ${
+                      className={`font-[Public_Sans] text-[13px] sm:text-[13.5px] transition-all whitespace-nowrap cursor-pointer px-3.5 sm:px-4 py-1.5 rounded-[6px] ${
                         isSelected
                           ? "bg-[#b4c7a5] text-[#22301c] font-semibold shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
-                          : "text-[#6b7280] hover:text-[#111827] font-medium"
+                          : "text-[#6b7280] hover:text-[#111827] font-medium hover:bg-[#eae8e3]"
                       }`}
                     >
                       {cat.name}
@@ -245,54 +250,42 @@ export default function GalleryContent({
                   );
                 })}
               </div>
-            </div>
+            </motion.div>
 
-            {/* Gallery Staggered 3-Column Grid */}
+            {/* Gallery Responsive Grid — All on One Page */}
             {filteredItems.length === 0 ? (
               <div className="py-24 text-center text-gray-500 font-sans">
                 No moments found in this category.
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[24px] w-full items-start">
-                {columns.map((colItems, colIdx) => (
-                  <div
-                    key={colIdx}
-                    className={`flex flex-col gap-[24px] w-full ${
-                      colIdx === 1 ? "lg:pt-[110px]" : ""
-                    }`}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 w-full items-start">
+                {filteredItems.map((item, idx) => (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{
+                      duration: 0.45,
+                      delay: Math.min((idx % 6) * 0.05, 0.25),
+                      ease: EASE,
+                    }}
+                    onClick={() => setLightboxIndex(idx)}
+                    className="group relative w-full h-[320px] sm:h-[400px] lg:h-[480px] rounded-[10px] overflow-hidden bg-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.09)] cursor-pointer"
                   >
-                    {colItems.map((item, itemIdx) => {
-                      const globalIdx = filteredItems.findIndex((i) => i.id === item.id);
-                      return (
-                        <motion.div
-                          key={item.id}
-                          initial={{ opacity: 0, y: 24 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          viewport={{ once: true, margin: "-40px" }}
-                          transition={{
-                            duration: 0.5,
-                            delay: (colIdx * 3 + itemIdx) * 0.07,
-                            ease: EASE,
-                          }}
-                          onClick={() => setLightboxIndex(globalIdx)}
-                          className="group relative w-full h-[380px] sm:h-[460px] lg:h-[538px] rounded-[8px] overflow-hidden bg-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.09)] cursor-pointer"
-                        >
-                          <Image
-                            src={item.src}
-                            alt={item.alt || "Kattil Hotel Space"}
-                            fill
-                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                            className="object-cover object-center group-hover:scale-[1.03] transition-transform duration-700 ease-out"
-                          />
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-400 flex items-end p-5">
-                            <span className="text-white font-[Public_Sans] text-[12px] font-semibold uppercase tracking-wider opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300 drop-shadow-md">
-                              {item.caption || item.alt || "View Space"}
-                            </span>
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
+                    <Image
+                      src={item.src}
+                      alt={item.alt || "Kattil Hotel Space"}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover object-center group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-5">
+                      <span className="text-white font-[Public_Sans] text-[13px] font-semibold tracking-wide translate-y-1 group-hover:translate-y-0 transition-all duration-300 drop-shadow-md">
+                        {item.caption || item.alt || "View Space"}
+                      </span>
+                    </div>
+                  </motion.div>
                 ))}
               </div>
             )}

@@ -7,14 +7,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu,
   X,
-  Home,
-  MapPin,
-  Users,
-  Settings,
-  Phone,
   ChevronUp,
   ChevronDown,
-  ChevronRight,
 } from "lucide-react";
 import { navLinks } from "@/lib/data";
 import DestinationsDropdown, { MobileDestinationsList } from "./destinations-dropdown";
@@ -42,25 +36,22 @@ export default function Navbar() {
   const headerContainerRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [navRowHeight, setNavRowHeight] = useState(84);
-  const [destinationsLeft, setDestinationsLeft] = useState<number>(0);
 
-  const updateDestinationsPosition = useCallback(() => {
-    if (destinationsTriggerRef.current && headerContainerRef.current) {
-      const triggerRect = destinationsTriggerRef.current.getBoundingClientRect();
-      const containerRect = headerContainerRef.current.getBoundingClientRect();
-      const offset = triggerRect.left - containerRect.left;
-      setDestinationsLeft(Math.max(0, Math.round(offset)));
+  const handleBookNowClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname === "/") {
+      e.preventDefault();
+      setMobileOpen(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }, []);
+  }, [pathname]);
 
   const handleDestinationsMouseEnter = useCallback(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
-    updateDestinationsPosition();
     setDestinationsOpen(true);
-  }, [updateDestinationsPosition]);
+  }, []);
 
   const handleDestinationsMouseLeave = useCallback(() => {
     if (timeoutRef.current) {
@@ -80,9 +71,8 @@ export default function Navbar() {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
-    updateDestinationsPosition();
     setDestinationsOpen((prev) => !prev);
-  }, [updateDestinationsPosition]);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -116,12 +106,11 @@ export default function Navbar() {
   useEffect(() => {
     const measure = () => {
       if (navRowRef.current) setNavRowHeight(navRowRef.current.offsetHeight);
-      updateDestinationsPosition();
     };
     measure();
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
-  }, [updateDestinationsPosition]);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -276,10 +265,14 @@ export default function Navbar() {
               })}
             </nav>
 
-            {/* Center logo */}
+            {/* Logo */}
             <Link
               href="/"
-              className="absolute left-5 md:left-1/2 md:-translate-x-1/2 flex items-center justify-center"
+              className={`flex items-center justify-center transition-all duration-300 ${
+                mobileOpen
+                  ? "absolute left-5 sm:left-6 md:left-8 top-1/2 -translate-y-1/2"
+                  : "absolute left-5 md:left-1/2 md:-translate-x-1/2 top-1/2 -translate-y-1/2"
+              }`}
             >
               <img
                 src="/assets/logo.png"
@@ -302,6 +295,7 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/"
+                onClick={handleBookNowClick}
                 className="w-[122px] h-[40px] rounded-[8px] border border-white px-6 text-white text-[14px] leading-none font-medium inline-flex items-center justify-center transition-all duration-300 hover:border-white hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-95 font-sans"
               >
                 Book Now
@@ -325,7 +319,7 @@ export default function Navbar() {
                     transition={{ duration: 0.2, ease: "easeOut" }}
                     style={{ willChange: "transform, opacity" }}
                   >
-                    <X size={18} color="white" />
+                    <X className="w-5 h-5 text-white" strokeWidth={2} />
                   </motion.div>
                 ) : (
                   <motion.div
@@ -336,7 +330,7 @@ export default function Navbar() {
                     transition={{ duration: 0.2, ease: "easeOut" }}
                     style={{ willChange: "transform, opacity" }}
                   >
-                    <Menu size={18} color="white" />
+                    <Menu className="w-5 h-5 text-white" strokeWidth={2} />
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -360,11 +354,10 @@ export default function Navbar() {
                   <Link
                     href="/"
                     onClick={() => setMobileOpen(false)}
-                    className={`flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname === "/" ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
+                    className={`py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname === "/" ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
                       }`}
                   >
-                    <Home size={20} className={pathname === "/" ? "text-[#D2E6BC]" : "text-white/80"} />
-                    <span>Home</span>
+                    Home
                   </Link>
 
                   {/* 2. Destinations */}
@@ -377,10 +370,7 @@ export default function Navbar() {
                         : "text-white/90 font-medium hover:text-[#D2E6BC]"
                         }`}
                     >
-                      <div className="flex items-center gap-3.5">
-                        <MapPin size={20} className={mobileDestinationsOpen || isDestinationsRoute(pathname) ? "text-[#D2E6BC]" : "text-white/80"} />
-                        <span className="text-[17px] sm:text-[18px]">Destinations</span>
-                      </div>
+                      <span className="text-[17px] sm:text-[18px]">Destinations</span>
                       {mobileDestinationsOpen ? (
                         <ChevronUp size={20} className="text-[#D2E6BC]" />
                       ) : (
@@ -407,32 +397,29 @@ export default function Navbar() {
                   <Link
                     href="/partners"
                     onClick={() => setMobileOpen(false)}
-                    className={`flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname.startsWith("/partners") ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
+                    className={`py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname.startsWith("/partners") ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
                       }`}
                   >
-                    <Users size={20} className={pathname.startsWith("/partners") ? "text-[#D2E6BC]" : "text-white/80"} />
-                    <span>Partners</span>
+                    Partners
                   </Link>
 
                   {/* 4. Offering */}
                   <Link
                     href="#"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium text-white/90 hover:text-[#D2E6BC] transition-colors"
+                    className="py-1 text-[17px] sm:text-[18px] font-sans font-medium text-white/90 hover:text-[#D2E6BC] transition-colors"
                   >
-                    <Settings size={20} className="text-white/80" />
-                    <span>Offering</span>
+                    Offering
                   </Link>
 
                   {/* 5. Contact Us */}
                   <Link
                     href="/contact-us"
                     onClick={() => setMobileOpen(false)}
-                    className={`flex items-center gap-3.5 py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname === "/contact-us" ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
+                    className={`py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname === "/contact-us" ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
                       }`}
                   >
-                    <Phone size={20} className={pathname === "/contact-us" ? "text-[#D2E6BC]" : "text-white/80"} />
-                    <span>Contact Us</span>
+                    Contact Us
                   </Link>
                 </nav>
 
@@ -442,7 +429,10 @@ export default function Navbar() {
                 <div className="pt-4">
                   <Link
                     href="/"
-                    onClick={() => setMobileOpen(false)}
+                    onClick={(e) => {
+                      setMobileOpen(false);
+                      handleBookNowClick(e);
+                    }}
                     className="flex items-center justify-center w-full border border-white hover:border-white text-white rounded-[8px] py-3.5 text-[15px] font-semibold tracking-wide transition-all duration-300 font-sans hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-[0.99]"
                   >
                     Book Now

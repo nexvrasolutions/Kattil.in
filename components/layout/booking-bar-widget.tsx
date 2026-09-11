@@ -556,6 +556,7 @@ export default function BookingBarWidget({
                   <ChevronDown
                     className={`w-4.5 h-4.5 text-gray-400 shrink-0 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""
                       }`}
+
                   />
                 </button>
 
@@ -567,9 +568,9 @@ export default function BookingBarWidget({
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -4 }}
                       transition={{ duration: 0.15 }}
-                      className="text-[11.5px] sm:text-xs text-[#0E2E4E] mt-1.5 font-medium flex items-center gap-1.5 font-sans"
+                      className="text-[13.5px] sm:text-[14px] text-[#0E2E4E] mt-1.5 font-medium flex items-center gap-1.5 font-sans"
                     >
-                      <Info className="w-3.5 h-3.5 shrink-0 text-[#0E2E4E]" />
+                      <Info className="w-4 h-4 shrink-0 text-[#0E2E4E]" />
                       <span>{hotelError}</span>
                     </motion.p>
                   )}
@@ -586,19 +587,19 @@ export default function BookingBarWidget({
                       transition={{ duration: 0.16, ease: "easeOut" }}
                       onWheel={(e) => e.stopPropagation()}
                       onTouchMove={(e) => e.stopPropagation()}
-                      className="absolute left-0 right-0 top-full mt-1.5 sm:mt-2 bg-white rounded-[8px] shadow-[0_16px_40px_-8px_rgba(0,0,0,0.22)] border border-gray-100 py-1 z-50 overflow-hidden"
+                      className="absolute left-0 right-0 top-full mt-2 bg-white rounded-[8px] shadow-[0_16px_40px_-8px_rgba(0,0,0,0.22)] border border-gray-100 py-1.5 z-50 overflow-hidden"
                     >
                       {/* Search Bar */}
-                      <div className="px-2 pb-1 pt-0.5 border-b border-gray-100">
+                      <div className="px-3 pb-2 pt-1 border-b border-gray-100">
                         <div className="relative flex items-center">
-                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                           <input
                             ref={searchInputRef}
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search place or hotel..."
-                            className="w-full h-7.5 pl-8 pr-7 text-[12px] sm:text-[12.5px] bg-gray-50 border border-gray-200 rounded-[5px] outline-none focus:bg-white focus:border-[#0E2E4E] transition-colors text-gray-800 placeholder-gray-400 font-sans"
+                            className="w-full h-10 pl-9.5 pr-8 text-[14px] sm:text-[14.5px] bg-gray-50 border border-gray-200 rounded-[6px] outline-none focus:bg-white focus:border-[#0E2E4E] transition-colors text-gray-800 placeholder-gray-400 font-sans"
                             onClick={(e) => e.stopPropagation()}
                           />
                           {searchQuery && (
@@ -609,31 +610,31 @@ export default function BookingBarWidget({
                                 setSearchQuery("");
                                 searchInputRef.current?.focus();
                               }}
-                              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5 cursor-pointer"
+                              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5 cursor-pointer"
                             >
-                              <X className="w-3 h-3" />
+                              <X className="w-3.5 h-3.5" />
                             </button>
                           )}
                         </div>
                       </div>
 
                       {/* Header Info */}
-                      <div className="px-2.5 py-0.5 flex items-center justify-between text-[9.5px] font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50">
+                      <div className="px-3.5 py-1.5 flex items-center justify-between text-[11px] sm:text-[11.5px] font-bold text-gray-500 uppercase tracking-wider bg-gray-50/70">
                         <span>Places & Hotels</span>
-                        <span className="text-[9px] text-gray-400 font-medium lowercase">
+                        <span className="text-[11px] text-gray-400 font-medium lowercase">
                           {filteredHotels.length} {filteredHotels.length === 1 ? "location" : "locations"}
                         </span>
                       </div>
 
-                      {/* Scrollable Hotels / Places List - Fixed height capping to avoid growing with more properties */}
+                      {/* Scrollable Hotels / Places List - High enough to display all locations cleanly without clipping */}
                       <div
                         data-prevent-hero-scroll="true"
-                        className="booking-dropdown-scrollbar max-h-[148px] overflow-y-auto overscroll-contain px-1 py-0.5 space-y-0.5"
+                        className="booking-dropdown-scrollbar max-h-[320px] overflow-y-auto overscroll-contain px-1.5 py-1 space-y-1"
                         onWheel={(e) => e.stopPropagation()}
                         onTouchMove={(e) => e.stopPropagation()}
                       >
                         {filteredHotels.length === 0 ? (
-                          <div className="py-3 px-3 text-center text-xs text-gray-400 font-sans">
+                          <div className="py-4 px-3 text-center text-sm text-gray-400 font-sans">
                             No hotels found matching &ldquo;{searchQuery}&rdquo;
                           </div>
                         ) : (
@@ -660,23 +661,23 @@ export default function BookingBarWidget({
                                     );
                                   }
                                 }}
-                                className={`w-full px-2 py-1 flex items-center justify-between text-left hover:bg-gray-50 transition-all rounded-[5px] cursor-pointer ${isSelected ? "bg-emerald-50 text-gray-900 font-semibold" : "text-gray-700"
+                                className={`w-full px-3 py-2 flex items-center justify-between text-left hover:bg-gray-50 transition-all rounded-[6px] cursor-pointer ${isSelected ? "bg-emerald-50 text-gray-900 font-semibold" : "text-gray-700"
                                   }`}
                               >
-                                <div className="flex items-center gap-2 min-w-0 pr-1.5">
-                                  <div className="w-5.5 h-5.5 rounded-[4px] bg-[#0E2E4E]/10 flex items-center justify-center shrink-0">
-                                    <MapPin className="w-2.5 h-2.5 text-[#0E2E4E]" />
+                                <div className="flex items-center gap-3 min-w-0 pr-2">
+                                  <div className="w-8 h-8 rounded-[6px] bg-[#0E2E4E]/10 flex items-center justify-center shrink-0">
+                                    <MapPin className="w-4 h-4 text-[#0E2E4E]" />
                                   </div>
                                   <div className="flex flex-col min-w-0">
-                                    <span className="text-[12px] sm:text-[12.5px] font-medium text-gray-900 truncate leading-tight">
+                                    <span className="text-[14px] sm:text-[14.5px] font-semibold text-gray-900 truncate leading-snug">
                                       {hotel.name}
                                     </span>
-                                    <span className="text-[10px] text-gray-400 truncate leading-none mt-0.5">
+                                    <span className="text-[12px] sm:text-[12.5px] text-gray-500 truncate leading-normal mt-0.5">
                                       {hotel.place}, {hotel.state}
                                     </span>
                                   </div>
                                 </div>
-                                {isSelected && <Check className="w-3 h-3 text-emerald-600 shrink-0" />}
+                                {isSelected && <Check className="w-4 h-4 text-emerald-600 shrink-0" />}
                               </button>
                             );
                           })
@@ -739,9 +740,9 @@ export default function BookingBarWidget({
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -4 }}
                       transition={{ duration: 0.15 }}
-                      className="text-[11.5px] sm:text-xs text-[#0E2E4E] mt-1.5 font-medium flex items-center gap-1.5 font-sans"
+                      className="text-[13.5px] sm:text-[14px] text-[#0E2E4E] mt-1.5 font-medium flex items-center gap-1.5 font-sans"
                     >
-                      <Info className="w-3.5 h-3.5 shrink-0 text-[#0E2E4E]" />
+                      <Info className="w-4 h-4 shrink-0 text-[#0E2E4E]" />
                       <span>{dateError}</span>
                     </motion.p>
                   )}

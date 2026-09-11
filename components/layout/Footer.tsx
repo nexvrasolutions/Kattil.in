@@ -102,11 +102,22 @@ export default function Footer({
         {/* Header — logo + headline */}
         <motion.div variants={topVariants} initial="hidden" animate="visible" className="flex flex-col items-center text-center mb-12">
           {logo && (
-            <img src={logo} alt="Kattil" className="h-20 sm:h-24 lg:h-28 object-contain mb-5" />
+            <Link
+              href="/"
+              onClick={(e) => {
+                if (typeof window !== "undefined" && window.location.pathname === "/") {
+                  e.preventDefault();
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }
+              }}
+              className="inline-block cursor-pointer"
+            >
+              <img src={logo} alt="Kattil" className="h-20 sm:h-24 lg:h-28 object-contain mb-5 hover:opacity-90 transition-opacity" />
+            </Link>
           )}
           {headline && (
             <p
-              className="font-sans font-normal text-[18px] sm:text-[24px] md:text-[28px] lg:text-[34px] leading-tight lg:leading-[40px] tracking-normal text-center max-w-[1080px] mx-auto"
+              className="font-sans font-normal text-[18px] sm:text-[22px] md:text-[26px] lg:text-[30px] leading-tight lg:leading-[38px] tracking-normal text-center max-w-[1080px] mx-auto"
               style={{
                 color: "rgba(230, 226, 212, 0.8082)",
               }}
@@ -141,6 +152,12 @@ export default function Footer({
                       href={link.href}
                       target={link.newTab ? "_blank" : undefined}
                       rel={link.newTab ? "noopener noreferrer" : undefined}
+                      onClick={(e) => {
+                        if (link.href === "/" && typeof window !== "undefined" && window.location.pathname === "/") {
+                          e.preventDefault();
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }
+                      }}
                       className="inline-block text-[14px] sm:text-[15px] font-medium text-[#E6E2D4CC]/80 hover:text-[#D2E6BC] hover:font-bold transition-all duration-200"
                     >
                       {link.label}

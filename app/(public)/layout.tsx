@@ -108,7 +108,7 @@ export default async function PublicLayout({ children }: { children: React.React
   return (
     <>
       <SocialSidebar icons={sidebar} />
-      <PageTransition>{children}</PageTransition>
+      <main className="flex-1 flex flex-col">{children}</main>
       <Footer {...footer} />
     </>
   );

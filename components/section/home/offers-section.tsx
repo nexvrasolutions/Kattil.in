@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 export default function OffersSection() {
   return (
-    <section className="w-full bg-transparent pt-4 sm:pt-6 md:pt-8 lg:pt-0 pb-10 sm:pb-14 md:pb-20 px-3 md:px-5">
+    <section className="w-full bg-transparent pt-4 sm:pt-6 md:pt-8 lg:pt-0 pb-0 px-3 md:px-5">
       <div className="w-full max-w-[1920px] mx-auto">
         <div
           className="

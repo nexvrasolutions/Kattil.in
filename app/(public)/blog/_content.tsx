@@ -15,7 +15,7 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const FALLBACK_FEATURED: BlogPost = {
   _id: "featured-1",
   slug: "art-of-a-perfect-weekend",
-  title: "The Art of a Perfect Weekend\nYour Comfort",
+  title: "The Art of a Perfect Weekend: Your Comfort",
   category: "Stay Experience",
   excerpt:
     "From serene Morning to breathtaking sunsets a weeekend at our resort is all about you",
@@ -193,44 +193,59 @@ export default function BlogContent({
       <Navbar />
 
       {/* ── 1. Hero Header Section (Sage Green) ───────────────────────────── */}
-      <section className="relative w-full bg-[#9caf88] overflow-hidden pt-36 md:pt-44 lg:pt-50 pb-16 md:pb-22">
+      <section className="relative w-full bg-[#8E9F78] overflow-hidden min-h-[300px] sm:min-h-[400px] md:min-h-[450px] lg:min-h-[500px] flex flex-col justify-end pt-28 sm:pt-32 md:pt-34 lg:pt-36 pb-8 sm:pb-9 md:pb-10 lg:pb-12">
         {/* Right Background Monument Skyline Silhouette */}
-        <div className="hidden md:flex absolute right-0 bottom-0 top-auto md:h-[78%] lg:h-[82%] md:w-[40%] lg:w-[34%] max-w-[460px] pointer-events-none z-0 overflow-hidden items-end justify-end pr-2 md:pr-6">
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 0.9, x: 0 }}
+          transition={{ duration: 0.85, ease: EASE, delay: 0.2 }}
+          className="hidden md:flex absolute right-0 bottom-0 top-auto md:h-[78%] lg:h-[82%] md:w-[40%] lg:w-[34%] max-w-[460px] pointer-events-none z-0 overflow-hidden items-end justify-end pr-2 md:pr-6"
+        >
           <div
-            className="w-full h-full opacity-85 md:opacity-90 bg-no-repeat"
+            className="w-full h-full bg-no-repeat"
             style={{
               backgroundImage: "url('/images/partners/hero-skyline.png')",
               backgroundSize: "contain",
               backgroundPosition: "right bottom",
             }}
           />
-        </div>
+        </motion.div>
 
         {/* Hero Content aligned straight down with Navbar container */}
         <div className="relative z-10 w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="relative px-5 md:px-8 lg:px-15 max-w-3xl">
-            <p className="font-[Public_Sans] font-semibold text-[14px] leading-[14px] tracking-normal text-left align-middle uppercase text-white/95 mb-3 drop-shadow-xs">
+            <motion.p
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: EASE, delay: 0.1 }}
+              className="font-[Public_Sans] font-semibold text-[14px] leading-[14px] tracking-normal text-left align-middle uppercase text-white/95 mb-3 drop-shadow-xs"
+            >
               LET US EXPLORE
-            </p>
-            <h1 className="text-white tracking-tight">
+            </motion.p>
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, ease: EASE, delay: 0.2 }}
+              className="text-white tracking-tight"
+            >
               <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] leading-[1.12]">
                 Stories Beyond
               </span>
               <span className="block font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-normal italic text-[#f4f7ef] leading-[1.15] mt-1">
                 Your Stay
               </span>
-            </h1>
+            </motion.h1>
           </div>
         </div>
       </section>
 
       {/* ── 2. Main Blog Section ─────────────────────────────────────────── */}
-      <section className="w-full py-10 sm:py-12 md:py-16 bg-[#FAF8F5]">
+      <section className="relative z-20 w-full py-10 sm:py-12 md:py-16 bg-[#FAF8F5] rounded-t-[20px] md:rounded-t-[24px] overflow-hidden -mt-3 md:-mt-4">
         <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15">
             {/* Category Filter Tabs */}
             <div className="mb-8 sm:mb-10">
-              <div className="flex items-center gap-7 sm:gap-9 md:gap-11 overflow-x-auto pb-1 scrollbar-none">
+              <div className="flex items-center gap-3.5 sm:gap-6 md:gap-8 lg:gap-11 overflow-x-auto pb-2 pt-1 scrollbar-none no-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {allCategories.map((cat) => {
                   const isSelected =
                     (cat === "All Stories" && (!currentCategory || currentCategory === "All Stories" || currentCategory === "All")) ||
@@ -241,7 +256,7 @@ export default function BlogContent({
                       key={cat}
                       type="button"
                       onClick={() => handleCategorySelect(cat)}
-                      className={`font-sans text-[14.5px] sm:text-[15.5px] transition-colors whitespace-nowrap cursor-pointer ${isSelected
+                      className={`font-sans text-[13.5px] sm:text-[14.5px] md:text-[15.5px] transition-colors whitespace-nowrap cursor-pointer shrink-0 ${isSelected
                         ? "font-bold text-[#2d3134]"
                         : "font-medium text-[#9ca3af] hover:text-[#4b5563]"
                         }`}
@@ -284,9 +299,8 @@ export default function BlogContent({
                     </p>
 
                     <Link href={`/blog/${featuredPost.slug}`} className="group mb-[24px]">
-                      <h2 className="font-[Public_Sans] font-normal text-[28px] sm:text-[32px] lg:text-[34px] xl:text-[36px] leading-[1.18] tracking-[-0.5px] text-[#202020]  transition-colors">
-                        <span className="block">The Art of a Perfect Weekend</span>
-                        <span className="block">Your Comfort</span>
+                      <h2 className="font-[Public_Sans] font-normal text-[26px] sm:text-[30px] lg:text-[34px] xl:text-[36px] leading-[1.18] tracking-[-0.5px] text-[#202020] transition-colors">
+                        {featuredPost.title.replace(/\n/g, " ") || "The Art of a Perfect Weekend Your Comfort"}
                       </h2>
                     </Link>
 

@@ -3,10 +3,13 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { ArrowRight, Wifi, Sparkles, Building2, MapPin, Check, ExternalLink } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import BookingBarWidget from "@/components/layout/booking-bar-widget";
 import { PropertyRoomOption } from "./PropertyDetailsView";
+
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 interface RoomsListingViewProps {
   destinationSlug?: string;
@@ -49,36 +52,57 @@ export default function RoomsListingView({
 
         <div className="relative z-10 w-full max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-15 text-center">
           {/* Eyebrow */}
-          <p className="font-sans text-[11px] sm:text-xs md:text-[13px] font-semibold text-[#D2E6BC] uppercase tracking-[0.16em] mb-2.5">
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: EASE, delay: 0.1 }}
+            className="font-sans text-[11px] sm:text-xs md:text-[13px] font-semibold text-[#D2E6BC] uppercase tracking-[0.16em] mb-2.5"
+          >
             {headingDestination ? `REFINED LIVING • ${headingDestination.toUpperCase()}` : "REFINED LIVING • ALL DESTINATIONS"}
-          </p>
+          </motion.p>
 
           {/* Heading */}
-          <h1 className="text-white tracking-tight mb-3">
+          <motion.h1
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, ease: EASE, delay: 0.2 }}
+            className="text-white tracking-tight mb-3"
+          >
             <span className="block font-sans text-2xl min-[360px]:text-3xl sm:text-4xl md:text-[44px] font-bold leading-[1.15]">
               {headingDestination ? `Available Rooms in ${headingDestination}` : "Explore Our Handpicked Rooms"}
             </span>
             <span className="block font-serif text-lg min-[360px]:text-xl sm:text-2xl md:text-[28px] font-normal italic text-[#e2ebd6] leading-[1.2] mt-1">
               {propertyName ? `${propertyName} — Book direct for the best rate` : "Find your ideal stay and comfort"}
             </span>
-          </h1>
+          </motion.h1>
 
           {/* ── Booking Bar Widget with Pre-Selected & Locked Destination ──── */}
-          <div className="mt-8 md:mt-10 max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 22 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: EASE, delay: 0.3 }}
+            className="mt-8 md:mt-10 max-w-4xl mx-auto"
+          >
             <BookingBarWidget
               initialDestination={destinationSlug}
               initialProperty={propertyName}
               lockedDestination={Boolean(destinationSlug)}
             />
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ── Rooms Listing Section ──────────────────────────────────────────── */}
-      <main className="flex-1 py-12 md:py-16">
+      <main className="relative z-20 flex-1 py-12 md:py-16 bg-[#FAF8F5] rounded-t-[20px] md:rounded-t-[24px] overflow-hidden -mt-3 md:-mt-4">
         <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-15">
           {/* Header Row: Count + Destination indicator */}
-          <div className="mb-8 md:mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, ease: EASE }}
+            className="mb-8 md:mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+          >
             <div>
               <p className="font-sans text-[16px] md:text-[18px] text-[#4b5563]">
                 Showing <span className="font-bold text-[#111827]">{rooms.length}</span>{" "}
@@ -122,11 +146,16 @@ export default function RoomsListingView({
                   );
                 })}
             </div>
-          </div>
+          </motion.div>
 
           {/* Rooms Grid */}
           {rooms.length === 0 ? (
-            <div className="py-16 px-6 text-center bg-white rounded-2xl border border-gray-100 shadow-[0_4px_24px_rgba(0,0,0,0.03)] max-w-xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, ease: EASE }}
+              className="py-16 px-6 text-center bg-white rounded-2xl border border-gray-100 shadow-[0_4px_24px_rgba(0,0,0,0.03)] max-w-xl mx-auto"
+            >
               <div className="w-12 h-12 rounded-full bg-[#edf5e4] flex items-center justify-center mx-auto mb-4">
                 <Building2 className="w-6 h-6 text-[#526442]" />
               </div>
@@ -142,7 +171,7 @@ export default function RoomsListingView({
               >
                 View All Rooms
               </Link>
-            </div>
+            </motion.div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {rooms.map((room, idx) => {
@@ -166,8 +195,13 @@ export default function RoomsListingView({
                     : `https://live.ipms247.com/booking/book-rooms-${hotelValue}`;
 
                 return (
-                  <div
+                  <motion.div
                     key={room._id || idx}
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ duration: 0.5, delay: idx * 0.08, ease: EASE }}
+                    whileHover={{ y: -6, transition: { duration: 0.25 } }}
                     className="group bg-white rounded-[12px] overflow-hidden border border-gray-100 shadow-[0_4px_24px_rgba(0,0,0,0.04)] hover:shadow-[0_16px_36px_rgba(0,0,0,0.08)] transition-all duration-300 flex flex-col"
                   >
                     {/* Room Image */}
@@ -177,7 +211,7 @@ export default function RoomsListingView({
                         alt={room.name}
                         fill
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                       />
                       <div className="absolute top-3.5 left-3.5 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-full shadow-xs">
                         <span className="font-sans text-[11.5px] font-semibold text-[#526442]">
@@ -190,7 +224,7 @@ export default function RoomsListingView({
                     <div className="p-6 flex flex-col justify-between flex-1">
                       <div>
                         {/* Title */}
-                        <h3 className="font-sans text-[20px] md:text-[22px] font-semibold text-[#111827] leading-snug tracking-tight">
+                        <h3 className="font-sans text-[20px] md:text-[22px] font-semibold text-[#111827] leading-snug tracking-tight group-hover:text-[#526442] transition-colors">
                           {room.name}
                         </h3>
 
@@ -240,7 +274,9 @@ export default function RoomsListingView({
                               Details
                             </Link>
                           )}
-                          <a
+                          <motion.a
+                            whileHover={{ scale: 1.04 }}
+                            whileTap={{ scale: 0.98 }}
                             href={directBookingUrl}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -248,11 +284,11 @@ export default function RoomsListingView({
                           >
                             <span>Book Now</span>
                             <ExternalLink className="w-3.5 h-3.5" />
-                          </a>
+                          </motion.a>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
@@ -262,3 +298,4 @@ export default function RoomsListingView({
     </div>
   );
 }
+

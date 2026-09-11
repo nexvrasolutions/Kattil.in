@@ -426,9 +426,8 @@ export default function RoomStickyBookingWidget({
                 {selectedHotel.place}, {selectedHotel.name}
               </span>
               <ChevronDown
-                className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
-                  dropdownOpen ? "rotate-180" : ""
-                }`}
+                className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""
+                  }`}
               />
             </button>
 
@@ -443,16 +442,16 @@ export default function RoomStickyBookingWidget({
                   className="absolute left-0 right-0 top-full mt-1.5 z-50 bg-white rounded-[8px] border border-gray-200 shadow-xl overflow-hidden p-1"
                 >
                   {/* List of Destinations & Hotels */}
-                  <div className="max-h-[148px] overflow-y-auto space-y-0.5">
+                  <div className="max-h-[260px] overflow-y-auto space-y-0.5">
                     {(lockedDestination
                       ? hotelsList.filter(
-                          (h) =>
-                            h.id === selectedHotel.id ||
-                            h.slug.toLowerCase() === selectedHotel.slug.toLowerCase() ||
-                            h.place.toLowerCase() === selectedHotel.place.toLowerCase() ||
-                            (initialDestinationSlug &&
-                              h.slug.toLowerCase() === initialDestinationSlug.toLowerCase())
-                        )
+                        (h) =>
+                          h.id === selectedHotel.id ||
+                          h.slug.toLowerCase() === selectedHotel.slug.toLowerCase() ||
+                          h.place.toLowerCase() === selectedHotel.place.toLowerCase() ||
+                          (initialDestinationSlug &&
+                            h.slug.toLowerCase() === initialDestinationSlug.toLowerCase())
+                      )
                       : hotelsList
                     ).length === 0 ? (
                       <div className="px-2.5 py-1.5 text-xs text-gray-500">
@@ -461,13 +460,13 @@ export default function RoomStickyBookingWidget({
                     ) : (
                       (lockedDestination
                         ? hotelsList.filter(
-                            (h) =>
-                              h.id === selectedHotel.id ||
-                              h.slug.toLowerCase() === selectedHotel.slug.toLowerCase() ||
-                              h.place.toLowerCase() === selectedHotel.place.toLowerCase() ||
-                              (initialDestinationSlug &&
-                                h.slug.toLowerCase() === initialDestinationSlug.toLowerCase())
-                          )
+                          (h) =>
+                            h.id === selectedHotel.id ||
+                            h.slug.toLowerCase() === selectedHotel.slug.toLowerCase() ||
+                            h.place.toLowerCase() === selectedHotel.place.toLowerCase() ||
+                            (initialDestinationSlug &&
+                              h.slug.toLowerCase() === initialDestinationSlug.toLowerCase())
+                        )
                         : hotelsList
                       ).map((h) => {
                         const isSelected =
@@ -482,17 +481,15 @@ export default function RoomStickyBookingWidget({
                               setSelectedHotel(h);
                               setDropdownOpen(false);
                             }}
-                            className={`w-full px-2 py-1 rounded-[6px] text-left text-xs flex items-center justify-between transition-colors cursor-pointer ${
-                              isSelected
-                                ? "bg-[#edf5e4] text-[#2d3f27] font-semibold"
-                                : "text-gray-700 hover:bg-gray-50"
-                            }`}
+                            className={`w-full px-2 py-1 rounded-[6px] text-left text-xs flex items-center justify-between transition-colors cursor-pointer ${isSelected
+                              ? "bg-[#edf5e4] text-[#2d3f27] font-semibold"
+                              : "text-gray-700 hover:bg-gray-50"
+                              }`}
                           >
                             <div className="flex items-center gap-2 truncate">
                               <MapPin
-                                className={`w-3 h-3 shrink-0 ${
-                                  isSelected ? "text-[#526442]" : "text-gray-400"
-                                }`}
+                                className={`w-3 h-3 shrink-0 ${isSelected ? "text-[#526442]" : "text-gray-400"
+                                  }`}
                               />
                               <span className="truncate text-[12px]">
                                 <span className="font-semibold text-gray-900">{h.place}</span>
@@ -523,11 +520,10 @@ export default function RoomStickyBookingWidget({
                 openCalendar();
                 dateInputRef.current?.blur();
               }}
-              className={`w-full h-11 px-3.5 rounded-[8px] border ${
-                dateError
-                  ? "border-red-400 bg-red-50/50 ring-1 ring-red-400/20"
-                  : "border-gray-200 bg-gray-50/70 hover:bg-gray-100/70"
-              } text-[13.5px] font-medium text-gray-800 flex items-center justify-between cursor-pointer transition-colors select-none`}
+              className={`w-full h-11 px-3.5 rounded-[8px] border ${dateError
+                ? "border-red-400 bg-red-50/50 ring-1 ring-red-400/20"
+                : "border-gray-200 bg-gray-50/70 hover:bg-gray-100/70"
+                } text-[13.5px] font-medium text-gray-800 flex items-center justify-between cursor-pointer transition-colors select-none`}
             >
               <div className="flex items-center gap-2.5 min-w-0 flex-1 pointer-events-none">
                 <Calendar
@@ -569,11 +565,10 @@ export default function RoomStickyBookingWidget({
 
       {/* ── Mobile Responsive Floating Popup Card with 8px Curves (Hidden on desktop, fixed while scrolling, unfixes/hides at footer) ── */}
       <div
-        className={`lg:hidden fixed bottom-3.5 inset-x-3.5 sm:bottom-4 sm:inset-x-4 z-40 max-w-lg mx-auto bg-white/95 backdrop-blur-md rounded-[8px] p-3.5 sm:p-4 border border-gray-200/90 shadow-[0_8px_32px_rgba(0,0,0,0.14)] transition-all duration-300 ease-out ${
-          isFooterVisible
-            ? "opacity-0 translate-y-12 pointer-events-none"
-            : "opacity-100 translate-y-0"
-        }`}
+        className={`lg:hidden fixed bottom-2.5 inset-x-2.5 sm:bottom-3 sm:inset-x-3.5 z-40 max-w-lg mx-auto bg-white/95 backdrop-blur-md rounded-[8px] p-2.5 sm:p-3 border border-gray-200/90 shadow-[0_8px_32px_rgba(0,0,0,0.14)] transition-all duration-300 ease-out ${isFooterVisible
+          ? "opacity-0 translate-y-12 pointer-events-none"
+          : "opacity-100 translate-y-0"
+          }`}
       >
         <div className="w-full">
           {/* Top Date Selection Card matching user mockup */}
@@ -583,33 +578,31 @@ export default function RoomStickyBookingWidget({
               openCalendar();
               dateInputRef.current?.blur();
             }}
-            className={`w-full bg-white border ${
-              dateError
-                ? "border-red-400 ring-1 ring-red-400/30"
-                : "border-[#d8e0ea] hover:border-gray-400"
-            } rounded-[8px] px-3.5 py-2.5 flex items-center justify-between cursor-pointer transition-colors shadow-2xs select-none`}
+            className={`w-full bg-white border ${dateError
+              ? "border-red-400 ring-1 ring-red-400/30"
+              : "border-[#d8e0ea] hover:border-gray-400"
+              } rounded-[8px] px-3 py-1.5 sm:py-2 flex items-center justify-between cursor-pointer transition-colors shadow-2xs select-none`}
           >
-            <div className="flex items-center gap-3.5">
+            <div className="flex items-center gap-2.5 sm:gap-3">
               <Calendar
-                className={`w-6 h-6 ${
-                  dateError ? "text-red-500" : "text-[#0d1b2e]"
-                } shrink-0 stroke-[1.6]`}
+                className={`w-5 h-5 ${dateError ? "text-red-500" : "text-[#0d1b2e]"
+                  } shrink-0 stroke-[1.6]`}
               />
               <div className="flex flex-col text-left">
-                <span className="text-[11px] sm:text-[11.5px] font-semibold text-[#64748b] leading-tight font-sans">
+                <span className="text-[10.5px] sm:text-[11px] font-semibold text-[#64748b] leading-tight font-sans">
                   Check In - Check Out
                 </span>
-                <span className="text-[14.5px] sm:text-[15.5px] font-bold text-[#0d1b2e] leading-tight mt-0.5 font-sans">
+                <span className="text-[13px] sm:text-[14px] font-bold text-[#0d1b2e] leading-tight mt-0.5 font-sans">
                   {dateDisplay || "Select dates"}
                 </span>
               </div>
             </div>
-            <ChevronRight className="w-4.5 h-4.5 text-[#0d1b2e] shrink-0 stroke-[2.5]" />
+            <ChevronRight className="w-4 h-4 text-[#0d1b2e] shrink-0 stroke-[2.5]" />
           </div>
 
           {/* Mobile Date Error */}
           {dateError && (
-            <p className="text-[11.5px] text-red-500 font-medium font-sans mt-1 text-center">
+            <p className="text-[11px] text-red-500 font-medium font-sans mt-1 text-center">
               {dateError}
             </p>
           )}
@@ -618,7 +611,7 @@ export default function RoomStickyBookingWidget({
           <button
             type="button"
             onClick={handleCheckAvailability}
-            className="w-full mt-2.5 py-3 rounded-[8px] bg-[#0d1b2e] hover:bg-[#162840] text-white font-semibold text-[14.5px] sm:text-[15px] shadow-sm transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center font-sans tracking-wide"
+            className="w-full mt-2 py-2.5 rounded-[8px] bg-[#0d1b2e] hover:bg-[#162840] text-white font-semibold text-[13.5px] sm:text-[14px] shadow-sm transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center font-sans tracking-wide"
           >
             Check Availability
           </button>
@@ -651,7 +644,7 @@ const STYLES = `
   @media (max-width: 1023px) {
     .flatpickr-calendar {
       position: fixed !important;
-      bottom: 136px !important;
+      bottom: 106px !important;
       left: 50% !important;
       transform: translateX(-50%) !important;
       top: auto !important;

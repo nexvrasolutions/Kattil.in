@@ -302,7 +302,7 @@ export default function TestimonialsSection() {
   const currentDesktopActiveDot = desktopSlideIndex % TESTIMONIALS_DATA.length;
 
   return (
-    <section className="w-full bg-transparent pt-10 pb-16 md:pt-18 md:pb-28 overflow-x-hidden">
+    <section className="w-full bg-transparent pt-12 md:pt-[80px] pb-16 md:pb-28 overflow-x-hidden">
       <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
         <div className="px-5 md:px-8 lg:px-12">
           {/* Section Heading */}

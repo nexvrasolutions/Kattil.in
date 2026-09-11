@@ -2,8 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import Navbar from "@/components/layout/Navbar";
 import SkylineSilhouette from "@/components/ui/SkylineSilhouette";
+
+const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const WHY_PARTNER_ITEMS = [
   {
@@ -96,27 +99,42 @@ export default function PartnersView() {
       <Navbar />
 
       {/* ── 1. Hero Section with Monuments Skyline Silhouette ─────────── */}
-      <section className="relative w-full bg-[#9caf88] overflow-hidden pt-36 md:pt-44 lg:pt-52 pb-16 md:pb-24">
+      <section className="relative w-full bg-[#8E9F78] overflow-hidden min-h-[300px] sm:min-h-[400px] md:min-h-[450px] lg:min-h-[500px] flex flex-col justify-end pt-28 sm:pt-32 md:pt-34 lg:pt-36 pb-8 sm:pb-9 md:pb-10 lg:pb-12">
         {/* Right Background Monument Skyline Silhouette */}
-        <div className="hidden md:flex absolute right-0 bottom-0 top-auto md:h-[78%] lg:h-[82%] md:w-[40%] lg:w-[34%] max-w-[460px] pointer-events-none z-0 overflow-hidden items-end justify-end pr-2 md:pr-6">
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          animate={{ opacity: 0.95, x: 0 }}
+          transition={{ duration: 0.85, ease: EASE, delay: 0.2 }}
+          className="hidden md:flex absolute right-0 bottom-0 top-auto md:h-[78%] lg:h-[82%] md:w-[40%] lg:w-[34%] max-w-[460px] pointer-events-none z-0 overflow-hidden items-end justify-end pr-2 md:pr-6"
+        >
           <div
-            className="w-full h-full opacity-90 md:opacity-95 bg-no-repeat"
+            className="w-full h-full bg-no-repeat"
             style={{
               backgroundImage: "url('/images/partners/hero-skyline.png')",
               backgroundSize: "contain",
               backgroundPosition: "right bottom",
             }}
           />
-        </div>
+        </motion.div>
 
         {/* Hero Content aligned straight down with Navbar container */}
         <div className="relative z-10 w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="relative px-5 md:px-8 lg:px-15 max-w-3xl">
-            <p className="font-sans text-[14px] sm:text-[15px]  uppercase text-[#FFFFFF] mb-4 drop-shadow-sm">
+            <motion.p
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: EASE, delay: 0.1 }}
+              className="font-sans text-[14px] sm:text-[15px] uppercase text-[#FFFFFF] mb-4 drop-shadow-sm"
+            >
               PARTNER WITH KATTIL
-            </p>
+            </motion.p>
 
-            <h1 className="text-white tracking-tight">
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, ease: EASE, delay: 0.2 }}
+              className="text-white tracking-tight"
+            >
               <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] leading-[1.12]">
                 Your Property. Our
               </span>
@@ -128,17 +146,23 @@ export default function PartnersView() {
                   Shared Growth.
                 </span>
               </span>
-            </h1>
+            </motion.h1>
           </div>
         </div>
       </section>
 
       {/* ── 2. Why Partner with Kattil? ───────────────────────────────── */}
-      <section className="w-full py-16 md:py-24 bg-[#FAF8F5]">
+      <section className="relative z-20 w-full py-16 md:py-24 bg-[#FAF8F5] rounded-t-[20px] md:rounded-t-[24px] overflow-hidden -mt-3 md:-mt-4">
         <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15">
             {/* Title */}
-            <div className="text-center mb-14 md:mb-18">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.55, ease: EASE }}
+              className="text-center mb-14 md:mb-18"
+            >
               <h2 className="text-[#111827] tracking-tight">
                 <span className="font-sans text-3xl sm:text-4xl md:text-[42px] font-normal">
                   Why partner with{" "}
@@ -147,14 +171,22 @@ export default function PartnersView() {
                   Kattil?
                 </span>
               </h2>
-            </div>
+            </motion.div>
 
             {/* 4 Feature Columns */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10 text-left">
               {WHY_PARTNER_ITEMS.map((item, idx) => (
-                <div key={idx} className="flex flex-col items-start text-left">
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.5, delay: idx * 0.09, ease: EASE }}
+                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                  className="flex flex-col items-start text-left group"
+                >
                   {/* Round Icon Badge */}
-                  <div className="w-14 h-14 rounded-full bg-[#FFFFFF] flex items-center justify-center mb-5 shadow-xs">
+                  <div className="w-14 h-14 rounded-full bg-[#FFFFFF] flex items-center justify-center mb-5 shadow-xs group-hover:shadow-md group-hover:scale-105 transition-all duration-300">
                     <Image
                       src="/images/partners/cabinet-icon.png"
                       alt={item.title}
@@ -164,28 +196,34 @@ export default function PartnersView() {
                     />
                   </div>
 
-                  <h3 className="font-sans font-semibold text-[17px] md:text-[18px] text-[#111827] mb-2">
+                  <h3 className="font-sans font-semibold text-[17px] md:text-[18px] text-[#111827] mb-2 group-hover:text-[#526442] transition-colors">
                     {item.title}
                   </h3>
 
                   <p className="font-sans text-[13px] md:text-[14px] text-[#6b7280] leading-relaxed max-w-xs">
                     {item.description}
                   </p>
-                </div>
+                </motion.div>
               ))}
             </div>
 
             {/* Large Team / Community Banner Image */}
-            <div className="mt-14 md:mt-20 w-full aspect-[16/9] sm:aspect-[21/10] md:aspect-[24/10] max-h-[540px] relative rounded-[8px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-[#e5e7eb]/60">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.97 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.7, ease: EASE }}
+              className="mt-14 md:mt-20 w-full aspect-[16/9] sm:aspect-[21/10] md:aspect-[24/10] max-h-[540px] relative rounded-[8px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-[#e5e7eb]/60 group"
+            >
               <Image
                 src="/images/partners/community-group.png"
                 alt="Kattil Community and Team"
                 fill
                 sizes="(max-width: 1920px) 100vw, 1920px"
-                className="object-cover object-center"
+                className="object-cover object-center group-hover:scale-[1.02] transition-transform duration-700 ease-out"
                 priority
               />
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -196,7 +234,13 @@ export default function PartnersView() {
           <div className="px-5 md:px-8 lg:px-15">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
               {/* Left Column: Heading with gap below floating navbar */}
-              <div className="lg:col-span-5 lg:sticky lg:top-[170px] xl:lg:top-[180px]">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.6, ease: EASE }}
+                className="lg:col-span-5 lg:sticky lg:top-[170px] xl:lg:top-[180px]"
+              >
                 <p className="font-sans text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.25em] text-[#6b7280] mb-3">
                   HOW IT WORKS
                 </p>
@@ -209,22 +253,26 @@ export default function PartnersView() {
                     Better performing
                   </span>
                 </h2>
-              </div>
+              </motion.div>
 
               {/* Right Column: 4 Numbered Steps that scroll smoothly */}
               <div className="lg:col-span-7 divide-y divide-[#e5e7eb]">
                 {HOW_IT_WORKS_STEPS.map((step, idx) => (
-                  <div
+                  <motion.div
                     key={idx}
-                    className="py-10 md:py-14 first:pt-0 lg:first:pt-[30px] last:pb-2 flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8 transition-colors"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ duration: 0.5, delay: idx * 0.08, ease: EASE }}
+                    className="py-10 md:py-14 first:pt-0 lg:first:pt-[30px] last:pb-2 flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8 transition-colors group"
                   >
                     {/* Number */}
-                    <span className="font-mono text-[13px] md:text-[14px] font-semibold text-[#9ca3af] tracking-wider shrink-0 pt-1">
+                    <span className="font-mono text-[13px] md:text-[14px] font-semibold text-[#9ca3af] group-hover:text-[#526442] tracking-wider shrink-0 pt-1 transition-colors">
                       {step.step}
                     </span>
 
                     {/* Step Title */}
-                    <h3 className="font-sans font-semibold text-[17px] md:text-[19px] text-[#111827] sm:w-56 shrink-0 leading-snug">
+                    <h3 className="font-sans font-semibold text-[17px] md:text-[19px] text-[#111827] sm:w-56 shrink-0 leading-snug group-hover:text-[#0d1b2e] transition-colors">
                       {step.title}
                     </h3>
 
@@ -232,7 +280,7 @@ export default function PartnersView() {
                     <p className="font-sans text-[13px] md:text-[14px] text-[#6b7280] leading-relaxed flex-1">
                       {step.description}
                     </p>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -247,7 +295,13 @@ export default function PartnersView() {
           <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
             <div className="px-5 md:px-8 lg:px-15">
               {/* Heading: 2 centered lines */}
-              <div className="text-center mb-12 md:mb-16">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.55, ease: EASE }}
+                className="text-center mb-12 md:mb-16"
+              >
                 <h2 className="text-[#111827] tracking-tight">
                   <span className="block font-sans text-3xl sm:text-4xl md:text-[42px] font-normal">
                     What properties can
@@ -256,28 +310,36 @@ export default function PartnersView() {
                     Partner with us?
                   </span>
                 </h2>
-              </div>
+              </motion.div>
 
               {/* 4 Cards Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7">
                 {PROPERTY_TYPES.map((prop, idx) => (
-                  <div key={idx} className="group flex flex-col text-left">
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ duration: 0.5, delay: idx * 0.08, ease: EASE }}
+                    whileHover={{ y: -6, transition: { duration: 0.25 } }}
+                    className="group flex flex-col text-left"
+                  >
                     {/* Card Image */}
-                    <div className="relative w-full aspect-[4/5] rounded-[10px] md:rounded-[12px] overflow-hidden bg-[#e5e7eb] shadow-xs">
+                    <div className="relative w-full aspect-[4/5] rounded-[10px] md:rounded-[12px] overflow-hidden bg-[#e5e7eb] shadow-xs group-hover:shadow-lg transition-all duration-500">
                       <Image
                         src={prop.image}
                         alt={prop.title}
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-103"
+                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                       />
                     </div>
 
                     {/* Title */}
-                    <h3 className="font-sans text-[16px] md:text-[17px] font-medium text-[#111827] mt-3.5 text-left">
+                    <h3 className="font-sans text-[16px] md:text-[17px] font-medium text-[#111827] mt-3.5 text-left group-hover:text-[#526442] transition-colors">
                       {prop.title}
                     </h3>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -287,7 +349,13 @@ export default function PartnersView() {
         {/* ── 5. A Simple Partnership Model (Deep Navy Card) ─────────────── */}
         <section className="w-full py-8 md:py-12">
           <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
-            <div className="bg-[#0E2E4E] text-white rounded-[12px] px-5 md:px-8 lg:px-15 py-12 sm:py-16 md:py-20 shadow-[0_12px_40px_rgba(14,39,60,0.2)] relative overflow-hidden">
+            <motion.div
+              initial={{ opacity: 0, y: 28 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.65, ease: EASE }}
+              className="bg-[#0E2E4E] text-white rounded-[12px] px-5 md:px-8 lg:px-15 py-12 sm:py-16 md:py-20 shadow-[0_12px_40px_rgba(14,39,60,0.2)] relative overflow-hidden"
+            >
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
                 {/* Left Column: Heading + Subtitle */}
                 <div className="lg:col-span-5 -mt-45">
@@ -314,7 +382,14 @@ export default function PartnersView() {
                 {/* Right Column: 2x2 Feature Grid */}
                 <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-10">
                   {PARTNERSHIP_MODELS.map((model, idx) => (
-                    <div key={idx} className="flex flex-col">
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 16 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.45, delay: 0.1 + idx * 0.08, ease: EASE }}
+                      className="flex flex-col"
+                    >
                       {/* White Circular Badge */}
                       <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center mb-4 shadow-sm">
                         <Image
@@ -333,18 +408,24 @@ export default function PartnersView() {
                       <p className="font-sans text-[13px] md:text-[14px] text-[#9bb3ca] leading-relaxed">
                         {model.description}
                       </p>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </section>
 
         {/* ── 6. Your Property Could Do More (CTA Section) ──────────────── */}
         <section className="w-full py-16 md:py-24">
           <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
-            <div className="px-5 md:px-8 lg:px-15 text-center max-w-3xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, ease: EASE }}
+              className="px-5 md:px-8 lg:px-15 text-center max-w-3xl mx-auto"
+            >
               <h2 className="text-[#111827] tracking-tight">
                 <span className="font-sans text-3xl sm:text-4xl md:text-[42px] font-normal">
                   Your property could{" "}
@@ -361,7 +442,9 @@ export default function PartnersView() {
 
               {/* Buttons */}
               <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
-                <a
+                <motion.a
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.98 }}
                   href="https://wa.me/917448749779?text=Hi%20Kattil%20Team%2C%20I%20am%20interested%20in%20partnering%20with%20you%20for%20my%20property."
                   target="_blank"
                   rel="noopener noreferrer"
@@ -384,19 +467,22 @@ export default function PartnersView() {
                   }}
                 >
                   Partner With Us
-                </a>
+                </motion.a>
 
-                <a
+                <motion.a
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.98 }}
                   href="tel:+917448749779"
                   className="h-[40px] px-6 rounded-[6px] border border-[#0e273c] text-[#0e273c] font-sans text-[14px] font-semibold hover:bg-[#0e273c]/5 transition-colors inline-flex items-center justify-center leading-none"
                 >
                   View Brochure
-                </a>
+                </motion.a>
               </div>
-            </div>
+            </motion.div>
           </div>
         </section>
       </div>
     </div>
   );
 }
+

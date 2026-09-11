@@ -125,8 +125,8 @@ export default function FAQsContent({ faqs }: { faqs: FaqItem[] }) {
       <Navbar />
 
       {/* ── Hero ──────────────────────────────────────────────────────────────── */}
-      <section className="bg-secondary pt-28 md:pt-36 lg:pt-44 pb-16 md:pb-20">
-        <div className="mx-auto max-w-480 px-5 md:px-8 lg:px-20">
+      <section className="relative w-full bg-[#8E9F78] overflow-hidden min-h-[300px] sm:min-h-[400px] md:min-h-[450px] lg:min-h-[500px] flex flex-col justify-end pt-28 sm:pt-32 md:pt-34 lg:pt-36 pb-8 sm:pb-9 md:pb-10 lg:pb-12">
+        <div className="mx-auto max-w-480 px-5 md:px-8 lg:px-20 w-full">
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -167,7 +167,7 @@ export default function FAQsContent({ faqs }: { faqs: FaqItem[] }) {
       </section>
 
       {/* ── Content ───────────────────────────────────────────────────────────── */}
-      <section className="bg-tertiary py-14 md:py-20 lg:py-28">
+      <section className="relative z-20 bg-tertiary py-14 md:py-20 lg:py-28 rounded-t-[20px] md:rounded-t-[24px] overflow-hidden -mt-3 md:-mt-4">
         <div className="mx-auto max-w-480 px-5 md:px-8 lg:px-20">
 
           {/* Intro line and text */}
