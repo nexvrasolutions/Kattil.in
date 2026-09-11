@@ -135,7 +135,7 @@ export default function PartnersView() {
               transition={{ duration: 0.65, ease: EASE, delay: 0.2 }}
               className="text-white tracking-tight"
             >
-              <span className="block font-sans min[390px]:text-[24px] min[360px]:text-[22px] text-20px sm:text34xl md:text-4xl lg:text-[40px] leading-[1.12]">
+              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] leading-[1.12]">
                 Your Property. Our
               </span>
               <span className="block mt-1">
@@ -358,7 +358,7 @@ export default function PartnersView() {
             >
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
                 {/* Left Column: Heading + Subtitle */}
-                <div className="lg:col-span-5 -mt-45">
+                <div className="lg:col-span-5">
                   <h2 className="text-white tracking-tight leading-tight">
                     <span className="block font-sans text-3xl sm:text-4xl md:text-[36px] font-normal text-[#d2e6bc]">
                       A simple

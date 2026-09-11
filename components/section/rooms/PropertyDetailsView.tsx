@@ -486,7 +486,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                                 href={externalBookUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="w-full h-[44px] rounded-[8px] border border-[#111827] flex items-center justify-center text-[#111827] font-[Public_Sans] font-medium text-[14px] hover:bg-[#0d1b2e] hover:text-white transition-all text-center"
+                                className="w-full min-h-[44px] py-[12px] px-[32px] rounded-[6px] border border-[#111827] flex items-center justify-center text-[#111827] font-[Public_Sans] font-medium text-[14px] hover:bg-[#0d1b2e] hover:text-white transition-all text-center"
                               >
                                 Book Now
                               </motion.a>

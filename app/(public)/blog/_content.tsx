@@ -121,7 +121,7 @@ export default function BlogContent({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Core 5 categories matching mockup
+  // Core 5 categories matching mockup & original content
   const allCategories = DEFAULT_CATEGORIES;
 
   // Combine initial posts with fallbacks if DB has limited entries
@@ -141,7 +141,7 @@ export default function BlogContent({
 
   // Filter posts based on active category
   const filteredPosts = useMemo(() => {
-    if (!currentCategory || currentCategory === "All Stories" || currentCategory === "All") {
+    if (!currentCategory || currentCategory === "All" || currentCategory === "All Stories") {
       return allPosts;
     }
     const lower = currentCategory.toLowerCase();
@@ -155,7 +155,7 @@ export default function BlogContent({
 
   // Determine featured post and grid items
   const featuredPost = useMemo(() => {
-    if (currentCategory && currentCategory !== "All Stories" && currentCategory !== "All") {
+    if (currentCategory && currentCategory !== "All" && currentCategory !== "All Stories") {
       return null;
     }
     return filteredPosts.find((p) => p.featured) || filteredPosts[0] || FALLBACK_FEATURED;
@@ -170,7 +170,7 @@ export default function BlogContent({
 
   const handleCategorySelect = (category: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    if (category && category !== "All Stories" && category !== "All") {
+    if (category && category !== "All" && category !== "All Stories") {
       params.set("category", category);
     } else {
       params.delete("category");
@@ -188,7 +188,7 @@ export default function BlogContent({
   const activeCategory = currentCategory || "All Stories";
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF8F5]">
+    <div className="min-h-screen flex flex-col bg-[#FFFCF2]">
       {/* ── Top Fixed Navbar ──────────────────────────────────────────────── */}
       <Navbar />
 
@@ -228,10 +228,10 @@ export default function BlogContent({
               transition={{ duration: 0.65, ease: EASE, delay: 0.2 }}
               className="text-white tracking-tight"
             >
-              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] leading-[1.12]">
+              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-medium leading-[1.12]">
                 Stories Beyond
               </span>
-              <span className="block font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-normal italic text-[#f4f7ef] leading-[1.15] mt-1">
+              <span className="block font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-medium italic text-[#f4f7ef] leading-[1.15] mt-1">
                 Your Stay
               </span>
             </motion.h1>
@@ -240,33 +240,39 @@ export default function BlogContent({
       </section>
 
       {/* ── 2. Main Blog Section ─────────────────────────────────────────── */}
-      <section className="relative z-20 w-full py-10 sm:py-12 md:py-16 bg-[#FAF8F5] rounded-t-[20px] md:rounded-t-[24px] overflow-hidden -mt-3 md:-mt-4">
+      <section className="relative z-20 w-full py-10 sm:py-12 md:py-16 bg-[#FFFCF2] rounded-t-[20px] md:rounded-t-[24px] overflow-hidden -mt-3 md:-mt-4">
         <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15">
             {/* Category Filter Tabs */}
-            <div className="mb-8 sm:mb-10">
-              <div className="flex items-center gap-3.5 sm:gap-6 md:gap-8 lg:gap-11 overflow-x-auto pb-2 pt-1 scrollbar-none no-scrollbar [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: EASE, delay: 0.3 }}
+              className="mb-8 sm:mb-10"
+            >
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 no-scrollbar scrollbar-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {allCategories.map((cat) => {
                   const isSelected =
                     (cat === "All Stories" && (!currentCategory || currentCategory === "All Stories" || currentCategory === "All")) ||
-                    cat.toLowerCase() === currentCategory.toLowerCase();
+                    cat.toLowerCase() === (currentCategory || "").toLowerCase();
 
                   return (
                     <button
                       key={cat}
                       type="button"
                       onClick={() => handleCategorySelect(cat)}
-                      className={`font-sans text-[13.5px] sm:text-[14.5px] md:text-[15.5px] transition-colors whitespace-nowrap cursor-pointer shrink-0 ${isSelected
-                        ? "font-bold text-[#2d3134]"
-                        : "font-medium text-[#9ca3af] hover:text-[#4b5563]"
-                        }`}
+                      className={`font-[Public_Sans] text-[13px] sm:text-[13.5px] transition-all whitespace-nowrap cursor-pointer px-3.5 sm:px-4 py-1.5 rounded-[6px] ${
+                        isSelected
+                          ? "bg-[#b4c7a5] text-[#22301c] font-semibold shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+                          : "text-[#6b7280] hover:text-[#111827] font-medium hover:bg-[#eae8e3]"
+                      }`}
                     >
                       {cat}
                     </button>
                   );
                 })}
               </div>
-            </div>
+            </motion.div>
 
             {/* ── 3. Featured Hero Card (2-Column Banner) ───────────────────── */}
             {featuredPost && (
@@ -299,8 +305,42 @@ export default function BlogContent({
                     </p>
 
                     <Link href={`/blog/${featuredPost.slug}`} className="group mb-[24px]">
-                      <h2 className="font-[Public_Sans] font-normal text-[26px] sm:text-[30px] lg:text-[34px] xl:text-[36px] leading-[1.18] tracking-[-0.5px] text-[#202020] transition-colors">
-                        {featuredPost.title.replace(/\n/g, " ") || "The Art of a Perfect Weekend Your Comfort"}
+                      <h2 className="font-[Public_Sans] font-medium text-[26px] sm:text-[30px] lg:text-[34px] xl:text-[36px] leading-[1.18] tracking-[-0.5px] text-[#202020] transition-colors">
+                        {featuredPost.title.toLowerCase().includes("weekend") &&
+                        featuredPost.title.toLowerCase().includes("your comfort") ? (
+                          <>
+                            {/* Desktop (sm+): Line 1 "The Art of a Perfect Weekend", Line 2 "Your Comfort" */}
+                            <span className="hidden sm:block">
+                              The Art of a Perfect Weekend
+                            </span>
+                            <span className="hidden sm:block">
+                              Your Comfort
+                            </span>
+
+                            {/* Mobile (<sm): Line 1 "The Art of a Perfect", Line 2 "Weekend Your Comfort" in one line */}
+                            <span className="block sm:hidden">
+                              The Art of a Perfect
+                            </span>
+                            <span className="block sm:hidden">
+                              Weekend Your Comfort
+                            </span>
+                          </>
+                        ) : featuredPost.title.toLowerCase().includes("your comfort") ? (
+                          <>
+                            <span className="block">
+                              {featuredPost.title.split(/your comfort/i)[0].replace(/[:—\-\s]+$/, "")}
+                            </span>
+                            <span className="block">Your Comfort</span>
+                          </>
+                        ) : featuredPost.title.includes("\n") ? (
+                          featuredPost.title.split("\n").map((line, i) => (
+                            <span key={i} className="block">
+                              {line}
+                            </span>
+                          ))
+                        ) : (
+                          featuredPost.title
+                        )}
                       </h2>
                     </Link>
 
@@ -336,7 +376,7 @@ export default function BlogContent({
 
             {/* ── 4. "Our Blogs" Section & 3-Column Grid ─────────────────────── */}
             <div>
-              <h2 className="font-[Public_Sans] font-normal text-[32px] leading-[20px] tracking-[-0.5px] text-[#202020] mb-8 sm:mb-10">
+              <h2 className="font-[Public_Sans] font-medium text-[32px] leading-[20px] tracking-[-0.5px] text-[#202020] mb-8 sm:mb-10">
                 Our Blogs
               </h2>
 
@@ -372,7 +412,7 @@ export default function BlogContent({
                             {post.category || "Stay"}
                           </p>
 
-                          <h3 className="font-sans text-[24px] sm:text-[25px] text-[#1a1a1a] leading-snug tracking-tight group-hover:text-[#526442] transition-colors line-clamp-2 mb-4">
+                          <h3 className="font-[Public_Sans] font-medium text-[20px] sm:text-[22px] lg:text-[24px] text-[#1a1a1a] leading-snug tracking-tight group-hover:text-[#526442] transition-colors line-clamp-2 mb-4">
                             {post.title}
                           </h3>
 

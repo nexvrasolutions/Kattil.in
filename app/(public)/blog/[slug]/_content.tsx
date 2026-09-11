@@ -52,7 +52,7 @@ function RelatedCard({ post, index }: { post: RelatedPost; index: number }) {
           <p className="font-sans text-[11.5px] font-bold uppercase tracking-[0.14em] text-gray-500 mb-1.5">
             {post.category || "Story"}
           </p>
-          <h3 className="font-sans text-[17px] font-semibold text-[#0d1b2e] leading-snug tracking-tight group-hover:text-[#526442] transition-colors line-clamp-2 mb-4">
+          <h3 className="font-sans text-[17px] font-medium text-[#0d1b2e] leading-snug tracking-tight group-hover:text-[#526442] transition-colors line-clamp-2 mb-4">
             {post.title}
           </h3>
           <div className="mt-auto pt-3 border-t border-gray-100/90 flex items-center justify-between">
@@ -151,7 +151,7 @@ export default function BlogDetailContent({
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF8F5]">
+    <div className="min-h-screen flex flex-col bg-[#FFFCF2]">
       {/* ── Top Fixed Navbar ──────────────────────────────────────────────── */}
       <Navbar />
 
@@ -206,18 +206,18 @@ export default function BlogDetailContent({
               transition={{ duration: 0.65, ease: EASE, delay: 0.2 }}
               className="text-white tracking-tight"
             >
-              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] leading-[1.12]">
+              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-medium leading-[1.12]">
                 {line1}
               </span>
               {(line2Sans || line2Italic || line2) && (
                 <span className="block mt-1">
                   {line2Sans && (
-                    <span className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] text-white leading-[1.12]">
+                    <span className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-medium text-white leading-[1.12]">
                       {line2Sans}{" "}
                     </span>
                   )}
                   {(line2Italic || line2) && (
-                    <span className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-normal italic text-[#f4f7ef] leading-[1.15]">
+                    <span className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-medium italic text-[#f4f7ef] leading-[1.15]">
                       {line2Italic || line2}
                     </span>
                   )}
@@ -229,7 +229,7 @@ export default function BlogDetailContent({
       </section>
 
       {/* ── 2. Article Content Section ────────────────────────────────────── */}
-      <section className="relative z-20 w-full py-12 md:py-16 bg-[#FAF8F5] rounded-t-[20px] md:rounded-t-[24px] overflow-hidden -mt-3 md:-mt-4">
+      <section className="relative z-20 w-full py-12 md:py-16 bg-[#FFFCF2] rounded-t-[20px] md:rounded-t-[24px] overflow-hidden -mt-3 md:-mt-4">
         <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15">
             {/* Main Featured Image Banner */}
@@ -351,7 +351,7 @@ export default function BlogDetailContent({
             {/* ── 3. Related Articles Section ───────────────────────────────── */}
             {related && related.length > 0 && (
               <div className="mt-20 pt-16 border-t border-gray-200">
-                <h2 className="text-2xl sm:text-3xl font-sans font-bold text-[#0d1b2e] mb-8">
+                <h2 className="text-2xl sm:text-3xl font-sans font-medium text-[#0d1b2e] mb-8">
                   Related Stories
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 md:gap-8">

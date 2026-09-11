@@ -520,7 +520,7 @@ export default function RoomStickyBookingWidget({
                 openCalendar();
                 dateInputRef.current?.blur();
               }}
-              className={`w-full h-11 px-3.5 rounded-[8px] border ${dateError
+              className={`w-full h-[44px] px-3.5 sm:px-[32px] rounded-[6px] border ${dateError
                 ? "border-red-400 bg-red-50/50 ring-1 ring-red-400/20"
                 : "border-gray-200 bg-gray-50/70 hover:bg-gray-100/70"
                 } text-[13.5px] font-medium text-gray-800 flex items-center justify-between cursor-pointer transition-colors select-none`}
@@ -555,7 +555,7 @@ export default function RoomStickyBookingWidget({
             <button
               type="button"
               onClick={handleCheckAvailability}
-              className="w-full py-3.5 rounded-[8px] bg-[#0d1b2e] hover:bg-[#162840] text-white font-semibold text-[14px] shadow-sm transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center font-sans"
+              className="w-full h-[44px] px-3.5 sm:px-[32px] rounded-[6px] bg-[#0d1b2e] hover:bg-[#162840] text-white font-semibold text-[14px] shadow-sm transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center font-sans"
             >
               Check Availability
             </button>
@@ -578,21 +578,21 @@ export default function RoomStickyBookingWidget({
               openCalendar();
               dateInputRef.current?.blur();
             }}
-            className={`w-full bg-white border ${dateError
+            className={`w-full h-[44px] px-3 sm:px-[32px] bg-white border ${dateError
               ? "border-red-400 ring-1 ring-red-400/30"
               : "border-[#d8e0ea] hover:border-gray-400"
-              } rounded-[8px] px-3 py-1.5 sm:py-2 flex items-center justify-between cursor-pointer transition-colors shadow-2xs select-none`}
+              } rounded-[6px] flex items-center justify-between cursor-pointer transition-colors shadow-2xs select-none`}
           >
-            <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
               <Calendar
-                className={`w-5 h-5 ${dateError ? "text-red-500" : "text-[#0d1b2e]"
+                className={`w-4 h-4 sm:w-4.5 sm:h-4.5 ${dateError ? "text-red-500" : "text-[#0d1b2e]"
                   } shrink-0 stroke-[1.6]`}
               />
-              <div className="flex flex-col text-left">
-                <span className="text-[10.5px] sm:text-[11px] font-semibold text-[#64748b] leading-tight font-sans">
+              <div className="flex flex-col text-left justify-center min-w-0 leading-tight">
+                <span className="text-[10px] font-semibold text-[#64748b] font-sans truncate">
                   Check In - Check Out
                 </span>
-                <span className="text-[13px] sm:text-[14px] font-bold text-[#0d1b2e] leading-tight mt-0.5 font-sans">
+                <span className="text-[12px] sm:text-[13px] font-bold text-[#0d1b2e] font-sans truncate">
                   {dateDisplay || "Select dates"}
                 </span>
               </div>
@@ -611,7 +611,7 @@ export default function RoomStickyBookingWidget({
           <button
             type="button"
             onClick={handleCheckAvailability}
-            className="w-full mt-2 py-2.5 rounded-[8px] bg-[#0d1b2e] hover:bg-[#162840] text-white font-semibold text-[13.5px] sm:text-[14px] shadow-sm transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center font-sans tracking-wide"
+            className="w-full h-[44px] mt-2 px-3 sm:px-[32px] rounded-[6px] bg-[#0d1b2e] hover:bg-[#162840] text-white font-semibold text-[13.5px] sm:text-[14px] shadow-sm transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center font-sans tracking-wide"
           >
             Check Availability
           </button>

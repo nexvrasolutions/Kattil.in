@@ -7,23 +7,36 @@ import { Home } from "lucide-react";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
+// ─── Deterministic pseudo-random sequence for SSR consistency ─────────────────
+function pseudoRandom(seed: number) {
+  const x = Math.sin(seed * 9999) * 10000;
+  return x - Math.floor(x);
+}
+
+const STATIC_STARS = Array.from({ length: 65 }, (_, i) => ({
+  id: i,
+  left: (pseudoRandom(i + 1) * 100).toFixed(2),
+  top: (pseudoRandom(i + 100) * 100).toFixed(2),
+  size: Number((0.7 + pseudoRandom(i + 200) * 2).toFixed(2)),
+  delay: Number((pseudoRandom(i + 300) * 5).toFixed(2)),
+  duration: Number((2.5 + pseudoRandom(i + 400) * 3).toFixed(2)),
+  peak: Number((0.25 + pseudoRandom(i + 500) * 0.65).toFixed(2)),
+}));
+
+const STATIC_PARTICLES = Array.from({ length: 14 }, (_, i) => ({
+  id: i,
+  left: Number((15 + pseudoRandom(i + 600) * 70).toFixed(2)),
+  delay: Number((pseudoRandom(i + 700) * 7).toFixed(2)),
+  size: Number((1.5 + pseudoRandom(i + 800) * 2.5).toFixed(2)),
+  duration: Number((6 + pseudoRandom(i + 900) * 5).toFixed(2)),
+  driftX: Number(((pseudoRandom(i + 1000) - 0.5) * 50).toFixed(2)),
+}));
+
 // ─── Star field ───────────────────────────────────────────────────────────────
 function StarField() {
-  const [stars] = useState(() =>
-    Array.from({ length: 65 }, (_, i) => ({
-      id: i,
-      left: Math.random() * 100,
-      top: Math.random() * 100,
-      size: 0.7 + Math.random() * 2,
-      delay: Math.random() * 5,
-      duration: 2.5 + Math.random() * 3,
-      peak: 0.25 + Math.random() * 0.65,
-    }))
-  );
-
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {stars.map((s) => (
+      {STATIC_STARS.map((s) => (
         <motion.div
           key={s.id}
           className="absolute rounded-full bg-white"
@@ -38,20 +51,9 @@ function StarField() {
 
 // ─── Floating dust particles ──────────────────────────────────────────────────
 function Particles() {
-  const [particles] = useState(() =>
-    Array.from({ length: 14 }, (_, i) => ({
-      id: i,
-      left: 15 + Math.random() * 70,
-      delay: Math.random() * 7,
-      size: 1.5 + Math.random() * 2.5,
-      duration: 6 + Math.random() * 5,
-      driftX: (Math.random() - 0.5) * 50,
-    }))
-  );
-
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {particles.map((p) => (
+      {STATIC_PARTICLES.map((p) => (
         <motion.div
           key={p.id}
           className="absolute rounded-full bg-secondary/30"
