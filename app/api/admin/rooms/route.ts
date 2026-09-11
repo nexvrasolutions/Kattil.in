@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db/mongodb";
 import Room from "@/lib/models/Room";
+import Property from "@/lib/models/Property";
 import { apiSuccess, apiError, handleApiError, slugify, getPaginationParams } from "@/lib/utils/api";
 import { roomSchema } from "@/lib/validations";
 import { clearDestinationsCache } from "@/lib/db/destinations";
@@ -12,18 +13,20 @@ export async function GET(request: NextRequest) {
     const { searchParams } = request.nextUrl;
     const { page, limit, skip } = getPaginationParams(searchParams);
 
-    const search   = searchParams.get("search")   ?? "";
-    const city     = searchParams.get("city")     ?? "";
+    const search = searchParams.get("search") ?? "";
+    const propertyId = searchParams.get("property") ?? searchParams.get("propertyId") ?? "";
+    const city = searchParams.get("city") ?? "";
     const category = searchParams.get("category") ?? "";
-    const status   = searchParams.get("status")   ?? "";
+    const status = searchParams.get("status") ?? "";
     const featured = searchParams.get("featured") ?? "";
 
     const filter: Record<string, unknown> = {};
-    if (search)            filter.name     = { $regex: search, $options: "i" };
-    if (city)              filter.city     = city;
-    if (category)          filter.category = category;
-    if (status)            filter.status   = status;
-    if (featured === "true")  filter.featured = true;
+    if (search) filter.name = { $regex: search, $options: "i" };
+    if (propertyId) filter.property = propertyId;
+    if (city) filter.city = city;
+    if (category) filter.category = category;
+    if (status) filter.status = status;
+    if (featured === "true") filter.featured = true;
     if (featured === "false") filter.featured = false;
 
     const [rooms, total] = await Promise.all([
@@ -31,6 +34,7 @@ export async function GET(request: NextRequest) {
         .sort({ order: 1, createdAt: -1 })
         .skip(skip)
         .limit(limit)
+        .populate("property", "name slug badge")
         .populate("city", "name slug"),
       Room.countDocuments(filter),
     ]);
@@ -53,24 +57,45 @@ export async function POST(request: NextRequest) {
       return apiError(msg, 400);
     }
 
-    // ── Map Zod's "cityId" → Mongoose's "city" ────────────────────────────────
-    const { cityId, ...rest } = parsed.data;
+    const { propertyId, cityId, price, ...rest } = parsed.data;
 
-    // Strip undefined values — let Mongoose model defaults handle missing fields
-    const createData = Object.fromEntries(
-      Object.entries({ ...rest, city: cityId }).filter(([, v]) => v !== undefined)
+    let resolvedCityId = cityId;
+    if (propertyId && !resolvedCityId) {
+      const prop = await Property.findById(propertyId).select("city").lean();
+      if (prop?.city) resolvedCityId = String(prop.city);
+    }
+
+    const createData: Record<string, unknown> = {
+      ...rest,
+      property: propertyId || undefined,
+      city: resolvedCityId || undefined,
+    };
+
+    // If pricing array not provided but price is, map it
+    if (price !== undefined && !createData.pricing) {
+      createData.pricing = [{ label: "Base Price", value: `₹${Number(price).toLocaleString("en-IN")}` }];
+    }
+
+    const cleanData = Object.fromEntries(
+      Object.entries(createData).filter(([, v]) => v !== undefined)
     );
 
     let slug = slugify(rest.name);
-    const existing = await Room.findOne({ slug, city: cityId });
+    const conflictQuery: Record<string, unknown> = { slug };
+    if (propertyId) conflictQuery.property = propertyId;
+    else if (resolvedCityId) conflictQuery.city = resolvedCityId;
+
+    const existing = await Room.findOne(conflictQuery);
     if (existing) {
       slug = `${slug}-${Date.now().toString().slice(-4)}`;
     }
 
-    const room = await Room.create({ ...createData, slug });
-    const populated = await room.populate("city", "name slug");
+    const room = await Room.create({ ...cleanData, slug });
+    const populated = await room.populate([
+      { path: "property", select: "name slug badge" },
+      { path: "city", select: "name slug" },
+    ]);
 
-    // Invalidate destination caches and revalidate public routes
     clearDestinationsCache();
     try {
       revalidatePath("/chennai");

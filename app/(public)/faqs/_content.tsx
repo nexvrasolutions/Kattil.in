@@ -5,6 +5,7 @@ import { usePageView } from "@/hooks/usePageView";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import { Plus, Minus } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
+import Link from "next/link";
 import type { FaqItem } from "./page";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -66,7 +67,7 @@ function AccordionItem({
         aria-expanded={isOpen}
       >
         <span
-          className={`font-serif text-lg md:text-xl leading-snug tracking-tight transition-colors duration-300
+          className={`font-sans text-lg md:text-xl font-semibold tracking-tight transition-colors duration-300
             ${isOpen ? "text-primary" : "text-primary/75 group-hover:text-primary"}`}
         >
           {faq.question}
@@ -92,7 +93,7 @@ function AccordionItem({
             transition={{ height: { duration: 0.4, ease: EASE }, opacity: { duration: 0.3 } }}
             className="overflow-hidden"
           >
-            <p className="font-sans text-base text-primary/60 leading-relaxed pb-7 max-w-3xl">
+            <p className="font-sans text-[15px] text-primary/65 leading-relaxed pb-7 max-w-3xl">
               {faq.answer}
             </p>
           </motion.div>
@@ -123,71 +124,97 @@ export default function FAQsContent({ faqs }: { faqs: FaqItem[] }) {
     <>
       <Navbar />
 
-      {/* ── Hero ── */}
+      {/* ── Hero ──────────────────────────────────────────────────────────────── */}
       <section className="bg-secondary pt-28 md:pt-36 lg:pt-44 pb-16 md:pb-20">
         <div className="mx-auto max-w-480 px-5 md:px-8 lg:px-20">
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
-            className="font-sans text-[12px] font-semibold uppercase tracking-[0.28em] text-white/70 mb-5"
+            className="font-sans text-[14px] uppercase text-white/70 mb-5"
           >
-            Support
+            Legal
           </motion.p>
 
-          <h1 className="font-serif text-4xl md:text-5xl lg:text-[3.6rem] font-normal
-            text-white leading-[1.1] tracking-tight mb-10 max-w-3xl">
-            <AnimatedWords text="Questions, Answered." delay={0.2} />
+          <h1 className="text-white text-[28px] sm:text-[32px] md:text-[36px] lg:text-[40px] leading-[1.1] tracking-tight mb-10 max-w-3xl">
+            <span className="font-sans">
+              <AnimatedWords text="Frequently Asked" delay={0.2} />
+            </span>{" "}
+            <span className="font-serif italic font-normal">
+              <AnimatedWords text="Questions." delay={0.35} />
+            </span>
           </h1>
 
           <motion.p
             initial={{ opacity: 0, filter: "blur(4px)" }}
             animate={{ opacity: 1, filter: "blur(0px)" }}
-            transition={{ duration: 0.6, delay: 0.65, ease: "easeOut" }}
+            transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
             className="font-sans text-base text-white/70 leading-relaxed max-w-xl"
           >
             Everything you need to know before, during, and after your stay.
             Can&#39;t find what you&#39;re looking for? Our team is always happy to help.
           </motion.p>
+
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 1.0 }}
+            className="font-sans text-[12px] text-white/45 uppercase tracking-widest mt-8"
+          >
+            Last updated: May 2026
+          </motion.p>
         </div>
       </section>
 
-      {/* ── Content ── */}
+      {/* ── Content ───────────────────────────────────────────────────────────── */}
       <section className="bg-tertiary py-14 md:py-20 lg:py-28">
         <div className="mx-auto max-w-480 px-5 md:px-8 lg:px-20">
 
-          {/* Category filter tabs */}
+          {/* Intro line and text */}
           <div ref={tabsRef}>
             <motion.div
+              initial={{ scaleX: 0, opacity: 0 }}
+              animate={tabsInView ? { scaleX: 1, opacity: 1 } : {}}
+              transition={{ duration: 0.8, ease: EASE }}
+              style={{ originX: 0 }}
+              className="h-px bg-primary/15 mb-10"
+            />
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={tabsInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.55, ease: EASE }}
-              className="flex flex-wrap gap-2.5 mb-12"
+              transition={{ duration: 0.6, delay: 0.2, ease: EASE }}
+              className="font-sans text-base text-primary/60 leading-relaxed max-w-3xl mb-12"
             >
-              {ALL_CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => handleCategoryChange(cat)}
-                  className="relative overflow-hidden px-5 py-2.5 rounded-full border
-                    font-sans text-[12px] font-semibold uppercase tracking-[0.18em]
-                    transition-all duration-300 cursor-pointer"
-                  style={{
-                    borderColor: activeCategory === cat ? "transparent" : "rgba(8,26,43,0.18)",
-                    color: activeCategory === cat ? "#fff" : "rgba(8,26,43,0.55)",
-                    backgroundColor: activeCategory === cat ? "#9CAF88" : "transparent",
-                  }}
-                >
-                  {cat}
-                  {activeCategory === cat && (
-                    <motion.span
-                      layoutId="activePill"
-                      className="absolute inset-0 bg-secondary rounded-full -z-10"
-                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                    />
-                  )}
-                </button>
-              ))}
-            </motion.div>
+              Browse our frequently asked questions by category below to find quick answers
+              about your reservations, hotel amenities, dining, and stay policies.
+            </motion.p>
+          </div>
+
+          {/* Category filter tabs */}
+          <div className="flex flex-wrap gap-2.5 mb-12">
+            {ALL_CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => handleCategoryChange(cat)}
+                className="relative overflow-hidden px-5 py-2.5 rounded-full border
+                  font-sans text-[12px] font-semibold uppercase tracking-[0.18em]
+                  transition-all duration-300 cursor-pointer"
+                style={{
+                  borderColor: activeCategory === cat ? "transparent" : "rgba(8,26,43,0.18)",
+                  color: activeCategory === cat ? "#fff" : "rgba(8,26,43,0.55)",
+                  backgroundColor: activeCategory === cat ? "#9CAF88" : "transparent",
+                }}
+              >
+                {cat}
+                {activeCategory === cat && (
+                  <motion.span
+                    layoutId="activePill"
+                    className="absolute inset-0 bg-secondary rounded-full -z-10"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+              </button>
+            ))}
           </div>
 
           {/* FAQ accordion */}
@@ -228,29 +255,20 @@ export default function FAQsContent({ faqs }: { faqs: FaqItem[] }) {
               justify-between gap-6 p-7 md:p-9 rounded-2xl bg-secondary/10 border border-secondary/20"
           >
             <div>
-              <h3 className="font-serif text-xl md:text-2xl font-medium text-primary mb-10">
+              <h3 className="font-sans text-lg md:text-xl font-semibold text-primary tracking-tight mb-2">
                 Still have questions?
               </h3>
               <p className="font-sans text-[15px] text-primary/60 leading-relaxed">
-                Our concierge team is available 24/7 to assist you.
+                Our team is available 24/7 to assist with any questions regarding your stay.
               </p>
             </div>
-            <motion.a
-              href="mailto:concierge@kattil.com"
-              whileHover="hover"
-              initial="rest"
-              animate="rest"
-              className="relative overflow-hidden shrink-0 px-8 py-4 rounded-xl bg-primary cursor-pointer
-                font-sans text-[11px] font-bold uppercase tracking-[0.22em] text-white"
+            <Link
+              href="/contact-us"
+              className="relative overflow-hidden shrink-0 px-8 py-3.5 rounded-xl bg-primary hover:bg-primary/90 transition-colors cursor-pointer
+                font-sans text-[12px] font-semibold uppercase tracking-[0.18em] text-white"
             >
-              <motion.span
-                variants={{ rest: { scaleX: 0 }, hover: { scaleX: 1 } }}
-                style={{ transformOrigin: "left" }}
-                transition={{ duration: 0.4, ease: EASE }}
-                className="absolute inset-0 bg-secondary"
-              />
-              <span className="relative z-10">Contact Us</span>
-            </motion.a>
+              Contact Us
+            </Link>
           </motion.div>
         </div>
       </section>

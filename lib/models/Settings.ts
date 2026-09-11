@@ -11,6 +11,14 @@ export interface ISettings extends Document {
   address?: string;
   socialLinks: Array<{ platform: string; url: string }>;
   features: Record<string, boolean>;
+  bookingEngine?: {
+    provider?: string;
+    baseUrl?: string;
+    apiKey?: string;
+    apiSecret?: string;
+    defaultHotelCode?: string;
+    globalBookingUrl?: string;
+  };
   updatedAt: Date;
 }
 
@@ -38,6 +46,14 @@ const settingsSchema = new Schema<ISettings>(
     address: { type: String },
     socialLinks: { type: [socialLinkSubdoc], default: [] },
     features: { type: Schema.Types.Mixed, default: {} },
+    bookingEngine: {
+      provider: { type: String, default: "eZee / IPMS247" },
+      baseUrl: { type: String, default: "https://live.ipms247.com/booking/book-rooms-" },
+      apiKey: { type: String, default: "" },
+      apiSecret: { type: String, default: "" },
+      defaultHotelCode: { type: String, default: "kattil" },
+      globalBookingUrl: { type: String, default: "https://live.ipms247.com/booking/book-rooms-kattil" },
+    },
   },
   { timestamps: true }
 );

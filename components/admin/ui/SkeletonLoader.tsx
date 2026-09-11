@@ -58,10 +58,12 @@ export function SkeletonCard({ className = "" }: SkeletonCardProps) {
 interface SkeletonTableProps {
   rows?: number;
   cols?: number;
+  columns?: number;
   className?: string;
 }
 
-export function SkeletonTable({ rows = 5, cols = 4, className = "" }: SkeletonTableProps) {
+export function SkeletonTable({ rows = 5, cols, columns, className = "" }: SkeletonTableProps) {
+  const colCount = cols ?? columns ?? 4;
   return (
     <div
       className={[
@@ -71,7 +73,7 @@ export function SkeletonTable({ rows = 5, cols = 4, className = "" }: SkeletonTa
     >
       {/* Header */}
       <div className="border-b border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-muted)/0.5)] px-4 py-3 flex gap-6">
-        {Array.from({ length: cols }).map((_, i) => (
+        {Array.from({ length: colCount }).map((_, i) => (
           <Skeleton key={i} height={10} width={`${60 + i * 5}px`} />
         ))}
       </div>
@@ -82,7 +84,7 @@ export function SkeletonTable({ rows = 5, cols = 4, className = "" }: SkeletonTa
           key={rowIdx}
           className="border-b border-[hsl(var(--adm-border)/0.5)] px-4 py-3 flex items-center gap-6"
         >
-          {Array.from({ length: cols }).map((_, colIdx) => (
+          {Array.from({ length: colCount }).map((_, colIdx) => (
             <Skeleton
               key={colIdx}
               height={12}

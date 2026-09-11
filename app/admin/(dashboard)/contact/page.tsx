@@ -47,7 +47,7 @@ export default function ContactPage() {
           }) => ({
             _id: c._id,
             id: c.slug,
-            label: c.label ?? c.name,
+            label: (c.label && c.label.trim()) || c.name,
             address: c.address ?? "",
             phone: c.phone ?? "",
             email: c.email ?? "",

@@ -131,13 +131,13 @@ export default function PrivacyPolicyPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
-            className="font-sans text-[12px] font-semibold uppercase tracking-[0.28em] text-white/70 mb-5"
+            className="font-sans text-[14px] font-semibold uppercase  text-white/70 mb-5"
           >
             Legal
           </motion.p>
 
-          <h1 className="text-white text-[34px] sm:text-[42px] md:text-[48px] lg:text-[52px] leading-[1.1] tracking-tight mb-10 max-w-3xl">
-            <span className="font-sans font-semibold">
+          <h1 className="text-white text-[28px] sm:text-[32px] md:text-[36px] lg:text-[40px] leading-[1.1] tracking-tight mb-10 max-w-3xl">
+            <span className="font-sans ">
               <AnimatedWords text="Your Privacy," delay={0.2} />
             </span>{" "}
             <span className="font-serif italic font-normal">

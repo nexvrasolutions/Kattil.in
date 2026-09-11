@@ -27,11 +27,18 @@ export interface FaqItem {
 async function getFaqs(): Promise<FaqItem[]> {
   try {
     await connectDB();
-    const faqs = await FaqModel.find({ status: "active" })
+    const rawFaqs = await FaqModel.find({ status: "active" })
       .sort({ displayOrder: 1, createdAt: 1 })
       .select("question answer category displayOrder")
-      .lean<FaqItem[]>();
-    return faqs;
+      .lean();
+
+    return (rawFaqs || []).map((f: any) => ({
+      _id: String(f._id),
+      question: String(f.question ?? ""),
+      answer: String(f.answer ?? ""),
+      category: f.category,
+      displayOrder: Number(f.displayOrder ?? 0),
+    }));
   } catch {
     return [];
   }

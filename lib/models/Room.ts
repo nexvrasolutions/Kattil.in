@@ -3,10 +3,12 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 export interface IRoom extends Document {
   name: string;
   slug: string;
-  city: mongoose.Types.ObjectId;
+  property?: mongoose.Types.ObjectId;
+  city?: mongoose.Types.ObjectId;
   category: string;
   images: string[];
-  link?: string;
+  link?: string; // Direct Let's Book / Booking Engine URL for this room
+  roomCode?: string; // Room Type ID / Code (e.g. roomtypeunkid for eZee)
   description?: string;
   features: string[];
   amenities: string[];
@@ -58,14 +60,16 @@ const roomSchema = new Schema<IRoom>(
   {
     name: { type: String, required: true, trim: true },
     slug: { type: String, required: true },
-    city: { type: Schema.Types.ObjectId, ref: "City", required: true },
+    property: { type: Schema.Types.ObjectId, ref: "Property" },
+    city: { type: Schema.Types.ObjectId, ref: "City" },
     category: {
       type: String,
-      enum: ["deluxe", "suite", "standard", "premium"],
+      enum: ["deluxe", "suite", "standard", "premium", "dormitory"],
       default: "deluxe",
     },
     images: { type: [String], default: [] },
     link: { type: String },
+    roomCode: { type: String, trim: true },
     description: { type: String, default: "" },
     features: { type: [String], default: [] },
     amenities: { type: [String], default: [] },
@@ -86,22 +90,20 @@ const roomSchema = new Schema<IRoom>(
   { timestamps: true }
 );
 
-roomSchema.index({ slug: 1, city: 1 }, { unique: true }); // unique per property, not globally
+roomSchema.index({ slug: 1, property: 1 });
+roomSchema.index({ property: 1 });
 roomSchema.index({ city: 1 });
 roomSchema.index({ status: 1 });
 roomSchema.index({ featured: 1 });
-roomSchema.index({ category: 1 });
 
 let Room: Model<IRoom>;
 
 if (process.env.NODE_ENV !== "production") {
-  // Development: always re-compile so schema changes take effect without restarting the server
   if (mongoose.models["Room"]) {
     delete mongoose.models["Room"];
   }
   Room = mongoose.model<IRoom>("Room", roomSchema);
 } else {
-  // Production: use the cached model; falls back to compiling if this is the first load
   Room = (mongoose.models.Room as Model<IRoom>) ?? mongoose.model<IRoom>("Room", roomSchema);
 }
 

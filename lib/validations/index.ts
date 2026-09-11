@@ -41,24 +41,67 @@ export const citySchema = z.object({
 export const updateCitySchema = citySchema.partial();
 
 // ---------------------------------------------------------------------------
+// Property
+// ---------------------------------------------------------------------------
+
+const directionsSubSchema = z.object({
+  railway: z.string().optional(),
+  busStand: z.string().optional(),
+  landmark: z.string().optional(),
+  byCar: z.string().optional(),
+  important: z.string().optional(),
+  helpText: z.string().optional(),
+});
+
+export const propertySchema = z.object({
+  name: z.string().min(1, "Property name is required"),
+  slug: z.string().optional(),
+  cityId: z.string().min(1, "Destination city is required"),
+  badge: z.string().optional(),
+  category: z
+    .enum(["hotel", "homestay", "resort", "hostel", "deluxe", "suite", "standard"])
+    .default("homestay"),
+  tagline: z.string().optional(),
+  description: z.string().optional(),
+  images: z.array(z.string()).default([]),
+  address: z.string().optional(),
+  phone: z.string().optional(),
+  email: z.string().optional(),
+  whatsapp: z.string().optional(),
+  mapSrc: z.string().optional(),
+  amenities: z.array(z.string()).default([]),
+  directions: directionsSubSchema.optional(),
+  hotelCode: z.string().optional(),
+  bookingEngineUrl: z.string().optional(),
+  featured: z.boolean().default(false),
+  status: z.enum(["active", "inactive", "maintenance"]).default("active"),
+  order: z.number().default(0),
+});
+
+export const updatePropertySchema = propertySchema.partial();
+
+// ---------------------------------------------------------------------------
 // Room
 // ---------------------------------------------------------------------------
 
 export const roomSchema = z.object({
   name: z.string().min(1, "Name is required"),
   slug: z.string().optional(),
-  cityId: z.string().min(1, "City is required"),
+  propertyId: z.string().optional(),
+  cityId: z.string().optional(),
   category: z
-    .enum(["deluxe", "suite", "standard", "premium"])
+    .enum(["deluxe", "suite", "standard", "premium", "dormitory"])
     .default("deluxe"),
   images: z.array(z.string()).default([]),
   link: z.string().optional(),
+  roomCode: z.string().optional(),
   description: z.string().optional(),
   features: z.array(z.string()).default([]),
   amenities: z.array(z.string()).default([]),
   pricing: z
     .array(z.object({ label: z.string(), value: z.string() }))
     .optional(),
+  price: z.union([z.string(), z.number()]).optional(),
   occupancy: z.string().optional(),
   cta: ctaSubSchema.optional(),
   seo: seoSubSchema.optional(),

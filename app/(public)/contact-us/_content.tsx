@@ -10,11 +10,12 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 export default function ContactContent({ locations }: { locations: LocationItem[] }) {
   usePageView();
-  const [activeId, setActiveId] = useState(locations[0]?.id ?? "");
+  const validLocations = (locations ?? []).filter((l) => Boolean(l.label && l.label.trim()));
+  const [activeId, setActiveId] = useState(validLocations[0]?.id ?? "");
   const [mapLoading, setMapLoading] = useState(false);
   const [mapKey, setMapKey] = useState(0);
 
-  const active = locations.find((l) => l.id === activeId) ?? locations[0];
+  const active = validLocations.find((l) => l.id === activeId) ?? validLocations[0];
 
   const handleTabChange = (id: string) => {
     if (id === activeId) return;
@@ -51,14 +52,14 @@ export default function ContactContent({ locations }: { locations: LocationItem[
             Contact Us
           </motion.p>
 
-          {locations.length > 1 && (
+          {validLocations.length > 1 && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.22, ease: "easeOut" }}
               className="flex items-center gap-2.5"
             >
-              {locations.map((loc) => (
+              {validLocations.map((loc) => (
                 <button
                   key={loc.id}
                   onClick={() => handleTabChange(loc.id)}

@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useState, useCallback, Suspense } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import {
-  Plus, Search, Pencil, Trash2, BedDouble, Star, StarOff,
-  X, Check, LayoutGrid, List, Building2,
+  Plus, Search, Pencil, Trash2, Building2, Star, StarOff,
+  X, Check, LayoutGrid, List, BedDouble, MapPin, ExternalLink,
 } from "lucide-react";
 import AdminPagination from "@/components/admin/ui/AdminPagination";
 import { AdminCard } from "@/components/admin/ui/AdminCard";
@@ -24,29 +23,20 @@ interface City {
   slug: string;
 }
 
-interface PropertySummary {
+interface PropertyItem {
   _id: string;
   name: string;
   slug: string;
-  badge?: string;
-}
-
-interface Room {
-  _id: string;
-  name: string;
-  slug: string;
-  property: PropertySummary | null;
   city: City | null;
-  category: string;
+  badge?: string;
+  category?: string;
   images: string[];
-  description: string;
-  features: string[];
-  amenities: string[];
+  address?: string;
+  phone?: string;
+  email?: string;
   status: "active" | "inactive" | "maintenance";
   featured: boolean;
-  badge?: string;
-  pricing?: { label: string; value: string }[];
-  cta?: { text: string; url: string };
+  roomCount?: number;
 }
 
 const statusLabel: Record<string, string> = {
@@ -55,14 +45,14 @@ const statusLabel: Record<string, string> = {
   maintenance: "Maintenance",
 };
 
-function StatusChanger({ room, onChanged }: { room: Room; onChanged: () => void }) {
+function StatusChanger({ property, onChanged }: { property: PropertyItem; onChanged: () => void }) {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const change = async (status: Room["status"]) => {
+  const change = async (status: PropertyItem["status"]) => {
     setSaving(true);
     setOpen(false);
-    await fetch(`/api/admin/rooms/${room._id}`, {
+    await fetch(`/api/admin/properties/${property._id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
@@ -79,21 +69,21 @@ function StatusChanger({ room, onChanged }: { room: Room; onChanged: () => void 
         className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold transition-colors hover:opacity-80"
         style={{
           background:
-            room.status === "active"
+            property.status === "active"
               ? "hsl(142 76% 36% / 0.12)"
-              : room.status === "maintenance"
+              : property.status === "maintenance"
               ? "hsl(38 92% 50% / 0.12)"
               : "hsl(var(--adm-muted))",
           color:
-            room.status === "active"
+            property.status === "active"
               ? "hsl(142 76% 30%)"
-              : room.status === "maintenance"
+              : property.status === "maintenance"
               ? "hsl(38 80% 35%)"
               : "hsl(var(--adm-muted-foreground))",
         }}
       >
         <span className="h-1.5 w-1.5 rounded-full" style={{ background: "currentColor" }} />
-        {statusLabel[room.status] || "Active"}
+        {statusLabel[property.status] || "Active"}
         <span className="opacity-50">▾</span>
       </button>
       {open && (
@@ -105,11 +95,11 @@ function StatusChanger({ room, onChanged }: { room: Room; onChanged: () => void 
                 key={s}
                 onClick={() => change(s)}
                 className={`flex w-full items-center gap-2 px-3 py-2 text-xs font-medium transition-colors hover:bg-[hsl(var(--adm-accent)/0.5)] ${
-                  room.status === s ? "text-[hsl(var(--adm-primary))]" : "text-[hsl(var(--adm-foreground))]"
+                  property.status === s ? "text-[hsl(var(--adm-primary))]" : "text-[hsl(var(--adm-foreground))]"
                 }`}
               >
-                {room.status === s && <Check className="h-3 w-3" />}
-                {room.status !== s && <span className="h-3 w-3" />}
+                {property.status === s && <Check className="h-3 w-3" />}
+                {property.status !== s && <span className="h-3 w-3" />}
                 {statusLabel[s]}
               </button>
             ))}
@@ -120,12 +110,8 @@ function StatusChanger({ room, onChanged }: { room: Room; onChanged: () => void 
   );
 }
 
-function RoomsContent() {
-  const searchParams = useSearchParams();
-  const initialProperty = searchParams.get("property") || "";
-
-  const [rooms, setRooms] = useState<Room[]>([]);
-  const [properties, setProperties] = useState<PropertySummary[]>([]);
+export default function PropertiesPage() {
+  const [properties, setProperties] = useState<PropertyItem[]>([]);
   const [cities, setCities] = useState<City[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -135,39 +121,34 @@ function RoomsContent() {
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
 
   const [search, setSearch] = useState("");
-  const [filterProperty, setFilterProperty] = useState(initialProperty);
   const [filterCity, setFilterCity] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const fetchRooms = useCallback(async () => {
+  const fetchProperties = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams({ page: String(page), limit: String(limit) });
     if (search) params.set("search", search);
-    if (filterProperty) params.set("property", filterProperty);
     if (filterCity) params.set("city", filterCity);
     if (filterStatus) params.set("status", filterStatus);
     try {
-      const res = await fetch(`/api/admin/rooms?${params}`).then((r) => r.json());
+      const res = await fetch(`/api/admin/properties?${params}`).then((r) => r.json());
       if (res.success) {
-        setRooms(res.data.rooms);
+        setProperties(res.data.properties);
         setTotalPages(res.data.pagination.pages);
         setTotal(res.data.pagination.total);
       }
     } finally {
       setLoading(false);
     }
-  }, [page, limit, search, filterProperty, filterCity, filterStatus]);
+  }, [page, limit, search, filterCity, filterStatus]);
 
   useEffect(() => {
-    fetchRooms();
-  }, [fetchRooms]);
+    fetchProperties();
+  }, [fetchProperties]);
 
   useEffect(() => {
-    fetch("/api/admin/properties?limit=100")
-      .then((r) => r.json())
-      .then((r) => r.success && setProperties(r.data.properties));
     fetch("/api/admin/cities?limit=100")
       .then((r) => r.json())
       .then((r) => r.success && setCities(r.data.cities));
@@ -175,23 +156,23 @@ function RoomsContent() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
-    await fetch(`/api/admin/rooms/${deleteId}`, { method: "DELETE" });
+    await fetch(`/api/admin/properties/${deleteId}`, { method: "DELETE" });
     setDeleteId(null);
-    fetchRooms();
+    fetchProperties();
   };
 
-  const activeCount = rooms.filter((r) => r.status === "active").length;
-  const featuredCount = rooms.filter((r) => r.featured).length;
+  const activeCount = properties.filter((p) => p.status === "active").length;
+  const featuredCount = properties.filter((p) => p.featured).length;
 
   return (
     <div>
       <PageHeader
-        title="Rooms"
-        subtitle="Manage room types, pricing, and amenities assigned to each property"
+        title="Properties"
+        subtitle="Manage all accommodation properties across Chennai, Madurai, Coimbatore and other destinations"
       >
-        <Link href={filterProperty ? `/admin/rooms/new?property=${filterProperty}` : "/admin/rooms/new"}>
+        <Link href="/admin/properties/new">
           <AdminButton variant="default">
-            <Plus className="h-4 w-4" /> Add Room
+            <Plus className="h-4 w-4" /> Add Property
           </AdminButton>
         </Link>
       </PageHeader>
@@ -204,7 +185,7 @@ function RoomsContent() {
         className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4"
       >
         {[
-          { label: "Total Rooms", value: total, icon: BedDouble, color: "hsl(var(--adm-primary))" },
+          { label: "Total Properties", value: total, icon: Building2, color: "hsl(var(--adm-primary))" },
           { label: "Active", value: activeCount, icon: Check, color: "hsl(var(--adm-success))" },
           { label: "Featured", value: featuredCount, icon: Star, color: "hsl(var(--adm-warning))" },
           { label: "Inactive", value: total - activeCount, icon: StarOff, color: "hsl(var(--adm-destructive))" },
@@ -236,25 +217,10 @@ function RoomsContent() {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              placeholder="Search rooms…"
+              placeholder="Search properties by name…"
               className="flex h-10 w-full rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] pl-9 pr-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
             />
           </div>
-          <select
-            value={filterProperty}
-            onChange={(e) => {
-              setFilterProperty(e.target.value);
-              setPage(1);
-            }}
-            className="h-10 rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
-          >
-            <option value="">All Properties</option>
-            {properties.map((p) => (
-              <option key={p._id} value={p._id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
           <select
             value={filterCity}
             onChange={(e) => {
@@ -283,12 +249,11 @@ function RoomsContent() {
             <option value="inactive">Inactive</option>
             <option value="maintenance">Maintenance</option>
           </select>
-          {(search || filterProperty || filterCity || filterStatus) && (
+          {(search || filterCity || filterStatus) && (
             <AdminButton
               variant="ghost"
               onClick={() => {
                 setSearch("");
-                setFilterProperty("");
                 setFilterCity("");
                 setFilterStatus("");
                 setPage(1);
@@ -330,80 +295,100 @@ function RoomsContent() {
       {viewMode === "grid" && (
         <div>
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-24 rounded-2xl adm-skeleton" />
+                <div key={i} className="h-48 rounded-2xl adm-skeleton" />
               ))}
             </div>
-          ) : rooms.length === 0 ? (
+          ) : properties.length === 0 ? (
             <AdminCard className="p-12 text-center">
-              <BedDouble className="mx-auto h-12 w-12 text-[hsl(var(--adm-muted-foreground))]" />
-              <h3 className="mt-4 text-base font-semibold text-[hsl(var(--adm-card-foreground))]">No rooms found</h3>
+              <Building2 className="mx-auto h-12 w-12 text-[hsl(var(--adm-muted-foreground))]" />
+              <h3 className="mt-4 text-base font-semibold text-[hsl(var(--adm-card-foreground))]">No properties found</h3>
               <p className="mt-1 text-sm text-[hsl(var(--adm-muted-foreground))]">
-                {search || filterProperty || filterCity || filterStatus
+                {search || filterCity || filterStatus
                   ? "Try clearing filters."
-                  : "Get started by adding your first room to a property."}
+                  : "Get started by adding your first property."}
               </p>
               <div className="mt-4">
-                <Link href="/admin/rooms/new">
+                <Link href="/admin/properties/new">
                   <AdminButton variant="default">
-                    <Plus className="h-4 w-4" /> Add Room
+                    <Plus className="h-4 w-4" /> Add Property
                   </AdminButton>
                 </Link>
               </div>
             </AdminCard>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-              {rooms.map((room) => (
-                <AdminCard key={room._id} className="p-4 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        {room.property && (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[hsl(var(--adm-primary))] bg-[hsl(var(--adm-primary)/0.1)] px-2 py-0.5 rounded-md">
-                            <Building2 className="w-3 h-3" /> {room.property.name}
-                          </span>
-                        )}
-                        {room.city && (
-                          <AdminBadge variant="outline">{room.city.name}</AdminBadge>
-                        )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+              {properties.map((property) => (
+                <AdminCard key={property._id} className="overflow-hidden flex flex-col justify-between">
+                  <div className="relative h-44 bg-[hsl(var(--adm-muted))] overflow-hidden">
+                    {property.images[0] ? (
+                      <img
+                        src={property.images[0]}
+                        alt={property.name}
+                        className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-[hsl(var(--adm-muted-foreground))]">
+                        <Building2 className="h-10 w-10 opacity-40" />
                       </div>
-                      <StatusChanger room={room} onChanged={fetchRooms} />
+                    )}
+                    <div className="absolute top-2.5 right-2.5">
+                      <StatusChanger property={property} onChanged={fetchProperties} />
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className="h-14 w-20 shrink-0 overflow-hidden rounded-xl bg-[hsl(var(--adm-muted))]">
-                        {room.images[0] ? (
-                          <img src={room.images[0]} alt={room.name} className="h-full w-full object-cover" />
-                        ) : (
-                          <div className="flex h-full items-center justify-center">
-                            <BedDouble className="h-6 w-6 text-[hsl(var(--adm-muted-foreground))]" />
-                          </div>
-                        )}
+                    {property.city && (
+                      <div className="absolute bottom-2.5 left-2.5">
+                        <span className="rounded-lg bg-black/60 backdrop-blur-sm px-2.5 py-1 text-xs font-semibold text-white">
+                          {property.city.name}
+                        </span>
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <h3 className="font-bold text-[hsl(var(--adm-card-foreground))] truncate">{room.name}</h3>
-                        <p className="text-xs text-[hsl(var(--adm-muted-foreground))]">{room.badge || "Private room"}</p>
-                      </div>
-                    </div>
+                    )}
                   </div>
+                  <div className="p-4 flex-1 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[hsl(var(--adm-primary))]">
+                          {property.badge || "Property"}
+                        </span>
+                      </div>
+                      <h3 className="text-base font-bold text-[hsl(var(--adm-card-foreground))]">{property.name}</h3>
+                      {property.address && (
+                        <p className="mt-1 text-xs text-[hsl(var(--adm-muted-foreground))] line-clamp-1 flex items-center gap-1">
+                          <MapPin className="h-3 w-3 shrink-0" /> {property.address}
+                        </p>
+                      )}
+                    </div>
 
-                  <div className="mt-3 pt-3 border-t border-[hsl(var(--adm-border)/0.5)] flex items-center justify-between">
-                    <span className="text-xs font-bold text-[hsl(var(--adm-foreground))]">
-                      {room.pricing?.[0]?.value || "Standard"}
-                    </span>
-                    <div className="flex items-center gap-1">
+                    <div className="mt-4 pt-3 border-t border-[hsl(var(--adm-border)/0.5)] flex items-center justify-between">
                       <Link
-                        href={`/admin/rooms/${room._id}`}
-                        className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-foreground))]"
+                        href={`/admin/rooms?property=${property._id}`}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-[hsl(var(--adm-primary))] hover:underline"
                       >
-                        <Pencil className="h-4 w-4" />
+                        <BedDouble className="h-3.5 w-3.5" />
+                        {property.roomCount ?? 0} {property.roomCount === 1 ? "Room" : "Rooms"}
                       </Link>
-                      <button
-                        onClick={() => setDeleteId(room._id)}
-                        className="rounded-lg p-1.5 text-[hsl(var(--adm-destructive))] hover:bg-[hsl(var(--adm-destructive)/0.1)]"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                      <div className="flex items-center gap-1">
+                        <Link
+                          href={`/properties/${property.slug}`}
+                          target="_blank"
+                          className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-foreground))]"
+                          title="View on site"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </Link>
+                        <Link
+                          href={`/admin/properties/${property._id}`}
+                          className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-foreground))]"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Link>
+                        <button
+                          onClick={() => setDeleteId(property._id)}
+                          className="rounded-lg p-1.5 text-[hsl(var(--adm-destructive))] hover:bg-[hsl(var(--adm-destructive)/0.1)]"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </AdminCard>
@@ -418,19 +403,19 @@ function RoomsContent() {
         <AdminCard>
           {loading ? (
             <SkeletonTable rows={5} columns={5} />
-          ) : rooms.length === 0 ? (
+          ) : properties.length === 0 ? (
             <div className="p-12 text-center">
-              <BedDouble className="mx-auto h-12 w-12 text-[hsl(var(--adm-muted-foreground))]" />
-              <h3 className="mt-4 text-base font-semibold text-[hsl(var(--adm-card-foreground))]">No rooms found</h3>
+              <Building2 className="mx-auto h-12 w-12 text-[hsl(var(--adm-muted-foreground))]" />
+              <h3 className="mt-4 text-base font-semibold text-[hsl(var(--adm-card-foreground))]">No properties found</h3>
               <p className="mt-1 text-sm text-[hsl(var(--adm-muted-foreground))]">
-                {search || filterProperty || filterCity || filterStatus
+                {search || filterCity || filterStatus
                   ? "Try clearing filters."
-                  : "Get started by adding your first room to a property."}
+                  : "Get started by adding your first property."}
               </p>
               <div className="mt-4">
-                <Link href="/admin/rooms/new">
+                <Link href="/admin/properties/new">
                   <AdminButton variant="default">
-                    <Plus className="h-4 w-4" /> Add Room
+                    <Plus className="h-4 w-4" /> Add Property
                   </AdminButton>
                 </Link>
               </div>
@@ -440,67 +425,74 @@ function RoomsContent() {
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-[hsl(var(--adm-border))] text-xs font-semibold uppercase text-[hsl(var(--adm-muted-foreground))]">
-                    <th className="px-4 py-3.5">Room</th>
                     <th className="px-4 py-3.5">Property</th>
                     <th className="px-4 py-3.5">Destination</th>
-                    <th className="px-4 py-3.5">Badge / Type</th>
+                    <th className="px-4 py-3.5">Type / Badge</th>
+                    <th className="px-4 py-3.5">Rooms</th>
                     <th className="px-4 py-3.5">Status</th>
                     <th className="px-4 py-3.5 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[hsl(var(--adm-border)/0.5)]">
-                  {rooms.map((room) => (
-                    <tr key={room._id} className="hover:bg-[hsl(var(--adm-accent)/0.3)] transition-colors">
+                  {properties.map((property) => (
+                    <tr key={property._id} className="hover:bg-[hsl(var(--adm-accent)/0.3)] transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-14 shrink-0 overflow-hidden rounded-lg bg-[hsl(var(--adm-muted))]">
-                            {room.images[0] ? (
-                              <img src={room.images[0]} alt={room.name} className="h-full w-full object-cover" />
+                          <div className="h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-[hsl(var(--adm-muted))]">
+                            {property.images[0] ? (
+                              <img src={property.images[0]} alt={property.name} className="h-full w-full object-cover" />
                             ) : (
                               <div className="flex h-full items-center justify-center">
-                                <BedDouble className="h-5 w-5 text-[hsl(var(--adm-muted-foreground))]" />
+                                <Building2 className="h-5 w-5 text-[hsl(var(--adm-muted-foreground))]" />
                               </div>
                             )}
                           </div>
                           <div>
-                            <p className="font-semibold text-[hsl(var(--adm-card-foreground))]">{room.name}</p>
-                            <p className="text-xs text-[hsl(var(--adm-muted-foreground))] line-clamp-1">{room.pricing?.[0]?.value || "Standard"}</p>
+                            <p className="font-semibold text-[hsl(var(--adm-card-foreground))]">{property.name}</p>
+                            <p className="text-xs text-[hsl(var(--adm-muted-foreground))] line-clamp-1">{property.address || `/properties/${property.slug}`}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        {room.property ? (
-                          <span className="inline-flex items-center gap-1 text-xs font-medium text-[hsl(var(--adm-foreground))]">
-                            <Building2 className="w-3.5 h-3.5 text-[hsl(var(--adm-primary))]" />
-                            {room.property.name}
-                          </span>
+                        {property.city ? (
+                          <AdminBadge variant="outline">{property.city.name}</AdminBadge>
                         ) : (
                           <span className="text-xs text-[hsl(var(--adm-muted-foreground))]">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        {room.city ? (
-                          <AdminBadge variant="outline">{room.city.name}</AdminBadge>
-                        ) : (
-                          <span className="text-xs text-[hsl(var(--adm-muted-foreground))]">—</span>
-                        )}
+                        <span className="text-xs font-medium text-[hsl(var(--adm-foreground))]">{property.badge || "Private room"}</span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-xs text-[hsl(var(--adm-foreground))]">{room.badge || "Private room"}</span>
+                        <Link
+                          href={`/admin/rooms?property=${property._id}`}
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-[hsl(var(--adm-primary))] hover:underline"
+                        >
+                          <BedDouble className="h-3.5 w-3.5" />
+                          {property.roomCount ?? 0} {property.roomCount === 1 ? "room" : "rooms"}
+                        </Link>
                       </td>
                       <td className="px-4 py-3">
-                        <StatusChanger room={room} onChanged={fetchRooms} />
+                        <StatusChanger property={property} onChanged={fetchProperties} />
                       </td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
                           <Link
-                            href={`/admin/rooms/${room._id}`}
+                            href={`/properties/${property.slug}`}
+                            target="_blank"
+                            className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-foreground))]"
+                            title="View on site"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Link>
+                          <Link
+                            href={`/admin/properties/${property._id}`}
                             className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-foreground))]"
                           >
                             <Pencil className="h-4 w-4" />
                           </Link>
                           <button
-                            onClick={() => setDeleteId(room._id)}
+                            onClick={() => setDeleteId(property._id)}
                             className="rounded-lg p-1.5 text-[hsl(var(--adm-destructive))] hover:bg-[hsl(var(--adm-destructive)/0.1)]"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -529,7 +521,7 @@ function RoomsContent() {
               setLimit(l);
               setPage(1);
             }}
-            itemLabel="rooms"
+            itemLabel="properties"
           />
         </div>
       )}
@@ -537,20 +529,12 @@ function RoomsContent() {
       {/* Delete dialog */}
       <ConfirmDialog
         open={Boolean(deleteId)}
-        title="Delete Room"
-        description="Are you sure you want to delete this room? This action cannot be undone."
+        title="Delete Property"
+        description="Are you sure you want to delete this property? Rooms assigned to this property will be unlinked."
         confirmLabel="Delete"
         onConfirm={handleDelete}
         onCancel={() => setDeleteId(null)}
       />
     </div>
-  );
-}
-
-export default function RoomsPage() {
-  return (
-    <Suspense fallback={<div className="p-8 text-center text-sm text-[hsl(var(--adm-muted-foreground))]">Loading rooms…</div>}>
-      <RoomsContent />
-    </Suspense>
   );
 }

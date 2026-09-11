@@ -1,7 +1,12 @@
 import dns from "dns";
 import mongoose from "mongoose";
 
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
+try {
+  if (typeof (dns as any).setDefaultResultOrder === "function") {
+    (dns as any).setDefaultResultOrder("ipv4first");
+  }
+  dns.setServers(["8.8.8.8", "1.1.1.1"]);
+} catch {}
 
 interface MongooseCache {
   uri: string;

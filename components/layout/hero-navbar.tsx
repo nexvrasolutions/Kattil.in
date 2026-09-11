@@ -840,11 +840,11 @@ export default function HeroNavbar({
                 </Link>
 
                 <Link
-                  href="/rooms"
+                  href="/"
                   className="
                     w-[122px]
                     h-[40px]
-                    rounded-[6px]
+                    rounded-[8px]
                     border-[1px]
                     border-white
                     px-6
@@ -1897,7 +1897,7 @@ export default function HeroNavbar({
 
               <div className="pt-4">
                 <Link
-                  href="/rooms"
+                  href="/"
                   onClick={() =>
                     setMobileOpen(false)
                   }
@@ -1907,17 +1907,20 @@ export default function HeroNavbar({
                     justify-center
                     w-full
                     border
-                    border-white/40
+                    border-white
                     hover:border-white
                     text-white
-                    rounded-xl
+                    rounded-[8px]
                     py-3.5
                     text-[15px]
                     font-semibold
                     tracking-wide
                     transition-all
+                    duration-300
                     font-sans
-                    hover:bg-white/5
+                    hover:bg-white
+                    hover:text-[#0d1b2e]
+                    shadow-sm
                     active:scale-[0.99]
                   "
                 >

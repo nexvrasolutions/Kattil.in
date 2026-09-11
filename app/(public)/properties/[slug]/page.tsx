@@ -3,10 +3,12 @@ import { getPropertyDetailsData } from "@/lib/db/rooms";
 import PropertyDetailsView from "@/components/section/rooms/PropertyDetailsView";
 import { SITE_URL } from "@/lib/seo";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ city?: string }>;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -27,9 +29,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function PropertyPage({ params }: PageProps) {
+export default async function PropertyPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
-  const data = await getPropertyDetailsData(slug);
+  const sParams = searchParams ? await searchParams : {};
+  const data = await getPropertyDetailsData(slug, "Kanniyakumari", sParams?.city);
 
   return <PropertyDetailsView data={data} />;
 }

@@ -22,41 +22,20 @@ export const FALLBACK_DESTINATIONS: DestinationItem[] = [
     name: "Chennai",
     slug: "chennai",
     image: "/images/destinations/kanyakumari.png",
-    hotelCount: "2 hotels",
+    hotelCount: "1 hotels",
     link: "/chennai",
     order: 1,
-  },
-  {
-    _id: "default-kanniyakumari",
-    name: "Kanniyakumari",
-    slug: "kanniyakumari",
-    image: "/images/destinations/kanyakumari.png",
-    hotelCount: "1 hotels",
-    link: "/destinations/kanniyakumari",
-    order: 2,
-  },
-  {
-    _id: "default-coimbatore",
-    name: "Coimbatore",
-    slug: "coimbatore",
-    image: "/images/destinations/coimbatore.png",
-    hotelCount: "2 hotels",
-    link: "/coimbatore",
-    order: 3,
   },
   {
     _id: "default-madurai",
     name: "Madurai",
     slug: "madurai",
     image: "/images/destinations/madurai.png",
-    hotelCount: "2 hotels",
+    hotelCount: "1 hotels",
     link: "/madurai",
-    order: 4,
+    order: 2,
   },
 ];
-
-// In-memory module cache to eliminate API round-trips when toggling menu
-let cachedDestinations: DestinationItem[] | null = null;
 
 interface DestinationsDropdownProps {
   isOpen: boolean;
@@ -73,18 +52,14 @@ export default function DestinationsDropdown({
   onItemClick,
   topOffset = 76,
 }: DestinationsDropdownProps) {
-  const [destinations, setDestinations] = useState<DestinationItem[]>(
-    cachedDestinations || FALLBACK_DESTINATIONS
-  );
+  const [destinations, setDestinations] = useState<DestinationItem[]>(FALLBACK_DESTINATIONS);
 
   useEffect(() => {
-    if (cachedDestinations && cachedDestinations.length > 0) return;
     let isMounted = true;
     fetch("/api/destinations")
       .then((res) => res.json())
       .then((data) => {
         if (isMounted && data.success && Array.isArray(data.data) && data.data.length > 0) {
-          cachedDestinations = data.data;
           setDestinations(data.data);
         }
       })
@@ -95,6 +70,9 @@ export default function DestinationsDropdown({
       isMounted = false;
     };
   }, []);
+
+  const displayedDestinations = destinations.length > 8 ? destinations.slice(0, 8) : destinations;
+  const hasMoreThan8 = destinations.length > 8;
 
   return (
     <AnimatePresence>
@@ -115,13 +93,13 @@ export default function DestinationsDropdown({
 
           {/* White Mega Menu Card */}
           <div
-            className="w-full rounded-[10px] bg-white border border-slate-100 p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.18)]"
+            className="w-full rounded-[8px] bg-white border border-slate-100 p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.18)]"
             style={{
               backgroundColor: "#ffffff",
             }}
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-6">
-              {destinations.map((dest) => {
+              {displayedDestinations.map((dest) => {
                 const targetLink =
                   dest.link?.trim() ||
                   (dest.slug === "chennai"
@@ -171,6 +149,23 @@ export default function DestinationsDropdown({
                 );
               })}
             </div>
+
+            {hasMoreThan8 && (
+              <div className="mt-6 pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <p className="text-[13px] text-[#707070] font-sans">
+                  Showing 8 of {destinations.length} destinations
+                </p>
+                <Link
+                  href="/destinations"
+                  prefetch={true}
+                  onClick={onItemClick}
+                  className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#526442] hover:bg-[#3d4b31] text-white text-[13.5px] font-medium font-sans transition-all duration-200 shadow-xs hover:shadow group"
+                >
+                  <span>View all destinations</span>
+                  <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                </Link>
+              </div>
+            )}
           </div>
         </motion.div>
       )}
@@ -184,18 +179,14 @@ export function MobileDestinationsList({
 }: {
   onItemClick?: () => void;
 }) {
-  const [destinations, setDestinations] = useState<DestinationItem[]>(
-    cachedDestinations || FALLBACK_DESTINATIONS
-  );
+  const [destinations, setDestinations] = useState<DestinationItem[]>(FALLBACK_DESTINATIONS);
 
   useEffect(() => {
-    if (cachedDestinations && cachedDestinations.length > 0) return;
     let isMounted = true;
     fetch("/api/destinations")
       .then((res) => res.json())
       .then((data) => {
         if (isMounted && data.success && Array.isArray(data.data) && data.data.length > 0) {
-          cachedDestinations = data.data;
           setDestinations(data.data);
         }
       })
@@ -205,11 +196,11 @@ export function MobileDestinationsList({
     };
   }, []);
 
-  const displayedDestinations = destinations.slice(0, 4);
-  const hasMore = destinations.length > 4;
+  const displayedDestinations = destinations.length > 8 ? destinations.slice(0, 8) : destinations;
+  const hasMore = destinations.length > 8;
 
   return (
-    <div className="mt-3.5 bg-white rounded-[16px] p-3 sm:p-4 shadow-xl border border-gray-100/90 overflow-hidden text-left">
+    <div className="mt-3.5 bg-white rounded-[8px] p-3 sm:p-4 shadow-xl border border-gray-100/90 overflow-hidden text-left">
       <div className="divide-y divide-gray-100">
         {displayedDestinations.map((dest) => {
           const targetLink =
@@ -231,7 +222,7 @@ export function MobileDestinationsList({
               onClick={onItemClick}
               className="flex items-center gap-3.5 py-3 px-1.5 rounded-[8px] hover:bg-slate-50 transition-colors group"
             >
-              <div className="relative w-13 h-13 rounded-[10px] overflow-hidden bg-slate-100 shrink-0 border border-slate-100 shadow-xs">
+              <div className="relative w-13 h-13 rounded-[8px] overflow-hidden bg-slate-100 shrink-0 border border-slate-100 shadow-xs">
                 <Image
                   src={imgSrc}
                   alt={dest.name}
@@ -256,7 +247,7 @@ export function MobileDestinationsList({
       {hasMore && (
         <div className="pt-2.5 border-t border-gray-100 mt-1">
           <Link
-            href="/rooms"
+            href="/destinations"
             prefetch={true}
             onClick={onItemClick}
             className="flex items-center justify-center gap-2 py-2 text-[#0d1b2e] hover:text-[#526442] font-semibold text-[13.5px] font-sans transition-colors"

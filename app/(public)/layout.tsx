@@ -80,19 +80,21 @@ async function getFooterData(): Promise<{ footer: FooterProps; sidebar: SidebarI
 
     if (!raw) return { footer: FOOTER_FALLBACK, sidebar: SIDEBAR_FALLBACK };
 
+    const parsed = JSON.parse(JSON.stringify(raw));
+
     const footer: FooterProps = {
-      logo:        (raw.logo as string)        || FOOTER_FALLBACK.logo,
-      headline:    (raw.headline as string)    || FOOTER_FALLBACK.headline,
-      description: (raw.description as string) || "",
-      copyright:   (raw.copyright as string)   || FOOTER_FALLBACK.copyright,
-      footerLinks: (raw.footerLinks as FooterProps["footerLinks"]) ?? FOOTER_FALLBACK.footerLinks,
-      socialLinks: (raw.socialLinks as FooterProps["socialLinks"]) ?? FOOTER_FALLBACK.socialLinks,
-      locations:   (raw.locations as FooterProps["locations"])?.length
-        ? (raw.locations as FooterProps["locations"])
+      logo:        (parsed.logo as string)        || FOOTER_FALLBACK.logo,
+      headline:    (parsed.headline as string)    || FOOTER_FALLBACK.headline,
+      description: (parsed.description as string) || "",
+      copyright:   (parsed.copyright as string)   || FOOTER_FALLBACK.copyright,
+      footerLinks: (parsed.footerLinks as FooterProps["footerLinks"]) ?? FOOTER_FALLBACK.footerLinks,
+      socialLinks: (parsed.socialLinks as FooterProps["socialLinks"]) ?? FOOTER_FALLBACK.socialLinks,
+      locations:   (parsed.locations as FooterProps["locations"])?.length
+        ? (parsed.locations as FooterProps["locations"])
         : LOCATIONS_FALLBACK,
     };
 
-    const sidebar = (raw.sidebarIcons as SidebarIconData[] | undefined) ?? SIDEBAR_FALLBACK;
+    const sidebar = (parsed.sidebarIcons as SidebarIconData[] | undefined) ?? SIDEBAR_FALLBACK;
 
     return { footer, sidebar };
   } catch {

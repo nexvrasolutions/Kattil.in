@@ -1,5 +1,6 @@
 import { connectDB } from "@/lib/db/mongodb";
 import City from "@/lib/models/City";
+import Property from "@/lib/models/Property";
 import Room from "@/lib/models/Room";
 import { PropertyStay } from "@/components/section/destination/DestinationStaysView";
 import { locationRooms } from "@/lib/data";
@@ -13,7 +14,7 @@ export interface DestinationStaysData {
   properties: PropertyStay[];
 }
 
-// In-memory cache with 60-second TTL to avoid repeated slow DB connections on every page tap
+// In-memory cache with 60-second TTL to avoid repeated slow DB connections
 const staysCache = new Map<string, { data: DestinationStaysData; timestamp: number }>();
 const CACHE_TTL_MS = 60 * 1000; // 60 seconds
 
@@ -67,48 +68,60 @@ export async function getDestinationStaysData(
       ],
     }).lean();
 
-    let rooms: any[] = [];
+    let propertiesList: any[] = [];
+
     if (city) {
-      // Find all rooms assigned to this city
-      rooms = await Room.find({
-        $or: [{ city: city._id }, { city: String(city._id) }],
+      // 2. Query Properties for this city
+      propertiesList = await Property.find({
+        city: city._id,
         status: { $ne: "inactive" },
       })
         .sort({ order: 1, createdAt: -1 })
         .lean();
     }
 
-    // Fallback: search rooms directly
-    if (!rooms || rooms.length === 0) {
-      const allActiveRooms = await Room.find({ status: { $ne: "inactive" } })
-        .populate("city", "name slug")
-        .sort({ order: 1, createdAt: -1 })
-        .lean();
-
-      rooms = allActiveRooms.filter(
-        (r: any) =>
-          r.city &&
-          (r.city.slug?.toLowerCase() === cleanSlug ||
-            r.city.name?.toLowerCase() === cleanSlug)
-      );
-    }
-
     let properties: PropertyStay[] = [];
-    if (rooms && rooms.length > 0) {
-      properties = JSON.parse(JSON.stringify(rooms)).map((r: any, idx: number) => ({
-        _id: String(r._id),
-        name: r.name,
-        slug: r.slug,
-        badge: r.badge?.trim() || (idx % 2 === 0 ? "Private room" : "Home stay"),
-        category: r.category,
-        images: Array.isArray(r.images) && r.images.length > 0 ? r.images : ["/assets/ac-double-room.webp"],
-        amenities: Array.isArray(r.amenities) && r.amenities.length > 0 ? r.amenities : ["Free Wifi", "Restaurant"],
-        link: r.link?.trim() || `/properties/${r.slug || r._id}`,
-        description: r.description,
-        occupancy: r.occupancy,
+
+    if (propertiesList.length > 0) {
+      properties = JSON.parse(JSON.stringify(propertiesList)).map((p: any) => ({
+        _id: String(p._id),
+        name: p.name,
+        slug: p.slug,
+        badge: p.badge?.trim() || "Private room",
+        category: p.category,
+        images: Array.isArray(p.images) && p.images.length > 0 ? p.images : ["/assets/ac-double-room.webp"],
+        amenities: Array.isArray(p.amenities) && p.amenities.length > 0 ? p.amenities : ["Free Wifi", "Restaurant"],
+        link: `/properties/${p.slug}`,
+        description: p.description,
       }));
     } else {
-      properties = getFallbackProperties(cleanSlug);
+      // Fallback: If no Property records exist, check legacy Room records
+      let legacyRooms: any[] = [];
+      if (city) {
+        legacyRooms = await Room.find({
+          $or: [{ city: city._id }, { city: String(city._id) }],
+          status: { $ne: "inactive" },
+        })
+          .sort({ order: 1, createdAt: -1 })
+          .lean();
+      }
+
+      if (legacyRooms.length > 0) {
+        properties = JSON.parse(JSON.stringify(legacyRooms)).map((r: any, idx: number) => ({
+          _id: String(r._id),
+          name: r.name,
+          slug: r.slug,
+          badge: r.badge?.trim() || (idx % 2 === 0 ? "Private room" : "Home stay"),
+          category: r.category,
+          images: Array.isArray(r.images) && r.images.length > 0 ? r.images : ["/assets/ac-double-room.webp"],
+          amenities: Array.isArray(r.amenities) && r.amenities.length > 0 ? r.amenities : ["Free Wifi", "Restaurant"],
+          link: r.link?.trim() || `/properties/${r.slug || r._id}`,
+          description: r.description,
+          occupancy: r.occupancy,
+        }));
+      } else {
+        properties = getFallbackProperties(cleanSlug);
+      }
     }
 
     const result: DestinationStaysData = {
@@ -131,4 +144,3 @@ export async function getDestinationStaysData(
     };
   }
 }
-

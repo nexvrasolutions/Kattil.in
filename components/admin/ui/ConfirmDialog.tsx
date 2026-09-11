@@ -7,31 +7,41 @@ import { AdminButton } from "./AdminButton";
 type ConfirmVariant = "destructive" | "default";
 
 interface ConfirmDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
+  isOpen?: boolean;
+  open?: boolean;
+  onClose?: () => void;
+  onCancel?: () => void;
+  onConfirm: () => any;
   title: string;
-  message: string;
+  message?: string;
+  description?: string;
   confirmLabel?: string;
   variant?: ConfirmVariant;
 }
 
 export function ConfirmDialog({
   isOpen,
+  open,
   onClose,
+  onCancel,
   onConfirm,
   title,
   message,
+  description,
   confirmLabel = "Confirm",
-  variant = "default",
+  variant = "destructive",
 }: ConfirmDialogProps) {
-  const handleConfirm = () => {
-    onConfirm();
-    onClose();
+  const isDialogVisible = Boolean(isOpen ?? open);
+  const handleClose = onClose ?? onCancel ?? (() => {});
+  const msg = message ?? description ?? "";
+
+  const handleConfirm = async () => {
+    await onConfirm();
+    handleClose();
   };
 
   return (
-    <AdminModal isOpen={isOpen} onClose={onClose} title={title} size="sm">
+    <AdminModal isOpen={isDialogVisible} onClose={handleClose} title={title} size="sm">
       <div className="flex flex-col gap-4">
         {/* Icon + message */}
         <div className="flex items-start gap-3">
@@ -50,13 +60,13 @@ export function ConfirmDialog({
             )}
           </div>
           <p className="text-sm leading-relaxed text-[hsl(var(--adm-muted-foreground))]">
-            {message}
+            {msg}
           </p>
         </div>
 
         {/* Actions */}
         <div className="flex justify-end gap-2 pt-1">
-          <AdminButton variant="ghost" size="sm" onClick={onClose}>
+          <AdminButton variant="ghost" size="sm" onClick={handleClose}>
             Cancel
           </AdminButton>
           <AdminButton

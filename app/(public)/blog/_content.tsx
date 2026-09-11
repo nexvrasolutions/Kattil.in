@@ -195,7 +195,7 @@ export default function BlogContent({
       {/* ── 1. Hero Header Section (Sage Green) ───────────────────────────── */}
       <section className="relative w-full bg-[#9caf88] overflow-hidden pt-36 md:pt-44 lg:pt-50 pb-16 md:pb-22">
         {/* Right Background Monument Skyline Silhouette */}
-        <div className="absolute right-0 bottom-0 top-auto h-[65%] sm:h-[72%] md:h-[78%] lg:h-[82%] w-[70%] sm:w-[48%] md:w-[40%] lg:w-[34%] max-w-[460px] pointer-events-none z-0 overflow-hidden flex items-end justify-end pr-2 md:pr-6">
+        <div className="hidden md:flex absolute right-0 bottom-0 top-auto md:h-[78%] lg:h-[82%] md:w-[40%] lg:w-[34%] max-w-[460px] pointer-events-none z-0 overflow-hidden items-end justify-end pr-2 md:pr-6">
           <div
             className="w-full h-full opacity-85 md:opacity-90 bg-no-repeat"
             style={{

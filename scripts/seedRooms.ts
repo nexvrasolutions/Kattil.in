@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Room from "../lib/models/Room";
 import City from "../lib/models/City";
+import Property from "../lib/models/Property";
 
 function slugify(text: string) {
   return text.toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-").replace(/^-+|-+$/g, "");
@@ -10,6 +11,10 @@ export async function seedRooms() {
   const madurai = await City.findOne({ slug: "madurai" });
   const chennai = await City.findOne({ slug: "chennai" });
   const coimbatore = await City.findOne({ slug: "coimbatore" });
+
+  const maduraiProp = await Property.findOne({ city: madurai?._id });
+  const chennaiProp = await Property.findOne({ city: chennai?._id });
+  const coimbatoreProp = await Property.findOne({ city: coimbatore?._id });
 
   if (!madurai || !chennai) {
     console.error("  ✗ Cities not found — run seedCities first");
@@ -21,6 +26,7 @@ export async function seedRooms() {
     {
       name: "6 Bed Mixed Dormitory",
       slug: "6-bed-mixed-dormitory",
+      property: maduraiProp?._id,
       city: madurai._id,
       category: "standard",
       images: ["/assets/six-bed-dormitory.webp"],
@@ -37,6 +43,7 @@ export async function seedRooms() {
     {
       name: "AC Double Room",
       slug: "ac-double-room",
+      property: maduraiProp?._id,
       city: madurai._id,
       category: "deluxe",
       images: ["/assets/ac-double-room.webp"],
@@ -53,6 +60,7 @@ export async function seedRooms() {
     {
       name: "Non-AC Double Room",
       slug: "non-ac-double-room",
+      property: maduraiProp?._id,
       city: madurai._id,
       category: "standard",
       images: ["/assets/non-ac-double-room.webp"],
@@ -70,6 +78,7 @@ export async function seedRooms() {
     {
       name: "Marina Horizon Suite",
       slug: "marina-horizon-suite",
+      property: chennaiProp?._id,
       city: chennai._id,
       category: "suite",
       images: [
@@ -87,6 +96,7 @@ export async function seedRooms() {
     {
       name: "Urban Sanctuary Room",
       slug: "urban-sanctuary-room",
+      property: chennaiProp?._id,
       city: chennai._id,
       category: "deluxe",
       images: [
@@ -104,6 +114,7 @@ export async function seedRooms() {
     {
       name: "Coastal Heritage Suite",
       slug: "coastal-heritage-suite",
+      property: chennaiProp?._id,
       city: chennai._id,
       category: "suite",
       images: [
@@ -121,6 +132,7 @@ export async function seedRooms() {
     {
       name: "Executive Garden Villa",
       slug: "executive-garden-villa",
+      property: chennaiProp?._id,
       city: chennai._id,
       category: "deluxe",
       images: [
@@ -141,6 +153,7 @@ export async function seedRooms() {
           {
             name: "Deluxe AC Room",
             slug: "deluxe-ac-room-cbe",
+            property: coimbatoreProp?._id,
             city: coimbatore._id,
             category: "deluxe",
             images: ["/assets/ac-double-room.webp"],
@@ -157,6 +170,7 @@ export async function seedRooms() {
           {
             name: "6 Bed Mixed Dormitory",
             slug: "6-bed-mixed-dormitory-cbe",
+            property: coimbatoreProp?._id,
             city: coimbatore._id,
             category: "standard",
             images: ["/assets/six-bed-dormitory.webp"],

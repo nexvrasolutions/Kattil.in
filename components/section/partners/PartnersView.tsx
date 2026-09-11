@@ -98,7 +98,7 @@ export default function PartnersView() {
       {/* ── 1. Hero Section with Monuments Skyline Silhouette ─────────── */}
       <section className="relative w-full bg-[#9caf88] overflow-hidden pt-36 md:pt-44 lg:pt-52 pb-16 md:pb-24">
         {/* Right Background Monument Skyline Silhouette */}
-        <div className="absolute right-0 bottom-0 top-auto h-[65%] sm:h-[72%] md:h-[78%] lg:h-[82%] w-[70%] sm:w-[48%] md:w-[40%] lg:w-[34%] max-w-[460px] pointer-events-none z-0 overflow-hidden flex items-end justify-end pr-2 md:pr-6">
+        <div className="hidden md:flex absolute right-0 bottom-0 top-auto md:h-[78%] lg:h-[82%] md:w-[40%] lg:w-[34%] max-w-[460px] pointer-events-none z-0 overflow-hidden items-end justify-end pr-2 md:pr-6">
           <div
             className="w-full h-full opacity-90 md:opacity-95 bg-no-repeat"
             style={{
@@ -290,16 +290,16 @@ export default function PartnersView() {
             <div className="bg-[#0E2E4E] text-white rounded-[12px] px-5 md:px-8 lg:px-15 py-12 sm:py-16 md:py-20 shadow-[0_12px_40px_rgba(14,39,60,0.2)] relative overflow-hidden">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
                 {/* Left Column: Heading + Subtitle */}
-                <div className="lg:col-span-5">
+                <div className="lg:col-span-5 -mt-45">
                   <h2 className="text-white tracking-tight leading-tight">
-                    <span className="block font-sans text-3xl sm:text-4xl md:text-[44px] font-normal text-[#d2e6bc]">
+                    <span className="block font-sans text-3xl sm:text-4xl md:text-[36px] font-normal text-[#d2e6bc]">
                       A simple
                     </span>
                     <span className="block mt-1">
-                      <span className="font-sans text-3xl sm:text-4xl md:text-[44px] font-normal text-[#d2e6bc]">
+                      <span className="font-sans text-3xl sm:text-4xl md:text-[36px] font-normal text-[#d2e6bc]">
                         partnership{" "}
                       </span>
-                      <span className="font-serif text-3xl sm:text-4xl md:text-[46px] font-normal italic text-[#d2e6bc]">
+                      <span className="font-serif text-3xl sm:text-4xl md:text-[36px] font-normal italic text-[#d2e6bc]">
                         Model
                       </span>
                     </span>
@@ -373,7 +373,7 @@ export default function PartnersView() {
                     paddingTop: "12px",
                     paddingRight: "24px",
                     paddingBottom: "12px",
-                    paddingLeft: "32px",
+                    paddingLeft: "30px",
                     fontFamily: "Public Sans, sans-serif",
                     fontWeight: 400,
                     fontSize: "14px",
@@ -383,7 +383,7 @@ export default function PartnersView() {
                     verticalAlign: "middle",
                   }}
                 >
-                  Partner With us
+                  Partner With Us
                 </a>
 
                 <a

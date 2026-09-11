@@ -1,5 +1,6 @@
 import { connectDB } from "@/lib/db/mongodb";
 import Room from "@/lib/models/Room";
+import Property from "@/lib/models/Property";
 import City from "@/lib/models/City";
 import { PropertyDetailsData, PropertyRoomOption } from "@/components/section/rooms/PropertyDetailsView";
 import { locationRooms } from "@/lib/data";
@@ -84,8 +85,7 @@ export function detectCitySlug(slug: string): string {
   if (
     s === "madurai" ||
     s.includes("madurai") ||
-    s.includes("dormitory") ||
-    s.includes("double-room")
+    s.includes("sparrow-madurai")
   ) {
     return "madurai";
   }
@@ -138,38 +138,47 @@ function getFallbackRoomOptions(citySlug: string): PropertyRoomOption[] {
   ];
 }
 
-// In-memory cache with 60-second TTL to avoid repeated slow DB queries on every page click
+// In-memory cache with 60-second TTL
 const propertyDetailsCache = new Map<string, { data: PropertyDetailsData; timestamp: number }>();
 const roomsPageCache = new Map<string, { data: RoomsPageData; timestamp: number }>();
 const CACHE_TTL_MS = 60 * 1000; // 60 seconds
 
+export function clearPropertyCache(slug?: string) {
+  if (slug) {
+    propertyDetailsCache.delete(slug.toLowerCase().trim());
+  } else {
+    propertyDetailsCache.clear();
+    roomsPageCache.clear();
+  }
+}
+
 export async function getPropertyDetailsData(
   slug: string,
-  fallbackDestination: string = "Kanniyakumari"
+  fallbackDestination: string = "Kanniyakumari",
+  cityHint?: string
 ): Promise<PropertyDetailsData> {
   const cleanSlug = slug.toLowerCase().trim();
-  const cacheKey = cleanSlug;
+  const cacheKey = `${cleanSlug}-${cityHint || ""}`;
 
   const cached = propertyDetailsCache.get(cacheKey);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL_MS) {
     return cached.data;
   }
 
-  const detectedCitySlug = detectCitySlug(cleanSlug);
+  const detectedCitySlug = cityHint ? cityHint.toLowerCase().trim() : detectCitySlug(cleanSlug);
   const cityConfig = CITY_CONFIGS[detectedCitySlug] || CITY_CONFIGS.kanniyakumari;
 
   try {
     await connectDB();
 
-    // 1. Try finding a room by slug, name regex, or _id
-    let primaryRoom: any = null;
-    let city: any = null;
+    // 1. Try finding a Property first by slug, name regex, or _id
+    let property: any = null;
 
     if (cleanSlug.match(/^[0-9a-fA-F]{24}$/)) {
-      primaryRoom = await Room.findById(cleanSlug).populate("city").lean();
+      property = await Property.findById(cleanSlug).populate("city").lean();
     }
-    if (!primaryRoom) {
-      primaryRoom = await Room.findOne({
+    if (!property) {
+      property = await Property.findOne({
         $or: [{ slug: cleanSlug }, { name: { $regex: new RegExp(`^${cleanSlug}$`, "i") } }],
         status: { $ne: "inactive" },
       })
@@ -177,11 +186,56 @@ export async function getPropertyDetailsData(
         .lean();
     }
 
-    if (primaryRoom?.city) {
-      city = primaryRoom.city;
+    let city: any = property?.city || null;
+
+    // 2. If property found, fetch all rooms belonging to this property
+    let roomsList: any[] = [];
+    if (property) {
+      roomsList = await Room.find({
+        property: property._id,
+        status: { $ne: "inactive" },
+      })
+        .sort({ order: 1, createdAt: -1 })
+        .lean();
     }
 
-    // 2. If city not resolved yet, check detected city slug
+    // 3. If no property found, fallback to searching for a Room directly or City
+    if (!property) {
+      let primaryRoom: any = null;
+      if (cleanSlug.match(/^[0-9a-fA-F]{24}$/)) {
+        primaryRoom = await Room.findById(cleanSlug).populate("city").populate("property").lean();
+      }
+      if (!primaryRoom) {
+        primaryRoom = await Room.findOne({
+          $or: [{ slug: cleanSlug }, { name: { $regex: new RegExp(`^${cleanSlug}$`, "i") } }],
+          status: { $ne: "inactive" },
+        })
+          .populate("city")
+          .populate("property")
+          .lean();
+      }
+
+      if (primaryRoom?.property) {
+        property = primaryRoom.property;
+        city = primaryRoom.city || property.city;
+        roomsList = await Room.find({
+          property: property._id,
+          status: { $ne: "inactive" },
+        })
+          .sort({ order: 1, createdAt: -1 })
+          .lean();
+      } else if (primaryRoom?.city) {
+        city = primaryRoom.city;
+        roomsList = await Room.find({
+          city: city._id,
+          status: { $ne: "inactive" },
+        })
+          .sort({ order: 1, createdAt: -1 })
+          .lean();
+      }
+    }
+
+    // 4. Resolve City if still null
     if (!city) {
       city = await City.findOne({
         $or: [
@@ -189,38 +243,21 @@ export async function getPropertyDetailsData(
           { slug: detectedCitySlug },
           { name: { $regex: new RegExp(`^${cleanSlug}$`, "i") } },
           { name: { $regex: new RegExp(`^${detectedCitySlug}$`, "i") } },
-          { label: { $regex: new RegExp(`^${cleanSlug}$`, "i") } },
-          { label: { $regex: new RegExp(`^${detectedCitySlug}$`, "i") } },
         ],
       }).lean();
     }
 
-    // 3. Find sibling rooms for this city
-    let cityRooms: any[] = [];
-    if (city) {
-      cityRooms = await Room.find({
-        $or: [{ city: city._id }, { city: String(city._id) }],
-        status: { $ne: "inactive" },
-      })
-        .sort({ order: 1, createdAt: -1 })
-        .lean();
-    }
-
     const destinationName = city?.name || cityConfig.destinationName || fallbackDestination;
     const destinationSlug = city?.slug || cityConfig.destinationSlug || detectedCitySlug;
-    const propertyName =
-      primaryRoom?.name ||
-      (cleanSlug === detectedCitySlug
-        ? cityConfig.defaultPropertyName
-        : primaryRoom?.name || cityConfig.defaultPropertyName);
+    const propertyName = property?.name || cityConfig.defaultPropertyName;
 
-    // Map rooms list for "Select Room"
+    // Map room options
     let roomOptions: PropertyRoomOption[] = [];
-    if (cityRooms.length > 0) {
-      roomOptions = JSON.parse(JSON.stringify(cityRooms)).map((r: any, idx: number) => ({
+    if (roomsList.length > 0) {
+      roomOptions = JSON.parse(JSON.stringify(roomsList)).map((r: any, idx: number) => ({
         _id: String(r._id),
         name: r.name,
-        badge: r.badge?.trim() || (idx === 0 ? "Private room" : idx === 1 ? "Dormitory" : "Private rooms"),
+        badge: r.badge?.trim() || (idx === 0 ? "Private room" : idx === 1 ? "Dormitory" : "Private room"),
         description: r.description || "Spacious Double occupancy room with extra comfort",
         images: Array.isArray(r.images) && r.images.length > 0 ? r.images : ["/assets/ac-double-room.webp"],
         amenities: Array.isArray(r.amenities) && r.amenities.length > 0 ? r.amenities : ["Free Wifi", "Restaurant", "Study Desk", "Double Occupancy"],
@@ -232,32 +269,32 @@ export async function getPropertyDetailsData(
     }
 
     const heroImages =
-      primaryRoom?.images && primaryRoom.images.length > 0
-        ? [
-          "/assets/kattil-room-hero.webp",
-          ...primaryRoom.images.filter((i: string) => i !== "/assets/kattil-room-hero.webp"),
-        ].slice(0, 3)
+      property?.images && property.images.length > 0
+        ? property.images
         : [
-          "/assets/kattil-room-hero.webp",
-          "/assets/deluxe-garden-suite.webp",
-          "/assets/ac-double-room.webp",
-        ];
+            "/assets/kattil-room-hero.webp",
+            "/assets/deluxe-garden-suite.webp",
+            "/assets/ac-double-room.webp",
+          ];
 
     const result: PropertyDetailsData = {
-      _id: primaryRoom ? String(primaryRoom._id) : undefined,
+      _id: property ? String(property._id) : undefined,
       name: propertyName,
       slug: cleanSlug,
       destinationName,
       destinationSlug,
+      tagline: property?.tagline,
       description:
-        primaryRoom?.description ||
+        property?.description ||
         city?.description ||
         `${propertyName} offers thoughtfully designed spaces with modern amenities, warm hospitality, and a vibrant community experience for students and professionals.`,
       heroImages,
-      address: city?.address || cityConfig.address,
-      mapLink: city?.mapSrc || cityConfig.mapSrc,
-      phone: city?.phone || cityConfig.phone,
-      email: city?.email || cityConfig.email,
+      address: property?.address || city?.address || cityConfig.address,
+      mapLink: property?.mapSrc || city?.mapSrc || cityConfig.mapSrc,
+      phone: property?.phone || city?.phone || cityConfig.phone,
+      email: property?.email || city?.email || cityConfig.email,
+      whatsapp: property?.whatsapp,
+      directions: property?.directions,
       rooms: roomOptions,
     };
 
@@ -322,78 +359,72 @@ export async function getRoomsPageData(
 
   try {
     await connectDB();
-    const cities = await City.find({ active: true }).sort({ order: 1 }).lean();
-    const allCities = cities.map((c) => ({ name: c.name, slug: c.slug }));
+    const allCitiesDocs = await City.find({ active: true }).select("name slug").sort({ order: 1 }).lean();
+    const allCities = allCitiesDocs.map((c) => ({ name: c.name, slug: c.slug }));
 
-    if (activeSlug) {
-      const propData = await getPropertyDetailsData(activeSlug);
-      const hotelVal = getHotelValueForSlug(propData.destinationSlug || activeSlug);
-      const result: RoomsPageData = {
-        destinationSlug: propData.destinationSlug || activeSlug,
-        destinationName: propData.destinationName,
-        propertyName: propData.name,
-        hotelValue: hotelVal,
-        rooms: propData.rooms,
-        allCities,
-      };
-      roomsPageCache.set(cacheKey, { data: result, timestamp: Date.now() });
-      return result;
+    let roomsDocs: any[] = [];
+    let propertyName = "";
+    let destinationName = "";
+    let destinationSlug = "";
+
+    if (cleanProp) {
+      const prop = await Property.findOne({ slug: cleanProp }).populate("city").lean();
+      if (prop) {
+        propertyName = prop.name;
+        destinationName = (prop.city as any)?.name || "";
+        destinationSlug = (prop.city as any)?.slug || "";
+        roomsDocs = await Room.find({ property: prop._id, status: { $ne: "inactive" } }).lean();
+      }
     }
 
-    // If no destination specified, return all active rooms
-    const allRooms = await Room.find({ status: { $ne: "inactive" } })
-      .populate("city")
-      .sort({ order: 1, createdAt: -1 })
-      .lean();
+    if (roomsDocs.length === 0 && activeSlug) {
+      const city = await City.findOne({ slug: activeSlug }).lean();
+      if (city) {
+        destinationName = city.name;
+        destinationSlug = city.slug;
+        roomsDocs = await Room.find({ city: city._id, status: { $ne: "inactive" } }).lean();
+      }
+    }
+
+    if (roomsDocs.length === 0) {
+      roomsDocs = await Room.find({ status: { $ne: "inactive" } }).limit(20).lean();
+    }
 
     let rooms: PropertyRoomOption[] = [];
-    if (allRooms.length > 0) {
-      rooms = JSON.parse(JSON.stringify(allRooms)).map((r: any, idx: number) => {
-        const citySlug = r.city?.slug || "madurai";
-        const hVal = getHotelValueForSlug(citySlug);
-        return {
-          _id: String(r._id),
-          name: r.name,
-          badge: r.badge?.trim() || (idx % 2 === 0 ? "Private room" : "Dormitory"),
-          description: r.description || "Thoughtfully designed room with modern amenities",
-          images: Array.isArray(r.images) && r.images.length > 0 ? r.images : ["/assets/ac-double-room.webp"],
-          amenities: Array.isArray(r.amenities) && r.amenities.length > 0 ? r.amenities : ["Free Wifi", "Restaurant", "Study Desk"],
-          bookingLink: r.link?.trim() || `https://live.ipms247.com/booking/book-rooms-${hVal}`,
-          price: r.pricing?.[0]?.value,
-        };
-      });
+    if (roomsDocs.length > 0) {
+      rooms = JSON.parse(JSON.stringify(roomsDocs)).map((r: any) => ({
+        _id: String(r._id),
+        name: r.name,
+        badge: r.badge?.trim() || "Private room",
+        description: r.description || "Spacious room with modern amenities and extra comfort",
+        images: Array.isArray(r.images) && r.images.length > 0 ? r.images : ["/assets/ac-double-room.webp"],
+        amenities: Array.isArray(r.amenities) && r.amenities.length > 0 ? r.amenities : ["Free Wifi", "Restaurant"],
+        bookingLink: r.link?.trim() || r.cta?.url?.trim() || undefined,
+        price: r.pricing?.[0]?.value,
+      }));
     } else {
-      rooms = [
-        ...getFallbackRoomOptions("chennai"),
-        ...getFallbackRoomOptions("madurai"),
-      ];
+      rooms = getFallbackRoomOptions(destinationSlug || "chennai");
     }
 
     const result: RoomsPageData = {
-      destinationSlug: undefined,
-      destinationName: undefined,
-      propertyName: undefined,
-      hotelValue: "kattil",
+      destinationSlug,
+      destinationName,
+      propertyName,
+      hotelValue: getHotelValueForSlug(destinationSlug || "chennai"),
       rooms,
       allCities,
     };
+
     roomsPageCache.set(cacheKey, { data: result, timestamp: Date.now() });
     return result;
   } catch (error) {
     console.error("[getRoomsPageData] Error:", error);
-    const config = CITY_CONFIGS[activeSlug] || CITY_CONFIGS.madurai;
     return {
-      destinationSlug: activeSlug || undefined,
-      destinationName: activeSlug ? config.destinationName : undefined,
-      propertyName: activeSlug ? config.defaultPropertyName : undefined,
-      hotelValue: activeSlug ? getHotelValueForSlug(activeSlug) : "kattil",
-      rooms: getFallbackRoomOptions(activeSlug || "madurai"),
-      allCities: [
-        { name: "Chennai", slug: "chennai" },
-        { name: "Madurai", slug: "madurai" },
-        { name: "Coimbatore", slug: "coimbatore" },
-        { name: "Kanniyakumari", slug: "kanniyakumari" },
-      ],
+      destinationSlug: activeSlug,
+      destinationName: activeSlug.charAt(0).toUpperCase() + activeSlug.slice(1),
+      hotelValue: getHotelValueForSlug(activeSlug || "chennai"),
+      rooms: getFallbackRoomOptions(activeSlug || "chennai"),
+      allCities: [],
     };
   }
 }

@@ -34,15 +34,20 @@ async function getLocations(): Promise<LocationItem[]> {
       .select("name slug label address phone email mapSrc")
       .lean();
 
-    return cities.map((c) => ({
-      _id: String(c._id),
-      id: c.slug,
-      label: c.label ?? c.name.toUpperCase(),
-      address: c.address ?? "",
-      phone: c.phone ?? "",
-      email: c.email ?? "",
-      mapSrc: c.mapSrc ?? "",
-    }));
+    return cities
+      .map((c) => {
+        const label = (c.label && c.label.trim()) || (c.name ? c.name.trim().toUpperCase() : "");
+        return {
+          _id: String(c._id),
+          id: c.slug,
+          label,
+          address: c.address ?? "",
+          phone: c.phone ?? "",
+          email: c.email ?? "",
+          mapSrc: c.mapSrc ?? "",
+        };
+      })
+      .filter((loc) => Boolean(loc.label && (loc.address || loc.phone || loc.email || loc.mapSrc)));
   } catch {
     return [];
   }

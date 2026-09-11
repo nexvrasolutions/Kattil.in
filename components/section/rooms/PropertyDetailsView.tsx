@@ -213,7 +213,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
       <Navbar />
 
       <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
-        <div className="px-5 md:px-8 lg:px-15 pt-28 md:pt-36 lg:pt-40 pb-20">
+        <div className="px-5 md:px-8 lg:px-15 pt-28 md:pt-36 lg:pt-40 pb-28 lg:pb-20">
           {/* ── 1. Top Panoramic Hero Carousel (Infinite Side-peek Slideshow) ── */}
           <section
             className="relative w-full mb-12 md:mb-16 -mx-5 md:-mx-8 lg:-mx-15 !w-[calc(100%+2.5rem)] md:!w-[calc(100%+4rem)] lg:!w-[calc(100%+7.5rem)] overflow-hidden select-none py-2"

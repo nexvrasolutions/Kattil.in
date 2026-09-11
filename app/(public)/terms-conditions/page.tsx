@@ -158,13 +158,13 @@ export default function TermsConditionsPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.5, ease: "easeOut" }}
-            className="font-sans text-[12px] font-semibold uppercase tracking-[0.28em] text-white/70 mb-5"
+            className="font-sans text-[14px] uppercase text-white/70 mb-5"
           >
             Legal
           </motion.p>
 
-          <h1 className="text-white text-[34px] sm:text-[42px] md:text-[48px] lg:text-[52px] leading-[1.1] tracking-tight mb-10 max-w-3xl">
-            <span className="font-sans font-semibold">
+          <h1 className="text-white text-[28px] sm:text-[32px] md:text-[36px] lg:text-[40px] leading-[1.1] tracking-tight mb-10 max-w-3xl">
+            <span className="font-sans">
               <AnimatedWords text="Terms of" delay={0.2} />
             </span>{" "}
             <span className="font-serif italic font-normal">
@@ -186,7 +186,7 @@ export default function TermsConditionsPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 1.0 }}
-            className="font-sans text-[11px] text-white/45 uppercase tracking-widest mt-8"
+            className="font-sans text-[12px] text-white/45 uppercase tracking-widest mt-8"
           >
             Effective: January 2025
           </motion.p>
@@ -233,7 +233,7 @@ export default function TermsConditionsPage() {
             transition={{ duration: 0.6, ease: EASE }}
             className="mt-12 p-6 rounded-2xl bg-primary/5 border border-primary/10"
           >
-            <p className="font-sans text-[13px] text-primary/55 leading-relaxed">
+            <p className="font-sans text-[14px] text-primary/55 leading-relaxed">
               <strong className="font-semibold text-primary/75">Note:</strong> Kattil
               reserves the right to amend these terms at any time. Changes will be effective
               upon posting to our website. Continued use of our services constitutes

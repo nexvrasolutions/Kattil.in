@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, BedDouble, Images, Sparkles, FileText,
+  LayoutDashboard, Building2, BedDouble, Images, Sparkles, FileText,
   Phone, Search, FolderOpen, MapPin, Settings, Menu, X, Home,
-  BookOpen, HelpCircle, Tag, Layers,
+  BookOpen, HelpCircle, Tag, Layers, Key,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -20,7 +20,8 @@ const navSections: NavSection[] = [
   {
     title: "Content Management",
     items: [
-      { label: "Properties & Rooms", href: "/admin/rooms", icon: BedDouble },
+      { label: "Properties", href: "/admin/properties", icon: Building2 },
+      { label: "Rooms", href: "/admin/rooms", icon: BedDouble },
       { label: "Gallery", href: "/admin/gallery", icon: Images },
       { label: "Gallery Categories", href: "/admin/gallery-categories", icon: Tag },
       { label: "Amenities", href: "/admin/amenities", icon: Sparkles },
@@ -39,17 +40,12 @@ const navSections: NavSection[] = [
       { label: "Footer & Sidebar", href: "/admin/footer", icon: Layers },
     ],
   },
-  // {
-  //   title: "SEO & Media",
-  //   items: [
-  //     { label: "SEO Manager",   href: "/admin/seo",   icon: Search    },
-  //     { label: "Media Library", href: "/admin/media", icon: FolderOpen },
-  //   ],
-  // },
   {
-    title: "Operations",
+    title: "Integrations & Operations",
     items: [
       { label: "Destinations", href: "/admin/destinations", icon: MapPin },
+      { label: "Booking API & Links", href: "/admin/booking-api", icon: Key },
+      { label: "Settings", href: "/admin/settings", icon: Settings },
     ],
   },
 ];

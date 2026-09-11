@@ -32,8 +32,17 @@ function loadEnvFile(filePath: string) {
 loadEnvFile(resolve(process.cwd(), ".env.local"));
 loadEnvFile(resolve(process.cwd(), ".env"));
 
+import dns from "dns";
+try {
+  if (typeof (dns as any).setDefaultResultOrder === "function") {
+    (dns as any).setDefaultResultOrder("ipv4first");
+  }
+  dns.setServers(["8.8.8.8", "1.1.1.1"]);
+} catch {}
+
 import mongoose from "mongoose";
 import { seedCities } from "./seedCities";
+import { seedProperties } from "./seedProperties";
 import { seedRooms } from "./seedRooms";
 import { seedAmenities } from "./seedAmenities";
 import { seedBlogs } from "./seedBlogs";
@@ -57,6 +66,9 @@ async function main() {
 
   console.log("── Cities ──────────────────────────────");
   await seedCities();
+
+  console.log("\n── Properties ──────────────────────────");
+  await seedProperties();
 
   console.log("\n── Rooms ───────────────────────────────");
   await seedRooms();

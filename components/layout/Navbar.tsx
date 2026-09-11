@@ -302,15 +302,8 @@ export default function Navbar() {
               </Link>
               <Link
                 href="/rooms"
-                className="w-[122px] h-[40px]
-rounded-[6px]
-border-[1px] border-white/100
-px-6
-text-white text-[14px] leading-none font-medium
-inline-flex items-center justify-center
-transition-all duration-300
-hover:border-white hover:bg-white hover:text-[#0d1b2e]
-shadow-sm active:scale-95 font-sans"         >
+                className="w-[122px] h-[40px] rounded-[8px] border border-white px-6 text-white text-[14px] leading-none font-medium inline-flex items-center justify-center transition-all duration-300 hover:border-white hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-95 font-sans"
+              >
                 Book Now
               </Link>
             </div>
@@ -450,7 +443,7 @@ shadow-sm active:scale-95 font-sans"         >
                   <Link
                     href="/rooms"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-center w-full border border-white/40 hover:border-white text-white rounded-xl py-3.5 text-[15px] font-semibold tracking-wide transition-all font-sans hover:bg-white/5 active:scale-[0.99]"
+                    className="flex items-center justify-center w-full border border-white hover:border-white text-white rounded-[8px] py-3.5 text-[15px] font-semibold tracking-wide transition-all duration-300 font-sans hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-[0.99]"
                   >
                     Book Now
                   </Link>

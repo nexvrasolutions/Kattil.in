@@ -59,7 +59,7 @@ export default function AllDestinationsView({
       {/* ── 1. Hero Section (Sage Green) ───────────────────────────────── */}
       <section className="relative w-full bg-[#9caf88] overflow-hidden pt-36 md:pt-44 lg:pt-52 pb-16 md:pb-24">
         {/* Right Background Monument Skyline Silhouette */}
-        <div className="absolute right-0 bottom-0 top-auto h-[65%] sm:h-[72%] md:h-[78%] lg:h-[82%] w-[70%] sm:w-[48%] md:w-[40%] lg:w-[34%] max-w-[460px] pointer-events-none z-0 overflow-hidden flex items-end justify-end pr-2 md:pr-6">
+        <div className="hidden md:flex absolute right-0 bottom-0 top-auto md:h-[78%] lg:h-[82%] md:w-[40%] lg:w-[34%] max-w-[460px] pointer-events-none z-0 overflow-hidden items-end justify-end pr-2 md:pr-6">
           <div
             className="w-full h-full opacity-90 md:opacity-95 bg-no-repeat"
             style={{
@@ -78,7 +78,7 @@ export default function AllDestinationsView({
             </p>
 
             <h1 className="text-white tracking-tight">
-              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-bold leading-[1.12]">
+              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] leading-[1.12]">
                 Destinations to
               </span>
               <span className="block font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-normal italic text-[#f4f7ef] leading-[1.15] mt-1">
