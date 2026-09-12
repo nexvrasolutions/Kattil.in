@@ -417,4 +417,32 @@ export const locationRooms = {
         "Comfortable bunk beds with individual locker, reading light, charging ports, and pod cooling in Coimbatore.",
     },
   ],
+  colachel: [
+    {
+      id: "cl1",
+      name: "Deluxe AC Beachside Room",
+      slug: "deluxe-ac-beachside-room",
+      size: "42",
+      feature: "BEACH VIEW",
+      capacity: 2,
+      price: 1800.00,
+      external_url: "https://live.ipms247.com/booking/book-rooms-kattilcolachel",
+      image: "/assets/ac-double-room.webp",
+      description:
+        "A serene and comfortable air-conditioned room located along the Colachel coastline, equipped with plush bedding and modern amenities.",
+    },
+    {
+      id: "cl2",
+      name: "6 Bed Mixed Dormitory",
+      slug: "6-bed-mixed-dormitory-colachel",
+      size: "45",
+      feature: "SHARED DORM",
+      capacity: 6,
+      price: 699.00,
+      external_url: "https://live.ipms247.com/booking/book-rooms-kattilcolachel",
+      image: "/assets/six-bed-dormitory.webp",
+      description:
+        "Comfortable bunk beds with individual locker, reading light, and charging ports near the Colachel coast.",
+    },
+  ],
 };

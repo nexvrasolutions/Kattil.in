@@ -10,6 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/chennai`, lastModified, changeFrequency: "monthly", priority: 0.9 },
     { url: `${SITE_URL}/madurai`, lastModified, changeFrequency: "monthly", priority: 0.9 },
     { url: `${SITE_URL}/coimbatore`, lastModified, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${SITE_URL}/colachel`, lastModified, changeFrequency: "monthly", priority: 0.9 },
     { url: `${SITE_URL}/rooms`, lastModified, changeFrequency: "weekly", priority: 0.85 },
     { url: `${SITE_URL}/about-us`, lastModified, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/contact-us`, lastModified, changeFrequency: "monthly", priority: 0.75 },

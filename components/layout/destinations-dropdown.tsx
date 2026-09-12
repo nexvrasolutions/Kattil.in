@@ -27,13 +27,22 @@ export const FALLBACK_DESTINATIONS: DestinationItem[] = [
     order: 1,
   },
   {
-    _id: "default-madurai",
-    name: "Madurai",
-    slug: "madurai",
-    image: "/images/destinations/madurai.png",
+    _id: "default-coimbatore",
+    name: "Coimbatore",
+    slug: "coimbatore",
+    image: "/images/destinations/coimbatore.png",
     hotelCount: "1 hotels",
-    link: "/madurai",
+    link: "/coimbatore",
     order: 2,
+  },
+  {
+    _id: "default-colachel",
+    name: "Colachel",
+    slug: "colachel",
+    image: "/images/destinations/kanyakumari.png",
+    hotelCount: "1 hotels",
+    link: "/colachel",
+    order: 3,
   },
 ];
 
@@ -78,11 +87,15 @@ export default function DestinationsDropdown({
 
   useEffect(() => {
     let isMounted = true;
-    getCachedDestinations().then((data) => {
-      if (isMounted && data && data.length > 0) {
-        setDestinations(data);
-      }
-    });
+    fetch("/api/destinations")
+      .then((res) => res.json())
+      .then((data) => {
+        if (isMounted && data && data.success && Array.isArray(data.data) && data.data.length > 0) {
+          cachedDestinations = data.data;
+          setDestinations(data.data);
+        }
+      })
+      .catch(() => {});
     return () => {
       isMounted = false;
     };
@@ -125,7 +138,9 @@ export default function DestinationsDropdown({
                       ? "/coimbatore"
                       : dest.slug === "madurai"
                         ? "/madurai"
-                        : `/destinations/${dest.slug}`);
+                        : dest.slug === "colachel"
+                          ? "/colachel"
+                          : `/destinations/${dest.slug}`);
                 const imgSrc = dest.image?.trim() || "/images/destinations/kanyakumari.png";
 
                 return (
@@ -202,11 +217,15 @@ export function MobileDestinationsList({
 
   useEffect(() => {
     let isMounted = true;
-    getCachedDestinations().then((data) => {
-      if (isMounted && data && data.length > 0) {
-        setDestinations(data);
-      }
-    });
+    fetch("/api/destinations")
+      .then((res) => res.json())
+      .then((data) => {
+        if (isMounted && data && data.success && Array.isArray(data.data) && data.data.length > 0) {
+          cachedDestinations = data.data;
+          setDestinations(data.data);
+        }
+      })
+      .catch(() => {});
     return () => {
       isMounted = false;
     };
@@ -227,7 +246,9 @@ export function MobileDestinationsList({
                 ? "/coimbatore"
                 : dest.slug === "madurai"
                   ? "/madurai"
-                  : `/destinations/${dest.slug}`);
+                  : dest.slug === "colachel"
+                    ? "/colachel"
+                    : `/destinations/${dest.slug}`);
           const imgSrc = dest.image?.trim() || "/images/destinations/kanyakumari.png";
 
           return (

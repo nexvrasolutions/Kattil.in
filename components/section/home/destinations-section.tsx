@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -14,20 +15,13 @@ interface DestinationItem {
   isViewAll?: boolean;
 }
 
-const DESTINATIONS: DestinationItem[] = [
+const DEFAULT_DESTINATIONS: DestinationItem[] = [
   {
-    id: "kanyakumari",
-    name: "Kanyakumari",
-    pillLabel: "Kanyakumari",
+    id: "chennai",
+    name: "Chennai",
+    pillLabel: "Chennai",
     image: "/images/destinations/kanyakumari.png",
-    href: "/destinations/kanniyakumari",
-  },
-  {
-    id: "madurai",
-    name: "Madurai",
-    pillLabel: "Madurai",
-    image: "/images/destinations/madurai.png",
-    href: "/madurai",
+    href: "/chennai",
   },
   {
     id: "coimbatore",
@@ -35,6 +29,13 @@ const DESTINATIONS: DestinationItem[] = [
     pillLabel: "Coimbatore",
     image: "/images/destinations/coimbatore.png",
     href: "/coimbatore",
+  },
+  {
+    id: "colachel",
+    name: "Colachel",
+    pillLabel: "Colachel",
+    image: "/images/destinations/kanyakumari.png",
+    href: "/colachel",
   },
   {
     id: "view-all",
@@ -47,6 +48,44 @@ const DESTINATIONS: DestinationItem[] = [
 ];
 
 export default function DestinationsSection() {
+  const [destinations, setDestinations] = useState<DestinationItem[]>(DEFAULT_DESTINATIONS);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    fetch("/api/destinations")
+      .then((res) => res.json())
+      .then((res) => {
+        if (!isMounted || !res.success || !Array.isArray(res.data) || res.data.length === 0) return;
+
+        const activeList: DestinationItem[] = res.data.map((d: any) => ({
+          id: d._id || d.slug,
+          name: d.name,
+          pillLabel: d.name,
+          image: d.image || "/images/destinations/kanyakumari.png",
+          href: d.link || (d.slug === "chennai" ? "/chennai" : d.slug === "coimbatore" ? "/coimbatore" : d.slug === "madurai" ? "/madurai" : d.slug === "colachel" ? "/colachel" : `/destinations/${d.slug}`),
+        }));
+
+        // Limit to 3 preview items so the 4th item is the "View all our Destination" card
+        const previewItems = activeList.slice(0, 3);
+        previewItems.push({
+          id: "view-all",
+          name: "View all our Destination",
+          pillLabel: "",
+          image: "/images/destinations/destination-card-bg.png",
+          href: "/destinations",
+          isViewAll: true,
+        });
+
+        setDestinations(previewItems);
+      })
+      .catch(() => {});
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <section
       id="destinations"
@@ -68,9 +107,9 @@ export default function DestinationsSection() {
           </h2>
         </motion.div>
 
-        {/* 4 Static Destination Cards (Clean grid, No slideshow, No shadow, No stroke) */}
+        {/* Dynamic Destination Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 justify-items-stretch">
-          {DESTINATIONS.map((dest, index) => (
+          {destinations.map((dest, index) => (
             <motion.div
               key={dest.id}
               initial={{ opacity: 0, y: 16 }}
@@ -84,7 +123,7 @@ export default function DestinationsSection() {
               className="w-full"
             >
               {dest.isViewAll ? (
-                /* 4th Card: View all our Destination (Matches Desktop on Mobile) */
+                /* 4th Card: View all our Destination */
                 <Link
                   href={dest.href}
                   className="group relative flex flex-col aspect-[3/3.9] sm:aspect-[3/4.2] rounded-[8px] overflow-hidden bg-[#C5D9B0] text-white transition-all duration-300 block"
@@ -112,7 +151,7 @@ export default function DestinationsSection() {
                   </div>
                 </Link>
               ) : (
-                /* Standard Destination Card (No shadow, no stroke) */
+                /* Standard Destination Card */
                 <Link
                   href={dest.href}
                   className="group relative block aspect-[3/3.9] sm:aspect-[3/4.2] rounded-[8px] overflow-hidden bg-white transition-all duration-300"

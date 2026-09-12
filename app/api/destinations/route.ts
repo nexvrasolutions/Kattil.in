@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server";
-import mongoose from "mongoose";
 import { connectDB } from "@/lib/db/mongodb";
 import City from "@/lib/models/City";
 import Property from "@/lib/models/Property";
@@ -10,29 +9,8 @@ export async function GET(_request: NextRequest) {
   try {
     await connectDB();
 
-    // 1. Find all active properties to determine which destinations are active
-    const activeProperties = await Property.find({ status: "active" }).select("city").lean();
-    const activeCityIdSet = new Set<string>();
-    for (const p of activeProperties) {
-      if (p.city) activeCityIdSet.add(String(p.city));
-    }
-
-    // Fallback: If no Property records exist yet in the database, check legacy active rooms
-    const totalPropertiesCount = await Property.countDocuments();
-    if (totalPropertiesCount === 0) {
-      const activeRooms = await Room.find({ status: "active" }).select("city").lean();
-      for (const r of activeRooms) {
-        if (r.city) activeCityIdSet.add(String(r.city));
-      }
-    }
-
-    if (activeCityIdSet.size === 0) {
-      return apiSuccess([]);
-    }
-
     const cityFilter = {
       active: { $ne: false },
-      _id: { $in: Array.from(activeCityIdSet).map((id) => new mongoose.Types.ObjectId(id)) },
     };
 
     const cities = await City.find(cityFilter).sort({ order: 1, name: 1 }).lean();
@@ -64,7 +42,7 @@ export async function GET(_request: NextRequest) {
     const destinations = cities.map((c) => {
       const idStr = String(c._id);
       const propCount = propertyCountMap.get(idStr);
-      const roomCount = roomCountMap.get(idStr) ?? 1;
+      const roomCount = roomCountMap.get(idStr) ?? (c.hotelCount ? parseInt(c.hotelCount, 10) || 1 : 1);
       const count = propCount !== undefined && propCount > 0 ? propCount : roomCount;
 
       // Smart link resolution
@@ -73,6 +51,7 @@ export async function GET(_request: NextRequest) {
         if (c.slug === "chennai") destinationLink = "/chennai";
         else if (c.slug === "coimbatore") destinationLink = "/coimbatore";
         else if (c.slug === "madurai") destinationLink = "/madurai";
+        else if (c.slug === "colachel") destinationLink = "/colachel";
         else destinationLink = `/destinations/${c.slug}`;
       }
 
@@ -81,6 +60,7 @@ export async function GET(_request: NextRequest) {
       if (!destinationImage) {
         if (c.slug === "coimbatore") destinationImage = "/images/destinations/coimbatore.png";
         else if (c.slug === "madurai") destinationImage = "/images/destinations/madurai.png";
+        else if (c.slug === "colachel") destinationImage = "/images/destinations/kanyakumari.png";
         else destinationImage = "/images/destinations/kanyakumari.png";
       }
 

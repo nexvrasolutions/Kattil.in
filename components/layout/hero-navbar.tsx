@@ -55,7 +55,8 @@ export const isDestinationsRoute = (path: string) => {
     path.startsWith("/destinations") ||
     path.startsWith("/chennai") ||
     path.startsWith("/coimbatore") ||
-    path.startsWith("/madurai")
+    path.startsWith("/madurai") ||
+    path.startsWith("/colachel")
   );
 };
 

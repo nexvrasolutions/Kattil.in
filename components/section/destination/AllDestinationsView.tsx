@@ -132,7 +132,9 @@ export default function AllDestinationsView({
                       ? "/coimbatore"
                       : dest.slug === "madurai"
                         ? "/madurai"
-                        : `/destinations/${dest.slug}`);
+                        : dest.slug === "colachel"
+                          ? "/colachel"
+                          : `/destinations/${dest.slug}`);
 
                 const imgSrc =
                   dest.image?.trim() ||
