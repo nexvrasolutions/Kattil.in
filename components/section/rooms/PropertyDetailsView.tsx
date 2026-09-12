@@ -225,7 +225,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
       <Navbar />
 
       <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
-        <div className="px-5 md:px-8 lg:px-15 pt-24 sm:pt-28 md:pt-36 lg:pt-40 pb-28 lg:pb-20">
+        <div className="px-5 md:px-8 lg:px-15 pt-24 sm:pt-28 md:pt-36 lg:pt-40 pb-36 sm:pb-32 lg:pb-20">
           {/* ── 1. Top Panoramic Hero Carousel (Edge-to-Edge Full-Bleed Slideshow) ── */}
           <section
             className="relative w-screen left-1/2 -translate-x-1/2 overflow-hidden select-none mb-8 sm:mb-12 md:mb-16 py-1 [--slide-width:88vw] [--slide-offset:6vw] [--slide-gap:10px] sm:[--slide-width:82vw] sm:[--slide-offset:9vw] sm:[--slide-gap:12px] md:[--slide-width:76vw] md:[--slide-offset:12vw] md:[--slide-gap:16px]"

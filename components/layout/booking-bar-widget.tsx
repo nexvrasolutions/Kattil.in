@@ -148,6 +148,7 @@ export default function BookingBarWidget({
   const dateInputRef = useRef<HTMLInputElement>(null);
   const dateBoxRef = useRef<HTMLDivElement>(null);
   const fpInstance = useRef<FpInstance | null>(null);
+  const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -375,6 +376,7 @@ export default function BookingBarWidget({
           disableMobile: true,
           allowInput: false,
           clickOpens: true,
+          closeOnSelect: false,
           position: "below left",
           positionElement: dateBoxRef.current || dateInputRef.current,
           appendTo: document.body,
@@ -387,6 +389,9 @@ export default function BookingBarWidget({
             repositionCalendar(instance);
           },
           onOpen(selectedDates: Date[], dateStr: string, instance: any) {
+            if (closeTimerRef.current) {
+              clearTimeout(closeTimerRef.current);
+            }
             if (instance._input) {
               instance._input.blur();
             }
@@ -398,7 +403,7 @@ export default function BookingBarWidget({
             setTimeout(() => repositionCalendar(instance), 10);
             setTimeout(() => repositionCalendar(instance), 50);
           },
-          onChange(dates: Date[]) {
+          onChange(dates: Date[], dateStr: string, instance: any) {
             if (dates.length === 2) {
               const d1 = new Date(dates[0]);
               d1.setHours(0, 0, 0, 0);
@@ -408,13 +413,27 @@ export default function BookingBarWidget({
               setCheckout(d2);
               setDateDisplay(`${formatDateDisplay(d1)} - ${formatDateDisplay(d2)}`);
               setDateError(null);
+
+              // Keep calendar visible for 1 second so user sees the selected check-out date & range
+              if (closeTimerRef.current) {
+                clearTimeout(closeTimerRef.current);
+              }
+              closeTimerRef.current = setTimeout(() => {
+                instance?.close();
+              }, 1000);
             } else if (dates.length === 1) {
+              if (closeTimerRef.current) {
+                clearTimeout(closeTimerRef.current);
+              }
               const d1 = new Date(dates[0]);
               d1.setHours(0, 0, 0, 0);
               setCheckin(d1);
               setCheckout(null);
               setDateDisplay(`${formatDateDisplay(d1)} - ...`);
             } else {
+              if (closeTimerRef.current) {
+                clearTimeout(closeTimerRef.current);
+              }
               setCheckin(null);
               setCheckout(null);
               setDateDisplay("");
@@ -433,6 +452,9 @@ export default function BookingBarWidget({
 
     return () => {
       alive = false;
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+      }
       window.removeEventListener("scroll", closeFlatpickr);
       fpInstance.current?.destroy();
     };
@@ -911,7 +933,6 @@ const STYLES = `
     align-items: center !important;
     justify-content: center !important;
     cursor: pointer !important;
-    transition: background-color 0.15s ease, color 0.15s ease !important;
   }
   @media (max-width: 640px) {
     .flatpickr-day {
@@ -923,25 +944,10 @@ const STYLES = `
     }
   }
   .flatpickr-day:hover,
-  .flatpickr-day:focus {
+  .flatpickr-day.prevMonthDay:hover,
+  .flatpickr-day.nextMonthDay:hover {
     background: #f1f5f9 !important;
     color: #0d1b2e !important;
-  }
-  .flatpickr-day.inRange {
-    background: #e2e8f0 !important;
-    color: #0d1b2e !important;
-    border-radius: 0 !important;
-    box-shadow: -5px 0 0 #e2e8f0, 5px 0 0 #e2e8f0 !important;
-  }
-  .flatpickr-day.inRange:hover,
-  .flatpickr-day.prevMonthDay.inRange:hover,
-  .flatpickr-day.nextMonthDay.inRange:hover {
-    background: #0d1b2e !important;
-    color: #ffffff !important;
-    font-weight: 700 !important;
-    border-radius: 6px !important;
-    box-shadow: -5px 0 0 #e2e8f0 !important;
-    border-color: #0d1b2e !important;
   }
   .flatpickr-day.selected,
   .flatpickr-day.startRange,
@@ -950,28 +956,18 @@ const STYLES = `
     color: #ffffff !important;
     font-weight: 700 !important;
     border-color: #0d1b2e !important;
-    border-radius: 6px !important;
+  }
+  .flatpickr-day.inRange {
+    background: #e2e8f0 !important;
+    color: #0d1b2e !important;
+    box-shadow: -10px 0 0 #e2e8f0, 10px 0 0 #e2e8f0 !important;
+    border-color: transparent !important;
   }
   .flatpickr-day.startRange:not(.endRange) {
-    border-top-right-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-    box-shadow: 5px 0 0 #e2e8f0 !important;
+    box-shadow: 10px 0 0 #e2e8f0 !important;
   }
   .flatpickr-day.endRange:not(.startRange) {
-    border-top-left-radius: 0 !important;
-    border-bottom-left-radius: 0 !important;
-    box-shadow: -5px 0 0 #e2e8f0 !important;
-  }
-  .flatpickr-day.startRange.endRange {
-    border-radius: 6px !important;
-    box-shadow: none !important;
-  }
-  .flatpickr-day.selected:hover,
-  .flatpickr-day.startRange:hover,
-  .flatpickr-day.endRange:hover {
-    background: #162840 !important;
-    color: #ffffff !important;
-    border-color: #162840 !important;
+    box-shadow: -10px 0 0 #e2e8f0 !important;
   }
   .flatpickr-day.today {
     border: 1.5px solid #0d1b2e !important;

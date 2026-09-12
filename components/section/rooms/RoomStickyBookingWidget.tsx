@@ -137,6 +137,7 @@ export default function RoomStickyBookingWidget({
   const mobileDateBoxRef = useRef<HTMLDivElement>(null);
   const dateInputRef = useRef<HTMLInputElement>(null);
   const fpRef = useRef<any>(null);
+  const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Monitor footer visibility to unfix/hide mobile floating bar at the footer
   useEffect(() => {
@@ -223,20 +224,20 @@ export default function RoomStickyBookingWidget({
 
       if (isMobile) {
         instance.calendarContainer.style.position = "fixed";
-        instance.calendarContainer.style.bottom = "136px";
+        instance.calendarContainer.style.bottom = "120px";
         instance.calendarContainer.style.top = "auto";
         instance.calendarContainer.style.left = "50%";
         instance.calendarContainer.style.right = "auto";
         instance.calendarContainer.style.transform = "translateX(-50%)";
-        instance.calendarContainer.style.width = "min(340px, calc(100vw - 32px))";
-        instance.calendarContainer.style.minWidth = "min(340px, calc(100vw - 32px))";
-        instance.calendarContainer.style.maxWidth = "min(340px, calc(100vw - 32px))";
+        instance.calendarContainer.style.width = "min(340px, calc(100vw - 24px))";
+        instance.calendarContainer.style.minWidth = "min(340px, calc(100vw - 24px))";
+        instance.calendarContainer.style.maxWidth = "min(340px, calc(100vw - 24px))";
         instance.calendarContainer.style.boxSizing = "border-box";
         instance.calendarContainer.style.zIndex = "999999";
         instance.calendarContainer.classList.remove("arrowTop");
         instance.calendarContainer.classList.add("arrowBottom");
       } else {
-        const box = dateBoxRef.current || dateInputRef.current;
+        const box = dateBoxRef.current;
         if (!box) return;
         const rect = box.getBoundingClientRect();
         instance.calendarContainer.style.position = "absolute";
@@ -293,9 +294,11 @@ export default function RoomStickyBookingWidget({
           disableMobile: true,
           allowInput: false,
           clickOpens: true,
+          closeOnSelect: false,
           position: "below left",
-          positionElement: dateBoxRef.current || dateInputRef.current,
+          positionElement: dateBoxRef.current || mobileDateBoxRef.current || dateInputRef.current,
           appendTo: document.body,
+          showMonths: 1,
           onReady(selectedDates: Date[], dateStr: string, instance: any) {
             if (instance._input) {
               instance._input.setAttribute("inputmode", "none");
@@ -304,6 +307,9 @@ export default function RoomStickyBookingWidget({
             repositionCalendar(instance);
           },
           onOpen(selectedDates: Date[], dateStr: string, instance: any) {
+            if (closeTimerRef.current) {
+              clearTimeout(closeTimerRef.current);
+            }
             if (instance._input) {
               instance._input.blur();
             }
@@ -315,7 +321,7 @@ export default function RoomStickyBookingWidget({
             setTimeout(() => repositionCalendar(instance), 10);
             setTimeout(() => repositionCalendar(instance), 50);
           },
-          onChange(dates: Date[]) {
+          onChange(dates: Date[], dateStr: string, instance: any) {
             if (dates.length === 2) {
               const d1 = new Date(dates[0]);
               d1.setHours(0, 0, 0, 0);
@@ -325,13 +331,27 @@ export default function RoomStickyBookingWidget({
               setCheckout(d2);
               setDateDisplay(`${formatDateDisplay(d1)} - ${formatDateDisplay(d2)}`);
               setDateError(null);
+
+              // Keep calendar visible for 1 second so user sees the selected check-out date & range
+              if (closeTimerRef.current) {
+                clearTimeout(closeTimerRef.current);
+              }
+              closeTimerRef.current = setTimeout(() => {
+                instance?.close();
+              }, 1000);
             } else if (dates.length === 1) {
+              if (closeTimerRef.current) {
+                clearTimeout(closeTimerRef.current);
+              }
               const d1 = new Date(dates[0]);
               d1.setHours(0, 0, 0, 0);
               setCheckin(d1);
               setCheckout(null);
               setDateDisplay(`${formatDateDisplay(d1)} - Select Check-out`);
             } else {
+              if (closeTimerRef.current) {
+                clearTimeout(closeTimerRef.current);
+              }
               setCheckin(null);
               setCheckout(null);
               setDateDisplay("");
@@ -353,6 +373,9 @@ export default function RoomStickyBookingWidget({
 
     return () => {
       alive = false;
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+      }
       window.removeEventListener("scroll", handleScrollOrResize);
       window.removeEventListener("resize", handleScrollOrResize);
       fpRef.current?.destroy();
@@ -407,6 +430,20 @@ export default function RoomStickyBookingWidget({
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: STYLES }} />
+
+      {/* Hidden input for Flatpickr instance (accessible on both desktop and mobile) */}
+      <input
+        ref={dateInputRef}
+        type="text"
+        readOnly
+        inputMode="none"
+        tabIndex={-1}
+        autoComplete="off"
+        value={dateDisplay}
+        onFocus={(e) => e.target.blur()}
+        className="sr-only pointer-events-none"
+        aria-hidden="true"
+      />
 
       {/* ── Desktop Sticky Sidebar Widget (Hidden on mobile <lg, visible on lg+) ── */}
       <div className="hidden lg:block sticky top-28 md:top-32 bg-white rounded-[8px] p-6 md:p-7 shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-gray-100">
@@ -518,7 +555,6 @@ export default function RoomStickyBookingWidget({
               ref={dateBoxRef}
               onClick={() => {
                 openCalendar();
-                dateInputRef.current?.blur();
               }}
               className={`w-full h-[44px] px-3.5 sm:px-[32px] rounded-[6px] border ${dateError
                 ? "border-red-400 bg-red-50/50 ring-1 ring-red-400/20"
@@ -529,18 +565,9 @@ export default function RoomStickyBookingWidget({
                 <Calendar
                   className={`w-4 h-4 ${dateError ? "text-red-500" : "text-gray-500"} shrink-0`}
                 />
-                <input
-                  ref={dateInputRef}
-                  type="text"
-                  readOnly
-                  inputMode="none"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  value={dateDisplay}
-                  onFocus={(e) => e.target.blur()}
-                  placeholder="Select check-in & check-out"
-                  className="w-full bg-transparent text-[13.5px] text-gray-900 font-medium outline-none cursor-pointer placeholder:text-gray-400 truncate font-sans pointer-events-none select-none"
-                />
+                <span className={`w-full bg-transparent text-[13.5px] font-medium truncate font-sans ${dateDisplay ? "text-gray-900" : "text-gray-400"}`}>
+                  {dateDisplay || "Select check-in & check-out"}
+                </span>
               </div>
             </div>
           </div>
@@ -576,7 +603,6 @@ export default function RoomStickyBookingWidget({
             ref={mobileDateBoxRef}
             onClick={() => {
               openCalendar();
-              dateInputRef.current?.blur();
             }}
             className={`w-full h-[44px] px-3 sm:px-[32px] bg-white border ${dateError
               ? "border-red-400 ring-1 ring-red-400/30"
@@ -644,13 +670,14 @@ const STYLES = `
   @media (max-width: 1023px) {
     .flatpickr-calendar {
       position: fixed !important;
-      bottom: 106px !important;
+      bottom: 120px !important;
       left: 50% !important;
       transform: translateX(-50%) !important;
       top: auto !important;
       right: auto !important;
-      width: min(340px, calc(100vw - 32px)) !important;
-      max-width: min(340px, calc(100vw - 32px)) !important;
+      width: min(340px, calc(100vw - 24px)) !important;
+      max-width: min(340px, calc(100vw - 24px)) !important;
+      z-index: 999999 !important;
     }
   }
 
@@ -737,7 +764,6 @@ const STYLES = `
     align-items: center !important;
     justify-content: center !important;
     cursor: pointer !important;
-    transition: background-color 0.15s ease, color 0.15s ease !important;
   }
   @media (max-width: 640px) {
     .flatpickr-day {
@@ -749,25 +775,10 @@ const STYLES = `
     }
   }
   .flatpickr-day:hover,
-  .flatpickr-day:focus {
+  .flatpickr-day.prevMonthDay:hover,
+  .flatpickr-day.nextMonthDay:hover {
     background: #f1f5f9 !important;
     color: #0d1b2e !important;
-  }
-  .flatpickr-day.inRange {
-    background: #e2e8f0 !important;
-    color: #0d1b2e !important;
-    border-radius: 0 !important;
-    box-shadow: -5px 0 0 #e2e8f0, 5px 0 0 #e2e8f0 !important;
-  }
-  .flatpickr-day.inRange:hover,
-  .flatpickr-day.prevMonthDay.inRange:hover,
-  .flatpickr-day.nextMonthDay.inRange:hover {
-    background: #0d1b2e !important;
-    color: #ffffff !important;
-    font-weight: 700 !important;
-    border-radius: 6px !important;
-    box-shadow: -5px 0 0 #e2e8f0 !important;
-    border-color: #0d1b2e !important;
   }
   .flatpickr-day.selected,
   .flatpickr-day.startRange,
@@ -776,28 +787,18 @@ const STYLES = `
     color: #ffffff !important;
     font-weight: 700 !important;
     border-color: #0d1b2e !important;
-    border-radius: 6px !important;
+  }
+  .flatpickr-day.inRange {
+    background: #e2e8f0 !important;
+    color: #0d1b2e !important;
+    box-shadow: -10px 0 0 #e2e8f0, 10px 0 0 #e2e8f0 !important;
+    border-color: transparent !important;
   }
   .flatpickr-day.startRange:not(.endRange) {
-    border-top-right-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-    box-shadow: 5px 0 0 #e2e8f0 !important;
+    box-shadow: 10px 0 0 #e2e8f0 !important;
   }
   .flatpickr-day.endRange:not(.startRange) {
-    border-top-left-radius: 0 !important;
-    border-bottom-left-radius: 0 !important;
-    box-shadow: -5px 0 0 #e2e8f0 !important;
-  }
-  .flatpickr-day.startRange.endRange {
-    border-radius: 6px !important;
-    box-shadow: none !important;
-  }
-  .flatpickr-day.selected:hover,
-  .flatpickr-day.startRange:hover,
-  .flatpickr-day.endRange:hover {
-    background: #162840 !important;
-    color: #ffffff !important;
-    border-color: #162840 !important;
+    box-shadow: -10px 0 0 #e2e8f0 !important;
   }
   .flatpickr-day.today {
     border: 1.5px solid #0d1b2e !important;
