@@ -56,7 +56,6 @@ const citySchema = new Schema<ICity>(
   { timestamps: true }
 );
 
-citySchema.index({ slug: 1 }, { unique: true });
 citySchema.index({ active: 1 });
 
 let City: Model<ICity>;

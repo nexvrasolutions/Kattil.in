@@ -15,6 +15,7 @@ export interface PublicGalleryItem {
   alt: string;
   caption?: string;
   category: string;
+  citySlug?: string;
   cityName?: string;
   featured?: boolean;
   width?: number;
@@ -28,9 +29,11 @@ export interface PublicGalleryCategory {
 
 export const STATIC_CATEGORIES: PublicGalleryCategory[] = [
   { slug: "all", name: "All" },
+  { slug: "rooms", name: "Rooms" },
+  { slug: "exterior", name: "Exterior" },
+  { slug: "outdoor", name: "Outdoor" },
   { slug: "resort", name: "Resort" },
   { slug: "dining", name: "Dining" },
-  { slug: "rooms", name: "Rooms" },
   { slug: "experience", name: "Experience" },
 ];
 
@@ -103,23 +106,20 @@ export const STATIC_ITEMS: PublicGalleryItem[] = [
 export default function GalleryContent({
   items: initialItems,
   categories: initialCategories,
+  initialCity,
+  initialCategory,
 }: {
   items: PublicGalleryItem[];
   categories: PublicGalleryCategory[];
+  initialCity?: string;
+  initialCategory?: string;
 }) {
   usePageView();
-  const [activeCategory, setActiveCategory] = useState<string>("all");
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-  // Categories list matching mockup
-  const categoriesList = useMemo(() => {
-    if (initialCategories && initialCategories.length > 0) {
-      const hasAll = initialCategories.some((c) => c.slug.toLowerCase() === "all");
-      const list = hasAll ? initialCategories : [{ slug: "all", name: "All" }, ...initialCategories];
-      return list;
-    }
-    return STATIC_CATEGORIES;
-  }, [initialCategories]);
+  const [activeCategory, setActiveCategory] = useState<string>(
+    initialCategory ? initialCategory.toLowerCase() : "all"
+  );
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   // Gallery items fallback
   const allItems = useMemo(() => {
@@ -129,16 +129,64 @@ export default function GalleryContent({
     return STATIC_ITEMS;
   }, [initialItems]);
 
-  // Filter items by selected category
-  const filteredItems = useMemo(() => {
-    if (!activeCategory || activeCategory === "all") {
-      return allItems;
+  // Build categories list
+  const categoriesList = useMemo(() => {
+    const list: PublicGalleryCategory[] = [{ slug: "all", name: "All" }];
+    const seen = new Set<string>(["all"]);
+
+    if (initialCategories && initialCategories.length > 0) {
+      for (const c of initialCategories) {
+        const slug = c.slug.toLowerCase().trim();
+        if (!seen.has(slug)) {
+          seen.add(slug);
+          list.push({ slug, name: c.name });
+        }
+      }
     }
-    const lower = activeCategory.toLowerCase();
-    return allItems.filter(
-      (item) => item.category?.toLowerCase() === lower || item.category?.toLowerCase().includes(lower)
-    );
-  }, [allItems, activeCategory]);
+
+    // Check if items have unique categories not present
+    for (const item of allItems) {
+      if (item.category && !seen.has(item.category.toLowerCase())) {
+        seen.add(item.category.toLowerCase());
+        const capitalized =
+          item.category.charAt(0).toUpperCase() + item.category.slice(1);
+        list.push({ slug: item.category.toLowerCase(), name: capitalized });
+      }
+    }
+
+    return list;
+  }, [initialCategories, allItems]);
+
+  // Filter items by city (if provided in URL) and category
+  const filteredItems = useMemo(() => {
+    let result = allItems;
+
+    // Filter by city if navigated from a particular property or URL param
+    if (initialCity && initialCity.toLowerCase() !== "all") {
+      const lowerCity = initialCity.toLowerCase().trim();
+      result = result.filter((item) => {
+        const itemCitySlug = item.citySlug?.toLowerCase();
+        const itemCityName = item.cityName?.toLowerCase();
+        return (
+          itemCitySlug === lowerCity ||
+          itemCityName === lowerCity ||
+          itemCitySlug?.includes(lowerCity) ||
+          itemCityName?.includes(lowerCity)
+        );
+      });
+    }
+
+    // Filter by active category
+    if (activeCategory && activeCategory !== "all") {
+      const lowerCat = activeCategory.toLowerCase().trim();
+      result = result.filter((item) => {
+        const itemCat = item.category?.toLowerCase();
+        return itemCat === lowerCat || itemCat?.includes(lowerCat);
+      });
+    }
+
+    return result;
+  }, [allItems, initialCity, activeCategory]);
 
   // Lightbox keyboard navigation
   const handlePrev = useCallback(() => {
@@ -252,7 +300,7 @@ export default function GalleryContent({
               </div>
             </motion.div>
 
-            {/* Gallery Responsive Grid — All on One Page */}
+            {/* Gallery Responsive Grid */}
             {filteredItems.length === 0 ? (
               <div className="py-24 text-center text-gray-500 font-sans">
                 No moments found in this category.

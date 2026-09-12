@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SITE_URL } from "@/lib/seo";
 import { connectDB } from "@/lib/db/mongodb";
+import CityModel from "@/lib/models/City";
 import GalleryModel from "@/lib/models/Gallery";
 import GalleryCategoryModel from "@/lib/models/GalleryCategory";
 import GalleryContent, {
@@ -34,7 +35,7 @@ async function getGalleryData(): Promise<{
     const [rawItems, rawCats] = await Promise.all([
       GalleryModel.find({})
         .sort({ order: 1, createdAt: -1 })
-        .populate("city", "name")
+        .populate({ path: "city", model: CityModel, select: "name slug" })
         .lean<
           Array<{
             _id: unknown;
@@ -42,7 +43,7 @@ async function getGalleryData(): Promise<{
             alt: string;
             caption?: string;
             category: string;
-            city?: { name: string } | null;
+            city?: { _id: unknown; name: string; slug: string } | null;
             featured?: boolean;
             order?: number;
             width?: number;
@@ -74,19 +75,36 @@ async function getGalleryData(): Promise<{
       alt: item.alt || "Kattil Hotel Gallery Space",
       caption: item.caption,
       category: String(item.category || "rooms").toLowerCase(),
-      cityName: item.city?.name?.toLowerCase() ?? undefined,
+      citySlug: item.city?.slug ? String(item.city.slug).toLowerCase() : undefined,
+      cityName: item.city?.name ? String(item.city.name) : undefined,
       featured: Boolean(item.featured),
       width: item.width,
       height: item.height,
     }));
 
     return { items, categories };
-  } catch {
-    return { items: STATIC_ITEMS, categories: STATIC_CATEGORIES };
+  } catch (err) {
+    console.error("Error fetching gallery data:", err);
+    return {
+      items: STATIC_ITEMS,
+      categories: STATIC_CATEGORIES,
+    };
   }
 }
 
-export default async function GalleryPage() {
+interface PageProps {
+  searchParams?: Promise<{ city?: string; category?: string }>;
+}
+
+export default async function GalleryPage({ searchParams }: PageProps) {
+  const sParams = searchParams ? await searchParams : {};
   const { items, categories } = await getGalleryData();
-  return <GalleryContent items={items} categories={categories} />;
+  return (
+    <GalleryContent
+      items={items}
+      categories={categories}
+      initialCity={sParams?.city}
+      initialCategory={sParams?.category}
+    />
+  );
 }

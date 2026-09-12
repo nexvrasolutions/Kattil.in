@@ -1,6 +1,8 @@
 import { NextRequest } from "next/server";
+import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db/mongodb";
 import Gallery from "@/lib/models/Gallery";
+import { clearPropertyCache } from "@/lib/db/rooms";
 import { apiSuccess, apiError, handleApiError } from "@/lib/utils/api";
 import { deleteUploadedFile } from "@/lib/utils/fileCleanup";
 import { updateGallerySchema } from "@/lib/validations";
@@ -38,6 +40,11 @@ export async function PUT(request: NextRequest, { params }: Params) {
       await deleteUploadedFile(oldItem.src);
     }
 
+    clearPropertyCache();
+    revalidatePath("/gallery");
+    revalidatePath("/properties", "layout");
+    revalidatePath("/", "layout");
+
     return apiSuccess(item);
   } catch (error) {
     console.error("[PUT /api/admin/gallery/[id]]", error);
@@ -52,9 +59,16 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
     const item = await Gallery.findByIdAndDelete(id);
     if (!item) return apiError("Gallery item not found", 404);
     await deleteUploadedFile(item.src);
+
+    clearPropertyCache();
+    revalidatePath("/gallery");
+    revalidatePath("/properties", "layout");
+    revalidatePath("/", "layout");
+
     return apiSuccess({ deleted: true });
   } catch (error) {
     console.error("[DELETE /api/admin/gallery/[id]]", error);
     return handleApiError(error);
   }
 }
+

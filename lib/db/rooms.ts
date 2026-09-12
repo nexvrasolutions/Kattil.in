@@ -2,6 +2,7 @@ import { connectDB } from "@/lib/db/mongodb";
 import Room from "@/lib/models/Room";
 import Property from "@/lib/models/Property";
 import City from "@/lib/models/City";
+import Gallery from "@/lib/models/Gallery";
 import { PropertyDetailsData, PropertyRoomOption } from "@/components/section/rooms/PropertyDetailsView";
 import { locationRooms } from "@/lib/data";
 
@@ -268,9 +269,45 @@ export async function getPropertyDetailsData(
       roomOptions = getFallbackRoomOptions(destinationSlug);
     }
 
+    // 1. Photos specifically uploaded in Admin Panel under Content Management > Gallery for this location
+    let adminGalleryPhotos: string[] = [];
+    if (city?._id) {
+      try {
+        const cityGalleries = await Gallery.find({ city: city._id })
+          .sort({ order: 1, createdAt: -1 })
+          .lean();
+        adminGalleryPhotos = cityGalleries.map((g: any) => g.src).filter(Boolean);
+      } catch (err) {
+        console.warn("[getPropertyDetailsData] Could not fetch admin gallery:", err);
+      }
+    }
+
+    // 2. Photos uploaded in Admin Panel under Properties
+    const propertyPhotos: string[] = Array.isArray(property?.images)
+      ? property.images.filter(Boolean)
+      : [];
+
+    // 3. Photos uploaded in Admin Panel under Rooms
+    const roomPhotos: string[] = roomsList.flatMap((r: any) =>
+      Array.isArray(r.images) ? r.images.filter(Boolean) : []
+    );
+
+    // Gallery section strictly contains photos uploaded in Admin Panel under Content Management > Gallery
+    const galleryImages = adminGalleryPhotos;
+
+    const hasCustomPropertyPhotos =
+      propertyPhotos.length > 0 &&
+      !propertyPhotos.every((img) => img.includes("kattil-room-hero") || img.includes("deluxe-garden-suite"));
+
     const heroImages =
-      property?.images && property.images.length > 0
-        ? property.images
+      hasCustomPropertyPhotos
+        ? propertyPhotos
+        : adminGalleryPhotos.length > 0
+        ? adminGalleryPhotos
+        : propertyPhotos.length > 0
+        ? propertyPhotos
+        : roomPhotos.length > 0
+        ? roomPhotos
         : [
             "/assets/kattil-room-hero.webp",
             "/assets/deluxe-garden-suite.webp",
@@ -289,6 +326,7 @@ export async function getPropertyDetailsData(
         city?.description ||
         `${propertyName} offers thoughtfully designed spaces with modern amenities, warm hospitality, and a vibrant community experience for students and professionals.`,
       heroImages,
+      galleryImages,
       address: property?.address || city?.address || cityConfig.address,
       mapLink: property?.mapSrc || city?.mapSrc || cityConfig.mapSrc,
       phone: property?.phone || city?.phone || cityConfig.phone,

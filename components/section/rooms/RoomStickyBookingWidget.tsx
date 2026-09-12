@@ -736,6 +736,8 @@ const STYLES = `
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    cursor: pointer !important;
+    transition: background-color 0.15s ease, color 0.15s ease !important;
   }
   @media (max-width: 640px) {
     .flatpickr-day {
@@ -746,9 +748,26 @@ const STYLES = `
       font-size: 11px !important;
     }
   }
-  .flatpickr-day:hover {
+  .flatpickr-day:hover,
+  .flatpickr-day:focus {
     background: #f1f5f9 !important;
     color: #0d1b2e !important;
+  }
+  .flatpickr-day.inRange {
+    background: #e2e8f0 !important;
+    color: #0d1b2e !important;
+    border-radius: 0 !important;
+    box-shadow: -5px 0 0 #e2e8f0, 5px 0 0 #e2e8f0 !important;
+  }
+  .flatpickr-day.inRange:hover,
+  .flatpickr-day.prevMonthDay.inRange:hover,
+  .flatpickr-day.nextMonthDay.inRange:hover {
+    background: #0d1b2e !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    border-radius: 6px !important;
+    box-shadow: -5px 0 0 #e2e8f0 !important;
+    border-color: #0d1b2e !important;
   }
   .flatpickr-day.selected,
   .flatpickr-day.startRange,
@@ -757,11 +776,28 @@ const STYLES = `
     color: #ffffff !important;
     font-weight: 700 !important;
     border-color: #0d1b2e !important;
+    border-radius: 6px !important;
   }
-  .flatpickr-day.inRange {
-    background: #e2e8f0 !important;
-    color: #0d1b2e !important;
-    box-shadow: -5px 0 0 #e2e8f0, 5px 0 0 #e2e8f0 !important;
+  .flatpickr-day.startRange:not(.endRange) {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    box-shadow: 5px 0 0 #e2e8f0 !important;
+  }
+  .flatpickr-day.endRange:not(.startRange) {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    box-shadow: -5px 0 0 #e2e8f0 !important;
+  }
+  .flatpickr-day.startRange.endRange {
+    border-radius: 6px !important;
+    box-shadow: none !important;
+  }
+  .flatpickr-day.selected:hover,
+  .flatpickr-day.startRange:hover,
+  .flatpickr-day.endRange:hover {
+    background: #162840 !important;
+    color: #ffffff !important;
+    border-color: #162840 !important;
   }
   .flatpickr-day.today {
     border: 1.5px solid #0d1b2e !important;

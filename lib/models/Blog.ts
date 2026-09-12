@@ -4,27 +4,28 @@ export interface IBlog extends Document {
   title: string;
   slug: string;
   category: string;
-  excerpt: string;
-  content: string;
-  image: string;
-  additionalImages: string[];   // extra supporting images
-  readTime: string;
-  date: string;
+  excerpt?: string;
+  content?: string;
+  image?: string;
+  additionalImages?: string[];   // extra supporting images
+  readTime?: string;
+  date?: string;
   publishedAt?: Date;
-  featured: boolean;
-  status: "draft" | "published";
+  featured?: boolean;
+  status?: "draft" | "published";
   author?: string;
-  tags: string[];
+  tags?: string[];
   seo?: {
     title?: string;
     description?: string;
     keywords?: string;
     ogImage?: string;
   };
-  order: number;
-  createdAt: Date;
-  updatedAt: Date;
+  order?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
+
 
 const seoSubdoc = new Schema(
   { title: { type: String }, description: { type: String }, keywords: { type: String }, ogImage: { type: String } },
@@ -53,7 +54,6 @@ const blogSchema = new Schema<IBlog>(
   { timestamps: true }
 );
 
-blogSchema.index({ slug: 1 }, { unique: true });
 blogSchema.index({ status: 1 });
 blogSchema.index({ featured: 1 });
 blogSchema.index({ category: 1 });
