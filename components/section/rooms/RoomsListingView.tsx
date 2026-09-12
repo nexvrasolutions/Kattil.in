@@ -173,7 +173,7 @@ export default function RoomsListingView({
               </Link>
             </motion.div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 sm:gap-8 md:gap-8">
               {rooms.map((room, idx) => {
                 const roomImg =
                   (room.images && room.images.length > 0 && room.images[0]) ||

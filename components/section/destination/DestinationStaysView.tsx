@@ -428,7 +428,8 @@ export default function DestinationStaysView({
                   grid-cols-1
                   md:grid-cols-2
                   lg:grid-cols-3
-                  gap-6
+                  gap-7
+                  sm:gap-8
                   md:gap-8
                   justify-items-center
                   lg:justify-items-start
@@ -526,7 +527,10 @@ export default function DestinationStaysView({
                           relative
                           block
                           w-full
-                          h-[279px]
+                          h-[300px]
+                          min-[400px]:h-[320px]
+                          sm:h-[300px]
+                          md:h-[279px]
                           bg-gray-100
                           overflow-hidden
                           rounded-t-[8px]

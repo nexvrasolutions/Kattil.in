@@ -626,10 +626,10 @@ export default function BookingBarWidget({
                         </span>
                       </div>
 
-                      {/* Scrollable Hotels / Places List - Displays 3 properties completely, scroll for the rest */}
+                      {/* Scrollable Hotels / Places List - Displays exactly 4 properties with 9px gap, scroll for the balance */}
                       <div
                         data-prevent-hero-scroll="true"
-                        className="booking-dropdown-scrollbar max-h-[152px] overflow-y-auto overscroll-contain p-1 space-y-1"
+                        className="booking-dropdown-scrollbar max-h-[211px] overflow-y-auto overscroll-contain p-1 space-y-[9px]"
                         onWheel={(e) => e.stopPropagation()}
                         onTouchMove={(e) => e.stopPropagation()}
                       >
@@ -661,7 +661,7 @@ export default function BookingBarWidget({
                                     );
                                   }
                                 }}
-                                className={`w-full h-[48px] px-2.5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors rounded-[5px] cursor-pointer ${isSelected ? "bg-emerald-50 text-gray-900 font-semibold" : "text-gray-700"
+                                className={`w-full h-[44px] shrink-0 px-2.5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors rounded-[5px] cursor-pointer ${isSelected ? "bg-emerald-50 text-gray-900 font-semibold" : "text-gray-700"
                                   }`}
                               >
                                 <div className="flex items-center gap-2.5 min-w-0 pr-2">

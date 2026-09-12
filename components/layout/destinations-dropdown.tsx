@@ -236,7 +236,7 @@ export function MobileDestinationsList({
 
   return (
     <div className="mt-3.5 bg-white rounded-[8px] p-3 sm:p-4 shadow-xl border border-gray-100/90 overflow-hidden text-left">
-      <div className="divide-y divide-gray-100">
+      <div className="flex flex-col gap-2.5">
         {displayedDestinations.map((dest) => {
           const targetLink =
             dest.link?.trim() ||
@@ -257,7 +257,7 @@ export function MobileDestinationsList({
               href={targetLink}
               prefetch={true}
               onClick={onItemClick}
-              className="flex items-center gap-3.5 py-3 px-1.5 rounded-[8px] hover:bg-slate-50 transition-colors group"
+              className="flex items-center gap-3.5 p-2.5 rounded-[8px] bg-slate-50/60 hover:bg-slate-100/80 border border-slate-100/80 transition-colors group"
             >
               <div className="relative w-13 h-13 rounded-[8px] overflow-hidden bg-slate-100 shrink-0 border border-slate-100 shadow-xs">
                 <Image

@@ -108,7 +108,7 @@ export default function DestinationsSection() {
         </motion.div>
 
         {/* Dynamic Destination Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 justify-items-stretch">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-6 lg:gap-6 justify-items-stretch">
           {destinations.map((dest, index) => (
             <motion.div
               key={dest.id}

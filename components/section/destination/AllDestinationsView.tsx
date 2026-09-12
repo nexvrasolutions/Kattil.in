@@ -118,7 +118,7 @@ export default function AllDestinationsView({
           sm:grid-cols-2
           md:grid-cols-3
           lg:grid-cols-4
-          gap-6
+          gap-7
           md:gap-7
           justify-items-center
         "
