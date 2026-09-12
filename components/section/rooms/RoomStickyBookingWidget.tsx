@@ -224,7 +224,7 @@ export default function RoomStickyBookingWidget({
 
       if (isMobile) {
         instance.calendarContainer.style.position = "fixed";
-        instance.calendarContainer.style.bottom = "120px";
+        instance.calendarContainer.style.bottom = "172px";
         instance.calendarContainer.style.top = "auto";
         instance.calendarContainer.style.left = "50%";
         instance.calendarContainer.style.right = "auto";
@@ -604,26 +604,26 @@ export default function RoomStickyBookingWidget({
             onClick={() => {
               openCalendar();
             }}
-            className={`w-full h-[44px] px-3 sm:px-[32px] bg-white border ${dateError
+            className={`w-full h-[58px] sm:h-[60px] px-4 sm:px-[32px] bg-white border ${dateError
               ? "border-red-400 ring-1 ring-red-400/30"
               : "border-[#d8e0ea] hover:border-gray-400"
-              } rounded-[6px] flex items-center justify-between cursor-pointer transition-colors shadow-2xs select-none`}
+              } rounded-[8px] flex items-center justify-between cursor-pointer transition-colors shadow-2xs select-none`}
           >
-            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
               <Calendar
-                className={`w-4 h-4 sm:w-4.5 sm:h-4.5 ${dateError ? "text-red-500" : "text-[#0d1b2e]"
+                className={`w-5 h-5 sm:w-5.5 sm:h-5.5 ${dateError ? "text-red-500" : "text-[#0d1b2e]"
                   } shrink-0 stroke-[1.6]`}
               />
               <div className="flex flex-col text-left justify-center min-w-0 leading-tight">
-                <span className="text-[10px] font-semibold text-[#64748b] font-sans truncate">
+                <span className="text-[11px] sm:text-[11.5px] font-semibold text-[#64748b] font-sans truncate">
                   Check In - Check Out
                 </span>
-                <span className="text-[12px] sm:text-[13px] font-bold text-[#0d1b2e] font-sans truncate">
+                <span className="text-[14px] sm:text-[14.5px] font-bold text-[#0d1b2e] font-sans truncate mt-0.5">
                   {dateDisplay || "Select dates"}
                 </span>
               </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-[#0d1b2e] shrink-0 stroke-[2.5]" />
+            <ChevronRight className="w-5 h-5 text-[#0d1b2e] shrink-0 stroke-[2.5]" />
           </div>
 
           {/* Mobile Date Error */}
@@ -637,7 +637,7 @@ export default function RoomStickyBookingWidget({
           <button
             type="button"
             onClick={handleCheckAvailability}
-            className="w-full h-[44px] mt-2 px-3 sm:px-[32px] rounded-[6px] bg-[#0d1b2e] hover:bg-[#162840] text-white font-semibold text-[13.5px] sm:text-[14px] shadow-sm transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center font-sans tracking-wide"
+            className="w-full h-[58px] sm:h-[60px] mt-2.5 sm:mt-3 px-4 sm:px-[32px] rounded-[8px] bg-[#0d1b2e] hover:bg-[#162840] text-white font-semibold text-[15px] sm:text-[15.5px] shadow-sm transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center font-sans tracking-wide"
           >
             Check Availability
           </button>
@@ -670,7 +670,7 @@ const STYLES = `
   @media (max-width: 1023px) {
     .flatpickr-calendar {
       position: fixed !important;
-      bottom: 120px !important;
+      bottom: 172px !important;
       left: 50% !important;
       transform: translateX(-50%) !important;
       top: auto !important;
