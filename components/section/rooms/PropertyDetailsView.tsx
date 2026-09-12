@@ -217,9 +217,9 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
 
       <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
         <div className="px-5 md:px-8 lg:px-15 pt-28 md:pt-36 lg:pt-40 pb-28 lg:pb-20">
-          {/* ── 1. Top Panoramic Hero Carousel (Infinite Side-peek Slideshow) ── */}
+          {/* ── 1. Top Panoramic Hero Carousel (Edge-to-Edge Full-Bleed Slideshow) ── */}
           <section
-            className="relative w-full mb-12 md:mb-16 -mx-5 md:-mx-8 lg:-mx-15 !w-[calc(100%+2.5rem)] md:!w-[calc(100%+4rem)] lg:!w-[calc(100%+7.5rem)] overflow-hidden select-none py-2"
+            className="relative w-screen left-1/2 -translate-x-1/2 overflow-hidden select-none mb-12 md:mb-16 py-1"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
@@ -228,7 +228,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
             <div
               className="flex items-center"
               style={{
-                transform: `translateX(calc(12% - ${currentIndex * 76}% - ${currentIndex * 16}px + ${touchDeltaX}px))`,
+                transform: `translateX(calc(12vw - ${currentIndex * 76}vw - ${currentIndex * 16}px + ${touchDeltaX}px))`,
                 gap: "16px",
                 transition: isTransitioning
                   ? "transform 650ms cubic-bezier(0.25, 1, 0.5, 1)"
@@ -245,9 +245,9 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                       setIsTransitioning(true);
                       setCurrentIndex(idx);
                     }}
-                    className={`shrink-0 w-[76%] aspect-[16/10] sm:aspect-[16/9] md:aspect-[21/10] max-h-[560px] rounded-[16px] sm:rounded-[20px] md:rounded-[24px] overflow-hidden relative transition-all duration-500 cursor-pointer ${isActive
+                    className={`shrink-0 w-[76vw] aspect-[16/10] sm:aspect-[16/9] md:aspect-[21/10] max-h-[560px] rounded-[16px] sm:rounded-[20px] md:rounded-[24px] overflow-hidden relative transition-all duration-500 cursor-pointer ${isActive
                       ? "opacity-100 scale-100 ring-1 ring-black/5"
-                      : "opacity-80 hover:opacity-95 scale-[0.985]"
+                      : "opacity-80 hover:opacity-95 scale-[0.99]"
                       }`}
                   >
                     <Image
@@ -255,7 +255,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                       alt={`${data.name} photo ${(idx % images.length) + 1}`}
                       fill
                       priority={idx === images.length}
-                      className="object-cover transition-transform duration-700 hover:scale-103"
+                      className="object-cover"
                     />
                   </div>
                 );

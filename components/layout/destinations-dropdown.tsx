@@ -55,24 +55,6 @@ interface DestinationsDropdownProps {
 }
 
 let cachedDestinations: DestinationItem[] | null = null;
-let destinationsFetchPromise: Promise<DestinationItem[]> | null = null;
-
-async function getCachedDestinations(): Promise<DestinationItem[]> {
-  if (cachedDestinations) return cachedDestinations;
-  if (!destinationsFetchPromise) {
-    destinationsFetchPromise = fetch("/api/destinations")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && data.success && Array.isArray(data.data) && data.data.length > 0) {
-          cachedDestinations = data.data;
-          return data.data;
-        }
-        return FALLBACK_DESTINATIONS;
-      })
-      .catch(() => FALLBACK_DESTINATIONS);
-  }
-  return destinationsFetchPromise;
-}
 
 export default function DestinationsDropdown({
   isOpen,
@@ -90,7 +72,7 @@ export default function DestinationsDropdown({
     fetch("/api/destinations")
       .then((res) => res.json())
       .then((data) => {
-        if (isMounted && data && data.success && Array.isArray(data.data) && data.data.length > 0) {
+        if (isMounted && data && data.success && Array.isArray(data.data)) {
           cachedDestinations = data.data;
           setDestinations(data.data);
         }
@@ -220,7 +202,7 @@ export function MobileDestinationsList({
     fetch("/api/destinations")
       .then((res) => res.json())
       .then((data) => {
-        if (isMounted && data && data.success && Array.isArray(data.data) && data.data.length > 0) {
+        if (isMounted && data && data.success && Array.isArray(data.data)) {
           cachedDestinations = data.data;
           setDestinations(data.data);
         }

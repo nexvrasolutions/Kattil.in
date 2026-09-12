@@ -547,7 +547,7 @@ export default function DestinationsPage() {
         onClose={() => setDeleteId(null)}
         onConfirm={handleDelete}
         title="Delete Destination"
-        message="Are you sure? This will fail if rooms are still assigned to this destination."
+        message="Are you sure you want to delete this destination? It will be removed from the website and navbar, and any linked rooms will be unassigned."
         variant="destructive"
         confirmLabel="Delete Destination"
       />

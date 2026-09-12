@@ -56,7 +56,7 @@ export default function DestinationsSection() {
     fetch("/api/destinations")
       .then((res) => res.json())
       .then((res) => {
-        if (!isMounted || !res.success || !Array.isArray(res.data) || res.data.length === 0) return;
+        if (!isMounted || !res.success || !Array.isArray(res.data)) return;
 
         const activeList: DestinationItem[] = res.data.map((d: any) => ({
           id: d._id || d.slug,

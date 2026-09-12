@@ -626,10 +626,10 @@ export default function BookingBarWidget({
                         </span>
                       </div>
 
-                      {/* Scrollable Hotels / Places List - Displays exactly 4 properties with 9px gap, scroll for the balance */}
+                      {/* Scrollable Hotels / Places List - Displays 3 properties on desktop, balance in scroll */}
                       <div
                         data-prevent-hero-scroll="true"
-                        className="booking-dropdown-scrollbar max-h-[211px] overflow-y-auto overscroll-contain p-1 space-y-[9px]"
+                        className="booking-dropdown-scrollbar max-h-[156px] overflow-y-auto overscroll-contain p-1 space-y-1"
                         onWheel={(e) => e.stopPropagation()}
                         onTouchMove={(e) => e.stopPropagation()}
                       >
@@ -669,10 +669,10 @@ export default function BookingBarWidget({
                                     <MapPin className="w-3.5 h-3.5 text-[#0E2E4E]" />
                                   </div>
                                   <div className="flex flex-col min-w-0 leading-tight">
-                                    <span className="text-[13.5px] sm:text-[14px] font-semibold text-gray-900 truncate leading-tight">
+                                    <span className="text-[13px] sm:text-[13.5px] font-semibold text-gray-900 truncate leading-tight">
                                       {hotel.name}
                                     </span>
-                                    <span className="text-[11.5px] sm:text-[12px] text-gray-500 truncate leading-tight mt-0.5">
+                                    <span className="text-[11px] sm:text-[11.5px] text-gray-500 truncate leading-tight mt-0.5">
                                       {hotel.place}, {hotel.state}
                                     </span>
                                   </div>
@@ -790,6 +790,10 @@ export default function BookingBarWidget({
 
 // ── Custom brand styling ───────────────────────────────────────────────────
 const STYLES = `
+  .booking-dropdown-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f8fafc;
+  }
   .booking-dropdown-scrollbar::-webkit-scrollbar {
     width: 6px;
   }

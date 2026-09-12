@@ -12,7 +12,7 @@ export interface IPropertyDirections {
 export interface IProperty extends Document {
   name: string;
   slug: string;
-  city: mongoose.Types.ObjectId;
+  city?: mongoose.Types.ObjectId;
   badge?: string; // e.g. "Private room", "Homestay", "Hotel", "Boutique Stay"
   category?: string; // "hotel", "homestay", "resort", "hostel"
   tagline?: string;
@@ -28,8 +28,8 @@ export interface IProperty extends Document {
   hotelCode?: string; // Booking API Hotel/PMS Code (e.g. "kattilchennai", "kattil")
   bookingEngineUrl?: string; // Custom Let's Book / Booking Engine URL
   featured: boolean;
-  status: "active" | "inactive" | "maintenance";
   order: number;
+  status: "active" | "inactive" | "maintenance";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -50,7 +50,7 @@ const propertySchema = new Schema<IProperty>(
   {
     name: { type: String, required: true, trim: true },
     slug: { type: String, required: true, trim: true, lowercase: true },
-    city: { type: Schema.Types.ObjectId, ref: "City", required: true },
+    city: { type: Schema.Types.ObjectId, ref: "City", required: false },
     badge: { type: String, default: "Private room" },
     category: {
       type: String,
