@@ -216,10 +216,10 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
       <Navbar />
 
       <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
-        <div className="px-5 md:px-8 lg:px-15 pt-28 md:pt-36 lg:pt-40 pb-28 lg:pb-20">
+        <div className="px-5 md:px-8 lg:px-15 pt-24 sm:pt-28 md:pt-36 lg:pt-40 pb-28 lg:pb-20">
           {/* ── 1. Top Panoramic Hero Carousel (Edge-to-Edge Full-Bleed Slideshow) ── */}
           <section
-            className="relative w-screen left-1/2 -translate-x-1/2 overflow-hidden select-none mb-12 md:mb-16 py-1"
+            className="relative w-screen left-1/2 -translate-x-1/2 overflow-hidden select-none mb-8 sm:mb-12 md:mb-16 py-1 [--slide-width:88vw] [--slide-offset:6vw] [--slide-gap:10px] sm:[--slide-width:82vw] sm:[--slide-offset:9vw] sm:[--slide-gap:12px] md:[--slide-width:76vw] md:[--slide-offset:12vw] md:[--slide-gap:16px]"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
@@ -228,8 +228,8 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
             <div
               className="flex items-center"
               style={{
-                transform: `translateX(calc(12vw - ${currentIndex * 76}vw - ${currentIndex * 16}px + ${touchDeltaX}px))`,
-                gap: "16px",
+                transform: `translateX(calc(var(--slide-offset) - (${currentIndex} * var(--slide-width)) - (${currentIndex} * var(--slide-gap)) + ${touchDeltaX}px))`,
+                gap: "var(--slide-gap)",
                 transition: isTransitioning
                   ? "transform 650ms cubic-bezier(0.25, 1, 0.5, 1)"
                   : "none",
@@ -245,7 +245,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                       setIsTransitioning(true);
                       setCurrentIndex(idx);
                     }}
-                    className={`shrink-0 w-[76vw] aspect-[16/10] sm:aspect-[16/9] md:aspect-[21/10] max-h-[560px] rounded-[16px] sm:rounded-[20px] md:rounded-[24px] overflow-hidden relative transition-all duration-500 cursor-pointer ${isActive
+                    className={`shrink-0 w-[var(--slide-width)] aspect-[4/3] sm:aspect-[16/10] md:aspect-[21/10] max-h-[580px] rounded-[14px] sm:rounded-[20px] md:rounded-[24px] overflow-hidden relative transition-all duration-500 cursor-pointer ${isActive
                       ? "opacity-100 scale-100 ring-1 ring-black/5"
                       : "opacity-80 hover:opacity-95 scale-[0.99]"
                       }`}
