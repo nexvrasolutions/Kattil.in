@@ -651,7 +651,7 @@ export default function BookingBarWidget({
                       {/* Scrollable Hotels / Places List - Displays 3 properties on desktop, balance in scroll */}
                       <div
                         data-prevent-hero-scroll="true"
-                        className="booking-dropdown-scrollbar max-h-[156px] overflow-y-auto overscroll-contain p-1 space-y-1"
+                        className="booking-dropdown-scrollbar max-h-[136px] overflow-y-auto overscroll-contain p-1 space-y-1"
                         onWheel={(e) => e.stopPropagation()}
                         onTouchMove={(e) => e.stopPropagation()}
                       >
@@ -683,7 +683,7 @@ export default function BookingBarWidget({
                                     );
                                   }
                                 }}
-                                className={`w-full h-[44px] shrink-0 px-2.5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors rounded-[5px] cursor-pointer ${isSelected ? "bg-emerald-50 text-gray-900 font-semibold" : "text-gray-700"
+                                className={`w-full h-[40px] shrink-0 px-2.5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors rounded-[5px] cursor-pointer ${isSelected ? "bg-emerald-50 text-gray-900 font-semibold" : "text-gray-700"
                                   }`}
                               >
                                 <div className="flex items-center gap-2.5 min-w-0 pr-2">
@@ -893,6 +893,12 @@ const STYLES = `
     color: #0d1b2e !important;
     padding: 2px 4px !important;
     border-radius: 4px !important;
+  }
+  .flatpickr-prev-month {
+    left: 24px !important;
+  }
+  .flatpickr-next-month {
+    right: 24px !important;
   }
   .flatpickr-prev-month:hover, .flatpickr-next-month:hover {
     background: #f1f5f9 !important;

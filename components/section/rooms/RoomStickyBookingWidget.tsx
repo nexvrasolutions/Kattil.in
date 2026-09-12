@@ -223,15 +223,28 @@ export default function RoomStickyBookingWidget({
       const isMobile = typeof window !== "undefined" && window.innerWidth < 1024;
 
       if (isMobile) {
+        const mobileBox = mobileDateBoxRef.current;
+        const rect = mobileBox ? mobileBox.getBoundingClientRect() : null;
+        const distFromBottom = rect
+          ? Math.round(window.innerHeight - rect.top + 2)
+          : 138;
         instance.calendarContainer.style.position = "fixed";
-        instance.calendarContainer.style.bottom = "172px";
+        instance.calendarContainer.style.bottom = `${distFromBottom}px`;
         instance.calendarContainer.style.top = "auto";
-        instance.calendarContainer.style.left = "50%";
-        instance.calendarContainer.style.right = "auto";
-        instance.calendarContainer.style.transform = "translateX(-50%)";
-        instance.calendarContainer.style.width = "min(340px, calc(100vw - 24px))";
-        instance.calendarContainer.style.minWidth = "min(340px, calc(100vw - 24px))";
-        instance.calendarContainer.style.maxWidth = "min(340px, calc(100vw - 24px))";
+        if (rect) {
+          instance.calendarContainer.style.left = `${rect.left}px`;
+          instance.calendarContainer.style.right = "auto";
+          instance.calendarContainer.style.transform = "none";
+          instance.calendarContainer.style.width = `${rect.width}px`;
+          instance.calendarContainer.style.minWidth = `${rect.width}px`;
+          instance.calendarContainer.style.maxWidth = `${rect.width}px`;
+        } else {
+          instance.calendarContainer.style.left = "50%";
+          instance.calendarContainer.style.right = "auto";
+          instance.calendarContainer.style.transform = "translateX(-50%)";
+          instance.calendarContainer.style.width = "calc(100vw - 20px)";
+          instance.calendarContainer.style.maxWidth = "512px";
+        }
         instance.calendarContainer.style.boxSizing = "border-box";
         instance.calendarContainer.style.zIndex = "999999";
         instance.calendarContainer.classList.remove("arrowTop");
@@ -446,7 +459,7 @@ export default function RoomStickyBookingWidget({
       />
 
       {/* ── Desktop Sticky Sidebar Widget (Hidden on mobile <lg, visible on lg+) ── */}
-      <div className="hidden lg:block sticky top-28 md:top-32 bg-white rounded-[8px] p-6 md:p-7 shadow-[0_4px_24px_rgba(0,0,0,0.06)] border border-gray-100">
+      <div className="hidden lg:block sticky top-40 lg:top-40 bg-white rounded-[8px] p-6 md:p-7 border border-gray-100">
         <div className="space-y-4">
           {/* Location Dropdown */}
           <div className="relative" ref={dropdownRef}>
@@ -670,13 +683,8 @@ const STYLES = `
   @media (max-width: 1023px) {
     .flatpickr-calendar {
       position: fixed !important;
-      bottom: 172px !important;
-      left: 50% !important;
-      transform: translateX(-50%) !important;
-      top: auto !important;
-      right: auto !important;
-      width: min(340px, calc(100vw - 24px)) !important;
-      max-width: min(340px, calc(100vw - 24px)) !important;
+      bottom: 138px;
+      box-sizing: border-box !important;
       z-index: 999999 !important;
     }
   }
@@ -724,6 +732,12 @@ const STYLES = `
     color: #0d1b2e !important;
     padding: 2px 4px !important;
     border-radius: 4px !important;
+  }
+  .flatpickr-prev-month {
+    left: 24px !important;
+  }
+  .flatpickr-next-month {
+    right: 24px !important;
   }
   .flatpickr-prev-month:hover, .flatpickr-next-month:hover {
     background: #f1f5f9 !important;
@@ -791,14 +805,14 @@ const STYLES = `
   .flatpickr-day.inRange {
     background: #e2e8f0 !important;
     color: #0d1b2e !important;
-    box-shadow: -10px 0 0 #e2e8f0, 10px 0 0 #e2e8f0 !important;
+    box-shadow: -25px 0 0 #e2e8f0, 25px 0 0 #e2e8f0 !important;
     border-color: transparent !important;
   }
   .flatpickr-day.startRange:not(.endRange) {
-    box-shadow: 10px 0 0 #e2e8f0 !important;
+    box-shadow: 25px 0 0 #e2e8f0 !important;
   }
   .flatpickr-day.endRange:not(.startRange) {
-    box-shadow: -10px 0 0 #e2e8f0 !important;
+    box-shadow: -25px 0 0 #e2e8f0 !important;
   }
   .flatpickr-day.today {
     border: 1.5px solid #0d1b2e !important;

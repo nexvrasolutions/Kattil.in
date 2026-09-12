@@ -66,7 +66,7 @@ export default function ComfortSection() {
             className="lg:col-span-7 lg:translate-x-[12px] lg:w-[calc(100%-12px)]"
           >
             {/* Heading */}
-            <h2 className="text-[#0d1b2e] text-[34px] sm:text-[42px] md:text-[46px] font-sans font-normal leading-[1.18] tracking-tight mb-10">
+            <h2 className="text-[#0d1b2e] text-[24px] sm:text-[32px] md:text-[36px] font-sans font-normal leading-[1.18] tracking-tight mb-10">
               Designed for{"  "}
               <span className="font-serif italic font-normal text-[#0d1b2e]">
                 Your
@@ -92,12 +92,12 @@ export default function ComfortSection() {
                   }}
                   className="flex items-start gap-3.5"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-[#EDF5E4] border border-[#526442]/20 flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#FFFCF2] flex items-center justify-center shrink-0 mt-0.5">
                     <ShieldCheck className="w-4 h-4 text-[#526442]" />
                   </div>
 
                   <div>
-                    <h3 className="text-[15px] font-semibold text-[#0d1b2e] leading-snug">
+                    <h3 className="text-[20px text-[#0d1b2e] leading-snug">
                       {feature.title}
                     </h3>
                     <p className="text-[13px] text-gray-500 mt-2 leading-relaxed">

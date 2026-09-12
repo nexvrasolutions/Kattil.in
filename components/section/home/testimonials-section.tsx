@@ -339,7 +339,7 @@ export default function TestimonialsSection() {
               {INFINITE_TESTIMONIALS.map((item, index) => (
                 <div
                   key={`mobile-${index}`}
-                  className="w-[calc(100vw-64px)] max-w-[340px] shrink-0 snap-start bg-white rounded-[20px] p-5 sm:p-6 flex flex-col justify-between shadow-[0_4px_25px_rgba(0,0,0,0.04)] border border-black/[0.04] select-none min-h-[260px]"
+                  className="w-[calc(100vw-64px)] max-w-[340px] shrink-0 snap-start bg-white rounded-[20px] p-5 sm:p-6 flex flex-col justify-between border border-black/[0.04] select-none min-h-[260px]"
                 >
                   <div>
                     {/* 5 Stars */}
@@ -386,11 +386,10 @@ export default function TestimonialsSection() {
                   type="button"
                   onClick={() => scrollToMobileCard(i)}
                   aria-label={`Go to review ${i + 1}`}
-                  className={`transition-all duration-300 cursor-pointer ${
-                    mobileActiveIndex === i
-                      ? "w-6 h-2 bg-[#8EA980] rounded-full"
-                      : "w-2 h-2 bg-[#D1D5DB] hover:bg-gray-400 rounded-full"
-                  }`}
+                  className={`transition-all duration-300 cursor-pointer ${mobileActiveIndex === i
+                    ? "w-6 h-2 bg-[#8EA980] rounded-full"
+                    : "w-2 h-2 bg-[#D1D5DB] hover:bg-gray-400 rounded-full"
+                    }`}
                 />
               ))}
             </div>
@@ -422,7 +421,7 @@ export default function TestimonialsSection() {
                     {pageReviews.map((item, index) => (
                       <div
                         key={`${pageIdx}-${index}`}
-                        className="bg-white rounded-[20px] p-6 sm:p-7 md:p-8 flex flex-col justify-between shadow-[0_4px_25px_rgba(0,0,0,0.03)] border border-black/[0.03] hover:shadow-[0_12px_36px_rgba(0,0,0,0.07)] transition-all duration-300 min-h-[290px]"
+                        className="bg-white rounded-[20px] p-6 sm:p-7 md:p-8 flex flex-col justify-between border border-black/[0.03] transition-all duration-300 min-h-[290px]"
                       >
                         <div>
                           {/* 5 Stars */}
@@ -470,11 +469,10 @@ export default function TestimonialsSection() {
                   type="button"
                   onClick={() => goToDesktopSlide(i)}
                   aria-label={`Go to testimonial slide ${i + 1}`}
-                  className={`transition-all duration-300 cursor-pointer ${
-                    currentDesktopActiveDot === i
-                      ? "w-7 h-2.5 bg-[#8EA980] rounded-full scale-105"
-                      : "w-2.5 h-2.5 bg-[#D1D5DB] hover:bg-gray-400 rounded-full"
-                  }`}
+                  className={`transition-all duration-300 cursor-pointer ${currentDesktopActiveDot === i
+                    ? "w-7 h-2.5 bg-[#8EA980] rounded-full scale-105"
+                    : "w-2.5 h-2.5 bg-[#D1D5DB] hover:bg-gray-400 rounded-full"
+                    }`}
                 />
               ))}
             </div>

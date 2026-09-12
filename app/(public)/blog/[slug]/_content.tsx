@@ -156,7 +156,7 @@ export default function BlogDetailContent({
       <Navbar />
 
       {/* ── 1. Hero Header Section (Sage Green) ───────────────────────────── */}
-      <section className="relative w-full bg-[#8E9F78] overflow-hidden min-h-[300px] sm:min-h-[400px] md:min-h-[450px] lg:min-h-[500px] flex flex-col justify-end pt-28 sm:pt-32 md:pt-34 lg:pt-36 pb-8 sm:pb-9 md:pb-10 lg:pb-12">
+      <section className="relative w-full bg-[#8E9F78] overflow-hidden min-h-[300px] sm:min-h-[400px] md:min-h-[450px] lg:min-h-[500px] flex flex-col justify-end pt-28 sm:pt-32 md:pt-34 lg:pt-36 pb-[64px]">
         {/* Right Background Monument Skyline Silhouette */}
         <motion.div
           initial={{ opacity: 0, x: 30 }}

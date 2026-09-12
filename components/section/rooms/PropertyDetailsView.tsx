@@ -273,49 +273,31 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
               })}
             </div>
 
-            {/* Previous / Next Controls */}
+            {/* Previous / Next Controls - Desktop only */}
             {images.length > 1 && (
               <>
-                {/* <button
+                <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     handlePrevSlide();
                   }}
-                  className="absolute left-3 sm:left-6 md:left-10 lg:left-14 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 hover:bg-white text-gray-900 shadow-[0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm flex items-center justify-center transition-all hover:scale-108 active:scale-95 cursor-pointer"
+                  className="hidden md:flex absolute left-4 md:left-6 lg:left-10 top-1/2 -translate-y-1/2 z-20 w-11 h-11 lg:w-12 lg:h-12 rounded-full bg-white/90 hover:bg-white text-gray-900 backdrop-blur-sm items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
                   aria-label="Previous image"
                 >
-                  <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
-                </button> */}
-                {/* <button
+                  <ChevronLeft className="w-5 h-5 lg:w-6 lg:h-6" />
+                </button>
+                <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleNextSlide();
                   }}
-                  className="absolute right-3 sm:right-6 md:right-10 lg:right-14 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/90 hover:bg-white text-gray-900 shadow-[0_4px_16px_rgba(0,0,0,0.15)] backdrop-blur-sm flex items-center justify-center transition-all hover:scale-108 active:scale-95 cursor-pointer"
+                  className="hidden md:flex absolute right-4 md:right-6 lg:right-10 top-1/2 -translate-y-1/2 z-20 w-11 h-11 lg:w-12 lg:h-12 rounded-full bg-white/90 hover:bg-white text-gray-900 backdrop-blur-sm items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer"
                   aria-label="Next image"
                 >
-                  <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
-                </button> */}
-
-                {/* Dot Indicators
-                <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md shadow-sm">
-                  {images.map((_, dotIdx) => (
-                    <button
-                      key={dotIdx}
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsTransitioning(true);
-                        setCurrentIndex(images.length + dotIdx);
-                      }}
-                      className={`h-2 rounded-full transition-all duration-300 cursor-pointer ${dotIdx === activeDotIndex ? "w-6 bg-white" : "w-2 bg-white/50 hover:bg-white/75"
-                        }`}
-                      aria-label={`Go to slide ${dotIdx + 1}`}
-                    />
-                  ))}
-                </div> */}
+                  <ChevronRight className="w-5 h-5 lg:w-6 lg:h-6" />
+                </button>
               </>
             )}
           </section>
@@ -344,7 +326,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
 
                 {/* Premium Amenities */}
                 <div className="mt-12">
-                  <h2 className="font-sans text-2xl md:text-[26px] font-semibold text-[#111827] mb-10">
+                  <h2 className="font-sans text-2xl md:text-[28px] font-semibold text-[#111827] mb-10">
                     Premium Amenities
                   </h2>
 
@@ -381,8 +363,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ duration: 0.5, ease: EASE }}
-                  className="font-sans text-2xl md:text-3xl font-semibold text-[#111827] mb-10"
-                >
+                  className="font-sans text-2xl md:text-[28px] font-semibold text-[#111827] mb-10"                >
                   Select Room
                 </motion.h2>
 
@@ -440,8 +421,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true, margin: "-40px" }}
                         transition={{ duration: 0.5, delay: rIdx * 0.09, ease: EASE }}
-                        whileHover={{ y: -4, transition: { duration: 0.25 } }}
-                        className="bg-white rounded-[8px] overflow-hidden border border-gray-100 shadow-[0_4px_24px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0_12px_32px_rgba(0,0,0,0.06)] group"
+                        className="bg-white rounded-[8px] overflow-hidden border border-gray-100"
                       >
                         <div className="w-full max-w-[865px] flex flex-col sm:flex-row gap-0 sm:gap-[20px] md:gap-[26px] h-auto sm:h-[290px]">
 
@@ -452,7 +432,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                               alt={room.name}
                               fill
                               sizes="(max-width: 640px) 100vw, 405px"
-                              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                              className="object-cover"
                             />
                           </div>
 
@@ -466,7 +446,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                               </p>
 
                               {/* Room Title */}
-                              <h3 className="font-[Public_Sans] text-[22px] sm:text-[24px] font-medium text-[#111827] leading-[28px] sm:leading-[30px] tracking-[-0.5px] group-hover:text-[#526442] transition-colors">
+                              <h3 className="font-[Public_Sans] text-[22px] sm:text-[24px] font-medium text-[#111827] leading-[28px] sm:leading-[30px] tracking-[-0.5px]">
                                 {room.name}
                               </h3>
 
@@ -540,21 +520,20 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, margin: "-40px" }}
                             transition={{ duration: 0.5, delay: 0.05 * (idx + 1), ease: EASE }}
-                            whileHover={{ y: -4 }}
                           >
                             <Link
                               href={galleryHref}
-                              className="group relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-900 shadow-xs block cursor-pointer"
+                              className="relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-900 shadow-xs block cursor-pointer"
                             >
                               <Image
                                 src={imgUrl}
                                 alt={`${data.name} photo ${idx + 1}`}
                                 fill
                                 sizes="(max-width: 768px) 100vw, 50vw"
-                                className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-700 ease-out"
+                                className="object-cover opacity-60"
                               />
                               <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                                <span className="font-sans text-[15px] md:text-[16px] font-medium text-white flex items-center gap-2 group-hover:translate-x-1 transition-transform">
+                                <span className="font-sans text-[15px] md:text-[16px] font-medium text-white flex items-center gap-2">
                                   View all <ArrowRight className="w-4 h-4" />
                                 </span>
                               </div>
@@ -570,18 +549,17 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                           whileInView={{ opacity: 1, y: 0 }}
                           viewport={{ once: true, margin: "-40px" }}
                           transition={{ duration: 0.5, delay: 0.05 * (idx + 1), ease: EASE }}
-                          whileHover={{ y: -4 }}
                         >
                           <Link
                             href={galleryHref}
-                            className="group relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-100 shadow-xs block cursor-pointer"
+                            className="relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-100 shadow-xs block cursor-pointer"
                           >
                             <Image
                               src={imgUrl}
                               alt={`${data.name} photo ${idx + 1}`}
                               fill
                               sizes="(max-width: 768px) 100vw, 50vw"
-                              className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                              className="object-cover"
                             />
                           </Link>
                         </motion.div>
@@ -659,8 +637,8 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                   {/* Accordion body - Hardware accelerated CSS Grid transition for 60fps smoothness */}
                   <div
                     className={`grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] overflow-hidden bg-white ${howToReachOpen
-                        ? "grid-rows-[1fr] opacity-100 border-t border-[#e3dcbf]"
-                        : "grid-rows-[0fr] opacity-0 border-t-0"
+                      ? "grid-rows-[1fr] opacity-100 border-t border-[#e3dcbf]"
+                      : "grid-rows-[0fr] opacity-0 border-t-0"
                       }`}
                   >
                     <div className="min-h-0 overflow-hidden">
@@ -802,7 +780,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
             </div>
 
             {/* Right Column: Sticky Booking Widget (Connected to IPMS247 Booking Engine) */}
-            <div className="lg:col-span-4 lg:sticky lg:top-28 xl:top-32 z-30">
+            <div className="lg:col-span-4 lg:sticky lg:top-40 z-30">
               <RoomStickyBookingWidget
                 initialDestinationName={data.destinationName}
                 initialPropertyName={data.name}

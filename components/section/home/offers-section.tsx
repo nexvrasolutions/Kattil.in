@@ -55,11 +55,11 @@ export default function OffersSection() {
               <h2
                 className=" 
     text-[#D2E6BC]
-    text-[28px] 
-    sm:text-[34px] 
-    md:text-[38px] 
-    lg:text-[42px] 
-    xl:text-[46px] 
+    text-[18px] 
+    sm:text-[24px] 
+    md:text-[28px] 
+    lg:text-[32px] 
+    xl:text-[36px] 
     font-sans font-normal 
     leading-[1.12] 
     tracking-tight 
@@ -73,13 +73,12 @@ export default function OffersSection() {
               <p
                 className="
                   text-white/80
-                  text-[14px]
-                  md:text-[15px]
+                  text-[13px]
+                  md:text-[14px]
                   font-sans
                   font-normal
                   leading-[22px]
                   md:leading-[24px]
-                  tracking-[-0.2px]
                   max-w-[440px]
                   mt-5
                 "

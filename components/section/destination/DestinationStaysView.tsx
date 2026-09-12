@@ -86,10 +86,10 @@ export default function DestinationStaysView({
                 setStays(mapped);
               }
             })
-            .catch(() => {});
+            .catch(() => { });
         }
       })
-      .catch(() => {});
+      .catch(() => { });
 
     return () => {
       isMounted = false;
@@ -132,10 +132,7 @@ export default function DestinationStaysView({
           sm:pt-32
           md:pt-34
           lg:pt-36
-          pb-8
-          sm:pb-9
-          md:pb-10
-          lg:pb-12
+          pb-[64px]
         "
       >
         {/* Background Monument Illustration */}
@@ -255,7 +252,7 @@ export default function DestinationStaysView({
                   min-[390px]:text-[24px]
                   sm:text-3xl
                   md:text-4xl
-                  lg:text-[42px]
+                  lg:text-[40px]
                   font-normal
                   italic
                   text-[#f4f7ef]

@@ -99,7 +99,7 @@ export default function PartnersView() {
       <Navbar />
 
       {/* ── 1. Hero Section with Monuments Skyline Silhouette ─────────── */}
-      <section className="relative w-full bg-[#8E9F78] overflow-hidden min-h-[300px] sm:min-h-[400px] md:min-h-[450px] lg:min-h-[500px] flex flex-col justify-end pt-28 sm:pt-32 md:pt-34 lg:pt-36 pb-8 sm:pb-9 md:pb-10 lg:pb-12">
+      <section className="relative w-full bg-[#8E9F78] overflow-hidden min-h-[300px] sm:min-h-[400px] md:min-h-[450px] lg:min-h-[500px] flex flex-col justify-end pt-28 sm:pt-32 md:pt-34 lg:pt-36 pb-[64px]">
         {/* Right Background Monument Skyline Silhouette */}
         <motion.div
           initial={{ opacity: 0, x: 30 }}
@@ -124,7 +124,7 @@ export default function PartnersView() {
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: EASE, delay: 0.1 }}
-              className="font-sans text-[14px] sm:text-[15px] uppercase text-[#FFFFFF] mb-4 drop-shadow-sm"
+              className="font-sans text-[15px] sm:text-[14px] uppercase text-[#FFFFFF] mb-4 drop-shadow-sm"
             >
               PARTNER WITH KATTIL
             </motion.p>
@@ -164,10 +164,10 @@ export default function PartnersView() {
               className="text-center mb-14 md:mb-18"
             >
               <h2 className="text-[#111827] tracking-tight">
-                <span className="font-sans text-3xl sm:text-4xl md:text-[42px] font-normal">
+                <span className="font-sans text-3xl sm:text-4xl md:text-[36px] font-normal">
                   Why partner with{" "}
                 </span>
-                <span className="font-serif text-3xl sm:text-4xl md:text-[44px] font-normal italic">
+                <span className="font-serif text-3xl sm:text-4xl md:text-[36px] font-normal italic">
                   Kattil?
                 </span>
               </h2>
@@ -181,12 +181,10 @@ export default function PartnersView() {
                   initial={{ opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-40px" }}
-                  transition={{ duration: 0.5, delay: idx * 0.09, ease: EASE }}
-                  whileHover={{ y: -4, transition: { duration: 0.2 } }}
                   className="flex flex-col items-start text-left group"
                 >
                   {/* Round Icon Badge */}
-                  <div className="w-14 h-14 rounded-full bg-[#FFFFFF] flex items-center justify-center mb-5 shadow-xs group-hover:shadow-md group-hover:scale-105 transition-all duration-300">
+                  <div className="w-14 h-14 rounded-full bg-[#FFFFFF] flex items-center justify-center mb-5 transition-all duration-300">
                     <Image
                       src="/images/partners/cabinet-icon.png"
                       alt={item.title}
@@ -196,7 +194,7 @@ export default function PartnersView() {
                     />
                   </div>
 
-                  <h3 className="font-sans font-semibold text-[17px] md:text-[18px] text-[#111827] mb-2 group-hover:text-[#526442] transition-colors">
+                  <h3 className="font-sans font-semibold text-[17px] md:text-[18px] text-[#111827] mb-2 transition-colors">
                     {item.title}
                   </h3>
 
@@ -213,7 +211,7 @@ export default function PartnersView() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.7, ease: EASE }}
-              className="mt-14 md:mt-20 w-full aspect-[16/9] sm:aspect-[21/10] md:aspect-[24/10] max-h-[540px] relative rounded-[8px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-[#e5e7eb]/60 group"
+              className="mt-14 md:mt-20 w-full h-[280px] sm:h-[360px] md:h-auto md:aspect-[24/10] max-h-[540px] relative rounded-[8px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-[#e5e7eb]/60 group"
             >
               <Image
                 src="/images/partners/community-group.png"
@@ -241,15 +239,15 @@ export default function PartnersView() {
                 transition={{ duration: 0.6, ease: EASE }}
                 className="lg:col-span-5 lg:sticky lg:top-[170px] xl:lg:top-[180px]"
               >
-                <p className="font-sans text-[11px] sm:text-[12px] font-bold uppercase tracking-[0.25em] text-[#6b7280] mb-3">
+                <p className="font-sans text-[11px] sm:text-[12px] font-bold uppercase text-[#6b7280] mb-3">
                   HOW IT WORKS
                 </p>
 
                 <h2 className="text-[#111827] tracking-tight leading-tight">
-                  <span className="block font-sans text-3xl sm:text-4xl md:text-[44px] font-normal">
+                  <span className="block font-sans text-3xl sm:text-4xl md:text-[36px] font-normal">
                     From your property
                   </span>
-                  <span className="block font-serif text-3xl sm:text-4xl md:text-[46px] font-normal italic mt-1">
+                  <span className="block font-serif text-3xl sm:text-4xl md:text-[36px] font-normal italic mt-1">
                     Better performing
                   </span>
                 </h2>
@@ -267,7 +265,7 @@ export default function PartnersView() {
                     className="py-10 md:py-14 first:pt-0 lg:first:pt-[30px] last:pb-2 flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-8 transition-colors group"
                   >
                     {/* Number */}
-                    <span className="font-mono text-[13px] md:text-[14px] font-semibold text-[#9ca3af] group-hover:text-[#526442] tracking-wider shrink-0 pt-1 transition-colors">
+                    <span className="font-sans text-[13px] md:text-[14px] font-semibold text-[#9ca3af] group-hover:text-[#526442] tracking-wider shrink-0 pt-1 transition-colors">
                       {step.step}
                     </span>
 
@@ -303,10 +301,10 @@ export default function PartnersView() {
                 className="text-center mb-12 md:mb-16"
               >
                 <h2 className="text-[#111827] tracking-tight">
-                  <span className="block font-sans text-3xl sm:text-4xl md:text-[42px] font-normal">
+                  <span className="block font-sans text-3xl sm:text-4xl md:text-[36px] font-normal">
                     What properties can
                   </span>
-                  <span className="block font-serif text-3xl sm:text-4xl md:text-[44px] font-normal italic mt-1 text-[#111827]">
+                  <span className="block font-serif text-3xl sm:text-4xl md:text-[36px] font-normal italic mt-1 text-[#111827]">
                     Partner with us?
                   </span>
                 </h2>
@@ -358,7 +356,7 @@ export default function PartnersView() {
             >
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
                 {/* Left Column: Heading + Subtitle */}
-                <div className="lg:col-span-5">
+                <div className="lg:col-span-5 lg:mb-40">
                   <h2 className="text-white tracking-tight leading-tight">
                     <span className="block font-sans text-3xl sm:text-4xl md:text-[36px] font-normal text-[#d2e6bc]">
                       A simple
@@ -427,10 +425,10 @@ export default function PartnersView() {
               className="px-5 md:px-8 lg:px-15 text-center max-w-3xl mx-auto"
             >
               <h2 className="text-[#111827] tracking-tight">
-                <span className="font-sans text-3xl sm:text-4xl md:text-[42px] font-normal">
+                <span className="font-sans text-3xl sm:text-4xl md:text-[36px] font-normal">
                   Your property could{" "}
                 </span>
-                <span className="font-serif text-3xl sm:text-4xl md:text-[44px] font-normal italic">
+                <span className="font-serif text-3xl sm:text-4xl md:text-[36px] font-normal italic">
                   Do more.
                 </span>
               </h2>
@@ -443,12 +441,12 @@ export default function PartnersView() {
               {/* Buttons */}
               <div className="flex flex-wrap items-center justify-center gap-4 mt-8">
                 <motion.a
-                  whileHover={{ scale: 1.04 }}
+
                   whileTap={{ scale: 0.98 }}
                   href="https://wa.me/917448749779?text=Hi%20Kattil%20Team%2C%20I%20am%20interested%20in%20partnering%20with%20you%20for%20my%20property."
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-[157px] h-[40px] rounded-[6px] bg-[#0E2E4E] text-white hover:bg-[#153a57] transition-colors shadow-sm inline-flex items-center justify-center text-center"
+                  className="w-[157px] h-[40px] rounded-[6px] bg-[#0E2E4E] text-white hover:bg-[#153a57] transition-colors inline-flex items-center justify-center text-center"
                   style={{
                     width: "157px",
                     height: "40px",
@@ -470,7 +468,7 @@ export default function PartnersView() {
                 </motion.a>
 
                 <motion.a
-                  whileHover={{ scale: 1.04 }}
+
                   whileTap={{ scale: 0.98 }}
                   href="tel:+917448749779"
                   className="h-[40px] px-6 rounded-[6px] border border-[#0e273c] text-[#0e273c] font-sans text-[14px] font-semibold hover:bg-[#0e273c]/5 transition-colors inline-flex items-center justify-center leading-none"

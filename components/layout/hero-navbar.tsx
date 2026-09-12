@@ -52,7 +52,10 @@ export const HERO_NAV_LINKS = [
 export const isDestinationsRoute = (path: string) => {
   return (
     path.startsWith("/rooms") ||
+    path.startsWith("/properties") ||
+    path.startsWith("/property") ||
     path.startsWith("/destinations") ||
+    path.startsWith("/destination") ||
     path.startsWith("/chennai") ||
     path.startsWith("/coimbatore") ||
     path.startsWith("/madurai") ||
@@ -199,10 +202,11 @@ export default function HeroNavbar({
   const [navRowHeight, setNavRowHeight] =
     useState(NAVBAR_H_DEFAULT);
 
+  const spacerRef = useRef<HTMLDivElement>(null);
+
   // ───────────────────────────────────────────────────────────────────────────
   // Native Smooth Scrolling
   // ───────────────────────────────────────────────────────────────────────────
-
   useEffect(() => {
     document.documentElement.style.scrollBehavior = "smooth";
 
@@ -211,6 +215,24 @@ export default function HeroNavbar({
     };
   }, []);
 
+  useEffect(() => {
+    const spacer = spacerRef.current;
+    if (!spacer) return;
+
+    let prevHeight = spacer.getBoundingClientRect().height;
+
+    const ro = new ResizeObserver(() => {
+      const newHeight = spacer.getBoundingClientRect().height;
+      const delta = newHeight - prevHeight;
+      if (delta !== 0) {
+        window.scrollBy({ top: delta, left: 0, behavior: "auto" });
+      }
+      prevHeight = newHeight;
+    });
+
+    ro.observe(spacer);
+    return () => ro.disconnect();
+  }, []);
   // ───────────────────────────────────────────────────────────────────────────
   // Measure Navbar Height
   // ───────────────────────────────────────────────────────────────────────────
@@ -1512,7 +1534,12 @@ export default function HeroNavbar({
           PAGE SPACER
       ═══════════════════════════════════════════════════════════════════════ */}
 
+      {/* ═══════════════════════════════════════════════════════════════════════
+    PAGE SPACER
+═══════════════════════════════════════════════════════════════════════ */}
+
       <motion.div
+        ref={spacerRef}
         animate={{
           height:
             isHome && heroVisible
@@ -1528,7 +1555,6 @@ export default function HeroNavbar({
         }}
         aria-hidden
       />
-
       {/* ═══════════════════════════════════════════════════════════════════════
           MOBILE NAVIGATION DRAWER
       ═══════════════════════════════════════════════════════════════════════ */}

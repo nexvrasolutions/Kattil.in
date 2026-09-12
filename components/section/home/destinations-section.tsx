@@ -79,7 +79,7 @@ export default function DestinationsSection() {
 
         setDestinations(previewItems);
       })
-      .catch(() => {});
+      .catch(() => { });
 
     return () => {
       isMounted = false;
@@ -99,7 +99,7 @@ export default function DestinationsSection() {
           transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           className="text-center mb-6 sm:mb-10"
         >
-          <h2 className="text-[#0d1b2e] text-[26px] sm:text-[36px] md:text-[44px] font-sans font-normal tracking-tight">
+          <h2 className="text-[#0d1b2e] text-[18px] sm:text-[28px] md:text-[36px] font-sans font-normal tracking-tight">
             Destinations to{" "}
             <span className="font-serif italic font-normal text-[#0d1b2e]">
               Discover
@@ -141,7 +141,7 @@ export default function DestinationsSection() {
 
                   {/* Bottom CTA */}
                   <div className="absolute bottom-4 sm:bottom-5 left-4 sm:left-5 right-4 sm:right-5 z-10 flex items-end justify-between gap-3">
-                    <p className="text-white text-[18px] sm:text-[20px] font-normal leading-[1.15] tracking-tight">
+                    <p className="text-white text-[24px] sm:text-[24px] font-normal leading-[1.15] tracking-tight">
                       View all our <br />Destination
                     </p>
 

@@ -70,7 +70,7 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
       <Navbar />
 
       {/* ================= 1. HERO SECTION (SAGE GREEN) ================= */}
-      <section className="relative w-full bg-[#8E9F78] overflow-hidden min-h-[300px] sm:min-h-[400px] md:min-h-[450px] lg:min-h-[500px] flex flex-col justify-end pt-28 sm:pt-32 md:pt-34 lg:pt-36 pb-8 sm:pb-9 md:pb-10 lg:pb-12">
+      <section className="relative w-full bg-[#8E9F78] overflow-hidden min-h-[300px] sm:min-h-[400px] md:min-h-[450px] lg:min-h-[500px] flex flex-col justify-end pt-28 sm:pt-32 md:pt-34 lg:pt-36 pb-[64px]">
         {/* Hero Content - Aligned exactly with Navbar 'Home' and 'Book Now' */}
         <div className="relative z-10 w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="relative px-5 md:px-8 lg:px-15 flex items-end justify-between">
@@ -123,8 +123,8 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
       </section>
 
       {/* ================= 2. STORY SECTION (WARM CREAM) ================= */}
-      <section className="relative z-20 rounded-t-[20px] bg-[#FAF8F2] overflow-hidden -mt-2">
-        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5 pt-20 sm:pt-24 md:pt-28 lg:pt-32 pb-14 sm:pb-18 md:pb-24">
+      <section className="relative z-20 w-full rounded-t-[20px] md:rounded-t-[24px] bg-[#FAF8F2] overflow-hidden -mt-3 md:-mt-4">
+        <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5 pt-16 sm:pt-20 md:pt-24 pb-16">
           <div className="px-5 md:px-8 lg:px-15">
             {/* Top Story: Text on Left, Photo on Right aligned with Book Now */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-12 lg:gap-12 xl:gap-16 items-center mt-8">              {/* Left Text */}
@@ -135,7 +135,7 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
                 transition={{ duration: 0.7, ease: EASE }}
                 className="lg:col-span-6 xl:col-span-6 flex flex-col justify-center text-left"
               >
-                <p className="font-sans text-[11px] sm:text-[12px] font-bold tracking-[0.10em] uppercase text-[#0d1b2e] mb-4">
+                <p className="font-sans text-[11px] sm:text-[12px] font-bold uppercase text-[#0d1b2e] mb-4">
                   THE HOMELY RESET
                 </p>
 
@@ -195,7 +195,7 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.7, ease: EASE }}
               className="
-                mt-14 sm:mt-18 md:mt-24
+                mt-16
                 w-full
                 bg-[#F0EAD2]
                 rounded-[8px] sm:rounded-[12px] md:rounded-[16px]
@@ -211,11 +211,10 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: 0.1 + idx * 0.08, ease: EASE }}
-                    whileHover={{ y: -4, transition: { duration: 0.2 } }}
                     className="flex flex-col text-left group"
                   >
                     {/* Icon Badge */}
-                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white flex items-center justify-center text-[#0d1b2e] shadow-sm mb-4 sm:mb-5 group-hover:scale-105 transition-transform">
+                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-white flex items-center justify-center text-[#0d1b2e] mb-4 sm:mb-5 transition-transform">
                       <LockerIcon />
                     </div>
 
@@ -234,7 +233,7 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
             </motion.div>
 
             {/* ================= 4. TEAM SECTION ================= */}
-            <div className="mt-16 sm:mt-20 md:mt-28">
+            <div className="mt-16">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 xl:gap-12 items-start">
                 {/* Left Heading */}
                 <motion.div
@@ -244,7 +243,7 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
                   transition={{ duration: 0.6, ease: EASE }}
                   className="lg:col-span-3 xl:col-span-3 text-left"
                 >
-                  <p className="font-sans text-[11px] sm:text-[12px] font-bold tracking-[0.10em] uppercase text-[#0d1b2e] mb-3 sm:mb-4">
+                  <p className="font-sans text-[11px] sm:text-[12px] font-bold uppercase text-[#0d1b2e] mb-3 sm:mb-4">
                     OUR TEAM
                   </p>
 
@@ -276,7 +275,7 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
                         className="group flex flex-col"
                       >
                         {/* Photo */}
-                        <div className="relative w-full aspect-[276/356] rounded-[8px] overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.06)] bg-[#0d1b2e]/5">
+                        <div className="relative w-full aspect-[276/356] rounded-[8px] overflow-hidden bg-[#0d1b2e]/5">
                           <Image
                             src={member.image}
                             alt={member.name}

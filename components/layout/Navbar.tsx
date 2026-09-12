@@ -18,7 +18,10 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const isDestinationsRoute = (path: string) => {
   return (
     path.startsWith("/rooms") ||
+    path.startsWith("/properties") ||
+    path.startsWith("/property") ||
     path.startsWith("/destinations") ||
+    path.startsWith("/destination") ||
     path.startsWith("/chennai") ||
     path.startsWith("/coimbatore") ||
     path.startsWith("/madurai") ||
