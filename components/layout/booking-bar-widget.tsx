@@ -889,16 +889,28 @@ const STYLES = `
   }
 
   .flatpickr-prev-month, .flatpickr-next-month {
+    top: 8px !important;
+    height: 24px !important;
+    width: 24px !important;
     fill: #0d1b2e !important;
     color: #0d1b2e !important;
-    padding: 2px 4px !important;
+    padding: 2px !important;
     border-radius: 4px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
   .flatpickr-prev-month {
-    left: 24px !important;
+    left: 20px !important;
   }
   .flatpickr-next-month {
-    right: 24px !important;
+    right: 20px !important;
+  }
+  .flatpickr-prev-month svg,
+  .flatpickr-next-month svg {
+    width: 12px !important;
+    height: 12px !important;
+    vertical-align: middle !important;
   }
   .flatpickr-prev-month:hover, .flatpickr-next-month:hover {
     background: #f1f5f9 !important;

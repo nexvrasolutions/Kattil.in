@@ -292,8 +292,43 @@ export async function getPropertyDetailsData(
       Array.isArray(r.images) ? r.images.filter(Boolean) : []
     );
 
-    // Gallery section strictly contains photos uploaded in Admin Panel under Content Management > Gallery
-    const galleryImages = adminGalleryPhotos;
+    const STATIC_GALLERY_BY_CITY: Record<string, string[]> = {
+      madurai: [
+        "/assets/madurai-gallery/image-1.jpeg",
+        "/assets/madurai-gallery/image-2.jpeg",
+        "/assets/madurai-gallery/image-3.jpeg",
+        "/assets/madurai-gallery/image-4.jpeg",
+        "/assets/madurai-gallery/image-5.jpeg",
+        "/assets/madurai-gallery/image-6.jpeg",
+        "/assets/madurai-gallery/image-7.jpeg",
+        "/assets/madurai-gallery/image-8.jpeg",
+        "/assets/madurai-gallery/image-9.jpeg",
+      ],
+      chennai: [
+        "/assets/chennai-gallery/image-1.jpeg",
+        "/assets/chennai-gallery/image-2.jpeg",
+        "/assets/chennai-gallery/image-3.jpeg",
+        "/assets/chennai-gallery/image-4.jpeg",
+      ],
+      coimbatore: [
+        "/assets/deluxe-garden-suite.webp",
+        "/assets/ac-double-room.webp",
+        "/assets/six-bed-dormitory.webp",
+      ],
+      colachel: [
+        "/assets/ac-double-room.webp",
+        "/assets/six-bed-dormitory.webp",
+        "/assets/deluxe-garden-suite.webp",
+      ],
+    };
+
+    const effectiveGalleryPhotos =
+      adminGalleryPhotos.length > 0
+        ? adminGalleryPhotos
+        : STATIC_GALLERY_BY_CITY[destinationSlug] || [];
+
+    // Gallery section strictly contains photos uploaded in Admin Panel under Content Management > Gallery or static fallbacks
+    const galleryImages = effectiveGalleryPhotos;
 
     const hasCustomPropertyPhotos =
       propertyPhotos.length > 0 &&
@@ -302,17 +337,17 @@ export async function getPropertyDetailsData(
     const heroImages =
       hasCustomPropertyPhotos
         ? propertyPhotos
-        : adminGalleryPhotos.length > 0
-        ? adminGalleryPhotos
+        : effectiveGalleryPhotos.length > 0
+        ? effectiveGalleryPhotos
         : propertyPhotos.length > 0
         ? propertyPhotos
         : roomPhotos.length > 0
         ? roomPhotos
-        : [
+        : (STATIC_GALLERY_BY_CITY[destinationSlug] || [
             "/assets/kattil-room-hero.webp",
             "/assets/deluxe-garden-suite.webp",
             "/assets/ac-double-room.webp",
-          ];
+          ]);
 
     const result: PropertyDetailsData = {
       _id: property ? String(property._id) : undefined,
@@ -340,17 +375,41 @@ export async function getPropertyDetailsData(
     return result;
   } catch (error) {
     console.error(`[getPropertyDetailsData] Failed for slug "${slug}":`, error);
+    const fallbackDestinationSlug = cityConfig.destinationSlug || "madurai";
+    const staticFallback =
+      fallbackDestinationSlug === "madurai"
+        ? [
+            "/assets/madurai-gallery/image-1.jpeg",
+            "/assets/madurai-gallery/image-2.jpeg",
+            "/assets/madurai-gallery/image-3.jpeg",
+            "/assets/madurai-gallery/image-4.jpeg",
+            "/assets/madurai-gallery/image-5.jpeg",
+            "/assets/madurai-gallery/image-6.jpeg",
+            "/assets/madurai-gallery/image-7.jpeg",
+            "/assets/madurai-gallery/image-8.jpeg",
+            "/assets/madurai-gallery/image-9.jpeg",
+          ]
+        : fallbackDestinationSlug === "chennai"
+        ? [
+            "/assets/chennai-gallery/image-1.jpeg",
+            "/assets/chennai-gallery/image-2.jpeg",
+            "/assets/chennai-gallery/image-3.jpeg",
+            "/assets/chennai-gallery/image-4.jpeg",
+          ]
+        : [
+            "/assets/kattil-room-hero.webp",
+            "/assets/deluxe-garden-suite.webp",
+            "/assets/ac-double-room.webp",
+          ];
+
     const fallbackResult: PropertyDetailsData = {
       name: cityConfig.defaultPropertyName,
       slug: cleanSlug,
       destinationName: cityConfig.destinationName,
       destinationSlug: cityConfig.destinationSlug,
       description: `${cityConfig.defaultPropertyName} offers thoughtfully designed spaces with modern amenities, warm hospitality, and a vibrant community experience for students and professionals.`,
-      heroImages: [
-        "/assets/kattil-room-hero.webp",
-        "/assets/deluxe-garden-suite.webp",
-        "/assets/ac-double-room.webp",
-      ],
+      heroImages: staticFallback,
+      galleryImages: staticFallback,
       address: cityConfig.address,
       mapLink: cityConfig.mapSrc,
       phone: cityConfig.phone,

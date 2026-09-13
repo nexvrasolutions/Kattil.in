@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
   Menu,
   X,
@@ -32,7 +32,46 @@ const HERO_EASE: [number, number, number, number] = [
   1,
 ];
 
-const HERO_DURATION = 0.65;
+const HERO_DURATION = 0.55;
+
+const MENU_CONTAINER_VARIANTS: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      duration: 0.28,
+      staggerChildren: 0.045,
+      delayChildren: 0.08,
+    },
+  },
+  exit: {
+    opacity: 0,
+    transition: {
+      duration: 0.2,
+      ease: HERO_EASE,
+    },
+  },
+};
+
+const MENU_ITEM_VARIANTS: Variants = {
+  hidden: { opacity: 0, y: 14 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: HERO_EASE,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -8,
+    transition: {
+      duration: 0.18,
+      ease: HERO_EASE,
+    },
+  },
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Navigation Links
@@ -190,6 +229,7 @@ export default function HeroNavbar({
   const lastScrollY = useRef(0);
   const heroVisibleRef = useRef(heroVisible);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollLockUntilRef = useRef<number>(0);
 
   const navRowRef = useRef<HTMLDivElement>(null);
 
@@ -224,8 +264,11 @@ export default function HeroNavbar({
     const ro = new ResizeObserver(() => {
       const newHeight = spacer.getBoundingClientRect().height;
       const delta = newHeight - prevHeight;
+      const isLocked = Date.now() < scrollLockUntilRef.current;
       if (delta !== 0) {
-        window.scrollBy({ top: delta, left: 0, behavior: "auto" });
+        if (!isLocked && window.scrollY > 200 && delta < 0) {
+          window.scrollBy({ top: delta, left: 0, behavior: "auto" });
+        }
       }
       prevHeight = newHeight;
     });
@@ -308,7 +351,7 @@ export default function HeroNavbar({
         timeoutRef.current = null;
       }
 
-      setDestinationsOpen((prev) => !prev);
+      setDestinationsOpen(true);
     },
     []
   );
@@ -380,8 +423,6 @@ export default function HeroNavbar({
     heroVisibleRef.current = heroVisible;
   }, [heroVisible]);
 
-  const isScrollingToTopRef = useRef(false);
-
   // ───────────────────────────────────────────────────────────────────────────
   // Scroll Handler
   // ───────────────────────────────────────────────────────────────────────────
@@ -393,31 +434,22 @@ export default function HeroNavbar({
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const currentY = window.scrollY;
-
-          setScrolled((prev) => {
-            const next = currentY > 20;
-
-            return prev === next ? prev : next;
-          });
+          const isLocked = Date.now() < scrollLockUntilRef.current;
 
           if (isHome) {
-            if (isScrollingToTopRef.current) {
-              if (currentY <= 15) {
-                isScrollingToTopRef.current = false;
-                setHeroVisible(true);
-                setScrolled(false);
-              }
+            if (isLocked) {
+              setHeroVisible(true);
+              setScrolled(false);
             } else {
+              setScrolled(currentY > 20);
               if (currentY > 80) {
-                setHeroVisible((prev) =>
-                  prev ? false : prev
-                );
+                setHeroVisible(false);
               } else if (currentY <= 5) {
-                setHeroVisible((prev) =>
-                  !prev ? true : prev
-                );
+                setHeroVisible(true);
               }
             }
+          } else {
+            setScrolled(currentY > 20);
           }
 
           lastScrollY.current = currentY;
@@ -453,12 +485,21 @@ export default function HeroNavbar({
       }
 
       if (isHome) {
+        scrollLockUntilRef.current = Date.now() + 1500;
         window.scrollTo(0, 0);
-
         lastScrollY.current = 0;
-
         setHeroVisible(true);
         setScrolled(false);
+        const raf = requestAnimationFrame(() => {
+          window.scrollTo(0, 0);
+        });
+        const t1 = setTimeout(() => window.scrollTo(0, 0), 100);
+        const t2 = setTimeout(() => window.scrollTo(0, 0), 300);
+        return () => {
+          cancelAnimationFrame(raf);
+          clearTimeout(t1);
+          clearTimeout(t2);
+        };
       } else {
         setHeroVisible(false);
       }
@@ -483,41 +524,40 @@ export default function HeroNavbar({
   // ───────────────────────────────────────────────────────────────────────────
 
   const handleBookNowClick = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>) => {
+    (e?: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
       if (isHome) {
-        e.preventDefault();
-        e.stopPropagation();
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
 
         setMobileOpen(false);
+        setDestinationsOpen(false);
         document.body.style.overflow = "";
         document.documentElement.style.overflow = "";
 
-        if (window.scrollY > 0) {
-          isScrollingToTopRef.current = true;
-          window.scrollTo({ top: 0, behavior: "smooth" });
+        // Lock scroll updates for 1.5 seconds so onScroll cannot collapse hero during smooth scroll
+        scrollLockUntilRef.current = Date.now() + 1500;
+        setHeroVisible(true);
+        setScrolled(false);
 
-          const checkArrival = setInterval(() => {
-            if (window.scrollY <= 15) {
-              clearInterval(checkArrival);
-              isScrollingToTopRef.current = false;
-              setHeroVisible(true);
-              setScrolled(false);
-            }
-          }, 30);
+        // Smooth scroll to top of hero
+        window.scrollTo({ top: 0, behavior: "smooth" });
 
-          setTimeout(() => {
-            clearInterval(checkArrival);
-            if (isScrollingToTopRef.current) {
-              isScrollingToTopRef.current = false;
-              window.scrollTo(0, 0);
-              setHeroVisible(true);
-              setScrolled(false);
-            }
-          }, 1200);
-        } else {
+        // Backup timers to guarantee reaching top
+        setTimeout(() => {
+          if (window.scrollY > 5) {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }
+        }, 300);
+
+        setTimeout(() => {
+          if (window.scrollY > 0) {
+            window.scrollTo(0, 0);
+          }
           setHeroVisible(true);
           setScrolled(false);
-        }
+        }, 1200);
       }
     },
     [isHome]
@@ -580,13 +620,15 @@ export default function HeroNavbar({
         >
           <motion.div
             animate={{
-              height: isExpanded
+              height: mobileOpen
+                ? "calc(100svh - 32px)"
+                : isExpanded
                 ? "95svh"
                 : `${navbarH}px`,
               marginTop: 0,
             }}
             transition={{
-              duration: HERO_DURATION,
+              duration: 0.5,
               ease: HERO_EASE,
             }}
             className="
@@ -604,22 +646,26 @@ export default function HeroNavbar({
             "
             style={{
               backgroundColor:
-                scrolled && !isExpanded
+                scrolled && !mobileOpen && !isExpanded
                   ? "rgba(13, 27, 46, 0.94)"
                   : "#0d1b2e",
 
               backdropFilter:
-                scrolled && !isExpanded
+                scrolled && !mobileOpen && !isExpanded
+                  ? "blur(16px)"
+                  : "none",
+              WebkitBackdropFilter:
+                scrolled && !mobileOpen && !isExpanded
                   ? "blur(16px)"
                   : "none",
 
               boxShadow:
-                scrolled && !isExpanded
+                scrolled && !mobileOpen && !isExpanded
                   ? "0 10px 35px rgba(0,0,0,0.4)"
                   : "none",
 
-              transition:
-                "background-color 0.5s ease, backdrop-filter 0.5s ease, box-shadow 0.5s ease",
+              transform: "translateZ(0)",
+              willChange: "height",
             }}
           >
             {/* ═══════════════════════════════════════════════════════════════
@@ -638,6 +684,7 @@ export default function HeroNavbar({
                   "url('/assets/overlay.png')",
                 backgroundPosition: "center",
                 backgroundSize: "cover",
+                transform: "translateZ(0)",
                 opacity: 0.85,
               }}
             />
@@ -786,6 +833,11 @@ export default function HeroNavbar({
                         <Link
                           href={link.href || "#"}
                           data-text={link.label}
+                          onClick={(e) => {
+                            if (link.href === "/" && isHome) {
+                              handleBookNowClick(e);
+                            }
+                          }}
                           className={`
                             nav-link-bold-safe
                             group
@@ -819,22 +871,14 @@ export default function HeroNavbar({
               <Link
                 href="/"
                 onClick={(e) => {
-                  if (isHome) {
-                    e.preventDefault();
-                    setHeroVisible(true);
-                    setScrolled(false);
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }
+                  setMobileOpen(false);
+                  handleBookNowClick(e);
                 }}
-                className="
-                  absolute
-                  left-5
-                  md:left-1/2
-                  md:-translate-x-1/2
-                  flex
-                  items-center
-                  justify-center
-                "
+                className={`flex items-center justify-center transition-all duration-300 ${
+                  mobileOpen
+                    ? "absolute left-5 sm:left-6 md:left-8 top-1/2 -translate-y-1/2"
+                    : "absolute left-5 md:left-1/2 md:-translate-x-1/2 top-1/2 -translate-y-1/2"
+                }`}
               >
                 <img
                   src="/assets/logo.png"
@@ -999,27 +1043,162 @@ export default function HeroNavbar({
               </button>
             </div>
 
+            {/* ── Expanded menu content (when mobile menu is open) ─────────────────────────── */}
+            <AnimatePresence>
+              {mobileOpen && (
+                <motion.div
+                  key="menu-content"
+                  variants={MENU_CONTAINER_VARIANTS}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  className="lg:hidden relative z-10 flex flex-col flex-1 px-6 sm:px-8 pb-8 border-t border-white/10 overflow-y-auto"
+                >
+                  {/* Links */}
+                  <nav className="flex flex-col gap-4.5 mt-6">
+                    {/* 1. Home */}
+                    <motion.div variants={MENU_ITEM_VARIANTS}>
+                      <Link
+                        href="/"
+                        onClick={(e) => {
+                          setMobileOpen(false);
+                          if (isHome) {
+                            handleBookNowClick(e);
+                          }
+                        }}
+                        className={`py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${
+                          pathname === "/"
+                            ? "text-[#D2E6BC] font-semibold"
+                            : "text-white/90 hover:text-[#D2E6BC]"
+                        }`}
+                      >
+                        Home
+                      </Link>
+                    </motion.div>
+
+                    {/* 2. Destinations */}
+                    <motion.div variants={MENU_ITEM_VARIANTS}>
+                      <button
+                        type="button"
+                        onClick={() => setMobileDestinationsOpen((prev) => !prev)}
+                        className={`flex items-center justify-between w-full text-left font-sans transition-all py-1 cursor-pointer ${
+                          mobileDestinationsOpen || isDestinationsRoute(pathname)
+                            ? "text-[#D2E6BC] font-semibold"
+                            : "text-white/90 font-medium hover:text-[#D2E6BC]"
+                        }`}
+                      >
+                        <span className="text-[17px] sm:text-[18px]">Destinations</span>
+                        {mobileDestinationsOpen ? (
+                          <ChevronUp size={20} className="text-[#D2E6BC]" />
+                        ) : (
+                          <ChevronDown size={20} className="text-white/60" />
+                        )}
+                      </button>
+
+                      <AnimatePresence>
+                        {mobileDestinationsOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.28, ease: HERO_EASE }}
+                            className="overflow-hidden"
+                          >
+                            <MobileDestinationsList onItemClick={() => setMobileOpen(false)} />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+
+                    {/* 3. Partners */}
+                    <motion.div variants={MENU_ITEM_VARIANTS}>
+                      <Link
+                        href="/partners"
+                        onClick={() => setMobileOpen(false)}
+                        className={`py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${
+                          pathname.startsWith("/partners")
+                            ? "text-[#D2E6BC] font-semibold"
+                            : "text-white/90 hover:text-[#D2E6BC]"
+                        }`}
+                      >
+                        Partners
+                      </Link>
+                    </motion.div>
+
+                    {/* 4. Offering */}
+                    <motion.div variants={MENU_ITEM_VARIANTS}>
+                      <Link
+                        href="#"
+                        onClick={() => setMobileOpen(false)}
+                        className="py-1 text-[17px] sm:text-[18px] font-sans font-medium text-white/90 hover:text-[#D2E6BC] transition-colors"
+                      >
+                        Offering
+                      </Link>
+                    </motion.div>
+
+                    {/* 5. Contact Us */}
+                    <motion.div variants={MENU_ITEM_VARIANTS}>
+                      <Link
+                        href="/contact-us"
+                        onClick={() => setMobileOpen(false)}
+                        className={`py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${
+                          pathname === "/contact-us"
+                            ? "text-[#D2E6BC] font-semibold"
+                            : "text-white/90 hover:text-[#D2E6BC]"
+                        }`}
+                      >
+                        Contact Us
+                      </Link>
+                    </motion.div>
+                  </nav>
+
+                  <div className="flex-1 min-h-[36px]" />
+
+                  {/* CTAs */}
+                  <motion.div variants={MENU_ITEM_VARIANTS} className="pt-4">
+                    <Link
+                      href="/"
+                      onClick={(e) => {
+                        setMobileOpen(false);
+                        handleBookNowClick(e);
+                      }}
+                      className="flex items-center justify-center w-full border border-white hover:border-white text-white rounded-[8px] py-3.5 text-[15px] font-semibold tracking-wide transition-all duration-300 font-sans hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-[0.99]"
+                    >
+                      Book Now
+                    </Link>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* ═══════════════════════════════════════════════════════════════
                 EXPANDED HERO CONTENT
             ═══════════════════════════════════════════════════════════════ */}
 
-            {isHome && (
-              <motion.div
-                animate={{
-                  opacity: heroVisible
-                    ? destinationsOpen
-                      ? 0.4
-                      : 1
-                    : 0,
+            <AnimatePresence>
+              {isHome && !mobileOpen && (
+                <motion.div
+                  key="hero-content"
+                  initial={{ opacity: 0 }}
+                  animate={{
+                    opacity: heroVisible
+                      ? destinationsOpen
+                        ? 0.4
+                        : 1
+                      : 0,
 
-                  y: heroVisible
-                    ? 0
-                    : -20,
-                }}
-                transition={{
-                  duration: 0.25,
-                  ease: "easeOut",
-                }}
+                    y: heroVisible
+                      ? 0
+                      : -20,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    transition: { duration: 0.18, ease: "easeOut" },
+                  }}
+                  transition={{
+                    duration: 0.35,
+                    ease: HERO_EASE,
+                  }}
                 style={{
                   pointerEvents:
                     heroVisible &&
@@ -1496,7 +1675,8 @@ export default function HeroNavbar({
                 </motion.div>
               </motion.div>
             )}
-          </motion.div>
+          </AnimatePresence>
+        </motion.div>
 
           {/* ═════════════════════════════════════════════════════════════════
               DESTINATIONS MEGA MENU
@@ -1505,7 +1685,9 @@ export default function HeroNavbar({
           <DestinationsDropdown
             isOpen={destinationsOpen}
             topOffset={
-              isExpanded
+              mobileOpen
+                ? navRowHeight + 14
+                : isExpanded
                 ? navbarH + 8
                 : navbarH + 16
             }
@@ -1534,10 +1716,6 @@ export default function HeroNavbar({
           PAGE SPACER
       ═══════════════════════════════════════════════════════════════════════ */}
 
-      {/* ═══════════════════════════════════════════════════════════════════════
-    PAGE SPACER
-═══════════════════════════════════════════════════════════════════════ */}
-
       <motion.div
         ref={spacerRef}
         animate={{
@@ -1555,362 +1733,6 @@ export default function HeroNavbar({
         }}
         aria-hidden
       />
-      {/* ═══════════════════════════════════════════════════════════════════════
-          MOBILE NAVIGATION DRAWER
-      ═══════════════════════════════════════════════════════════════════════ */}
-
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{
-              clipPath:
-                "circle(0% at calc(100% - 40px) 59px)",
-            }}
-            animate={{
-              clipPath:
-                "circle(150% at calc(100% - 40px) 59px)",
-            }}
-            exit={{
-              clipPath:
-                "circle(0% at calc(100% - 40px) 59px)",
-            }}
-            transition={{
-              duration: 0.8,
-              ease: [0.76, 0, 0.24, 1],
-            }}
-            style={{
-              backgroundColor: "#0d1b2e",
-              willChange: "clip-path",
-            }}
-            className="
-              fixed
-              inset-3
-              md:inset-6
-              z-75
-              lg:hidden
-              rounded-2xl
-              overflow-hidden
-              shadow-2xl
-              flex
-              flex-col
-            "
-          >
-            {/* Mobile texture */}
-
-            <div
-              className="
-                absolute
-                inset-0
-                pointer-events-none
-              "
-              style={{
-                backgroundImage:
-                  "url('/assets/overlay.png')",
-                backgroundPosition: "center",
-                backgroundSize: "cover",
-                opacity: 0.15,
-              }}
-            />
-
-            {/* Mobile Header */}
-
-            <div
-              className="
-                relative
-                z-20
-                flex
-                items-center
-                justify-between
-                px-6
-                pt-5
-                pb-2
-                shrink-0
-              "
-            >
-              <Link
-                href="/"
-                onClick={() =>
-                  setMobileOpen(false)
-                }
-                className="
-                  flex
-                  items-center
-                "
-              >
-                <img
-                  src="/assets/logo.png"
-                  alt="Kattil — The Homely Reset"
-                  className="
-                    h-10
-                    sm:h-12
-                    object-contain
-                    drop-shadow-md
-                  "
-                />
-              </Link>
-
-              <button
-                onClick={() =>
-                  setMobileOpen(false)
-                }
-                aria-label="Close Menu"
-                className="
-                  ml-auto
-                  flex
-                  items-center
-                  justify-center
-                  w-10
-                  h-10
-                  rounded-full
-                  border
-                  border-white/10
-                  bg-white/5
-                  transition-all
-                  duration-200
-                  hover:border-white/30
-                  hover:bg-white/10
-                "
-              >
-                <X
-                  className="w-5 h-5 text-white"
-                  strokeWidth={2}
-                />
-              </button>
-            </div>
-
-            {/* Mobile Navigation */}
-
-            <div
-              className="
-                relative
-                z-10
-                flex
-                flex-col
-                px-6
-                sm:px-8
-                pb-8
-                flex-1
-                overflow-y-auto
-              "
-            >
-              <nav
-                className="
-                  flex
-                  flex-col
-                  gap-4.5
-                  mt-6
-                "
-              >
-                {/* 1. Home */}
-
-                <Link
-                  href="/"
-                  onClick={() =>
-                    setMobileOpen(false)
-                  }
-                  className={`
-                    py-1
-                    text-[17px]
-                    sm:text-[18px]
-                    font-sans
-                    font-medium
-                    transition-colors
-                    ${pathname === "/" &&
-                      isHome
-                      ? "text-[#D2E6BC] font-semibold"
-                      : "text-white/90 hover:text-[#D2E6BC]"
-                    }
-                  `}
-                >
-                  Home
-                </Link>
-
-                {/* 2. Destinations */}
-
-                <div>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setMobileDestinationsOpen(
-                        (prev) => !prev
-                      )
-                    }
-                    className={`
-                      flex
-                      items-center
-                      justify-between
-                      w-full
-                      text-left
-                      font-sans
-                      transition-all
-                      py-1
-                      cursor-pointer
-                      ${mobileDestinationsOpen ||
-                        isDestinationsRoute(
-                          pathname
-                        )
-                        ? "text-[#D2E6BC] font-semibold"
-                        : "text-white/90 font-medium hover:text-[#D2E6BC]"
-                      }
-                    `}
-                  >
-                    <span className="text-[17px] sm:text-[18px]">
-                      Destinations
-                    </span>
-
-                    {mobileDestinationsOpen ? (
-                      <ChevronUp
-                        size={20}
-                        className="text-[#D2E6BC]"
-                      />
-                    ) : (
-                      <ChevronDown
-                        size={20}
-                        className="text-white/60"
-                      />
-                    )}
-                  </button>
-
-                  <AnimatePresence>
-                    {mobileDestinationsOpen && (
-                      <motion.div
-                        initial={{
-                          opacity: 0,
-                          height: 0,
-                        }}
-                        animate={{
-                          opacity: 1,
-                          height: "auto",
-                        }}
-                        exit={{
-                          opacity: 0,
-                          height: 0,
-                        }}
-                        transition={{
-                          duration: 0.22,
-                          ease: "easeOut",
-                        }}
-                        className="overflow-hidden"
-                      >
-                        <MobileDestinationsList
-                          onItemClick={() =>
-                            setMobileOpen(false)
-                          }
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-
-                {/* 3. Partners */}
-
-                <Link
-                  href="/partners"
-                  onClick={() =>
-                    setMobileOpen(false)
-                  }
-                  className={`
-                    py-1
-                    text-[17px]
-                    sm:text-[18px]
-                    font-sans
-                    font-medium
-                    transition-colors
-                    ${pathname.startsWith(
-                    "/partners"
-                  )
-                      ? "text-[#D2E6BC] font-semibold"
-                      : "text-white/90 hover:text-[#D2E6BC]"
-                    }
-                  `}
-                >
-                  Partners
-                </Link>
-
-                {/* 4. Offering */}
-
-                <Link
-                  href="#"
-                  onClick={() =>
-                    setMobileOpen(false)
-                  }
-                  className="
-                    py-1
-                    text-[17px]
-                    sm:text-[18px]
-                    font-sans
-                    font-medium
-                    text-white/90
-                    hover:text-[#D2E6BC]
-                    transition-colors
-                  "
-                >
-                  Offering
-                </Link>
-
-                {/* 5. Contact Us */}
-
-                <Link
-                  href="/contact-us"
-                  onClick={() =>
-                    setMobileOpen(false)
-                  }
-                  className={`
-                    py-1
-                    text-[17px]
-                    sm:text-[18px]
-                    font-sans
-                    font-medium
-                    transition-colors
-                    ${pathname ===
-                      "/contact-us"
-                      ? "text-[#D2E6BC] font-semibold"
-                      : "text-white/90 hover:text-[#D2E6BC]"
-                    }
-                  `}
-                >
-                  Contact Us
-                </Link>
-              </nav>
-
-              <div className="flex-1 min-h-[36px]" />
-
-              {/* Mobile Book Now */}
-
-              <div className="pt-4">
-                <Link
-                  href="/"
-                  onClick={handleBookNowClick}
-                  className="
-                    flex
-                    items-center
-                    justify-center
-                    w-full
-                    border
-                    border-white
-                    hover:border-white
-                    text-white
-                    rounded-[8px]
-                    py-3.5
-                    text-[15px]
-                    font-semibold
-                    tracking-wide
-                    transition-all
-                    duration-300
-                    font-sans
-                    hover:bg-white
-                    hover:text-[#0d1b2e]
-                    shadow-sm
-                    active:scale-[0.99]
-                  "
-                >
-                  Book Now
-                </Link>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </>
   );
 }

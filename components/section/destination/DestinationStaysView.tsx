@@ -335,7 +335,6 @@ export default function DestinationStaysView({
                   rounded-[8px]
                   border
                   border-gray-100
-                  shadow-[0_4px_24px_rgba(0,0,0,0.03)]
                   max-w-xl
                   mx-auto
                 "
@@ -495,7 +494,6 @@ export default function DestinationStaysView({
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: "-40px" }}
                       transition={{ duration: 0.5, delay: idx * 0.08, ease: EASE }}
-                      whileHover={{ y: -6, transition: { duration: 0.25 } }}
                       className="
                         group
                         w-full
@@ -505,10 +503,7 @@ export default function DestinationStaysView({
                         overflow-hidden
                         border
                         border-gray-100
-                        shadow-[0_4px_24px_rgba(0,0,0,0.03)]
-                        hover:shadow-[0_16px_36px_rgba(0,0,0,0.08)]
-                        transition-all
-                        duration-300
+                       
                         flex
                         flex-col
                       "
@@ -544,10 +539,6 @@ export default function DestinationStaysView({
                           "
                           className="
                             object-cover
-                            group-hover:scale-[1.04]
-                            transition-transform
-                            duration-700
-                            ease-out
                           "
                         />
                       </Link>

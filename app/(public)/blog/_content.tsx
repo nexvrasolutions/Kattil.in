@@ -261,11 +261,10 @@ export default function BlogContent({
                       key={cat}
                       type="button"
                       onClick={() => handleCategorySelect(cat)}
-                      className={`font-[Public_Sans] text-[13px] sm:text-[13.5px] transition-all whitespace-nowrap cursor-pointer px-3.5 sm:px-4 py-1.5 rounded-[6px] ${
-                        isSelected
-                          ? "bg-[#b4c7a5] text-[#22301c] font-semibold shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
-                          : "text-[#6b7280] hover:text-[#111827] font-medium hover:bg-[#eae8e3]"
-                      }`}
+                      className={`font-[Public_Sans] text-[13px] sm:text-[13.5px] transition-all whitespace-nowrap cursor-pointer px-3.5 sm:px-4 py-1.5 rounded-[6px] ${isSelected
+                        ? "bg-[#b4c7a5] text-[#22301c] font-semibold shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+                        : "text-[#6b7280] hover:text-[#111827] font-medium hover:bg-[#eae8e3]"
+                        }`}
                     >
                       {cat}
                     </button>
@@ -307,7 +306,7 @@ export default function BlogContent({
                     <Link href={`/blog/${featuredPost.slug}`} className="group mb-[24px]">
                       <h2 className="font-[Public_Sans] font-medium text-[26px] sm:text-[30px] lg:text-[34px] xl:text-[36px] leading-[1.18] tracking-[-0.5px] text-[#202020] transition-colors">
                         {featuredPost.title.toLowerCase().includes("weekend") &&
-                        featuredPost.title.toLowerCase().includes("your comfort") ? (
+                          featuredPost.title.toLowerCase().includes("your comfort") ? (
                           <>
                             {/* Desktop (sm+): Line 1 "The Art of a Perfect Weekend", Line 2 "Your Comfort" */}
                             <span className="hidden sm:block">
@@ -393,7 +392,7 @@ export default function BlogContent({
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: "-40px" }}
                       transition={{ duration: 0.45, delay: (idx % 3) * 0.08, ease: EASE }}
-                      className="group flex flex-col bg-white rounded-[12px] overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.07)] transition-all duration-300"
+                      className="group flex flex-col bg-white rounded-[12px] overflow-hidden  transition-all duration-300"
                     >
                       <Link href={`/blog/${post.slug}`} className="block flex flex-col flex-1">
                         {/* Card Image */}
@@ -403,7 +402,7 @@ export default function BlogContent({
                             alt={post.title}
                             fill
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                            className="object-cover object-center group-hover:scale-[1.04] transition-transform duration-500 ease-out"
+                            className="object-cover object-center  transition-transform duration-500 ease-out"
                           />
                         </div>
                         {/* Card Content */}

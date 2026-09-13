@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
   Menu,
   X,
@@ -14,6 +14,45 @@ import { navLinks } from "@/lib/data";
 import DestinationsDropdown, { MobileDestinationsList } from "./destinations-dropdown";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
+const MENU_CONTAINER_VARIANTS: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      duration: 0.28,
+      staggerChildren: 0.045,
+      delayChildren: 0.08,
+    },
+  },
+  exit: {
+    opacity: 0,
+    transition: {
+      duration: 0.2,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
+const MENU_ITEM_VARIANTS: Variants = {
+  hidden: { opacity: 0, y: 14 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -8,
+    transition: {
+      duration: 0.18,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
 
 const isDestinationsRoute = (path: string) => {
   return (
@@ -42,9 +81,11 @@ export default function Navbar() {
   const [navRowHeight, setNavRowHeight] = useState(84);
 
   const handleBookNowClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    setMobileOpen(false);
+    setDestinationsOpen(false);
+    document.body.style.overflow = "";
     if (pathname === "/") {
       e.preventDefault();
-      setMobileOpen(false);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [pathname]);
@@ -75,7 +116,7 @@ export default function Navbar() {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
-    setDestinationsOpen((prev) => !prev);
+    setDestinationsOpen(true);
   }, []);
 
   useEffect(() => {
@@ -137,20 +178,25 @@ export default function Navbar() {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.55, ease: EASE }}
-      style={{ willChange: "transform, opacity" }}
+      style={{ willChange: "transform, opacity", transform: "translateZ(0)" }}
       className="fixed top-0 left-0 right-0 z-70 mt-2 md:mt-3 lg:mt-4 px-3 md:px-5 pointer-events-none flex justify-center"
     >
       <div ref={headerContainerRef} className="relative w-full max-w-[1920px] mx-auto pointer-events-none">
         {/* ── Expanding container ───────────────────────────────────────────────── */}
         <motion.div
           animate={{ height: mobileOpen ? "calc(100svh - 32px)" : navRowHeight }}
-          transition={{ duration: 0.55, ease: EASE, delay: mobileOpen ? 0 : 0.15 }}
+          transition={{
+            duration: 0.5,
+            ease: EASE,
+          }}
           className="relative mx-auto overflow-hidden rounded-[12px] border border-white/5 flex flex-col pointer-events-auto"
           style={{
             backgroundColor: scrolled && !mobileOpen ? "rgba(13, 27, 46, 0.92)" : "#0d1b2e",
             backdropFilter: scrolled && !mobileOpen ? "blur(16px)" : "none",
+            WebkitBackdropFilter: scrolled && !mobileOpen ? "blur(16px)" : "none",
             maxWidth: "1920px",
             boxShadow: scrolled && !mobileOpen ? "0 8px 32px rgba(0,0,0,0.35)" : "none",
+            transform: "translateZ(0)",
             willChange: "height",
           }}
         >
@@ -161,6 +207,7 @@ export default function Navbar() {
               backgroundImage: "url('/assets/overlay.png')",
               backgroundPosition: "center",
               backgroundSize: "cover",
+              transform: "translateZ(0)",
             }}
           />
 
@@ -272,11 +319,10 @@ export default function Navbar() {
             {/* Logo */}
             <Link
               href="/"
-              className={`flex items-center justify-center transition-all duration-300 ${
-                mobileOpen
-                  ? "absolute left-5 sm:left-6 md:left-8 top-1/2 -translate-y-1/2"
-                  : "absolute left-5 md:left-1/2 md:-translate-x-1/2 top-1/2 -translate-y-1/2"
-              }`}
+              className={`flex items-center justify-center transition-all duration-300 ${mobileOpen
+                ? "absolute left-5 sm:left-6 md:left-8 top-1/2 -translate-y-1/2"
+                : "absolute left-5 md:left-1/2 md:-translate-x-1/2 top-1/2 -translate-y-1/2"
+                }`}
             >
               <img
                 src="/assets/logo.png"
@@ -346,26 +392,28 @@ export default function Navbar() {
             {mobileOpen && (
               <motion.div
                 key="menu-content"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.12 }}
+                variants={MENU_CONTAINER_VARIANTS}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
                 className="lg:hidden relative z-10 flex flex-col flex-1 px-6 sm:px-8 pb-8 border-t border-white/10 overflow-y-auto"
               >
                 {/* Links */}
                 <nav className="flex flex-col gap-4.5 mt-6">
                   {/* 1. Home */}
-                  <Link
-                    href="/"
-                    onClick={() => setMobileOpen(false)}
-                    className={`py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname === "/" ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
-                      }`}
-                  >
-                    Home
-                  </Link>
+                  <motion.div variants={MENU_ITEM_VARIANTS}>
+                    <Link
+                      href="/"
+                      onClick={() => setMobileOpen(false)}
+                      className={`py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname === "/" ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
+                        }`}
+                    >
+                      Home
+                    </Link>
+                  </motion.div>
 
                   {/* 2. Destinations */}
-                  <div>
+                  <motion.div variants={MENU_ITEM_VARIANTS}>
                     <button
                       type="button"
                       onClick={() => setMobileDestinationsOpen((prev) => !prev)}
@@ -388,49 +436,55 @@ export default function Navbar() {
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: "auto" }}
                           exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.22, ease: "easeOut" }}
+                          transition={{ duration: 0.28, ease: EASE }}
                           className="overflow-hidden"
                         >
                           <MobileDestinationsList onItemClick={() => setMobileOpen(false)} />
                         </motion.div>
                       )}
                     </AnimatePresence>
-                  </div>
+                  </motion.div>
 
                   {/* 3. Partners */}
-                  <Link
-                    href="/partners"
-                    onClick={() => setMobileOpen(false)}
-                    className={`py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname.startsWith("/partners") ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
-                      }`}
-                  >
-                    Partners
-                  </Link>
+                  <motion.div variants={MENU_ITEM_VARIANTS}>
+                    <Link
+                      href="/partners"
+                      onClick={() => setMobileOpen(false)}
+                      className={`py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname.startsWith("/partners") ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
+                        }`}
+                    >
+                      Partners
+                    </Link>
+                  </motion.div>
 
                   {/* 4. Offering */}
-                  <Link
-                    href="#"
-                    onClick={() => setMobileOpen(false)}
-                    className="py-1 text-[17px] sm:text-[18px] font-sans font-medium text-white/90 hover:text-[#D2E6BC] transition-colors"
-                  >
-                    Offering
-                  </Link>
+                  <motion.div variants={MENU_ITEM_VARIANTS}>
+                    <Link
+                      href="#"
+                      onClick={() => setMobileOpen(false)}
+                      className="py-1 text-[17px] sm:text-[18px] font-sans font-medium text-white/90 hover:text-[#D2E6BC] transition-colors"
+                    >
+                      Offering
+                    </Link>
+                  </motion.div>
 
                   {/* 5. Contact Us */}
-                  <Link
-                    href="/contact-us"
-                    onClick={() => setMobileOpen(false)}
-                    className={`py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname === "/contact-us" ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
-                      }`}
-                  >
-                    Contact Us
-                  </Link>
+                  <motion.div variants={MENU_ITEM_VARIANTS}>
+                    <Link
+                      href="/contact-us"
+                      onClick={() => setMobileOpen(false)}
+                      className={`py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname === "/contact-us" ? "text-[#D2E6BC] font-semibold" : "text-white/90 hover:text-[#D2E6BC]"
+                        }`}
+                    >
+                      Contact Us
+                    </Link>
+                  </motion.div>
                 </nav>
 
                 <div className="flex-1 min-h-[36px]" />
 
                 {/* CTAs */}
-                <div className="pt-4">
+                <motion.div variants={MENU_ITEM_VARIANTS} className="pt-4">
                   <Link
                     href="/"
                     onClick={(e) => {
@@ -441,7 +495,7 @@ export default function Navbar() {
                   >
                     Book Now
                   </Link>
-                </div>
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>

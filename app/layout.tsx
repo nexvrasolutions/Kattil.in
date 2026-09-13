@@ -84,8 +84,8 @@ export default function RootLayout({
       lang="en"
       className={`${playfairDisplay.variable} ${publicSans.variable}`}
       suppressHydrationWarning
-      data-scroll-behavior="smooth"
-    ><body className="min-h-screen flex flex-col antialiased relative">
+    >
+      <body className="min-h-screen flex flex-col antialiased relative">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

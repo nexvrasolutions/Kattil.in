@@ -70,7 +70,7 @@ export default function SocialSidebar({ icons }: { icons?: SidebarIconData[] }) 
   }, []);
 
   useEffect(() => {
-    if (!isHome) {
+    if (!isHome || (typeof window !== "undefined" && window.innerWidth < 768)) {
       setInHero((prev) => (prev ? false : prev));
       return;
     }

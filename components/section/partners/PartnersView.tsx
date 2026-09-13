@@ -319,7 +319,7 @@ export default function PartnersView() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
                     transition={{ duration: 0.5, delay: idx * 0.08, ease: EASE }}
-                    whileHover={{ y: -6, transition: { duration: 0.25 } }}
+
                     className="group flex flex-col text-left"
                   >
                     {/* Card Image */}

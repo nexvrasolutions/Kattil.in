@@ -151,7 +151,6 @@ export default function AllDestinationsView({
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
                     transition={{ duration: 0.5, delay: index * 0.08, ease: EASE }}
-                    whileHover={{ y: -6, transition: { duration: 0.25 } }}
                     className="w-full max-w-[303px]"
                   >
                     <Link
@@ -166,9 +165,6 @@ export default function AllDestinationsView({
                         overflow-hidden
                         bg-white
                         shadow-xs
-                        hover:shadow-lg
-                        transition-all
-                        duration-500
                       "
                     >
                       {/* Top Pill Tag */}
@@ -187,8 +183,6 @@ export default function AllDestinationsView({
                             text-[#52613F]
                             tracking-tight
                             shadow-xs
-                            group-hover:bg-white
-                            transition-colors
                           "
                         >
                           {dest.name}
@@ -205,10 +199,6 @@ export default function AllDestinationsView({
                           className="
                             object-cover
                             object-center
-                            transition-transform
-                            duration-700
-                            ease-out
-                            group-hover:scale-105
                           "
                         />
                       </div>

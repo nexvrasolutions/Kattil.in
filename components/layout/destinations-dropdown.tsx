@@ -77,7 +77,7 @@ export default function DestinationsDropdown({
           setDestinations(data.data);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
     return () => {
       isMounted = false;
     };
@@ -207,7 +207,7 @@ export function MobileDestinationsList({
           setDestinations(data.data);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
     return () => {
       isMounted = false;
     };

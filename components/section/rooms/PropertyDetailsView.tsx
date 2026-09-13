@@ -219,6 +219,11 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
     }
   };
 
+  const galleryCity = data.destinationSlug || data.destinationName?.toLowerCase() || "";
+  const galleryHref = galleryCity
+    ? `/gallery?city=${encodeURIComponent(galleryCity)}`
+    : "/gallery";
+
   return (
     <div className="min-h-screen bg-[#F5F3EB] text-[#111827]">
       {/* Top Navbar */}
@@ -250,13 +255,16 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
               {extendedImages.map((img, idx) => {
                 const isActive = idx === currentIndex;
                 return (
-                  <div
+                  <Link
                     key={idx}
-                    onClick={() => {
-                      setIsTransitioning(true);
-                      setCurrentIndex(idx);
+                    href={galleryHref}
+                    onClick={(e) => {
+                      if (Math.abs(touchDeltaX) > 10) {
+                        e.preventDefault();
+                        return;
+                      }
                     }}
-                    className={`shrink-0 w-[var(--slide-width)] aspect-[4/3] sm:aspect-[16/10] md:aspect-[21/10] max-h-[580px] rounded-[14px] sm:rounded-[20px] md:rounded-[24px] overflow-hidden relative transition-all duration-500 cursor-pointer ${isActive
+                    className={`shrink-0 w-[var(--slide-width)] aspect-[4/3] sm:aspect-[16/10] md:aspect-[21/10] max-h-[580px] rounded-[14px] sm:rounded-[20px] md:rounded-[24px] overflow-hidden relative transition-all duration-500 cursor-pointer block ${isActive
                       ? "opacity-100 scale-100 ring-1 ring-black/5"
                       : "opacity-80 hover:opacity-95 scale-[0.99]"
                       }`}
@@ -268,7 +276,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                       priority={idx === images.length}
                       className="object-cover"
                     />
-                  </div>
+                  </Link>
                 );
               })}
             </div>
@@ -472,7 +480,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                             {/* Book Now */}
                             <div className="mt-5 sm:mt-0 sm:mb-1">
                               <motion.a
-                                whileHover={{ scale: 1.02 }}
+
                                 whileTap={{ scale: 0.98 }}
                                 href={externalBookUrl}
                                 target="_blank"
