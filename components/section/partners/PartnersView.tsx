@@ -311,7 +311,7 @@ export default function PartnersView() {
               </motion.div>
 
               {/* 4 Cards Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-7">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[40px] sm:gap-6 md:gap-7">
                 {PROPERTY_TYPES.map((prop, idx) => (
                   <motion.div
                     key={idx}

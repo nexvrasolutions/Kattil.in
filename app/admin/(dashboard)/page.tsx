@@ -26,13 +26,13 @@ const item = { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transiti
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface CMSData {
-  totalRooms: number; activeRooms: number;
+  totalProperties: number; activeProperties: number;
   totalCities: number; amenitiesCount: number;
   galleryCount: number; mediaCount: number;
   blogsCount: number; publishedBlogsCount: number; faqsCount: number;
-  roomCategories: Array<{ name: string; value: number }>;
+  propertyCategories: Array<{ name: string; value: number }>;
   cmsModules: Array<{ module: string; count: number }>;
-  recentRooms: Array<{ _id: string; name: string; status: string; city?: { name: string }; slug: string }>;
+  recentProperties: Array<{ _id: string; name: string; status: string; city?: { name: string }; slug: string; category?: string; badge?: string }>;
   recentGallery: Array<{ _id: string; src: string; alt: string }>;
 }
 
@@ -66,20 +66,20 @@ const shortDate = (iso: string) => {
 };
 
 const quickActions = [
-  { icon: BedDouble, label: "Add Room",    href: "/admin/rooms",    color: "#9CAF88" },   // sage
-  { icon: Upload,   label: "Upload Media", href: "/admin/media",    color: "#7a9e6a" },   // sage mid
-  { icon: Images,   label: "Gallery",      href: "/admin/gallery",  color: "#b8c9a6" },   // sage light
-  { icon: FileText, label: "Edit About",   href: "/admin/about",    color: "#526442" },   // sage dark
-  { icon: MapPin,   label: "Cities",       href: "/admin/cities",   color: "#3d6080" },   // mid navy
-  { icon: Settings, label: "Settings",     href: "/admin/settings", color: "#5a7a6a" },   // sage-navy mix
+  { icon: Hotel,    label: "Add Property", href: "/admin/properties/new", color: "#9CAF88" },   // sage
+  { icon: Upload,   label: "Upload Media", href: "/admin/media",          color: "#7a9e6a" },   // sage mid
+  { icon: Images,   label: "Gallery",      href: "/admin/gallery",        color: "#b8c9a6" },   // sage light
+  { icon: FileText, label: "Edit About",   href: "/admin/about",          color: "#526442" },   // sage dark
+  { icon: MapPin,   label: "Destinations", href: "/admin/destinations",   color: "#3d6080" },   // mid navy
+  { icon: Settings, label: "Settings",     href: "/admin/settings",       color: "#5a7a6a" },   // sage-navy mix
 ];
 
 const statusBadge = (s: string): "success" | "warning" | "destructive" =>
   s === "active" ? "success" : s === "maintenance" ? "warning" : "destructive";
 
 const DEFAULT_CMS_DATA: CMSData = {
-  totalRooms: 0,
-  activeRooms: 0,
+  totalProperties: 0,
+  activeProperties: 0,
   totalCities: 0,
   amenitiesCount: 0,
   galleryCount: 0,
@@ -87,9 +87,9 @@ const DEFAULT_CMS_DATA: CMSData = {
   blogsCount: 0,
   publishedBlogsCount: 0,
   faqsCount: 0,
-  roomCategories: [],
+  propertyCategories: [],
   cmsModules: [],
-  recentRooms: [],
+  recentProperties: [],
   recentGallery: [],
 };
 
@@ -117,7 +117,7 @@ export default function AdminDashboard() {
 
   const d = cms || DEFAULT_CMS_DATA;
   const a = analytics;
-  const occupancyPct = d.totalRooms > 0 ? Math.round((d.activeRooms / d.totalRooms) * 100) : 0;
+  const activePct = d.totalProperties > 0 ? Math.round((d.activeProperties / d.totalProperties) * 100) : 100;
   const weeklyClicks = a?.bookNowByDay.reduce((s, x) => s + x.clicks, 0) ?? 0;
   const weeklyViews  = a?.visitsByDay.reduce((s, x) => s + x.views, 0) ?? 0;
 
@@ -140,8 +140,8 @@ export default function AdminDashboard() {
           <GradientCard className="h-full">
             <div className="p-6">
               <p className="text-xs font-black uppercase tracking-[0.25em] text-white/70">Kattil Hotels</p>
-              <h2 className="mt-3 text-5xl font-bold text-white">{d.totalRooms}</h2>
-              <p className="mt-1 text-sm text-white/70">Total rooms across all properties</p>
+              <h2 className="mt-3 text-5xl font-bold text-white">{d.activeProperties}</h2>
+              <p className="mt-1 text-sm text-white/70">Active properties across all locations</p>
               <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1">
                 <TrendingUp className="h-4 w-4 text-white" />
                 <span className="text-xs font-semibold text-white">Active since 2024</span>
@@ -149,12 +149,12 @@ export default function AdminDashboard() {
             </div>
             <div className="grid grid-cols-3 gap-3 px-6 pb-6">
               {[
-                { label: "Active Rooms",  value: d.activeRooms },
-                { label: "Cities",        value: d.totalCities },
-                { label: "Amenities",     value: d.amenitiesCount },
-                { label: "Blog Posts",    value: d.blogsCount },
-                { label: "Published",     value: d.publishedBlogsCount },
-                { label: "FAQs",          value: d.faqsCount },
+                { label: "Active Properties", value: d.activeProperties },
+                { label: "Cities",            value: d.totalCities },
+                { label: "Amenities",         value: d.amenitiesCount },
+                { label: "Blog Posts",        value: d.blogsCount },
+                { label: "Published",         value: d.publishedBlogsCount },
+                { label: "FAQs",              value: d.faqsCount },
               ].map(({ label, value }) => (
                 <div key={label} className="rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur-sm">
                   <p className="text-xs font-bold uppercase tracking-wide text-white/70">{label}</p>
@@ -170,8 +170,8 @@ export default function AdminDashboard() {
             <AdminCardHeader>
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <AdminCardDescription>Occupancy</AdminCardDescription>
-                  <AdminCardTitle className="mt-2">{d.activeRooms}/{d.totalRooms} rooms</AdminCardTitle>
+                  <AdminCardDescription>Properties</AdminCardDescription>
+                  <AdminCardTitle className="mt-2">{d.activeProperties}/{d.totalProperties} Active</AdminCardTitle>
                   <p className="mt-1 text-xs text-[hsl(var(--adm-muted-foreground))]">Currently active</p>
                 </div>
                 <span className="rounded-full bg-[hsl(var(--adm-accent)/0.24)] p-2 text-[hsl(var(--adm-primary))]">
@@ -180,13 +180,13 @@ export default function AdminDashboard() {
               </div>
               <AdminBadge variant="default">
                 <TrendingUp className="h-3.5 w-3.5" />
-                {occupancyPct}% occupancy
+                {activePct}% active
               </AdminBadge>
             </AdminCardHeader>
             <AdminCardContent>
               <div className="mb-4 h-2 w-full overflow-hidden rounded-full bg-[hsl(var(--adm-muted))]">
                 <div className="h-full rounded-full bg-[hsl(var(--adm-primary))] transition-all duration-700"
-                  style={{ width: `${occupancyPct}%` }} />
+                  style={{ width: `${activePct}%` }} />
               </div>
               <div className="flex flex-col gap-3">
                 <StatRow label="Gallery Items" value={d.galleryCount.toString()} helper="Uploaded images" />
@@ -358,28 +358,28 @@ export default function AdminDashboard() {
           </AdminCard>
         </motion.div>
 
-        {/* ── Row 3: Pie (room categories) + Recent Rooms ── */}
+        {/* ── Row 3: Pie (property categories) + Recent Properties ── */}
         <motion.div variants={item} className="xl:col-span-4">
           <AdminCard className="h-full">
             <AdminCardHeader>
               <AdminCardDescription>Inventory</AdminCardDescription>
-              <AdminCardTitle className="mt-2">Room Categories</AdminCardTitle>
+              <AdminCardTitle className="mt-2">Property Categories</AdminCardTitle>
             </AdminCardHeader>
             <AdminCardContent>
-              {d.roomCategories.length > 0 ? (
+              {d.propertyCategories.length > 0 ? (
                 <>
                   <ResponsiveContainer width="100%" height={160}>
                     <PieChart>
-                      <Pie data={d.roomCategories} cx="50%" cy="50%" innerRadius={45} outerRadius={70}
+                      <Pie data={d.propertyCategories} cx="50%" cy="50%" innerRadius={45} outerRadius={70}
                         paddingAngle={3} dataKey="value">
-                        {d.roomCategories.map((_: { name: string; value: number }, i: number) => (
+                        {d.propertyCategories.map((_: { name: string; value: number }, i: number) => (
                           <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
                         ))}
                       </Pie>
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="mt-2 grid grid-cols-2 gap-2">
-                    {d.roomCategories.map(({ name, value }: { name: string; value: number }, i: number) => (
+                    {d.propertyCategories.map(({ name, value }: { name: string; value: number }, i: number) => (
                       <div key={name} className="flex items-center gap-2">
                         <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
                         <span className="text-xs text-[hsl(var(--adm-muted-foreground))]">{name}</span>
@@ -389,7 +389,7 @@ export default function AdminDashboard() {
                   </div>
                 </>
               ) : (
-                <p className="py-10 text-center text-sm text-[hsl(var(--adm-muted-foreground))]">No rooms yet</p>
+                <p className="py-10 text-center text-sm text-[hsl(var(--adm-muted-foreground))]">No active properties yet</p>
               )}
             </AdminCardContent>
           </AdminCard>
@@ -400,9 +400,9 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between px-6 pt-6 pb-0">
               <div>
                 <AdminCardDescription>Inventory</AdminCardDescription>
-                <AdminCardTitle className="mt-2">Recent Rooms</AdminCardTitle>
+                <AdminCardTitle className="mt-2">Recent Properties</AdminCardTitle>
               </div>
-              <Link href="/admin/rooms" className="flex items-center gap-1 text-xs font-medium text-[hsl(var(--adm-primary))] hover:underline">
+              <Link href="/admin/properties" className="flex items-center gap-1 text-xs font-medium text-[hsl(var(--adm-primary))] hover:underline">
                 View All <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
@@ -411,22 +411,27 @@ export default function AdminDashboard() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-[hsl(var(--adm-border)/0.5)]">
-                      {["Room Name", "City", "Status"].map((h) => (
+                      {["Property Name", "City", "Category", "Status"].map((h) => (
                         <th key={h} className="pb-3 text-left text-xs font-semibold uppercase tracking-wide text-[hsl(var(--adm-muted-foreground))]">{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {d.recentRooms.map((room) => (
-                      <tr key={room._id} className="border-b border-[hsl(var(--adm-border)/0.3)] transition-colors hover:bg-[hsl(var(--adm-accent)/0.2)]">
-                        <td className="py-3 pr-4 font-medium text-[hsl(var(--adm-foreground))]">{room.name}</td>
-                        <td className="py-3 pr-4 text-[hsl(var(--adm-muted-foreground))]">{room.city?.name ?? "—"}</td>
-                        <td className="py-3"><AdminBadge variant={statusBadge(room.status)}>{room.status}</AdminBadge></td>
+                    {d.recentProperties.map((property) => (
+                      <tr key={property._id} className="border-b border-[hsl(var(--adm-border)/0.3)] transition-colors hover:bg-[hsl(var(--adm-accent)/0.2)]">
+                        <td className="py-3 pr-4 font-medium text-[hsl(var(--adm-foreground))]">
+                          <Link href={`/admin/properties/${property._id}`} className="hover:text-[hsl(var(--adm-primary))] hover:underline">
+                            {property.name}
+                          </Link>
+                        </td>
+                        <td className="py-3 pr-4 text-[hsl(var(--adm-muted-foreground))]">{property.city?.name ?? "—"}</td>
+                        <td className="py-3 pr-4 text-[hsl(var(--adm-muted-foreground))] capitalize">{property.category ?? property.badge ?? "Homestay"}</td>
+                        <td className="py-3"><AdminBadge variant={statusBadge(property.status)}>{property.status}</AdminBadge></td>
                       </tr>
                     ))}
-                    {d.recentRooms.length === 0 && (
-                      <tr><td colSpan={3} className="py-8 text-center text-sm text-[hsl(var(--adm-muted-foreground))]">
-                        No rooms yet — <Link href="/admin/rooms" className="text-[hsl(var(--adm-primary))] hover:underline">add your first room</Link>
+                    {d.recentProperties.length === 0 && (
+                      <tr><td colSpan={4} className="py-8 text-center text-sm text-[hsl(var(--adm-muted-foreground))]">
+                        No properties yet — <Link href="/admin/properties/new" className="text-[hsl(var(--adm-primary))] hover:underline">add your first property</Link>
                       </td></tr>
                     )}
                   </tbody>
@@ -524,7 +529,7 @@ export default function AdminDashboard() {
               <div className="mt-2 flex items-center gap-2">
                 <TrendingUp className="h-3.5 w-3.5 text-[hsl(var(--adm-primary))]" />
                 <span className="text-xs text-[hsl(var(--adm-muted-foreground))]">
-                  {d.totalRooms + d.galleryCount + d.mediaCount + d.amenitiesCount + d.blogsCount + d.faqsCount} total items managed
+                  {d.totalProperties + d.galleryCount + d.mediaCount + d.amenitiesCount + d.blogsCount + d.faqsCount} total items managed
                 </span>
               </div>
             </AdminCardContent>

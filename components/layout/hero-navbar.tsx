@@ -74,6 +74,74 @@ const MENU_ITEM_VARIANTS: Variants = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Blur-reveal character sweep (continuous left-to-right focus pull)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const CHAR_STAGGER = 0.026;
+
+const CHAR_VARIANTS: Variants = {
+  hidden: {
+    opacity: 0,
+    filter: "blur(16px)",
+  },
+  visible: {
+    opacity: 1,
+    filter: "blur(0px)",
+    transition: {
+      duration: 0.5,
+      ease: HERO_EASE,
+    },
+  },
+};
+
+function BlurRevealChars({
+  text,
+  visible,
+  baseDelay = 0,
+  charOffset = 0,
+  className,
+}: {
+  text: string;
+  visible: boolean;
+  baseDelay?: number;
+  charOffset?: number;
+  className?: string;
+}) {
+  const chars = Array.from(text);
+
+  return (
+    <motion.span
+      initial="hidden"
+      animate={visible ? "visible" : "hidden"}
+      variants={{
+        hidden: {},
+        visible: {
+          transition: {
+            staggerChildren: CHAR_STAGGER,
+            delayChildren: baseDelay + charOffset * CHAR_STAGGER,
+          },
+        },
+      }}
+      className={className}
+      style={{ display: "inline-block" }}
+    >
+      {chars.map((c, i) => (
+        <motion.span
+          key={i}
+          variants={CHAR_VARIANTS}
+          style={{
+            display: "inline-block",
+            willChange: "filter, opacity",
+          }}
+        >
+          {c === " " ? "\u00A0" : c}
+        </motion.span>
+      ))}
+    </motion.span>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Navigation Links
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -245,37 +313,13 @@ export default function HeroNavbar({
   const spacerRef = useRef<HTMLDivElement>(null);
 
   // ───────────────────────────────────────────────────────────────────────────
-  // Native Smooth Scrolling
+  // Scroll layout
+  //
+  // The hero uses a fixed visual container, but the document always reserves
+  // one full viewport for it. We intentionally do NOT animate the spacer
+  // height. This prevents the next section from moving upward while the hero
+  // is still being scrolled out.
   // ───────────────────────────────────────────────────────────────────────────
-  useEffect(() => {
-    document.documentElement.style.scrollBehavior = "smooth";
-
-    return () => {
-      document.documentElement.style.scrollBehavior = "";
-    };
-  }, []);
-
-  useEffect(() => {
-    const spacer = spacerRef.current;
-    if (!spacer) return;
-
-    let prevHeight = spacer.getBoundingClientRect().height;
-
-    const ro = new ResizeObserver(() => {
-      const newHeight = spacer.getBoundingClientRect().height;
-      const delta = newHeight - prevHeight;
-      const isLocked = Date.now() < scrollLockUntilRef.current;
-      if (delta !== 0) {
-        if (!isLocked && window.scrollY > 200 && delta < 0) {
-          window.scrollBy({ top: delta, left: 0, behavior: "auto" });
-        }
-      }
-      prevHeight = newHeight;
-    });
-
-    ro.observe(spacer);
-    return () => ro.disconnect();
-  }, []);
   // ───────────────────────────────────────────────────────────────────────────
   // Measure Navbar Height
   // ───────────────────────────────────────────────────────────────────────────
@@ -426,51 +470,55 @@ export default function HeroNavbar({
   // ───────────────────────────────────────────────────────────────────────────
   // Scroll Handler
   // ───────────────────────────────────────────────────────────────────────────
+  //
+  // IMPORTANT: the hero is NOT collapsed after a small scroll amount.
+  // It remains the active hero until the user has consumed one complete
+  // viewport of scroll. Only then does the compact fixed navbar state appear.
+  // Because the spacer below always remains 100svh, the Destinations section
+  // cannot appear before the hero's document space has been fully scrolled.
+  // ───────────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
     let ticking = false;
 
     const onScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const currentY = window.scrollY;
-          const isLocked = Date.now() < scrollLockUntilRef.current;
+      if (ticking) return;
 
-          if (isHome) {
-            if (isLocked) {
-              setHeroVisible(true);
-              setScrolled(false);
-            } else {
-              setScrolled(currentY > 20);
-              if (currentY > 80) {
-                setHeroVisible(false);
-              } else if (currentY <= 5) {
-                setHeroVisible(true);
-              }
-            }
+      ticking = true;
+
+      window.requestAnimationFrame(() => {
+        const currentY = window.scrollY;
+        const isLocked = Date.now() < scrollLockUntilRef.current;
+
+        if (isHome) {
+          if (isLocked) {
+            setHeroVisible(true);
+            setScrolled(false);
           } else {
             setScrolled(currentY > 20);
+
+            // Keep the hero active for the entire first viewport.
+            // Do not use a small threshold such as 80px here.
+            const heroFinished =
+              currentY >= window.innerHeight;
+
+            setHeroVisible(!heroFinished);
           }
+        } else {
+          setScrolled(currentY > 20);
+        }
 
-          lastScrollY.current = currentY;
-          ticking = false;
-        });
-
-        ticking = true;
-      }
+        lastScrollY.current = currentY;
+        ticking = false;
+      });
     };
 
-    window.addEventListener(
-      "scroll",
-      onScroll,
-      { passive: true }
-    );
+    window.addEventListener("scroll", onScroll, {
+      passive: true,
+    });
 
     return () => {
-      window.removeEventListener(
-        "scroll",
-        onScroll
-      );
+      window.removeEventListener("scroll", onScroll);
     };
   }, [isHome]);
 
@@ -623,8 +671,8 @@ export default function HeroNavbar({
               height: mobileOpen
                 ? "calc(100svh - 32px)"
                 : isExpanded
-                ? "95svh"
-                : `${navbarH}px`,
+                  ? "95svh"
+                  : `${navbarH}px`,
               marginTop: 0,
             }}
             transition={{
@@ -691,11 +739,6 @@ export default function HeroNavbar({
 
             {/* ═══════════════════════════════════════════════════════════════
                 BLACK FADE WHEN DESTINATIONS IS OPEN
-
-                8% opacity
-                No blur
-                Pure black
-                Dropdown remains sharp
             ═══════════════════════════════════════════════════════════════ */}
 
             <AnimatePresence>
@@ -874,11 +917,10 @@ export default function HeroNavbar({
                   setMobileOpen(false);
                   handleBookNowClick(e);
                 }}
-                className={`flex items-center justify-center transition-all duration-300 ${
-                  mobileOpen
-                    ? "absolute left-5 sm:left-6 md:left-8 top-1/2 -translate-y-1/2"
-                    : "absolute left-5 md:left-1/2 md:-translate-x-1/2 top-1/2 -translate-y-1/2"
-                }`}
+                className={`flex items-center justify-center transition-all duration-300 ${mobileOpen
+                  ? "absolute left-5 sm:left-6 md:left-8 top-1/2 -translate-y-1/2"
+                  : "absolute left-5 md:left-1/2 md:-translate-x-1/2 top-1/2 -translate-y-1/2"
+                  }`}
               >
                 <img
                   src="/assets/logo.png"
@@ -1066,11 +1108,10 @@ export default function HeroNavbar({
                             handleBookNowClick(e);
                           }
                         }}
-                        className={`py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${
-                          pathname === "/"
-                            ? "text-[#D2E6BC] font-semibold"
-                            : "text-white/90 hover:text-[#D2E6BC]"
-                        }`}
+                        className={`py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname === "/"
+                          ? "text-[#D2E6BC] font-semibold"
+                          : "text-white/90 hover:text-[#D2E6BC]"
+                          }`}
                       >
                         Home
                       </Link>
@@ -1081,11 +1122,10 @@ export default function HeroNavbar({
                       <button
                         type="button"
                         onClick={() => setMobileDestinationsOpen((prev) => !prev)}
-                        className={`flex items-center justify-between w-full text-left font-sans transition-all py-1 cursor-pointer ${
-                          mobileDestinationsOpen || isDestinationsRoute(pathname)
-                            ? "text-[#D2E6BC] font-semibold"
-                            : "text-white/90 font-medium hover:text-[#D2E6BC]"
-                        }`}
+                        className={`flex items-center justify-between w-full text-left font-sans transition-all py-1 cursor-pointer ${mobileDestinationsOpen || isDestinationsRoute(pathname)
+                          ? "text-[#D2E6BC] font-semibold"
+                          : "text-white/90 font-medium hover:text-[#D2E6BC]"
+                          }`}
                       >
                         <span className="text-[17px] sm:text-[18px]">Destinations</span>
                         {mobileDestinationsOpen ? (
@@ -1115,11 +1155,10 @@ export default function HeroNavbar({
                       <Link
                         href="/partners"
                         onClick={() => setMobileOpen(false)}
-                        className={`py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${
-                          pathname.startsWith("/partners")
-                            ? "text-[#D2E6BC] font-semibold"
-                            : "text-white/90 hover:text-[#D2E6BC]"
-                        }`}
+                        className={`py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname.startsWith("/partners")
+                          ? "text-[#D2E6BC] font-semibold"
+                          : "text-white/90 hover:text-[#D2E6BC]"
+                          }`}
                       >
                         Partners
                       </Link>
@@ -1141,11 +1180,10 @@ export default function HeroNavbar({
                       <Link
                         href="/contact-us"
                         onClick={() => setMobileOpen(false)}
-                        className={`py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${
-                          pathname === "/contact-us"
-                            ? "text-[#D2E6BC] font-semibold"
-                            : "text-white/90 hover:text-[#D2E6BC]"
-                        }`}
+                        className={`py-1 text-[17px] sm:text-[18px] font-sans font-medium transition-colors ${pathname === "/contact-us"
+                          ? "text-[#D2E6BC] font-semibold"
+                          : "text-white/90 hover:text-[#D2E6BC]"
+                          }`}
                       >
                         Contact Us
                       </Link>
@@ -1199,18 +1237,17 @@ export default function HeroNavbar({
                     duration: 0.35,
                     ease: HERO_EASE,
                   }}
-                style={{
-                  pointerEvents:
-                    heroVisible &&
-                      !destinationsOpen
-                      ? "auto"
-                      : "none",
+                  style={{
+                    pointerEvents:
+                      heroVisible &&
+                        !destinationsOpen
+                        ? "auto"
+                        : "none",
 
-                  // No blur
-                  willChange:
-                    "transform, opacity",
-                }}
-                className="
+                    willChange:
+                      "transform, opacity",
+                  }}
+                  className="
                   relative
                   z-10
                   px-5
@@ -1230,28 +1267,28 @@ export default function HeroNavbar({
                   w-full
                   my-auto
                 "
-              >
-                {/* EYEBROW */}
+                >
+                  {/* EYEBROW */}
 
-                <motion.p
-                  initial={{
-                    opacity: 0,
-                    y: 10,
-                  }}
-                  animate={{
-                    opacity: heroVisible
-                      ? 1
-                      : 0,
-                    y: heroVisible
-                      ? 0
-                      : 10,
-                  }}
-                  transition={{
-                    delay: 0.4,
-                    duration: 0.45,
-                    ease: HERO_EASE,
-                  }}
-                  className="
+                  <motion.p
+                    initial={{
+                      opacity: 0,
+                      y: 10,
+                    }}
+                    animate={{
+                      opacity: heroVisible
+                        ? 1
+                        : 0,
+                      y: heroVisible
+                        ? 0
+                        : 10,
+                    }}
+                    transition={{
+                      delay: 0.3,
+                      duration: 0.45,
+                      ease: HERO_EASE,
+                    }}
+                    className="
                     text-[11px]
                     sm:text-xs
                     md:text-[13px]
@@ -1263,88 +1300,82 @@ export default function HeroNavbar({
                     sm:mb-1.5
                     font-sans
                   "
-                >
-                  {heroEyebrow ||
-                    "THE HOMELY RESET"}
-                </motion.p>
+                  >
+                    {heroEyebrow ||
+                      "THE HOMELY RESET"}
+                  </motion.p>
 
-                {/* HEADLINE */}
+                  {/* HEADLINE — continuous blur sweep, left to right */}
 
-                <motion.div
-                  initial={{
-                    opacity: 0,
-                    y: 14,
-                  }}
-                  animate={{
-                    opacity: heroVisible
-                      ? 1
-                      : 0,
-                    y: heroVisible
-                      ? 0
-                      : 14,
-                  }}
-                  transition={{
-                    delay: 0.48,
-                    duration: 0.5,
-                    ease: HERO_EASE,
-                  }}
-                  className="
+                  <div
+                    className="
                     mb-10
                     sm:mb-5
                     md:mb-[60px]
                   "
-                >
-                  {(() => {
-                    const line1Trimmed = (
-                      heroLine1 ||
-                      "Find your perfect"
-                    ).trim();
+                  >
+                    {(() => {
+                      const line1Trimmed = (
+                        heroLine1 ||
+                        "Find your perfect"
+                      ).trim();
 
-                    const hasStayAtEnd =
-                      /\bstay$/i.test(
-                        line1Trimmed
-                      );
+                      const hasStayAtEnd =
+                        /\bstay$/i.test(
+                          line1Trimmed
+                        );
 
-                    let headlinePrefix =
-                      hasStayAtEnd
-                        ? line1Trimmed
-                          .replace(
-                            /\bstay$/i,
-                            ""
-                          )
-                          .trim()
-                        : line1Trimmed;
+                      let headlinePrefix =
+                        hasStayAtEnd
+                          ? line1Trimmed
+                            .replace(
+                              /\bstay$/i,
+                              ""
+                            )
+                            .trim()
+                          : line1Trimmed;
 
-                    if (
-                      headlinePrefix.toLowerCase() ===
-                      "find your perfect"
-                    ) {
-                      headlinePrefix =
-                        "Find your perfect";
-                    }
+                      if (
+                        headlinePrefix.toLowerCase() ===
+                        "find your perfect"
+                      ) {
+                        headlinePrefix =
+                          "Find your perfect";
+                      }
 
-                    const stayWord = (
-                      hasStayAtEnd
-                        ? line1Trimmed.match(
-                          /\bstay$/i
-                        )?.[0] || "stay"
-                        : "stay"
-                    ).toLowerCase();
+                      const stayWord = (
+                        hasStayAtEnd
+                          ? line1Trimmed.match(
+                            /\bstay$/i
+                          )?.[0] || "stay"
+                          : "stay"
+                      ).toLowerCase();
 
-                    const headlineLine2 = (
-                      heroLine2 ||
-                      "experience"
-                    )
-                      .trim()
-                      .replace(
-                        /^stay\s+/i,
-                        ""
+                      const headlineLine2 = (
+                        heroLine2 ||
+                        "experience"
                       )
-                      .toLowerCase();
+                        .trim()
+                        .replace(
+                          /^stay\s+/i,
+                          ""
+                        )
+                        .toLowerCase();
 
-                    return (
-                      <h1
-                        className="
+                      // continuous character offsets so the sweep never resets mid-headline
+                      const prefixOffset = 0;
+                      const stayOffset =
+                        headlinePrefix.length + 1;
+                      const line2Offset =
+                        stayOffset +
+                        stayWord.length +
+                        1;
+
+                      const HEADLINE_BASE_DELAY = 0.68;
+
+                      return (
+                        <h1
+                          className="
                           text-white
                           text-[26px]
                           sm:text-[30px]
@@ -1356,89 +1387,120 @@ export default function HeroNavbar({
                           sm:tracking-[-1px]
                           text-center
                         "
-                      >
-                        {/* Mobile */}
+                        >
+                          {/* Mobile */}
 
-                        <span className="sm:hidden">
-                          <span className="block font-sans font-semibold">
-                            {headlinePrefix}
+                          <span className="sm:hidden">
+                            <span className="block font-sans font-semibold">
+                              <BlurRevealChars
+                                text={headlinePrefix}
+                                visible={heroVisible}
+                                baseDelay={HEADLINE_BASE_DELAY}
+                                charOffset={prefixOffset}
+                              />
+                            </span>
+
+                            <span className="block font-serif italic font-normal mt-0.5">
+                              <BlurRevealChars
+                                text={stayWord}
+                                visible={heroVisible}
+                                baseDelay={HEADLINE_BASE_DELAY}
+                                charOffset={stayOffset}
+                              />
+                              {"\u00A0"}
+                              <BlurRevealChars
+                                text={headlineLine2}
+                                visible={heroVisible}
+                                baseDelay={HEADLINE_BASE_DELAY}
+                                charOffset={line2Offset}
+                              />
+                            </span>
                           </span>
 
-                          <span className="block font-serif italic font-normal mt-0.5">
-                            {stayWord}{" "}
-                            {headlineLine2}
+                          {/* Tablet + Desktop */}
+
+                          <span className="hidden sm:inline">
+                            <span className="font-sans font-semibold">
+                              <BlurRevealChars
+                                text={headlinePrefix}
+                                visible={heroVisible}
+                                baseDelay={HEADLINE_BASE_DELAY}
+                                charOffset={prefixOffset}
+                              />
+                            </span>
+                            {"\u00A0"}
+                            <span className="font-serif italic font-normal">
+                              <BlurRevealChars
+                                text={stayWord}
+                                visible={heroVisible}
+                                baseDelay={HEADLINE_BASE_DELAY}
+                                charOffset={stayOffset}
+                              />
+                            </span>
+
+                            <span className="block font-serif italic font-normal mt-1 sm:mt-1.5">
+                              <BlurRevealChars
+                                text={headlineLine2}
+                                visible={heroVisible}
+                                baseDelay={HEADLINE_BASE_DELAY}
+                                charOffset={line2Offset}
+                              />
+                            </span>
                           </span>
-                        </span>
+                        </h1>
+                      );
+                    })()}
+                  </div>
 
-                        {/* Tablet + Desktop */}
+                  {/* BOOKING WIDGET */}
 
-                        <span className="hidden sm:inline">
-                          <span className="font-sans font-semibold">
-                            {headlinePrefix}{" "}
-                          </span>
-
-                          <span className="font-serif italic font-normal">
-                            {stayWord}
-                          </span>
-
-                          <span className="block font-serif italic font-normal mt-1 sm:mt-1.5">
-                            {headlineLine2}
-                          </span>
-                        </span>
-                      </h1>
-                    );
-                  })()}
-                </motion.div>
-
-                {/* BOOKING WIDGET */}
-
-                <motion.div
-                  initial={{
-                    opacity: 0,
-                    y: 22,
-                  }}
-                  animate={{
-                    opacity: heroVisible
-                      ? 1
-                      : 0,
-                    y: heroVisible
-                      ? 0
-                      : 22,
-                  }}
-                  transition={{
-                    delay: 0.58,
-                    duration: 0.5,
-                    ease: HERO_EASE,
-                  }}
-                  className="
+                  <motion.div
+                    initial={{
+                      opacity: 0,
+                      y: 22,
+                    }}
+                    animate={{
+                      opacity: heroVisible
+                        ? 1
+                        : 0,
+                      y: heroVisible
+                        ? 0
+                        : 22,
+                    }}
+                    transition={{
+                      delay: 0.5,
+                      duration: 0.5,
+                      ease: HERO_EASE,
+                    }}
+                    className="
                     w-full
                     max-w-4xl
                   "
-                >
-                  <BookingBarWidget />
-                </motion.div>
+                  >
+                    <BookingBarWidget />
+                  </motion.div>
 
-                {/* TRUST BADGES */}
+                  {/* TRUST BADGES */}
 
-                <motion.div
-                  initial={{
-                    opacity: 0,
-                    y: 14,
-                  }}
-                  animate={{
-                    opacity: heroVisible
-                      ? 1
-                      : 0,
-                    y: heroVisible
-                      ? 0
-                      : 14,
-                  }}
-                  transition={{
-                    delay: 0.68,
-                    duration: 0.5,
-                    ease: HERO_EASE,
-                  }}
-                  className="
+                  <motion.div
+                    initial={{
+                      opacity: 0,
+                      y: 14,
+                    }}
+                    animate={{
+                      opacity: heroVisible
+                        ? 1
+                        : 0,
+                      y: heroVisible
+                        ? 0
+                        : 14,
+                    }}
+                    transition={{
+                      delay: 0.58,
+                      duration: 0.5,
+                      ease: HERO_EASE,
+                    }}
+                    className="
                     flex
                     justify-center
                     w-full
@@ -1447,17 +1509,17 @@ export default function HeroNavbar({
                     md:mt-4
                     lg:mt-5
                   "
-                >
-                  {/* Mobile ticker */}
+                  >
+                    {/* Mobile ticker */}
 
-                  <div className="block md:hidden w-full">
-                    <TrustTicker />
-                  </div>
+                    <div className="block md:hidden w-full">
+                      <TrustTicker />
+                    </div>
 
-                  {/* Desktop trust badges */}
+                    {/* Desktop trust badges */}
 
-                  <div
-                    className="
+                    <div
+                      className="
                       relative
                       hidden
                       md:flex
@@ -1473,43 +1535,43 @@ export default function HeroNavbar({
                       px-[20px]
                       py-[16px]
                     "
-                    style={{
-                      background:
-                        "rgba(255, 255, 255, 0.05)",
-                      backdropFilter:
-                        "blur(16px)",
-                    }}
-                    role="list"
-                    aria-label="Trust signals"
-                  >
-                    <div
-                      className="
+                      style={{
+                        background:
+                          "rgba(255, 255, 255, 0.05)",
+                        backdropFilter:
+                          "blur(16px)",
+                      }}
+                      role="list"
+                      aria-label="Trust signals"
+                    >
+                      <div
+                        className="
                         absolute
                         inset-0
                         rounded-[18px]
                         pointer-events-none
                       "
-                      style={{
-                        boxShadow:
-                          "inset 0 1px 0 rgba(255,255,255,0.12)",
-                      }}
-                      aria-hidden="true"
-                    />
+                        style={{
+                          boxShadow:
+                            "inset 0 1px 0 rgba(255,255,255,0.12)",
+                        }}
+                        aria-hidden="true"
+                      />
 
-                    {/* Verified */}
+                      {/* Verified */}
 
-                    <div
-                      className="
+                      <div
+                        className="
                         flex-1
                         min-w-0
                         flex
                         items-center
                         gap-3
                       "
-                      role="listitem"
-                    >
-                      <div
-                        className="
+                        role="listitem"
+                      >
+                        <div
+                          className="
                           w-8
                           h-8
                           rounded-full
@@ -1520,59 +1582,59 @@ export default function HeroNavbar({
                           border-white/10
                           shrink-0
                         "
-                        style={{
-                          background:
-                            "#D2E6BC66",
-                        }}
-                      >
-                        <ShieldCheck
-                          className="
+                          style={{
+                            background:
+                              "#D2E6BC66",
+                          }}
+                        >
+                          <ShieldCheck
+                            className="
                             w-4
                             h-4
                             text-[#D2E6BC]
                           "
-                          aria-hidden="true"
-                        />
+                            aria-hidden="true"
+                          />
+                        </div>
+
+                        <div className="text-left">
+                          <p className="text-[13px] font-semibold text-white leading-tight font-sans">
+                            Verified Hospitality
+                          </p>
+
+                          <p className="text-[11px] text-white/50 leading-tight mt-0.5 font-sans">
+                            Certified & trusted
+                            property
+                          </p>
+                        </div>
                       </div>
 
-                      <div className="text-left">
-                        <p className="text-[13px] font-semibold text-white leading-tight font-sans">
-                          Verified Hospitality
-                        </p>
+                      {/* Divider */}
 
-                        <p className="text-[11px] text-white/50 leading-tight mt-0.5 font-sans">
-                          Certified & trusted
-                          property
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Divider */}
-
-                    <div
-                      className="
+                      <div
+                        className="
                         w-px
                         h-6
                         bg-white/10
                         shrink-0
                       "
-                      aria-hidden="true"
-                    />
+                        aria-hidden="true"
+                      />
 
-                    {/* Exclusive Benefit */}
+                      {/* Exclusive Benefit */}
 
-                    <div
-                      className="
+                      <div
+                        className="
                         flex-1
                         min-w-0
                         flex
                         items-center
                         gap-3
                       "
-                      role="listitem"
-                    >
-                      <div
-                        className="
+                        role="listitem"
+                      >
+                        <div
+                          className="
                           w-8
                           h-8
                           rounded-full
@@ -1583,59 +1645,59 @@ export default function HeroNavbar({
                           border-white/10
                           shrink-0
                         "
-                        style={{
-                          background:
-                            "#D2E6BC66",
-                        }}
-                      >
-                        <Gem
-                          className="
+                          style={{
+                            background:
+                              "#D2E6BC66",
+                          }}
+                        >
+                          <Gem
+                            className="
                             w-4
                             h-4
                             text-[#D2E6BC]
                           "
-                          aria-hidden="true"
-                        />
+                            aria-hidden="true"
+                          />
+                        </div>
+
+                        <div className="text-left">
+                          <p className="text-[13px] font-semibold text-white leading-tight font-sans">
+                            10% Exclusive Benefit
+                          </p>
+
+                          <p className="text-[11px] text-white/50 leading-tight mt-0.5 font-sans">
+                            Best rate on direct
+                            booking
+                          </p>
+                        </div>
                       </div>
 
-                      <div className="text-left">
-                        <p className="text-[13px] font-semibold text-white leading-tight font-sans">
-                          10% Exclusive Benefit
-                        </p>
+                      {/* Divider */}
 
-                        <p className="text-[11px] text-white/50 leading-tight mt-0.5 font-sans">
-                          Best rate on direct
-                          booking
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Divider */}
-
-                    <div
-                      className="
+                      <div
+                        className="
                         w-px
                         h-6
                         bg-white/10
                         shrink-0
                       "
-                      aria-hidden="true"
-                    />
+                        aria-hidden="true"
+                      />
 
-                    {/* Support */}
+                      {/* Support */}
 
-                    <div
-                      className="
+                      <div
+                        className="
                         flex-1
                         min-w-0
                         flex
                         items-center
                         gap-3
                       "
-                      role="listitem"
-                    >
-                      <div
-                        className="
+                        role="listitem"
+                      >
+                        <div
+                          className="
                           w-8
                           h-8
                           rounded-full
@@ -1646,37 +1708,37 @@ export default function HeroNavbar({
                           border-white/10
                           shrink-0
                         "
-                        style={{
-                          background:
-                            "#D2E6BC66",
-                        }}
-                      >
-                        <Bell
-                          className="
+                          style={{
+                            background:
+                              "#D2E6BC66",
+                          }}
+                        >
+                          <Bell
+                            className="
                             w-4
                             h-4
                             text-[#D2E6BC]
                           "
-                          aria-hidden="true"
-                        />
-                      </div>
+                            aria-hidden="true"
+                          />
+                        </div>
 
-                      <div className="text-left">
-                        <p className="text-[13px] font-semibold text-white leading-tight font-sans">
-                          Premium Guest Support
-                        </p>
+                        <div className="text-left">
+                          <p className="text-[13px] font-semibold text-white leading-tight font-sans">
+                            Premium Guest Support
+                          </p>
 
-                        <p className="text-[11px] text-white/50 leading-tight mt-0.5 font-sans">
-                          Always here for you
-                        </p>
+                          <p className="text-[11px] text-white/50 leading-tight mt-0.5 font-sans">
+                            Always here for you
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
 
           {/* ═════════════════════════════════════════════════════════════════
               DESTINATIONS MEGA MENU
@@ -1688,8 +1750,8 @@ export default function HeroNavbar({
               mobileOpen
                 ? navRowHeight + 14
                 : isExpanded
-                ? navbarH + 8
-                : navbarH + 16
+                  ? navbarH + 8
+                  : navbarH + 16
             }
             onMouseEnter={
               handleDestinationsMouseEnter
@@ -1716,20 +1778,14 @@ export default function HeroNavbar({
           PAGE SPACER
       ═══════════════════════════════════════════════════════════════════════ */}
 
-      <motion.div
+      <div
         ref={spacerRef}
-        animate={{
-          height:
-            isHome && heroVisible
-              ? "100svh"
-              : `${navbarH + 32}px`,
-        }}
-        transition={{
-          duration: HERO_DURATION,
-          ease: HERO_EASE,
-        }}
         style={{
-          willChange: "height",
+          // Always reserve the complete hero viewport in the document.
+          // This is what prevents Destinations from appearing early.
+          height: isHome
+            ? "100svh"
+            : `${navbarH + 32}px`,
         }}
         aria-hidden
       />

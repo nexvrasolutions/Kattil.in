@@ -96,7 +96,7 @@ export default function AllDestinationsView({
               transition={{ duration: 0.65, ease: EASE, delay: 0.2 }}
               className="text-white tracking-tight"
             >
-              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] leading-[1.12]">
+              <span className="block font-sans text-2xl sm:text-4xl md:text-5xl lg:text-[40px] leading-[1.12]">
                 Destinations to
               </span>
               <span className="block font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-normal italic text-[#f4f7ef] leading-[1.15] mt-1">

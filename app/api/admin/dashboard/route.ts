@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db/mongodb";
 import City from "@/lib/models/City";
-import Room from "@/lib/models/Room";
+import Property from "@/lib/models/Property";
 import Gallery from "@/lib/models/Gallery";
 import Amenity from "@/lib/models/Amenity";
 import KanbanTask from "@/lib/models/Kanban";
@@ -15,8 +15,8 @@ export async function GET(_request: NextRequest) {
     await connectDB();
 
     const [
-      totalRooms,
-      activeRooms,
+      totalProperties,
+      activeProperties,
       totalCities,
       amenitiesCount,
       galleryCount,
@@ -28,12 +28,12 @@ export async function GET(_request: NextRequest) {
       kanbanInProgress,
       kanbanReview,
       kanbanCompleted,
-      recentRooms,
+      recentProperties,
       recentGallery,
-      roomCategories,
+      propertyCategories,
     ] = await Promise.all([
-      Room.countDocuments(),
-      Room.countDocuments({ status: "active" }),
+      Property.countDocuments(),
+      Property.countDocuments({ status: "active" }),
       City.countDocuments({ active: true }),
       Amenity.countDocuments({ visible: true }),
       Gallery.countDocuments(),
@@ -45,24 +45,25 @@ export async function GET(_request: NextRequest) {
       KanbanTask.countDocuments({ column: "in-progress" }),
       KanbanTask.countDocuments({ column: "review" }),
       KanbanTask.countDocuments({ column: "completed" }),
-      Room.find()
+      Property.find({ status: "active" })
         .sort({ createdAt: -1 })
         .limit(5)
         .populate("city", "name")
-        .select("name status city slug"),
+        .select("name status city slug category badge"),
       Gallery.find()
         .sort({ createdAt: -1 })
         .limit(6)
         .select("src alt category"),
-      Room.aggregate([
+      Property.aggregate([
+        { $match: { status: "active" } },
         { $group: { _id: "$category", count: { $sum: 1 } } },
         { $sort: { count: -1 } },
       ]),
     ]);
 
     return apiSuccess({
-      totalRooms,
-      activeRooms,
+      totalProperties,
+      activeProperties,
       totalCities,
       amenitiesCount,
       galleryCount,
@@ -76,19 +77,19 @@ export async function GET(_request: NextRequest) {
         review: kanbanReview,
         completed: kanbanCompleted,
       },
-      roomCategories: roomCategories.map((r: { _id: string; count: number }) => ({
-        name: r._id ? r._id.charAt(0).toUpperCase() + r._id.slice(1) : "Unknown",
+      propertyCategories: propertyCategories.map((r: { _id: string; count: number }) => ({
+        name: r._id ? r._id.charAt(0).toUpperCase() + r._id.slice(1) : "General",
         value: r.count,
       })),
       cmsModules: [
-        { module: "Rooms", count: totalRooms },
+        { module: "Properties", count: activeProperties },
         { module: "Blogs", count: blogsCount },
         { module: "Gallery", count: galleryCount },
         { module: "FAQs", count: faqsCount },
         { module: "Amenities", count: amenitiesCount },
         { module: "Media", count: mediaCount },
       ],
-      recentRooms,
+      recentProperties,
       recentGallery,
       timestamp: new Date().toISOString(),
     });

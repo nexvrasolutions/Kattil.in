@@ -99,7 +99,7 @@ export default function DestinationsSection() {
           transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           className="text-center mb-6 sm:mb-10"
         >
-          <h2 className="text-[#0d1b2e] text-[18px] sm:text-[28px] md:text-[36px] font-sans font-normal tracking-tight">
+          <h2 className="text-[#0d1b2e] text-[24px] sm:text-[32px] md:text-[36px] font-sans font-normal leading-[1.18] tracking-tight mb-10">
             Destinations to{" "}
             <span className="font-serif italic font-normal text-[#0d1b2e]">
               Discover

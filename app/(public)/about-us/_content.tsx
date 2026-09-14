@@ -260,7 +260,7 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
 
                 {/* Right Team Cards */}
                 <div className="lg:col-span-9 xl:col-span-9">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-4 md:gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 sm:gap-4 md:gap-6">
                     {TEAM_MEMBERS.map((member, idx) => (
                       <motion.div
                         key={idx}
