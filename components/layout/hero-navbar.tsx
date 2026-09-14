@@ -294,23 +294,13 @@ export default function HeroNavbar({
   const [destinationsOpen, setDestinationsOpen] = useState(false);
   const [heroVisible, setHeroVisible] = useState(isHome);
 
-  const lastScrollY = useRef(0);
-  const heroVisibleRef = useRef(heroVisible);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scrollLockUntilRef = useRef<number>(0);
 
   const navRowRef = useRef<HTMLDivElement>(null);
 
-  const destinationsTriggerRef =
-    useRef<HTMLButtonElement>(null);
-
-  const headerContainerRef =
-    useRef<HTMLDivElement>(null);
-
   const [navRowHeight, setNavRowHeight] =
     useState(NAVBAR_H_DEFAULT);
-
-  const spacerRef = useRef<HTMLDivElement>(null);
 
   // ───────────────────────────────────────────────────────────────────────────
   // Scroll layout
@@ -460,14 +450,6 @@ export default function HeroNavbar({
   }, [destinationsOpen]);
 
   // ───────────────────────────────────────────────────────────────────────────
-  // Hero Visibility Ref
-  // ───────────────────────────────────────────────────────────────────────────
-
-  useEffect(() => {
-    heroVisibleRef.current = heroVisible;
-  }, [heroVisible]);
-
-  // ───────────────────────────────────────────────────────────────────────────
   // Scroll Handler
   // ───────────────────────────────────────────────────────────────────────────
   //
@@ -508,7 +490,6 @@ export default function HeroNavbar({
           setScrolled(currentY > 20);
         }
 
-        lastScrollY.current = currentY;
         ticking = false;
       });
     };
@@ -535,7 +516,6 @@ export default function HeroNavbar({
       if (isHome) {
         scrollLockUntilRef.current = Date.now() + 1500;
         window.scrollTo(0, 0);
-        lastScrollY.current = 0;
         setHeroVisible(true);
         setScrolled(false);
         const raf = requestAnimationFrame(() => {
@@ -657,7 +637,6 @@ export default function HeroNavbar({
         "
       >
         <div
-          ref={headerContainerRef}
           className="
             relative
             w-full
@@ -836,9 +815,6 @@ export default function HeroNavbar({
                     >
                       {isDestinations ? (
                         <button
-                          ref={
-                            destinationsTriggerRef
-                          }
                           type="button"
                           data-text={link.label}
                           data-destinations-trigger="true"
@@ -1779,7 +1755,6 @@ export default function HeroNavbar({
       ═══════════════════════════════════════════════════════════════════════ */}
 
       <div
-        ref={spacerRef}
         style={{
           // Always reserve the complete hero viewport in the document.
           // This is what prevents Destinations from appearing early.
