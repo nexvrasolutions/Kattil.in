@@ -7,48 +7,48 @@ import { locations as staticLocations } from "@/lib/data";
 
 // Map lib/data locations to FooterLocation shape — used as fallback when DB has none
 const LOCATIONS_FALLBACK: FooterProps["locations"] = staticLocations.map((l) => ({
-  city:    l.label,
+  city: l.label,
   address: l.address,
-  phone:   l.phone,
-  email:   l.email,
+  phone: l.phone,
+  email: l.email,
 }));
 
 // Static fallback data — matches the seeded defaults
 const FOOTER_FALLBACK: FooterProps = {
-  logo:        "/assets/logo.png",
-  headline:    "Experience luxury hospitality with premium comfort, elegant spaces, and world-class service designed for unforgettable stays.",
+  logo: "/assets/logo.png",
+  headline: "Experience luxury hospitality with premium comfort, elegant spaces, and world-class service designed for unforgettable stays.",
   description: "",
-  copyright:   `© ${new Date().getFullYear()} Kattil. All Rights Reserved.`,
+  copyright: `© ${new Date().getFullYear()} Kattil. All Rights Reserved.`,
   footerLinks: [
     {
       section: "NAVIGATION", order: 0,
       links: [
-        { label: "Home",         href: "/",           newTab: false, order: 0 },
-        { label: "About Us",     href: "/about-us",   newTab: false, order: 1 },
+        { label: "Home", href: "/", newTab: false, order: 0 },
+        { label: "About Us", href: "/about-us", newTab: false, order: 1 },
         { label: "Destinations", href: "/destinations", newTab: false, order: 2 },
-        { label: "Gallery",      href: "/gallery",     newTab: false, order: 3 },
-        { label: "Blog",         href: "/blog",        newTab: false, order: 4 },
-        { label: "Contact",      href: "/contact-us",  newTab: false, order: 5 },
+        { label: "Gallery", href: "/gallery", newTab: false, order: 3 },
+        { label: "Blog", href: "/blog", newTab: false, order: 4 },
+        { label: "Contact", href: "/contact-us", newTab: false, order: 5 },
       ],
     },
     {
       section: "NAVIGATION", order: 1,
       links: [
-        { label: "Home",         href: "/",           newTab: false, order: 0 },
-        { label: "About Us",     href: "/about-us",   newTab: false, order: 1 },
+        { label: "Home", href: "/", newTab: false, order: 0 },
+        { label: "About Us", href: "/about-us", newTab: false, order: 1 },
         { label: "Destinations", href: "/destinations", newTab: false, order: 2 },
-        { label: "Gallery",      href: "/gallery",     newTab: false, order: 3 },
-        { label: "Blog",         href: "/blog",        newTab: false, order: 4 },
-        { label: "Contact",      href: "/contact-us",  newTab: false, order: 5 },
+        { label: "Gallery", href: "/gallery", newTab: false, order: 3 },
+        { label: "Blog", href: "/blog", newTab: false, order: 4 },
+        { label: "Contact", href: "/contact-us", newTab: false, order: 5 },
       ],
     },
     {
       section: "LEGAL", order: 2,
       links: [
-        { label: "Privacy Policy",     href: "/privacy-policy",   newTab: false, order: 0 },
-        { label: "Refund Policy",      href: "/refund-policy",    newTab: false, order: 1 },
+        { label: "Privacy Policy", href: "/privacy-policy", newTab: false, order: 0 },
+        { label: "Refund Policy", href: "/refund-policy", newTab: false, order: 1 },
         { label: "Terms & Conditions", href: "/terms-conditions", newTab: false, order: 2 },
-        { label: "FAQs",               href: "/faqs",             newTab: false, order: 3 },
+        { label: "FAQs", href: "/faqs", newTab: false, order: 3 },
       ],
     },
   ],
@@ -83,13 +83,13 @@ async function getFooterData(): Promise<{ footer: FooterProps; sidebar: SidebarI
     const parsed = JSON.parse(JSON.stringify(raw));
 
     const footer: FooterProps = {
-      logo:        (parsed.logo as string)        || FOOTER_FALLBACK.logo,
-      headline:    (parsed.headline as string)    || FOOTER_FALLBACK.headline,
+      logo: (parsed.logo as string) || FOOTER_FALLBACK.logo,
+      headline: (parsed.headline as string) || FOOTER_FALLBACK.headline,
       description: (parsed.description as string) || "",
-      copyright:   (parsed.copyright as string)   || FOOTER_FALLBACK.copyright,
+      copyright: (parsed.copyright as string) || FOOTER_FALLBACK.copyright,
       footerLinks: (parsed.footerLinks as FooterProps["footerLinks"]) ?? FOOTER_FALLBACK.footerLinks,
       socialLinks: (parsed.socialLinks as FooterProps["socialLinks"]) ?? FOOTER_FALLBACK.socialLinks,
-      locations:   (parsed.locations as FooterProps["locations"])?.length
+      locations: (parsed.locations as FooterProps["locations"])?.length
         ? (parsed.locations as FooterProps["locations"])
         : LOCATIONS_FALLBACK,
     };
