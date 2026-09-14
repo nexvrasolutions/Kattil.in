@@ -216,7 +216,7 @@ export default function GalleryContent({
       <Navbar />
 
       {/* ── 1. Hero Header Section (Sage Green) ───────────────────────────── */}
-      <section className="relative w-full bg-[#8E9F78] overflow-hidden min-h-[300px] sm:min-h-[400px] md:min-h-[450px] lg:min-h-[500px] flex flex-col justify-end pt-28 sm:pt-32 md:pt-34 lg:pt-36 pb-[64px]">
+      <section className="relative w-full bg-[#8E9F78] overflow-hidden min-h-[280px] sm:min-h-[360px] md:min-h-[400px] lg:min-h-[440px] flex flex-col justify-end pt-28 sm:pt-32 md:pt-34 lg:pt-36 pb-12 sm:pb-14 md:pb-16">
         {/* Right Background Monument Skyline Silhouette */}
         <motion.div
           initial={{ opacity: 0, x: 30 }}
@@ -251,14 +251,11 @@ export default function GalleryContent({
               transition={{ duration: 0.65, ease: EASE, delay: 0.2 }}
               className="text-white tracking-tight"
             >
-              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] leading-[1.12]">
-                Moments to{" "}
-                <span className="font-serif font-normal italic text-[#f4f7ef]">
-                  Remember
-                </span>
+              <span className="block font-sans text-[26px] sm:text-4xl md:text-5xl lg:text-[40px] leading-[1.12]">
+                Moments to
               </span>
-              <span className="block font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-normal italic text-[#f4f7ef] leading-[1.15] mt-1 whitespace-nowrap">
-                our hotel
+              <span className="block font-serif text-[26px] sm:text-4xl md:text-5xl lg:text-[40px] font-normal italic text-[#f4f7ef] leading-[1.15] mt-1 whitespace-nowrap">
+                Remember our hotel
               </span>
             </motion.h1>
           </div>

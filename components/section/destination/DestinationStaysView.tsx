@@ -121,10 +121,10 @@ export default function DestinationStaysView({
           w-full
           bg-[#8E9F78]
           overflow-hidden
-          min-h-[300px]
-          sm:min-h-[400px]
-          md:min-h-[450px]
-          lg:min-h-[500px]
+          min-h-[280px]
+          sm:min-h-[360px]
+          md:min-h-[400px]
+          lg:min-h-[440px]
           flex
           flex-col
           justify-end
@@ -132,7 +132,9 @@ export default function DestinationStaysView({
           sm:pt-32
           md:pt-34
           lg:pt-36
-          pb-[64px]
+          pb-12
+          sm:pb-14
+          md:pb-16
         "
       >
         {/* Background Monument Illustration */}

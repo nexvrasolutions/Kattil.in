@@ -54,9 +54,8 @@ function IconRenderer({ iconName, iconUrl, iconColor }: { iconName: string; icon
 export default function SocialSidebar({ icons }: { icons?: SidebarIconData[] }) {
   const pathname = usePathname();
   const isHome = pathname === "/";
-  const [hovered,  setHovered]  = useState<string | null>(null);
+  const [hovered, setHovered] = useState<string | null>(null);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
-  const [inHero, setInHero] = useState<boolean>(isHome);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -69,24 +68,7 @@ export default function SocialSidebar({ icons }: { icons?: SidebarIconData[] }) 
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
-  useEffect(() => {
-    if (!isHome || (typeof window !== "undefined" && window.innerWidth < 768)) {
-      setInHero((prev) => (prev ? false : prev));
-      return;
-    }
-
-    const checkScroll = () => {
-      const inHeroSection = window.scrollY < 80;
-      setInHero((prev) => (prev !== inHeroSection ? inHeroSection : prev));
-      if (inHeroSection) {
-        setOpenMenu((prev) => (prev ? null : prev));
-      }
-    };
-
-    checkScroll();
-    window.addEventListener("scroll", checkScroll, { passive: true });
-    return () => window.removeEventListener("scroll", checkScroll);
-  }, [isHome]);
+  if (!isHome) return null;
 
   const visibleIcons = (icons ?? [])
     .filter((ic) => ic.visible)
@@ -94,92 +76,82 @@ export default function SocialSidebar({ icons }: { icons?: SidebarIconData[] }) 
 
   if (visibleIcons.length === 0) return null;
 
-  const isVisible = !isHome || !inHero;
-
   return (
-    <AnimatePresence>
-      {isVisible && (
+    <div
+      ref={containerRef}
+      className="fixed right-3 md:right-5 bottom-6 md:bottom-0 md:-translate-y-1/2 z-80 flex flex-col gap-2.5 md:gap-3"
+    >
+      {visibleIcons.map((social, i) => (
         <motion.div
-          ref={containerRef}
-          initial={{ opacity: 0, x: 100 }}
+          key={`${social.label}-${i}`}
+          initial={{ opacity: 0, x: 32 }}
           animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 100 }}
-          transition={{ duration: 0.35, ease: EASE }}
-          className="fixed right-5 bottom-0 -translate-y-1/2 z-50 hidden md:flex flex-col gap-3"
+          transition={{ duration: 0.3, ease: EASE, delay: i * 0.05 }}
+          className="relative flex items-center justify-end"
+          onHoverStart={() => setHovered(social.label)}
+          onHoverEnd={() => setHovered(null)}
         >
-          {visibleIcons.map((social, i) => (
-            <motion.div
-              key={`${social.label}-${i}`}
-              initial={{ opacity: 0, x: 32 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, ease: EASE, delay: i * 0.05 }}
-              className="relative flex items-center justify-end"
-              onHoverStart={() => setHovered(social.label)}
-              onHoverEnd={() => setHovered(null)}
-            >
-              {/* Tooltip */}
-              <AnimatePresence>
-                {hovered === social.label && openMenu !== social.label && (
-                  <motion.span
-                    initial={{ opacity: 0, x: 10, scale: 0.88 }}
-                    animate={{ opacity: 1, x: 0, scale: 1 }}
-                    exit={{ opacity: 0, x: 10, scale: 0.88 }}
-                    transition={{ duration: 0.18, ease: "easeOut" }}
-                    className="absolute right-14 bg-white text-primary font-sans text-[11px] font-semibold
-                      tracking-wide px-3 py-1.5 rounded-full shadow-lg whitespace-nowrap pointer-events-none"
-                  >
-                    {social.tooltip || social.label}
-                  </motion.span>
-                )}
-              </AnimatePresence>
+          {/* Tooltip */}
+          <AnimatePresence>
+            {hovered === social.label && openMenu !== social.label && (
+              <motion.span
+                initial={{ opacity: 0, x: 10, scale: 0.88 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: 10, scale: 0.88 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
+                className="absolute right-14 bg-white text-primary font-sans text-[11px] font-semibold
+                  tracking-wide px-3 py-1.5 rounded-full shadow-lg whitespace-nowrap pointer-events-none"
+              >
+                {social.tooltip || social.label}
+              </motion.span>
+            )}
+          </AnimatePresence>
 
-              {/* Multi sub-menu */}
-              <AnimatePresence>
-                {social.type === "multi" && openMenu === social.label && (
-                  <motion.div
-                    initial={{ opacity: 0, x: 10, scale: 0.9 }}
-                    animate={{ opacity: 1, x: 0, scale: 1 }}
-                    exit={{ opacity: 0, x: 10, scale: 0.9 }}
-                    transition={{ duration: 0.2, ease: "easeOut" }}
-                    className="absolute right-14 flex flex-col gap-1.5"
-                  >
-                    {social.locations.map((loc) => (
-                      <a key={loc.label} href={loc.url} target="_blank" rel="noopener noreferrer"
-                        onClick={() => setOpenMenu(null)}
-                        className="bg-white text-primary font-sans text-[11px] font-semibold tracking-wide
-                          px-4 py-1.5 rounded-full shadow-lg whitespace-nowrap
-                          hover:bg-primary hover:text-white transition-colors duration-200 text-center">
-                        {loc.label}
-                      </a>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+          {/* Multi sub-menu */}
+          <AnimatePresence>
+            {social.type === "multi" && openMenu === social.label && (
+              <motion.div
+                initial={{ opacity: 0, x: 10, scale: 0.9 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: 10, scale: 0.9 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="absolute right-14 flex flex-col gap-1.5"
+              >
+                {social.locations.map((loc) => (
+                  <a key={loc.label} href={loc.url} target="_blank" rel="noopener noreferrer"
+                    onClick={() => setOpenMenu(null)}
+                    className="bg-white text-primary font-sans text-[11px] font-semibold tracking-wide
+                      px-4 py-1.5 rounded-full shadow-lg whitespace-nowrap
+                      hover:bg-primary hover:text-white transition-colors duration-200 text-center">
+                    {loc.label}
+                  </a>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-              {/* Icon button */}
-              {social.type === "link" ? (
-                <motion.a href={social.url} aria-label={social.label} target="_blank" rel="noopener noreferrer"
-                  whileHover={{ scale: 1.14, x: -4 }} whileTap={{ scale: 0.93 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="relative w-12 h-12 rounded-full flex items-center justify-center shadow-lg cursor-pointer"
-                  style={{ background: social.bgColor }}>
-                  <IconRenderer iconName={social.iconName} iconUrl={social.iconUrl} iconColor={social.iconColor} />
-                </motion.a>
-              ) : (
-                <motion.button aria-label={social.label}
-                  onClick={() => setOpenMenu((prev) => (prev === social.label ? null : social.label))}
-                  whileHover={{ scale: 1.14, x: -4 }} whileTap={{ scale: 0.93 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="relative w-12 h-12 rounded-full flex items-center justify-center shadow-lg cursor-pointer"
-                  style={{ background: social.bgColor }}>
-                  {social.pulse && <span className="absolute inset-0 rounded-full animate-ping opacity-25" style={{ background: social.bgColor }} />}
-                  <IconRenderer iconName={social.iconName} iconUrl={social.iconUrl} iconColor={social.iconColor} />
-                </motion.button>
-              )}
-            </motion.div>
-          ))}
+          {/* Icon button */}
+          {social.type === "link" ? (
+            <motion.a href={social.url} aria-label={social.label} target="_blank" rel="noopener noreferrer"
+              whileHover={{ scale: 1.14, x: -4 }} whileTap={{ scale: 0.93 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="relative w-11 h-11 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-lg cursor-pointer"
+              style={{ background: social.bgColor }}>
+              <IconRenderer iconName={social.iconName} iconUrl={social.iconUrl} iconColor={social.iconColor} />
+            </motion.a>
+          ) : (
+            <motion.button aria-label={social.label}
+              onClick={() => setOpenMenu((prev) => (prev === social.label ? null : social.label))}
+              whileHover={{ scale: 1.14, x: -4 }} whileTap={{ scale: 0.93 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="relative w-11 h-11 md:w-12 md:h-12 rounded-full flex items-center justify-center shadow-lg cursor-pointer"
+              style={{ background: social.bgColor }}>
+              {social.pulse && <span className="absolute inset-0 rounded-full animate-ping opacity-25" style={{ background: social.bgColor }} />}
+              <IconRenderer iconName={social.iconName} iconUrl={social.iconUrl} iconColor={social.iconColor} />
+            </motion.button>
+          )}
         </motion.div>
-      )}
-    </AnimatePresence>
+      ))}
+    </div>
   );
 }

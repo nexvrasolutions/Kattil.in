@@ -70,7 +70,7 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
       <Navbar />
 
       {/* ================= 1. HERO SECTION (SAGE GREEN) ================= */}
-      <section className="relative w-full bg-[#8E9F78] overflow-hidden min-h-[300px] sm:min-h-[400px] md:min-h-[450px] lg:min-h-[500px] flex flex-col justify-end pt-28 sm:pt-32 md:pt-34 lg:pt-36 pb-[64px]">
+      <section className="relative w-full bg-[#8E9F78] overflow-hidden min-h-[280px] sm:min-h-[360px] md:min-h-[400px] lg:min-h-[440px] flex flex-col justify-end pt-28 sm:pt-32 md:pt-34 lg:pt-36 pb-12 sm:pb-14 md:pb-16">
         {/* Hero Content - Aligned exactly with Navbar 'Home' and 'Book Now' */}
         <div className="relative z-10 w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="relative px-5 md:px-8 lg:px-15 flex items-end justify-between">
@@ -81,7 +81,7 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
               transition={{ duration: 0.7, ease: EASE }}
               className="max-w-xl text-left relative z-10"
             >
-              <p className="font-sans text-[14px] sm:text-[15px] md:text-[14px] uppercase text-white/85 mb-[28px]">
+              <p className="font-sans text-[14px] sm:text-[15px] md:text-[14px] uppercase text-white/85 mb-5 sm:mb-6">
                 WHO WE ARE
               </p>
 
