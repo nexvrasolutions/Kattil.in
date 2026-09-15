@@ -302,6 +302,10 @@ export default function HeroNavbar({
   const lastScrollY = useRef(0);
   const heroJumpedRef = useRef(false);
   const heroVisibleRef = useRef(heroVisible);
+  // Mirrors mobileOpen so the scroll-jack closures can bail out without
+  // re-binding their event listeners — lets touch/wheel/keyboard scrolling
+  // inside the open mobile menu behave normally instead of being hijacked.
+  const mobileOpenRef = useRef(false);
 
   const navRowRef = useRef<HTMLDivElement>(null);
 
@@ -466,6 +470,10 @@ export default function HeroNavbar({
     heroVisibleRef.current = heroVisible;
   }, [heroVisible]);
 
+  useEffect(() => {
+    mobileOpenRef.current = mobileOpen;
+  }, [mobileOpen]);
+
   // ───────────────────────────────────────────────────────────────────────────
   // Wheel / touch / keyboard scroll interception
   //
@@ -509,6 +517,7 @@ export default function HeroNavbar({
     };
 
     const onWheel = (e: WheelEvent) => {
+      if (mobileOpenRef.current) return;
       const heroNow = heroVisibleRef.current;
       if (heroNow && !prevHeroVisible) {
         heroJumpedRef.current = false;
@@ -527,10 +536,12 @@ export default function HeroNavbar({
       touchStartY = e.touches[0].clientY;
     };
     const onTouchEnd = (e: TouchEvent) => {
+      if (mobileOpenRef.current) return;
       if (!heroVisibleRef.current) return;
       if (touchStartY - e.changedTouches[0].clientY > 30) jump();
     };
     const onKeyDown = (e: KeyboardEvent) => {
+      if (mobileOpenRef.current) return;
       if (!heroVisibleRef.current) return;
       if (["ArrowDown", "PageDown", " "].includes(e.key)) {
         e.preventDefault();
@@ -620,14 +631,37 @@ export default function HeroNavbar({
 
   // ───────────────────────────────────────────────────────────────────────────
   // Lock Body Scroll For Mobile Menu
+  //
+  // `overflow: hidden` alone does not stop iOS Safari from rubber-banding the
+  // background page behind the open menu. Pinning the body with `position:
+  // fixed` (and restoring the exact scroll offset on close) blocks that
+  // background bleed-through while the menu's own content keeps scrolling
+  // normally via its `overflow-y-auto` container.
   // ───────────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
-    document.body.style.overflow =
-      mobileOpen ? "hidden" : "";
+    if (!mobileOpen) return;
+
+    const scrollY = window.scrollY;
+    const { body, documentElement: html } = document;
+
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+    body.style.overflow = "hidden";
+    html.style.overflow = "hidden";
 
     return () => {
-      document.body.style.overflow = "";
+      body.style.position = "";
+      body.style.top = "";
+      body.style.left = "";
+      body.style.right = "";
+      body.style.width = "";
+      body.style.overflow = "";
+      html.style.overflow = "";
+      window.scrollTo(0, scrollY);
     };
   }, [mobileOpen]);
 
@@ -645,6 +679,14 @@ export default function HeroNavbar({
 
         setMobileOpen(false);
         setDestinationsOpen(false);
+        // Clear the mobile-menu scroll lock synchronously (matches the
+        // cleanup in the body-scroll-lock effect) so the smooth scroll below
+        // isn't fighting a still-pinned `position: fixed` body.
+        document.body.style.position = "";
+        document.body.style.top = "";
+        document.body.style.left = "";
+        document.body.style.right = "";
+        document.body.style.width = "";
         document.body.style.overflow = "";
         document.documentElement.style.overflow = "";
 
