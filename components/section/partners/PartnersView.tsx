@@ -11,19 +11,19 @@ const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 const WHY_PARTNER_ITEMS = [
   {
     title: "More Bookings",
-    description: "Thoughtfully designed spaces that make settling in feel effortless.",
+    description: "Reach more guests through Kattil’s growing hospitality network and digital booking platform.",
   },
   {
     title: "Better Operations",
-    description: "Thoughtfully designed spaces that make settling in feel effortless.",
+    description: "Get professional support with marketing, reservations, guest experience, and day-to-day hotel operations.",
   },
   {
     title: "Better Revenue",
-    description: "Thoughtfully designed spaces that make settling in feel effortless.",
+    description: "Improve occupancy and maximize your property’s revenue with smarter pricing and stronger market reach.",
   },
   {
     title: "You Keep Ownership",
-    description: "Thoughtfully designed spaces that make settling in feel effortless.",
+    description: "Retain ownership and control of your property while Kattil helps you grow and manage its hospitality potential.",
   },
 ];
 
@@ -75,20 +75,20 @@ const PROPERTY_TYPES = [
 
 const PARTNERSHIP_MODELS = [
   {
-    title: "No Upfront Fee",
-    description: "Thoughtfully designed spaces that make settling in feel effortless.",
+    title: "No Upfront Investment",
+    description: "Partner with Kattil without the burden of large upfront costs or unnecessary setup expenses.",
   },
   {
-    title: "Shared Revenue",
-    description: "We grow the property together and share the success.",
+    title: "Shared Growth",
+    description: "We work together to increase bookings, improve occupancy, and grow your property’s revenue.",
   },
   {
     title: "Transparent Reporting",
-    description: "You receive clear updates about your property's performance.",
+    description: "Get clear and regular reports on bookings, revenue, occupancy, and overall property performance.",
   },
   {
-    title: "Full Ownership",
-    description: "Thoughtfully designed spaces that make settling in feel effortless.",
+    title: "You Keep Ownership",
+    description: "Your property remains yours. We bring the hospitality expertise and operational support to help it succeed.",
   },
 ];
 
@@ -372,8 +372,7 @@ export default function PartnersView() {
                   </h2>
 
                   <p className="font-sans text-[14px] md:text-[15px] text-[#a6bfd5] leading-relaxed mt-5 max-w-md">
-                    Discover thoughtfully curated offers designed to make your stay more rewarding,
-                    from special rates to exclusive experiences.
+                    We provide the expertise, technology, and support to help your property grow while keeping the partnership simple and transparent.
                   </p>
                 </div>
 

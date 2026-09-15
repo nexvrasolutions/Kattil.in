@@ -101,13 +101,14 @@ const FALLBACK_BLOGS: BlogPost[] = [
   },
 ];
 
-const DEFAULT_CATEGORIES = ["All Stories", "Stay", "Dining", "Wellness", "Local Guide"];
+const FIXED_CATEGORIES = ["All Stories", "Stay", "Dining", "Wellness", "Local Guide"] as const;
 
 export default function BlogContent({
   posts: initialPosts,
   currentCategory,
   currentPage,
   totalPages,
+  total: _total,
 }: {
   posts: BlogPost[];
   categories: string[];
@@ -121,8 +122,8 @@ export default function BlogContent({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Core 5 categories matching mockup & original content
-  const allCategories = DEFAULT_CATEGORIES;
+  // Exactly the 5 requested category headings
+  const allCategories = FIXED_CATEGORIES;
 
   // Combine initial posts with fallbacks if DB has limited entries
   const allPosts = useMemo(() => {
@@ -145,12 +146,22 @@ export default function BlogContent({
       return allPosts;
     }
     const lower = currentCategory.toLowerCase();
-    return allPosts.filter(
-      (p) =>
-        p.category?.toLowerCase() === lower ||
-        p.category?.toLowerCase().includes(lower) ||
-        lower.includes(p.category?.toLowerCase() || "")
-    );
+    return allPosts.filter((p) => {
+      const cat = (p.category || "").toLowerCase();
+      if (lower === "stay") {
+        return cat.includes("stay") || cat.includes("resort") || cat.includes("room");
+      }
+      if (lower === "local guide") {
+        return cat.includes("guide") || cat.includes("local") || cat.includes("travel") || cat.includes("heritage");
+      }
+      if (lower === "dining") {
+        return cat.includes("dining") || cat.includes("food") || cat.includes("culinary");
+      }
+      if (lower === "wellness") {
+        return cat.includes("wellness") || cat.includes("spa") || cat.includes("calm");
+      }
+      return cat === lower || cat.includes(lower) || lower.includes(cat);
+    });
   }, [allPosts, currentCategory]);
 
   // Determine featured post and grid items
@@ -184,8 +195,6 @@ export default function BlogContent({
     params.set("page", String(page));
     router.push(`${pathname}?${params.toString()}`);
   };
-
-  const activeCategory = currentCategory || "All Stories";
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FFFCF2]">
@@ -228,10 +237,10 @@ export default function BlogContent({
               transition={{ duration: 0.65, ease: EASE, delay: 0.2 }}
               className="text-white tracking-tight"
             >
-              <span className="block font-sans text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-medium leading-[1.12]">
+              <span className="block font-[Public_Sans] text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-medium leading-[1.12]">
                 Stories Beyond
               </span>
-              <span className="block font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-medium italic text-[#f4f7ef] leading-[1.15] mt-1">
+              <span className="block font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[40px] font-normal italic text-[#f4f7ef] leading-[1.15] mt-1">
                 Your Stay
               </span>
             </motion.h1>
@@ -250,7 +259,7 @@ export default function BlogContent({
               transition={{ duration: 0.5, ease: EASE, delay: 0.3 }}
               className="mb-8 sm:mb-10"
             >
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3 no-scrollbar scrollbar-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6 no-scrollbar scrollbar-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {allCategories.map((cat) => {
                   const isSelected =
                     (cat === "All Stories" && (!currentCategory || currentCategory === "All Stories" || currentCategory === "All")) ||
@@ -261,9 +270,9 @@ export default function BlogContent({
                       key={cat}
                       type="button"
                       onClick={() => handleCategorySelect(cat)}
-                      className={`font-[Public_Sans] text-[13px] sm:text-[13.5px] transition-all whitespace-nowrap cursor-pointer px-3.5 sm:px-4 py-1.5 rounded-[6px] ${isSelected
-                        ? "bg-[#b4c7a5] text-[#22301c] font-semibold shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
-                        : "text-[#6b7280] hover:text-[#111827] font-medium hover:bg-[#eae8e3]"
+                      className={`font-[Public_Sans] text-[13.5px] sm:text-[14px] transition-all whitespace-nowrap cursor-pointer px-4 py-1.5 rounded-[6px] ${isSelected
+                        ? "bg-[#c8d9bb] text-[#1f2e18] font-semibold shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+                        : "text-[#6b7280] hover:text-[#111827] font-normal hover:bg-[#eae8e3]/50"
                         }`}
                     >
                       {cat}
@@ -291,7 +300,7 @@ export default function BlogContent({
                       src={featuredPost.image || "/assets/kattil-room-hero.webp"}
                       alt={featuredPost.title.replace("\n", " ")}
                       fill
-                      sizes="564px"
+                      sizes="540px"
                       className="object-cover object-center group-hover:scale-[1.04] transition-transform duration-700 ease-out"
                       priority
                     />
@@ -299,12 +308,12 @@ export default function BlogContent({
 
                   {/* Right: Featured Text Details */}
                   <div className="flex-1 flex flex-col justify-center text-left">
-                    <p className="font-[Public_Sans] font-normal text-[14px] leading-[18px] text-[#202020] mb-2.5">
+                    <p className="font-[Public_Sans] text-[12px] font-semibold uppercase tracking-[0.14em] text-[#526442] mb-2.5">
                       {featuredPost.category || "Stay Experience"}
                     </p>
 
-                    <Link href={`/blog/${featuredPost.slug}`} className="group mb-[24px]">
-                      <h2 className="font-[Public_Sans] font-medium text-[26px] sm:text-[30px] lg:text-[34px] xl:text-[36px] leading-[1.18] tracking-[-0.5px] text-[#202020] transition-colors">
+                    <Link href={`/blog/${featuredPost.slug}`} className="group mb-4">
+                      <h2 className="font-[Public_Sans] font-normal text-[24px] sm:text-[28px] lg:text-[32px] leading-[1.22] tracking-tight text-[#0d1b2e] transition-colors">
                         {featuredPost.title.toLowerCase().includes("weekend") &&
                           featuredPost.title.toLowerCase().includes("your comfort") ? (
                           <>
@@ -343,28 +352,28 @@ export default function BlogContent({
                       </h2>
                     </Link>
 
-                    <p className="font-[Public_Sans] font-normal text-[14.5px] sm:text-[15.5px] leading-[1.45] text-[#5e6670] max-w-[430px] mb-8">
-                      From serene Morning to breathtaking sunsets a weeekend at our resort is all about you
+                    <p className="font-[Public_Sans] font-normal text-[15px] sm:text-[16px] leading-[1.65] text-[#0d1b2e]/75 max-w-[480px] mb-7">
+                      {featuredPost.excerpt || "From serene mornings with gentle sunlight to relaxing evenings under open skies, every moment is crafted for your comfort."}
                     </p>
 
                     {/* Meta Row: Date, Read time, Read More */}
-                    <div className="flex items-center justify-between gap-4 flex-wrap pt-2">
-                      <div className="flex items-center gap-7 text-[13.5px] font-[Public_Sans] text-[#4b5563]">
+                    <div className="flex items-center justify-between gap-4 flex-wrap pt-1">
+                      <div className="flex items-center gap-6 text-[13px] font-[Public_Sans] text-[#0d1b2e]/65">
                         <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-[#526e4e] stroke-[1.5]" />
-                          <span>{featuredPost.date || "August 20,2025"}</span>
+                          <Calendar className="w-3.5 h-3.5 text-[#526442] stroke-[1.8]" />
+                          <span>{featuredPost.date || "August 20, 2025"}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-[#526e4e] stroke-[1.5]" />
+                          <Clock className="w-3.5 h-3.5 text-[#526442] stroke-[1.8]" />
                           <span>{featuredPost.readTime || "6 mins"}</span>
                         </div>
                       </div>
 
                       <Link
                         href={`/blog/${featuredPost.slug}`}
-                        className="inline-flex items-center gap-1.5 font-[Public_Sans] text-[13.5px] text-[#333] hover:text-black border-b border-[#333] hover:border-black pb-0.5 transition-colors"
+                        className="inline-flex items-center gap-1.5 font-[Public_Sans] text-[13px] font-semibold text-[#0d1b2e] group-hover:text-[#526442] transition-colors"
                       >
-                        <span>Read More</span>
+                        <span>Read Article</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
                     </div>
@@ -375,12 +384,17 @@ export default function BlogContent({
 
             {/* ── 4. "Our Blogs" Section & 3-Column Grid ─────────────────────── */}
             <div>
-              <h2 className="font-[Public_Sans] font-medium text-[32px] leading-[20px] tracking-[-0.5px] text-[#202020] mb-8 sm:mb-10">
-                Our Blogs
+              <h2 className="text-[#0d1b2e] tracking-tight mb-8 sm:mb-10">
+                <span className="font-[Public_Sans] text-2xl sm:text-3xl md:text-[34px] font-normal">
+                  Our{" "}
+                </span>
+                <span className="font-serif text-2xl sm:text-3xl md:text-[34px] font-normal italic">
+                  Blogs
+                </span>
               </h2>
 
               {gridPosts.length === 0 ? (
-                <div className="py-16 text-center text-gray-500 font-sans">
+                <div className="py-16 text-center text-[#0d1b2e]/60 font-[Public_Sans]">
                   No blog stories found in &ldquo;{activeCategory}&rdquo;.
                 </div>
               ) : (
@@ -392,7 +406,7 @@ export default function BlogContent({
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true, margin: "-40px" }}
                       transition={{ duration: 0.45, delay: (idx % 3) * 0.08, ease: EASE }}
-                      className="group flex flex-col bg-white rounded-[12px] overflow-hidden  transition-all duration-300"
+                      className="group flex flex-col bg-white rounded-[12px] overflow-hidden border border-[#EBE8DF]  transition-all duration-300"
                     >
                       <Link href={`/blog/${post.slug}`} className="block flex flex-col flex-1">
                         {/* Card Image */}
@@ -402,16 +416,16 @@ export default function BlogContent({
                             alt={post.title}
                             fill
                             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                            className="object-cover object-center  transition-transform duration-500 ease-out"
+                            className="object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
                           />
                         </div>
                         {/* Card Content */}
                         <div className="p-5 sm:p-6 flex flex-col flex-1">
-                          <p className="font-sans text-[14px] sm:text-[14.5px] font-normal text-[#737373] mb-1.5">
+                          <p className="font-[Public_Sans] text-[12px] font-semibold uppercase tracking-[0.14em] text-[#526442] mb-2">
                             {post.category || "Stay"}
                           </p>
 
-                          <h3 className="font-[Public_Sans] font-medium text-[20px] sm:text-[22px] lg:text-[24px] text-[#1a1a1a] leading-snug tracking-tight group-hover:text-[#526442] transition-colors line-clamp-2 mb-4">
+                          <h3 className="font-[Public_Sans] font-medium text-[18px] sm:text-[19px] lg:text-[20px] text-[#0d1b2e] leading-snug tracking-tight group-hover:text-[#526442] transition-colors line-clamp-2 mb-4">
                             {post.title}
                           </h3>
 
@@ -419,18 +433,18 @@ export default function BlogContent({
                           <div className="mt-auto flex items-center justify-between gap-3 pt-1">
                             <div className="flex items-center gap-2 flex-wrap">
                               {post.date && (
-                                <span className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#f0eee9] text-[11px] font-medium text-[#5c5a55] font-sans">
+                                <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-[#F5F3EB] text-[11px] font-medium text-[#0d1b2e]/70 font-[Public_Sans] border border-[#E5E0D0]">
                                   {post.date}
                                 </span>
                               )}
                               {post.readTime && (
-                                <span className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#f0eee9] text-[11px] font-medium text-[#5c5a55] font-sans">
+                                <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-[#F5F3EB] text-[11px] font-medium text-[#0d1b2e]/70 font-[Public_Sans] border border-[#E5E0D0]">
                                   {post.readTime}
                                 </span>
                               )}
                             </div>
 
-                            <span className="text-[12.5px] font-medium text-[#4a4a4a] group-hover:text-black inline-flex items-center gap-1 transition-colors shrink-0">
+                            <span className="text-[12.5px] font-semibold text-[#0d1b2e] group-hover:text-[#526442] inline-flex items-center gap-1 transition-colors shrink-0">
                               <span>View</span>
                               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                             </span>
@@ -449,7 +463,7 @@ export default function BlogContent({
                     type="button"
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage <= 1}
-                    className="px-4 py-2 rounded-[6px] border border-gray-200 text-xs font-semibold text-gray-700 disabled:opacity-30 hover:bg-gray-50 transition-colors flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed"
+                    className="px-4 py-2 rounded-full border border-[#E0DCCE] bg-white text-xs font-semibold font-[Public_Sans] text-[#0d1b2e] disabled:opacity-30 hover:bg-[#F5F3EB] hover:border-[#526442]/40 transition-colors flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed shadow-xs"
                   >
                     <ChevronLeft className="w-3.5 h-3.5" /> Prev
                   </button>
@@ -460,9 +474,9 @@ export default function BlogContent({
                         key={p}
                         type="button"
                         onClick={() => handlePageChange(p)}
-                        className={`w-8 h-8 rounded-[6px] text-xs font-semibold transition-colors cursor-pointer ${p === currentPage
-                          ? "bg-[#0d1b2e] text-white"
-                          : "border border-gray-200 text-gray-700 hover:bg-gray-50"
+                        className={`w-8 h-8 rounded-full text-xs font-semibold font-[Public_Sans] transition-colors cursor-pointer flex items-center justify-center ${p === currentPage
+                          ? "bg-[#0d1b2e] text-white shadow-xs"
+                          : "border border-[#E0DCCE] bg-white text-[#0d1b2e] hover:bg-[#F5F3EB]"
                           }`}
                       >
                         {p}
@@ -474,7 +488,7 @@ export default function BlogContent({
                     type="button"
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage >= totalPages}
-                    className="px-4 py-2 rounded-[6px] border border-gray-200 text-xs font-semibold text-gray-700 disabled:opacity-30 hover:bg-gray-50 transition-colors flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed"
+                    className="px-4 py-2 rounded-full border border-[#E0DCCE] bg-white text-xs font-semibold font-[Public_Sans] text-[#0d1b2e] disabled:opacity-30 hover:bg-[#F5F3EB] hover:border-[#526442]/40 transition-colors flex items-center gap-1 cursor-pointer disabled:cursor-not-allowed shadow-xs"
                   >
                     Next <ChevronRight className="w-3.5 h-3.5" />
                   </button>

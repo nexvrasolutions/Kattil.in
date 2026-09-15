@@ -188,6 +188,15 @@ export default function GalleryContent({
     return result;
   }, [allItems, initialCity, activeCategory]);
 
+  // Split into 3 columns for staggered masonry layout
+  const staggeredColumns = useMemo(() => {
+    const cols: { item: PublicGalleryItem; originalIndex: number }[][] = [[], [], []];
+    filteredItems.forEach((item, idx) => {
+      cols[idx % 3].push({ item, originalIndex: idx });
+    });
+    return cols;
+  }, [filteredItems]);
+
   // Lightbox keyboard navigation
   const handlePrev = useCallback(() => {
     if (lightboxIndex === null) return;
@@ -209,6 +218,18 @@ export default function GalleryContent({
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [lightboxIndex, handlePrev, handleNext]);
+
+  // Lock body scroll when lightbox modal is open
+  useEffect(() => {
+    if (lightboxIndex !== null) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [lightboxIndex]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF8F5]">
@@ -284,11 +305,10 @@ export default function GalleryContent({
                       key={cat.slug}
                       type="button"
                       onClick={() => setActiveCategory(cat.slug)}
-                      className={`font-[Public_Sans] text-[13px] sm:text-[13.5px] transition-all whitespace-nowrap cursor-pointer px-3.5 sm:px-4 py-1.5 rounded-[6px] ${
-                        isSelected
-                          ? "bg-[#b4c7a5] text-[#22301c] font-semibold shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
-                          : "text-[#6b7280] hover:text-[#111827] font-medium hover:bg-[#eae8e3]"
-                      }`}
+                      className={`font-[Public_Sans] text-[13px] sm:text-[13.5px] transition-all whitespace-nowrap cursor-pointer px-3.5 sm:px-4 py-1.5 rounded-[6px] ${isSelected
+                        ? "bg-[#b4c7a5] text-[#22301c] font-semibold shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+                        : "text-[#6b7280] hover:text-[#111827] font-medium hover:bg-[#eae8e3]"
+                        }`}
                     >
                       {cat.name}
                     </button>
@@ -297,40 +317,48 @@ export default function GalleryContent({
               </div>
             </motion.div>
 
-            {/* Gallery Responsive Grid */}
+            {/* Gallery Staggered 3-Column Grid */}
             {filteredItems.length === 0 ? (
               <div className="py-24 text-center text-gray-500 font-sans">
                 No moments found in this category.
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 w-full items-start">
-                {filteredItems.map((item, idx) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-40px" }}
-                    transition={{
-                      duration: 0.45,
-                      delay: Math.min((idx % 6) * 0.05, 0.25),
-                      ease: EASE,
-                    }}
-                    onClick={() => setLightboxIndex(idx)}
-                    className="group relative w-full h-[320px] sm:h-[400px] lg:h-[480px] rounded-[10px] overflow-hidden bg-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.09)] cursor-pointer"
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-7 w-full items-start">
+                {staggeredColumns.map((col, colIdx) => (
+                  <div
+                    key={colIdx}
+                    className={`flex flex-col gap-5 sm:gap-6 lg:gap-7 ${colIdx === 1 ? "lg:pt-14 sm:pt-8" : ""
+                      }`}
                   >
-                    <Image
-                      src={item.src}
-                      alt={item.alt || "Kattil Hotel Space"}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover object-center group-hover:scale-[1.03] transition-transform duration-700 ease-out"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-5">
-                      <span className="text-white font-[Public_Sans] text-[13px] font-semibold tracking-wide translate-y-1 group-hover:translate-y-0 transition-all duration-300 drop-shadow-md">
-                        {item.caption || item.alt || "View Space"}
-                      </span>
-                    </div>
-                  </motion.div>
+                    {col.map(({ item, originalIndex }) => (
+                      <motion.div
+                        key={item.id || originalIndex}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-40px" }}
+                        transition={{
+                          duration: 0.5,
+                          delay: Math.min((originalIndex % 6) * 0.05, 0.25),
+                          ease: EASE,
+                        }}
+                        onClick={() => setLightboxIndex(originalIndex)}
+                        className="group relative w-full aspect-[3/4] sm:aspect-[3/4.1] rounded-[8px] overflow-hidden bg-gray-100 transition-all duration-300 cursor-pointer"
+                      >
+                        <Image
+                          src={item.src}
+                          alt={item.alt || "Kattil Hotel Space"}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          className="object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-5">
+                          <span className="text-white font-[Public_Sans] text-[13.5px] font-semibold tracking-wide translate-y-1 group-hover:translate-y-0 transition-all duration-300 drop-shadow-md">
+                            {item.caption || item.alt || "View Space"}
+                          </span>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
                 ))}
               </div>
             )}
@@ -346,7 +374,7 @@ export default function GalleryContent({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-50 bg-black/92 backdrop-blur-md flex items-center justify-center p-4 sm:p-6"
+            className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8"
             onClick={() => setLightboxIndex(null)}
           >
             {/* Close button */}
@@ -356,7 +384,7 @@ export default function GalleryContent({
                 e.stopPropagation();
                 setLightboxIndex(null);
               }}
-              className="absolute top-6 right-6 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer z-20"
+              className="absolute top-5 right-5 sm:top-6 sm:right-6 w-11 h-11 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer z-30"
               aria-label="Close photo"
             >
               <X className="w-6 h-6" />
@@ -369,7 +397,7 @@ export default function GalleryContent({
                 e.stopPropagation();
                 handlePrev();
               }}
-              className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer z-20"
+              className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer z-30"
               aria-label="Previous photo"
             >
               <ChevronLeft className="w-7 h-7" />
@@ -382,7 +410,7 @@ export default function GalleryContent({
                 e.stopPropagation();
                 handleNext();
               }}
-              className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer z-20"
+              className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer z-30"
               aria-label="Next photo"
             >
               <ChevronRight className="w-7 h-7" />
@@ -390,7 +418,7 @@ export default function GalleryContent({
 
             {/* Modal Image Box */}
             <div
-              className="relative max-w-5xl max-h-[85vh] w-full h-[80vh] flex flex-col items-center justify-center"
+              className="relative max-w-5xl max-h-[82vh] w-full h-[75vh] flex flex-col items-center justify-center"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="relative w-full h-full">
@@ -398,7 +426,7 @@ export default function GalleryContent({
                   src={filteredItems[lightboxIndex].src}
                   alt={filteredItems[lightboxIndex].alt}
                   fill
-                  sizes="100vw"
+                  sizes="(max-width: 1024px) 100vw, 1200px"
                   className="object-contain"
                   priority
                 />

@@ -93,7 +93,7 @@ const STATIC_POSTS: BlogDocLean[] = [
     excerpt: "Holistic self-care routines, mindful rituals, and rejuvenating spaces crafted for modern travellers.",
     image: "/assets/gallery.png",
     featured: false,
-    content: "<p>Wellness is not just a treatment; it is a way of living. From ergonomic workspaces to restful sleep setups and restorative lounges, wellness is woven into every corner of Kattil.</p>",
+    content: "<p>Wellness is not just a treatment, it is a way of living. From ergonomic workspaces to restful sleep setups and restorative lounges, wellness is woven into every corner of Kattil.</p>",
   },
   {
     _id: "post-4",

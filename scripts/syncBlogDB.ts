@@ -83,7 +83,7 @@ const blogs = [
     image: "/assets/gallery.png",
     featured: false,
     status: "published",
-    content: "<p>Wellness is not just a treatment; it is a way of living. From ergonomic workspaces to restful sleep setups and restorative lounges, wellness is woven into every corner of Kattil.</p>",
+    content: "<p>Wellness is not just a treatment, it is a way of living. From ergonomic workspaces to restful sleep setups and restorative lounges, wellness is woven into every corner of Kattil.</p>",
     order: 3,
   },
   {

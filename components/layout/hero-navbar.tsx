@@ -302,6 +302,15 @@ export default function HeroNavbar({
   const lastScrollY = useRef(0);
   const heroJumpedRef = useRef(false);
   const heroVisibleRef = useRef(heroVisible);
+  // Latches true the first time the hero becomes visible (initial load) and
+  // never resets — lets the headline's blur-reveal play once only, while
+  // heroVisible itself keeps driving the hero/compact-navbar crossfade as
+  // before on every scroll.
+  const heroTextRevealedRef = useRef(false);
+  if (heroVisible) {
+    heroTextRevealedRef.current = true;
+  }
+  const heroTextVisible = heroTextRevealedRef.current;
   // Mirrors mobileOpen so the scroll-jack closures can bail out without
   // re-binding their event listeners — lets touch/wheel/keyboard scrolling
   // inside the open mobile menu behave normally instead of being hijacked.
@@ -1586,7 +1595,7 @@ export default function HeroNavbar({
                             <span className="block font-sans font-semibold">
                               <BlurRevealChars
                                 text={headlinePrefix}
-                                visible={heroVisible}
+                                visible={heroTextVisible}
                                 baseDelay={HEADLINE_BASE_DELAY}
                                 charOffset={prefixOffset}
                               />
@@ -1595,14 +1604,14 @@ export default function HeroNavbar({
                             <span className="block font-serif italic font-normal mt-0.5">
                               <BlurRevealChars
                                 text={stayWord}
-                                visible={heroVisible}
+                                visible={heroTextVisible}
                                 baseDelay={HEADLINE_BASE_DELAY}
                                 charOffset={stayOffset}
                               />
                               {"\u00A0"}
                               <BlurRevealChars
                                 text={headlineLine2}
-                                visible={heroVisible}
+                                visible={heroTextVisible}
                                 baseDelay={HEADLINE_BASE_DELAY}
                                 charOffset={line2Offset}
                               />
@@ -1615,7 +1624,7 @@ export default function HeroNavbar({
                             <span className="font-sans font-semibold">
                               <BlurRevealChars
                                 text={headlinePrefix}
-                                visible={heroVisible}
+                                visible={heroTextVisible}
                                 baseDelay={HEADLINE_BASE_DELAY}
                                 charOffset={prefixOffset}
                               />
@@ -1624,7 +1633,7 @@ export default function HeroNavbar({
                             <span className="font-serif italic font-normal">
                               <BlurRevealChars
                                 text={stayWord}
-                                visible={heroVisible}
+                                visible={heroTextVisible}
                                 baseDelay={HEADLINE_BASE_DELAY}
                                 charOffset={stayOffset}
                               />
@@ -1633,7 +1642,7 @@ export default function HeroNavbar({
                             <span className="block font-serif italic font-normal mt-1 sm:mt-1.5">
                               <BlurRevealChars
                                 text={headlineLine2}
-                                visible={heroVisible}
+                                visible={heroTextVisible}
                                 baseDelay={HEADLINE_BASE_DELAY}
                                 charOffset={line2Offset}
                               />

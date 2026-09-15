@@ -36,7 +36,7 @@ async function getLocations(): Promise<LocationItem[]> {
 
     return cities
       .map((c) => {
-        const label = (c.label && c.label.trim()) || (c.name ? c.name.trim().toUpperCase() : "");
+        const label = (c.label && c.label.trim()) || (c.name ? c.name.trim() : "");
         return {
           _id: String(c._id),
           id: c.slug,
