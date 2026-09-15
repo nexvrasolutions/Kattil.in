@@ -494,11 +494,30 @@ export default function HeroNavbar({
 
     const jump = () => {
       if (heroJumpedRef.current) return;
+
+      // Don't latch heroJumpedRef until we know we can actually complete the
+      // jump — on a genuinely fresh mount the destinations section is always
+      // in the initial HTML, but latching first and finding no element would
+      // permanently disable every future scroll/touch/keyboard attempt for
+      // this page view with no way to recover.
+      const el = document.getElementById("destinations");
+      if (!el) return;
+
       heroJumpedRef.current = true;
       lockUntil = Date.now() + 600;
 
-      const el = document.getElementById("destinations");
-      if (!el) return;
+      // The mount / route-change effect below sets a 1.5s scrollLockUntilRef
+      // so its own scroll-to-top reset can't be interrupted by the passive
+      // scroll handler collapsing the hero mid-reset. If the user scrolls
+      // (triggering this jump) while that window is still open — very
+      // possible right after a fast client-side navigation to "/" — the
+      // scroll handler would otherwise see our programmatic scroll, treat it
+      // as still "locked", and force heroVisible back to true, undoing this
+      // jump before it's visible. Clear it and flip heroVisible ourselves so
+      // the collapse is immediate and deterministic instead of depending on
+      // the next "scroll" event to arrive before that lock expires.
+      scrollLockUntilRef.current = 0;
+      setHeroVisible(false);
 
       // Spacer below collapses from 100svh -> (navbarH + 32) once the hero
       // is dismissed; pre-compensate so the landing spot accounts for that
@@ -1633,14 +1652,16 @@ export default function HeroNavbar({
                       items-center
                       w-full
                       max-w-[750px]
-                      h-[67px]
-                      gap-[24px]
+                      min-h-[67px]
+                      gap-[14px]
+                      lg:gap-[24px]
                       rounded-[18px]
-                      overflow-hidden
                       border-[1px]
                       border-white/10
-                      px-[20px]
-                      py-[16px]
+                      px-[14px]
+                      lg:px-[20px]
+                      py-[12px]
+                      lg:py-[16px]
                     "
                       style={{
                         background:
