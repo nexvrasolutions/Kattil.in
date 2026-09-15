@@ -556,17 +556,30 @@ export default function HeroNavbar({
     // hero and #destinations together in real time before the 30px swipe
     // threshold below ever fires, and jump()'s programmatic scrollTo then
     // lands on top of wherever that native scroll left off. Preventing
-    // default on touchmove while the hero is visible (or during the
-    // post-jump lock window) blocks that native scroll entirely so the
-    // section swap is the single, deliberate jump() below instead of a
-    // blended scroll.
+    // default on touchmove while the hero is visible (or for the remainder
+    // of the gesture that triggered the jump) blocks that native scroll
+    // entirely so the section swap is the single, deliberate jump() below
+    // instead of a blended scroll.
+    //
+    // touchLockActive is scoped to the current finger-down gesture (reset on
+    // touchstart/touchend/touchcancel) rather than a wall-clock timer like
+    // the wheel handler's `lockUntil`. A timed lock would keep swallowing
+    // touchmove events — via preventDefault with no compensating scroll,
+    // since jump() is already a no-op after the first call — on any new
+    // swipe that starts within that window, which is exactly what happens
+    // during normal rapid swiping and made the page feel stuck after a few
+    // swipes. Tying the lock to the gesture instead means it can never
+    // outlive the swipe that set it, so native scrolling is immediately
+    // available again on the very next touch.
     let touchStartY = 0;
     let touchActive = false;
+    let touchLockActive = false;
 
     const onTouchStart = (e: TouchEvent) => {
       if (mobileOpenRef.current) return;
       touchStartY = e.touches[0].clientY;
       touchActive = true;
+      touchLockActive = false;
     };
 
     const onTouchMove = (e: TouchEvent) => {
@@ -575,7 +588,7 @@ export default function HeroNavbar({
       const heroNow = heroVisibleRef.current;
       if (heroNow && !prevHeroVisible) {
         heroJumpedRef.current = false;
-        lockUntil = 0;
+        touchLockActive = false;
       }
       prevHeroVisible = heroNow;
 
@@ -586,14 +599,27 @@ export default function HeroNavbar({
       const deltaY = touchStartY - e.touches[0].clientY;
       if (deltaY <= 0) return;
 
-      if (heroNow || Date.now() < lockUntil) {
+      if (heroNow || touchLockActive) {
         e.preventDefault();
-        if (deltaY > 30) jump();
+        if (deltaY > 30) {
+          jump();
+          // Keep intercepting only for the rest of THIS gesture so the
+          // browser doesn't try to "catch up" a scroll it never started,
+          // then release fully on touchend — never carried into the next
+          // swipe.
+          if (heroJumpedRef.current) touchLockActive = true;
+        }
       }
     };
 
     const onTouchEnd = () => {
       touchActive = false;
+      touchLockActive = false;
+    };
+
+    const onTouchCancel = () => {
+      touchActive = false;
+      touchLockActive = false;
     };
     const onKeyDown = (e: KeyboardEvent) => {
       if (mobileOpenRef.current) return;
@@ -608,6 +634,7 @@ export default function HeroNavbar({
     window.addEventListener("touchstart", onTouchStart, { passive: true });
     window.addEventListener("touchmove", onTouchMove, { passive: false });
     window.addEventListener("touchend", onTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", onTouchCancel, { passive: true });
     window.addEventListener("keydown", onKeyDown);
 
     return () => {
@@ -615,6 +642,7 @@ export default function HeroNavbar({
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", onTouchCancel);
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [isHome, navbarH]);
