@@ -550,14 +550,50 @@ export default function HeroNavbar({
       }
     };
 
+    // Touch: mirrors the wheel handler above. Native touch scrolling is not
+    // intercepted by default (touchstart/touchend alone can't stop it — only
+    // a non-passive touchmove can), so without this the browser scrolls the
+    // hero and #destinations together in real time before the 30px swipe
+    // threshold below ever fires, and jump()'s programmatic scrollTo then
+    // lands on top of wherever that native scroll left off. Preventing
+    // default on touchmove while the hero is visible (or during the
+    // post-jump lock window) blocks that native scroll entirely so the
+    // section swap is the single, deliberate jump() below instead of a
+    // blended scroll.
     let touchStartY = 0;
+    let touchActive = false;
+
     const onTouchStart = (e: TouchEvent) => {
-      touchStartY = e.touches[0].clientY;
-    };
-    const onTouchEnd = (e: TouchEvent) => {
       if (mobileOpenRef.current) return;
-      if (!heroVisibleRef.current) return;
-      if (touchStartY - e.changedTouches[0].clientY > 30) jump();
+      touchStartY = e.touches[0].clientY;
+      touchActive = true;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (mobileOpenRef.current || !touchActive) return;
+
+      const heroNow = heroVisibleRef.current;
+      if (heroNow && !prevHeroVisible) {
+        heroJumpedRef.current = false;
+        lockUntil = 0;
+      }
+      prevHeroVisible = heroNow;
+
+      // Positive deltaY == finger dragging up == scroll-down intent (same
+      // sign convention as wheel's deltaY). Dragging down (returning toward
+      // the hero) is left alone so native scroll keeps working for that
+      // direction, same as the wheel handler's `deltaY <= 0` early return.
+      const deltaY = touchStartY - e.touches[0].clientY;
+      if (deltaY <= 0) return;
+
+      if (heroNow || Date.now() < lockUntil) {
+        e.preventDefault();
+        if (deltaY > 30) jump();
+      }
+    };
+
+    const onTouchEnd = () => {
+      touchActive = false;
     };
     const onKeyDown = (e: KeyboardEvent) => {
       if (mobileOpenRef.current) return;
@@ -570,12 +606,14 @@ export default function HeroNavbar({
 
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
     window.addEventListener("touchend", onTouchEnd, { passive: true });
     window.addEventListener("keydown", onKeyDown);
 
     return () => {
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("touchend", onTouchEnd);
       window.removeEventListener("keydown", onKeyDown);
     };
