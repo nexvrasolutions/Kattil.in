@@ -395,7 +395,7 @@ export default function BlogContent({
 
               {gridPosts.length === 0 ? (
                 <div className="py-16 text-center text-[#0d1b2e]/60 font-[Public_Sans]">
-                  No blog stories found in &ldquo;{activeCategory}&rdquo;.
+                  No blog stories found in &ldquo;{currentCategory || "All Stories"}&rdquo;.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 md:gap-8">
