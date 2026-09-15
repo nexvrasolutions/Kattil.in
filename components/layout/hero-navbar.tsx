@@ -32,7 +32,7 @@ const HERO_EASE: [number, number, number, number] = [
   1,
 ];
 
-const HERO_DURATION = 0.55;
+const HERO_DURATION = 0.65;
 
 const MENU_CONTAINER_VARIANTS: Variants = {
   hidden: { opacity: 0 },
@@ -293,10 +293,15 @@ export default function HeroNavbar({
     useState(false);
   const [destinationsOpen, setDestinationsOpen] = useState(false);
   const [heroVisible, setHeroVisible] = useState(isHome);
-  const [heroCollapseProgress, setHeroCollapseProgress] = useState(0);
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scrollLockUntilRef = useRef<number>(0);
+
+  // Drives the wheel/touch/keyboard scroll interception below (jump-to-content
+  // on first downward scroll intent).
+  const lastScrollY = useRef(0);
+  const heroJumpedRef = useRef(false);
+  const heroVisibleRef = useRef(heroVisible);
 
   const navRowRef = useRef<HTMLDivElement>(null);
 
@@ -306,10 +311,11 @@ export default function HeroNavbar({
   // ───────────────────────────────────────────────────────────────────────────
   // Scroll layout
   //
-  // The hero uses a fixed visual container, but the document always reserves
-  // one full viewport for it. We intentionally do NOT animate the spacer
-  // height. This prevents the next section from moving upward while the hero
-  // is still being scrolled out.
+  // The page spacer below animates in sync with the fixed header (see the
+  // motion.div at the bottom of this file), and the hero → compact navbar
+  // collapse is a two-state, fixed-duration eased transition driven by
+  // heroVisible — not a value scrubbed against raw scroll position on every
+  // frame.
   // ───────────────────────────────────────────────────────────────────────────
   // ───────────────────────────────────────────────────────────────────────────
   // Measure Navbar Height
@@ -451,67 +457,134 @@ export default function HeroNavbar({
   }, [destinationsOpen]);
 
   // ───────────────────────────────────────────────────────────────────────────
-  // Scroll Handler
+  // Keep a ref mirror of heroVisible for use inside the scroll-jack closures
+  // below (they must read the latest value without re-binding their event
+  // listeners on every render).
   // ───────────────────────────────────────────────────────────────────────────
-  //
-  // IMPORTANT: the hero is NOT collapsed after a small scroll amount.
-  // It remains the active hero until the user has consumed one complete
-  // viewport of scroll. Only then does the compact fixed navbar state appear.
-  // Because the spacer below always remains 100svh, the Destinations section
-  // cannot appear before the hero's document space has been fully scrolled.  // ───────────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
-    let ticking = false;
+    heroVisibleRef.current = heroVisible;
+  }, [heroVisible]);
 
-    const onScroll = () => {
-      if (ticking) return;
+  // ───────────────────────────────────────────────────────────────────────────
+  // Wheel / touch / keyboard scroll interception
+  //
+  // While the hero is visible, the first downward scroll intent (wheel,
+  // swipe, or ArrowDown/PageDown/Space) is captured, default scrolling is
+  // prevented, and the page is jumped straight to its post-collapse resting
+  // position (the top of the Destinations section) in one shot. The hero →
+  // compact navbar transition then plays out on its own fixed-duration eased
+  // curve (see the motion.div below), completely decoupled from the raw
+  // scroll deltas that would otherwise scrub it frame-by-frame and cause jank.
+  // ───────────────────────────────────────────────────────────────────────────
 
-      ticking = true;
+  useEffect(() => {
+    if (!isHome) return;
 
-      window.requestAnimationFrame(() => {
-        const currentY = window.scrollY;
-        const isLocked = Date.now() < scrollLockUntilRef.current;
-        const headerBand = navRowHeight + 32;
+    let lockUntil = 0;
+    let prevHeroVisible = heroVisibleRef.current;
 
-        if (isHome) {
-          if (isLocked) {
-            setHeroVisible(true);
-            setHeroCollapseProgress(0);
-            setScrolled(false);
-          } else {
-            setScrolled(currentY > 20);
+    const jump = () => {
+      if (heroJumpedRef.current) return;
+      heroJumpedRef.current = true;
+      lockUntil = Date.now() + 600;
 
-            const collapseDistance = Math.max(
-              1,
-              window.innerHeight - headerBand
-            );
-            const progress = Math.min(
-              1,
-              Math.max(0, currentY / collapseDistance)
-            );
+      const el = document.getElementById("destinations");
+      if (!el) return;
 
-            setHeroCollapseProgress(progress);
-            setHeroVisible(progress < 0.4);
-          }
-        } else {
-          setScrolled(currentY > 20);
-          setHeroCollapseProgress(1);
-        }
+      // Spacer below collapses from 100svh -> (navbarH + 32) once the hero
+      // is dismissed; pre-compensate so the landing spot accounts for that
+      // shrink instead of drifting once layout settles.
+      const spacerShrink = window.innerHeight - (navbarH + 32);
 
-        ticking = false;
-      });
+      // Respect the section's own scroll-margin-top (its intended gap below
+      // a fixed header) rather than a value tuned for a different section.
+      const scrollMarginTop =
+        parseFloat(getComputedStyle(el).scrollMarginTop) || navbarH + 32;
+
+      const futureAbsPos =
+        el.getBoundingClientRect().top + window.scrollY - spacerShrink;
+      const top = Math.max(81, futureAbsPos - scrollMarginTop);
+      window.scrollTo(0, top);
     };
 
-    window.addEventListener("scroll", onScroll, {
-      passive: true,
-    });
+    const onWheel = (e: WheelEvent) => {
+      const heroNow = heroVisibleRef.current;
+      if (heroNow && !prevHeroVisible) {
+        heroJumpedRef.current = false;
+        lockUntil = 0;
+      }
+      prevHeroVisible = heroNow;
+      if (e.deltaY <= 0) return;
+      if (heroNow || Date.now() < lockUntil) {
+        e.preventDefault();
+        jump();
+      }
+    };
 
-    onScroll();
+    let touchStartY = 0;
+    const onTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+    };
+    const onTouchEnd = (e: TouchEvent) => {
+      if (!heroVisibleRef.current) return;
+      if (touchStartY - e.changedTouches[0].clientY > 30) jump();
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!heroVisibleRef.current) return;
+      if (["ArrowDown", "PageDown", " "].includes(e.key)) {
+        e.preventDefault();
+        jump();
+      }
+    };
+
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+    window.addEventListener("keydown", onKeyDown);
 
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("keydown", onKeyDown);
     };
-  }, [isHome, navRowHeight]);
+  }, [isHome, navbarH]);
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Scroll handler — manages the scrolled shadow + hero expand/collapse.
+  //
+  // Two-state (boundary-crossing): heroVisible only flips when currentY
+  // crosses 80px scrolling down or 20px scrolling up, so this triggers at
+  // most two re-renders per pass instead of one per scroll frame. The actual
+  // collapse animation is handled entirely by Framer Motion once heroVisible
+  // flips (see isExpanded below) — not by this handler.
+  // ───────────────────────────────────────────────────────────────────────────
+
+  useEffect(() => {
+    const onScroll = () => {
+      const currentY = window.scrollY;
+      const isLocked = Date.now() < scrollLockUntilRef.current;
+
+      if (isLocked) {
+        setScrolled(false);
+        if (isHome) setHeroVisible(true);
+        return;
+      }
+
+      setScrolled(currentY > 20);
+
+      if (isHome) {
+        const scrollingDown = currentY > lastScrollY.current;
+        if (scrollingDown && currentY > 80) setHeroVisible(false);
+        if (!scrollingDown && currentY < 20) setHeroVisible(true);
+        lastScrollY.current = currentY;
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isHome]);
 
   // ───────────────────────────────────────────────────────────────────────────
   // Reset Hero On Route Change
@@ -525,9 +598,9 @@ export default function HeroNavbar({
 
       if (isHome) {
         scrollLockUntilRef.current = Date.now() + 1500;
+        heroJumpedRef.current = false;
         window.scrollTo(0, 0);
         setHeroVisible(true);
-        setHeroCollapseProgress(0);
         setScrolled(false);
         const raf = requestAnimationFrame(() => {
           window.scrollTo(0, 0);
@@ -541,7 +614,6 @@ export default function HeroNavbar({
         };
       } else {
         setHeroVisible(false);
-        setHeroCollapseProgress(1);
       }
     }
   }, [isHome]);
@@ -578,8 +650,8 @@ export default function HeroNavbar({
 
         // Lock scroll updates for 1.5 seconds so onScroll cannot collapse hero during smooth scroll
         scrollLockUntilRef.current = Date.now() + 1500;
+        heroJumpedRef.current = false;
         setHeroVisible(true);
-        setHeroCollapseProgress(0);
         setScrolled(false);
 
         // Smooth scroll to top of hero
@@ -597,7 +669,6 @@ export default function HeroNavbar({
             window.scrollTo(0, 0);
           }
           setHeroVisible(true);
-          setHeroCollapseProgress(0);
           setScrolled(false);
         }, 1200);
       }
@@ -605,8 +676,7 @@ export default function HeroNavbar({
     [isHome]
   );
 
-  const isExpanded = isHome && heroCollapseProgress < 1;
-  const scrollLinkedHeroHeight = `calc(${(1 - heroCollapseProgress) * 95}svh + ${heroCollapseProgress * navbarH}px)`;
+  const isExpanded = isHome && heroVisible;
 
   // ───────────────────────────────────────────────────────────────────────────
   // Render
@@ -662,15 +732,19 @@ export default function HeroNavbar({
         >
           <motion.div
             animate={{
+              // Two-state collapse: the header snaps between the full-hero
+              // height and the compact navbar height once heroVisible flips,
+              // rather than being scrubbed continuously against raw scroll
+              // position.
               height: mobileOpen
                 ? "calc(100svh - 32px)"
-                : isHome
-                  ? scrollLinkedHeroHeight
+                : isExpanded
+                  ? "95svh"
                   : `${navbarH}px`,
               marginTop: 0,
             }}
             transition={{
-              duration: mobileOpen ? 0.5 : isHome ? 0 : 0.5,
+              duration: mobileOpen ? 0.5 : HERO_DURATION,
               ease: HERO_EASE,
             }}
             className="
@@ -1769,14 +1843,17 @@ export default function HeroNavbar({
           PAGE SPACER
       ═══════════════════════════════════════════════════════════════════════ */}
 
-      <div
-        style={{
-          // Always reserve the complete hero viewport in the document.
-          // This is what prevents Destinations from appearing early.
-          height: isHome
-            ? "100svh"
-            : `${navbarH + 32}px`,
+      <motion.div
+        animate={{
+          // Collapses in sync with the fixed header's own eased tween
+          // (heroVisible flips → both animate together) instead of being
+          // pinned open for the full scroll pass.
+          height:
+            isHome && heroVisible
+              ? "100svh"
+              : `${navbarH + 32}px`,
         }}
+        transition={{ duration: HERO_DURATION, ease: HERO_EASE }}
         aria-hidden
       />
     </>
