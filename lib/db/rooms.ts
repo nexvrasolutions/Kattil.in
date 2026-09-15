@@ -181,15 +181,43 @@ export async function getPropertyDetailsData(
     if (!property) {
       property = await Property.findOne({
         $or: [{ slug: cleanSlug }, { name: { $regex: new RegExp(`^${cleanSlug}$`, "i") } }],
-        status: { $ne: "inactive" },
       })
         .populate("city")
         .lean();
     }
 
+    // If property exists and is inactive, return property with 0 rooms (do not fallback to dummy rooms)
+    if (property && property.status === "inactive") {
+      const city = property.city || null;
+      const destinationName = city?.name || cityConfig.destinationName || fallbackDestination;
+      const destinationSlug = city?.slug || cityConfig.destinationSlug || detectedCitySlug;
+
+      const inactiveResult: PropertyDetailsData = {
+        _id: String(property._id),
+        name: property.name,
+        slug: cleanSlug,
+        destinationName,
+        destinationSlug,
+        tagline: property.tagline,
+        description: property.description || "This property is currently unavailable.",
+        heroImages: Array.isArray(property.images) && property.images.length > 0 ? property.images : [],
+        galleryImages: [],
+        address: property.address || city?.address || cityConfig.address,
+        mapLink: property.mapSrc || city?.mapSrc || cityConfig.mapSrc,
+        phone: property.phone || city?.phone || cityConfig.phone,
+        email: property.email || city?.email || cityConfig.email,
+        whatsapp: property.whatsapp,
+        directions: property.directions,
+        rooms: [],
+      };
+
+      propertyDetailsCache.set(cacheKey, { data: inactiveResult, timestamp: Date.now() });
+      return inactiveResult;
+    }
+
     let city: any = property?.city || null;
 
-    // 2. If property found, fetch all rooms belonging to this property
+    // 2. If active property found, fetch all active rooms belonging to this property
     let roomsList: any[] = [];
     if (property) {
       roomsList = await Room.find({
@@ -209,11 +237,15 @@ export async function getPropertyDetailsData(
       if (!primaryRoom) {
         primaryRoom = await Room.findOne({
           $or: [{ slug: cleanSlug }, { name: { $regex: new RegExp(`^${cleanSlug}$`, "i") } }],
-          status: { $ne: "inactive" },
         })
           .populate("city")
           .populate("property")
           .lean();
+      }
+
+      // If room or its parent property is inactive, do not show active rooms
+      if (primaryRoom?.status === "inactive" || (primaryRoom?.property && (primaryRoom.property as any)?.status === "inactive")) {
+        primaryRoom = null;
       }
 
       if (primaryRoom?.property) {
@@ -227,9 +259,16 @@ export async function getPropertyDetailsData(
           .lean();
       } else if (primaryRoom?.city) {
         city = primaryRoom.city;
+        // Only rooms from active properties in this city
+        const activePropsInCity = (await Property.find({ city: city._id, status: { $ne: "inactive" } }).select("_id").lean()).map((p) => p._id);
         roomsList = await Room.find({
           city: city._id,
           status: { $ne: "inactive" },
+          $or: [
+            { property: { $in: activePropsInCity } },
+            { property: { $exists: false } },
+            { property: null },
+          ],
         })
           .sort({ order: 1, createdAt: -1 })
           .lean();
@@ -246,11 +285,36 @@ export async function getPropertyDetailsData(
           { name: { $regex: new RegExp(`^${detectedCitySlug}$`, "i") } },
         ],
       }).lean();
+
+      if (city) {
+        // Check if properties exist for this city in DB
+        const cityProps = await Property.find({ city: city._id }).lean();
+        if (cityProps.length > 0) {
+          const activeCityProps = cityProps.filter((p) => p.status !== "inactive");
+          if (activeCityProps.length > 0) {
+            property = activeCityProps[0];
+            roomsList = await Room.find({
+              property: property._id,
+              status: { $ne: "inactive" },
+            })
+              .sort({ order: 1, createdAt: -1 })
+              .lean();
+          } else {
+            // All properties in this city are inactive -> no rooms!
+            roomsList = [];
+          }
+        }
+      }
     }
 
     const destinationName = city?.name || cityConfig.destinationName || fallbackDestination;
     const destinationSlug = city?.slug || cityConfig.destinationSlug || detectedCitySlug;
     const propertyName = property?.name || cityConfig.defaultPropertyName;
+
+    // Check if DB has any properties or rooms configured at all
+    const totalPropsInDb = await Property.countDocuments();
+    const totalRoomsInDb = await Room.countDocuments();
+    const isDbBootstrapped = totalPropsInDb > 0 || totalRoomsInDb > 0;
 
     // Map room options
     let roomOptions: PropertyRoomOption[] = [];
@@ -265,8 +329,11 @@ export async function getPropertyDetailsData(
         bookingLink: r.link?.trim() || r.cta?.url?.trim() || undefined,
         price: r.pricing?.[0]?.value,
       }));
-    } else {
+    } else if (!isDbBootstrapped) {
+      // Only fallback to hardcoded dummy rooms if database is completely empty
       roomOptions = getFallbackRoomOptions(destinationSlug);
+    } else {
+      roomOptions = [];
     }
 
     // 1. Photos specifically uploaded in Admin Panel under Content Management > Gallery for this location
@@ -282,6 +349,34 @@ export async function getPropertyDetailsData(
       }
     }
 
+    const MADURAI_STATIC_GALLERY = [
+      "/assets/madurai-gallery/image-1.jpeg",
+      "/assets/madurai-gallery/image-2.jpeg",
+      "/assets/madurai-gallery/image-3.jpeg",
+      "/assets/madurai-gallery/image-4.jpeg",
+      "/assets/madurai-gallery/image-5.jpeg",
+      "/assets/madurai-gallery/image-6.jpeg",
+      "/assets/madurai-gallery/image-7.jpeg",
+      "/assets/madurai-gallery/image-8.jpeg",
+      "/assets/madurai-gallery/image-9.jpeg",
+    ];
+
+    const CHENNAI_STATIC_GALLERY = [
+      "/assets/chennai-gallery/image-1.jpeg",
+      "/assets/chennai-gallery/image-2.jpeg",
+      "/assets/chennai-gallery/image-3.jpeg",
+      "/assets/chennai-gallery/image-4.jpeg",
+    ];
+
+    const effectiveAdminGallery =
+      adminGalleryPhotos.length > 0
+        ? adminGalleryPhotos
+        : destinationSlug === "madurai"
+        ? MADURAI_STATIC_GALLERY
+        : destinationSlug === "chennai"
+        ? CHENNAI_STATIC_GALLERY
+        : [];
+
     // 2. Photos uploaded in Admin Panel under Properties
     const propertyPhotos: string[] = Array.isArray(property?.images)
       ? property.images.filter(Boolean)
@@ -292,62 +387,32 @@ export async function getPropertyDetailsData(
       Array.isArray(r.images) ? r.images.filter(Boolean) : []
     );
 
-    const STATIC_GALLERY_BY_CITY: Record<string, string[]> = {
-      madurai: [
-        "/assets/madurai-gallery/image-1.jpeg",
-        "/assets/madurai-gallery/image-2.jpeg",
-        "/assets/madurai-gallery/image-3.jpeg",
-        "/assets/madurai-gallery/image-4.jpeg",
-        "/assets/madurai-gallery/image-5.jpeg",
-        "/assets/madurai-gallery/image-6.jpeg",
-        "/assets/madurai-gallery/image-7.jpeg",
-        "/assets/madurai-gallery/image-8.jpeg",
-        "/assets/madurai-gallery/image-9.jpeg",
-      ],
-      chennai: [
-        "/assets/chennai-gallery/image-1.jpeg",
-        "/assets/chennai-gallery/image-2.jpeg",
-        "/assets/chennai-gallery/image-3.jpeg",
-        "/assets/chennai-gallery/image-4.jpeg",
-      ],
-      coimbatore: [
-        "/assets/deluxe-garden-suite.webp",
-        "/assets/ac-double-room.webp",
-        "/assets/six-bed-dormitory.webp",
-      ],
-      colachel: [
-        "/assets/ac-double-room.webp",
-        "/assets/six-bed-dormitory.webp",
-        "/assets/deluxe-garden-suite.webp",
-      ],
-    };
-
-    const effectiveGalleryPhotos =
-      adminGalleryPhotos.length > 0
-        ? adminGalleryPhotos
-        : STATIC_GALLERY_BY_CITY[destinationSlug] || [];
-
-    // Gallery section strictly contains photos uploaded in Admin Panel under Content Management > Gallery or static fallbacks
-    const galleryImages = effectiveGalleryPhotos;
-
-    const hasCustomPropertyPhotos =
-      propertyPhotos.length > 0 &&
-      !propertyPhotos.every((img) => img.includes("kattil-room-hero") || img.includes("deluxe-garden-suite"));
-
-    const heroImages =
-      hasCustomPropertyPhotos
-        ? propertyPhotos
-        : effectiveGalleryPhotos.length > 0
-        ? effectiveGalleryPhotos
-        : propertyPhotos.length > 0
-        ? propertyPhotos
-        : roomPhotos.length > 0
-        ? roomPhotos
-        : (STATIC_GALLERY_BY_CITY[destinationSlug] || [
+    const DEFAULT_PROPERTY_IMAGES =
+      destinationSlug === "madurai"
+        ? MADURAI_STATIC_GALLERY
+        : destinationSlug === "chennai"
+        ? CHENNAI_STATIC_GALLERY
+        : [
             "/assets/kattil-room-hero.webp",
             "/assets/deluxe-garden-suite.webp",
             "/assets/ac-double-room.webp",
-          ]);
+          ];
+
+    // Hero carousel uses gallery photos from Admin Panel (or property photos)
+    const heroImages =
+      effectiveAdminGallery.length > 0
+        ? effectiveAdminGallery
+        : propertyPhotos.length > 0
+        ? propertyPhotos
+        : DEFAULT_PROPERTY_IMAGES;
+
+    // Gallery section shows EXACTLY the gallery photos from Admin Panel
+    const galleryImages =
+      effectiveAdminGallery.length > 0
+        ? effectiveAdminGallery
+        : propertyPhotos.length > 0
+        ? propertyPhotos
+        : DEFAULT_PROPERTY_IMAGES;
 
     const result: PropertyDetailsData = {
       _id: property ? String(property._id) : undefined,
@@ -376,7 +441,7 @@ export async function getPropertyDetailsData(
   } catch (error) {
     console.error(`[getPropertyDetailsData] Failed for slug "${slug}":`, error);
     const fallbackDestinationSlug = cityConfig.destinationSlug || "madurai";
-    const staticFallback =
+    const staticPropertyFallback =
       fallbackDestinationSlug === "madurai"
         ? [
             "/assets/madurai-gallery/image-1.jpeg",
@@ -408,8 +473,8 @@ export async function getPropertyDetailsData(
       destinationName: cityConfig.destinationName,
       destinationSlug: cityConfig.destinationSlug,
       description: `${cityConfig.defaultPropertyName} offers thoughtfully designed spaces with modern amenities, warm hospitality, and a vibrant community experience for students and professionals.`,
-      heroImages: staticFallback,
-      galleryImages: staticFallback,
+      heroImages: staticPropertyFallback,
+      galleryImages: staticPropertyFallback,
       address: cityConfig.address,
       mapLink: cityConfig.mapSrc,
       phone: cityConfig.phone,
@@ -459,33 +524,53 @@ export async function getRoomsPageData(
     const allCitiesDocs = await City.find({ active: true }).select("name slug").sort({ order: 1 }).lean();
     const allCities = allCitiesDocs.map((c) => ({ name: c.name, slug: c.slug }));
 
+    const activeProperties = await Property.find({ status: { $ne: "inactive" } }).select("_id").lean();
+    const activePropertyIds = activeProperties.map((p) => p._id);
+
     let roomsDocs: any[] = [];
     let propertyName = "";
     let destinationName = "";
     let destinationSlug = "";
 
     if (cleanProp) {
-      const prop = await Property.findOne({ slug: cleanProp }).populate("city").lean();
+      const prop = await Property.findOne({ slug: cleanProp, status: { $ne: "inactive" } }).populate("city").lean();
       if (prop) {
         propertyName = prop.name;
         destinationName = (prop.city as any)?.name || "";
         destinationSlug = (prop.city as any)?.slug || "";
         roomsDocs = await Room.find({ property: prop._id, status: { $ne: "inactive" } }).lean();
       }
-    }
-
-    if (roomsDocs.length === 0 && activeSlug) {
+    } else if (activeSlug) {
       const city = await City.findOne({ slug: activeSlug }).lean();
       if (city) {
         destinationName = city.name;
         destinationSlug = city.slug;
-        roomsDocs = await Room.find({ city: city._id, status: { $ne: "inactive" } }).lean();
+        roomsDocs = await Room.find({
+          city: city._id,
+          status: { $ne: "inactive" },
+          $or: [
+            { property: { $in: activePropertyIds } },
+            { property: { $exists: false } },
+            { property: null },
+          ],
+        }).lean();
       }
+    } else {
+      roomsDocs = await Room.find({
+        status: { $ne: "inactive" },
+        $or: [
+          { property: { $in: activePropertyIds } },
+          { property: { $exists: false } },
+          { property: null },
+        ],
+      })
+        .limit(20)
+        .lean();
     }
 
-    if (roomsDocs.length === 0) {
-      roomsDocs = await Room.find({ status: { $ne: "inactive" } }).limit(20).lean();
-    }
+    const totalPropsInDb = await Property.countDocuments();
+    const totalRoomsInDb = await Room.countDocuments();
+    const isDbBootstrapped = totalPropsInDb > 0 || totalRoomsInDb > 0;
 
     let rooms: PropertyRoomOption[] = [];
     if (roomsDocs.length > 0) {
@@ -499,8 +584,10 @@ export async function getRoomsPageData(
         bookingLink: r.link?.trim() || r.cta?.url?.trim() || undefined,
         price: r.pricing?.[0]?.value,
       }));
-    } else {
+    } else if (!isDbBootstrapped) {
       rooms = getFallbackRoomOptions(destinationSlug || "chennai");
+    } else {
+      rooms = [];
     }
 
     const result: RoomsPageData = {

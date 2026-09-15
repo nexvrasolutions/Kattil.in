@@ -177,6 +177,7 @@ export default function AboutPage() {
                 <div>
                   <AdminDropzone
                     label="Main Image"
+                    folder="about"
                     value={data.mainImage}
                     onChange={(url) => setData((d) => ({ ...d, mainImage: url }))}
                     aspectRatio="aspect-[3/1]"
@@ -194,6 +195,7 @@ export default function AboutPage() {
                 <div>
                   <AdminDropzone
                     label="Overlay Image"
+                    folder="about"
                     value={data.overlayImage}
                     onChange={(url) => setData((d) => ({ ...d, overlayImage: url }))}
                     aspectRatio="aspect-[1/1]"

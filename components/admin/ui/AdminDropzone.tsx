@@ -35,8 +35,12 @@ export default function AdminDropzone({
   const uploadFile = useCallback(
     async (file: File) => {
       setError("");
-      if (!file.type.startsWith("image/")) {
-        setError("Please select an image file (JPG, PNG, WebP, etc.)");
+      const isImage =
+        (file.type && file.type.startsWith("image/")) ||
+        /\.(jpe?g|png|webp|gif|svg|avif|bmp)$/i.test(file.name);
+
+      if (!isImage) {
+        setError("Please select a valid image file (JPG, PNG, WebP, GIF, SVG, AVIF)");
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
@@ -58,8 +62,9 @@ export default function AdminDropzone({
         } else {
           setError(json.error ?? "Upload failed. Please try again.");
         }
-      } catch {
-        setError("Upload failed. Please check your connection and try again.");
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Upload failed. Please check your connection and try again.";
+        setError(msg);
       } finally {
         setUploading(false);
       }

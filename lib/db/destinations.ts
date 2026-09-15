@@ -69,45 +69,57 @@ export async function getDestinationStaysData(
     }).lean();
 
     let propertiesList: any[] = [];
+    let hasPropertiesForCity = false;
 
     if (city) {
       // 2. Query Properties for this city
-      propertiesList = await Property.find({
+      const allCityProps = await Property.find({
         city: city._id,
-        status: { $ne: "inactive" },
       })
         .sort({ order: 1, createdAt: -1 })
         .lean();
+
+      hasPropertiesForCity = allCityProps.length > 0;
+      propertiesList = allCityProps.filter((p: any) => p.status !== "inactive");
     }
 
     let properties: PropertyStay[] = [];
 
-    if (propertiesList.length > 0) {
-      properties = JSON.parse(JSON.stringify(propertiesList)).map((p: any) => ({
-        _id: String(p._id),
-        name: p.name,
-        slug: p.slug,
-        badge: p.badge?.trim() || "Private room",
-        category: p.category,
-        images: Array.isArray(p.images) && p.images.length > 0 ? p.images : ["/assets/ac-double-room.webp"],
-        amenities: Array.isArray(p.amenities) && p.amenities.length > 0 ? p.amenities : ["Free Wifi", "Restaurant"],
-        link: `/properties/${p.slug}`,
-        description: p.description,
-      }));
+    if (hasPropertiesForCity) {
+      // If properties exist in DB for this city, only return the active ones (empty array if all inactive)
+      if (propertiesList.length > 0) {
+        properties = JSON.parse(JSON.stringify(propertiesList)).map((p: any) => ({
+          _id: String(p._id),
+          name: p.name,
+          slug: p.slug,
+          badge: p.badge?.trim() || "Private room",
+          category: p.category,
+          images: Array.isArray(p.images) && p.images.length > 0 ? p.images : ["/assets/ac-double-room.webp"],
+          amenities: Array.isArray(p.amenities) && p.amenities.length > 0 ? p.amenities : ["Free Wifi", "Restaurant"],
+          link: `/properties/${p.slug}`,
+          description: p.description,
+        }));
+      } else {
+        properties = [];
+      }
     } else {
       // Fallback: If no Property records exist, check legacy Room records
       let legacyRooms: any[] = [];
       if (city) {
         legacyRooms = await Room.find({
           $or: [{ city: city._id }, { city: String(city._id) }],
-          status: { $ne: "inactive" },
         })
+          .populate("property")
           .sort({ order: 1, createdAt: -1 })
           .lean();
       }
 
-      if (legacyRooms.length > 0) {
-        properties = JSON.parse(JSON.stringify(legacyRooms)).map((r: any, idx: number) => ({
+      const activeRooms = legacyRooms.filter(
+        (r: any) => r.status !== "inactive" && (!r.property || (r.property as any)?.status !== "inactive")
+      );
+
+      if (activeRooms.length > 0) {
+        properties = JSON.parse(JSON.stringify(activeRooms)).map((r: any, idx: number) => ({
           _id: String(r._id),
           name: r.name,
           slug: r.slug,
@@ -119,8 +131,16 @@ export async function getDestinationStaysData(
           description: r.description,
           occupancy: r.occupancy,
         }));
+      } else if (legacyRooms.length > 0) {
+        properties = [];
       } else {
-        properties = getFallbackProperties(cleanSlug);
+        const totalPropsInDb = await Property.countDocuments();
+        const totalRoomsInDb = await Room.countDocuments();
+        if (totalPropsInDb === 0 && totalRoomsInDb === 0) {
+          properties = getFallbackProperties(cleanSlug);
+        } else {
+          properties = [];
+        }
       }
     }
 

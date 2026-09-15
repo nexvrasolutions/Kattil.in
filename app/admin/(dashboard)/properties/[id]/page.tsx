@@ -548,6 +548,7 @@ export default function PropertyFormPage() {
               <AdminDropzone
                 label="Primary Cover Photo"
                 hint="Main hero photo shown on destination cards and property banner (1200×800px recommended)."
+                folder="properties"
                 value={form.images[0] ?? ""}
                 onChange={(url) =>
                   setForm((f) => ({
@@ -586,6 +587,7 @@ export default function PropertyFormPage() {
                 <AdminDropzone
                   label="Add Gallery Photo"
                   hint="Upload additional photos of amenities, suites, lounges, and surrounds."
+                  folder="properties"
                   value=""
                   onChange={addGalleryImage}
                 />

@@ -21,7 +21,7 @@ export async function GET(_request: NextRequest) {
 
     // Count active properties per city
     const propertyCounts = await Property.aggregate([
-      { $match: { status: "active" } },
+      { $match: { status: { $ne: "inactive" } } },
       { $group: { _id: "$city", count: { $sum: 1 } } },
     ]);
     const propertyCountMap = new Map<string, number>();
@@ -29,9 +29,31 @@ export async function GET(_request: NextRequest) {
       if (p._id) propertyCountMap.set(String(p._id), p.count);
     }
 
+    // Count all properties per city in DB (to distinguish 0 active vs no records)
+    const allPropertyCounts = await Property.aggregate([
+      { $group: { _id: "$city", count: { $sum: 1 } } },
+    ]);
+    const allPropertyCountMap = new Map<string, number>();
+    for (const p of allPropertyCounts) {
+      if (p._id) allPropertyCountMap.set(String(p._id), p.count);
+    }
+
+    // Get active property IDs
+    const activeProps = await Property.find({ status: { $ne: "inactive" } }).select("_id").lean();
+    const activePropIds = activeProps.map((p) => p._id);
+
     // Count active rooms per city (fallback)
     const roomCounts = await Room.aggregate([
-      { $match: { status: "active" } },
+      {
+        $match: {
+          status: { $ne: "inactive" },
+          $or: [
+            { property: { $in: activePropIds } },
+            { property: { $exists: false } },
+            { property: null },
+          ],
+        },
+      },
       { $group: { _id: "$city", count: { $sum: 1 } } },
     ]);
     const roomCountMap = new Map<string, number>();
@@ -41,9 +63,13 @@ export async function GET(_request: NextRequest) {
 
     const destinations = cities.map((c) => {
       const idStr = String(c._id);
-      const propCount = propertyCountMap.get(idStr);
-      const roomCount = roomCountMap.get(idStr) ?? (c.hotelCount ? parseInt(c.hotelCount, 10) || 1 : 1);
-      const count = propCount !== undefined && propCount > 0 ? propCount : roomCount;
+      const hasProps = (allPropertyCountMap.get(idStr) ?? 0) > 0;
+      let count = 0;
+      if (hasProps) {
+        count = propertyCountMap.get(idStr) ?? 0;
+      } else {
+        count = roomCountMap.get(idStr) ?? 0;
+      }
 
       // Smart link resolution
       let destinationLink = c.link?.trim();
@@ -67,7 +93,7 @@ export async function GET(_request: NextRequest) {
       // Hotel count subtitle
       const hotelCount =
         c.hotelCount?.trim() ||
-        `${count} ${count === 1 ? "hotel" : "hotels"}`;
+        (count === 0 ? "Coming Soon" : `${count} ${count === 1 ? "hotel" : "hotels"}`);
 
       return {
         _id: idStr,

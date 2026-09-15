@@ -12,35 +12,52 @@ export async function GET(request: NextRequest) {
     const cityParam = searchParams.get("city")?.toLowerCase().trim();
     const propertyParam = searchParams.get("property")?.toLowerCase().trim() || searchParams.get("propertyId")?.trim();
 
+    // Get all active properties
+    const activeProperties = await Property.find({ status: { $ne: "inactive" } }).select("_id").lean();
+    const activePropertyIds = activeProperties.map((p) => p._id);
+
     if (propertyParam) {
       let propDoc: any = null;
       if (propertyParam.match(/^[0-9a-fA-F]{24}$/)) {
-        propDoc = await Property.findById(propertyParam).lean();
+        propDoc = await Property.findOne({ _id: propertyParam, status: { $ne: "inactive" } }).lean();
       }
       if (!propDoc) {
-        propDoc = await Property.findOne({ slug: propertyParam }).lean();
+        propDoc = await Property.findOne({ slug: propertyParam, status: { $ne: "inactive" } }).lean();
       }
 
-      const query: Record<string, unknown> = { status: { $ne: "inactive" } };
-      if (propDoc) {
-        query.property = propDoc._id;
+      if (!propDoc) {
+        return apiSuccess({
+          property: null,
+          count: 0,
+          rooms: [],
+        });
       }
 
-      const rooms = await Room.find(query)
+      const rooms = await Room.find({
+        property: propDoc._id,
+        status: { $ne: "inactive" },
+      })
         .sort({ order: 1, createdAt: -1 })
         .populate("property", "name slug badge")
         .populate("city", "name slug")
         .lean();
 
       return apiSuccess({
-        property: propDoc ? { _id: propDoc._id, name: propDoc.name, slug: propDoc.slug } : null,
+        property: { _id: propDoc._id, name: propDoc.name, slug: propDoc.slug },
         count: rooms.length,
         rooms,
       });
     }
 
     const cities = await City.find({ active: true }).sort({ order: 1 }).lean();
-    const rooms = await Room.find({ status: { $ne: "inactive" } })
+    const rooms = await Room.find({
+      status: { $ne: "inactive" },
+      $or: [
+        { property: { $in: activePropertyIds } },
+        { property: { $exists: false } },
+        { property: null },
+      ],
+    })
       .sort({ order: 1, createdAt: -1 })
       .populate("property", "name slug badge")
       .populate("city", "name slug")

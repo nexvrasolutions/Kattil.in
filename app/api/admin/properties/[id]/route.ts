@@ -7,6 +7,7 @@ import { apiSuccess, apiError, handleApiError, slugify } from "@/lib/utils/api";
 import { deleteUploadedFiles } from "@/lib/utils/fileCleanup";
 import { updatePropertySchema } from "@/lib/validations";
 import { clearDestinationsCache } from "@/lib/db/destinations";
+import { clearPropertyCache } from "@/lib/db/rooms";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -71,12 +72,23 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
     if (!property) return apiError("Property not found", 404);
 
+    // If property status changed, cascade to its rooms
+    if (updateData.status) {
+      await Room.updateMany(
+        { property: id },
+        { $set: { status: updateData.status } }
+      );
+    }
+
     clearDestinationsCache();
+    clearPropertyCache();
     try {
       revalidatePath("/chennai");
       revalidatePath("/madurai");
       revalidatePath("/coimbatore");
+      revalidatePath("/colachel");
       revalidatePath("/destinations");
+      revalidatePath("/rooms");
       revalidatePath(`/properties/${property.slug}`);
       revalidatePath("/");
     } catch {}
@@ -101,11 +113,14 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
     await Room.updateMany({ property: id }, { $unset: { property: "" } });
 
     clearDestinationsCache();
+    clearPropertyCache();
     try {
       revalidatePath("/chennai");
       revalidatePath("/madurai");
       revalidatePath("/coimbatore");
+      revalidatePath("/colachel");
       revalidatePath("/destinations");
+      revalidatePath("/rooms");
       revalidatePath("/");
     } catch {}
 

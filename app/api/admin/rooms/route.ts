@@ -6,6 +6,7 @@ import Property from "@/lib/models/Property";
 import { apiSuccess, apiError, handleApiError, slugify, getPaginationParams } from "@/lib/utils/api";
 import { roomSchema } from "@/lib/validations";
 import { clearDestinationsCache } from "@/lib/db/destinations";
+import { clearPropertyCache } from "@/lib/db/rooms";
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,12 +30,22 @@ export async function GET(request: NextRequest) {
     if (featured === "true") filter.featured = true;
     if (featured === "false") filter.featured = false;
 
+    // Synchronize rooms of inactive properties to inactive
+    const inactiveProperties = await Property.find({ status: "inactive" }).select("_id").lean();
+    const inactivePropIds = inactiveProperties.map((p) => p._id);
+    if (inactivePropIds.length > 0) {
+      await Room.updateMany(
+        { property: { $in: inactivePropIds }, status: "active" },
+        { $set: { status: "inactive" } }
+      );
+    }
+
     const [rooms, total] = await Promise.all([
       Room.find(filter)
         .sort({ order: 1, createdAt: -1 })
         .skip(skip)
         .limit(limit)
-        .populate("property", "name slug badge")
+        .populate("property", "name slug badge status")
         .populate("city", "name slug"),
       Room.countDocuments(filter),
     ]);
@@ -97,12 +108,17 @@ export async function POST(request: NextRequest) {
     ]);
 
     clearDestinationsCache();
+    clearPropertyCache();
     try {
       revalidatePath("/chennai");
       revalidatePath("/madurai");
       revalidatePath("/coimbatore");
+      revalidatePath("/colachel");
       revalidatePath("/destinations");
       revalidatePath("/rooms");
+      if (room.property) {
+        revalidatePath(`/properties/${(room.property as any).slug}`);
+      }
       revalidatePath("/");
     } catch {}
 

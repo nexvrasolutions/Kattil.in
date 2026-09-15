@@ -6,6 +6,7 @@ import Room from "@/lib/models/Room";
 import { apiSuccess, apiError, handleApiError, slugify, getPaginationParams } from "@/lib/utils/api";
 import { propertySchema } from "@/lib/validations";
 import { clearDestinationsCache } from "@/lib/db/destinations";
+import { clearPropertyCache } from "@/lib/db/rooms";
 
 export async function GET(request: NextRequest) {
   try {
@@ -83,11 +84,14 @@ export async function POST(request: NextRequest) {
     const populated = await property.populate("city", "name slug");
 
     clearDestinationsCache();
+    clearPropertyCache();
     try {
       revalidatePath("/chennai");
       revalidatePath("/madurai");
       revalidatePath("/coimbatore");
+      revalidatePath("/colachel");
       revalidatePath("/destinations");
+      revalidatePath("/rooms");
       revalidatePath(`/properties/${slug}`);
       revalidatePath("/");
     } catch {}

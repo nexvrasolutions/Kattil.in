@@ -7,6 +7,7 @@ import { apiSuccess, apiError, handleApiError, slugify } from "@/lib/utils/api";
 import { deleteUploadedFiles } from "@/lib/utils/fileCleanup";
 import { updateRoomSchema } from "@/lib/validations";
 import { clearDestinationsCache } from "@/lib/db/destinations";
+import { clearPropertyCache } from "@/lib/db/rooms";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -15,7 +16,7 @@ export async function GET(_request: NextRequest, { params }: Params) {
     await connectDB();
     const { id } = await params;
     const room = await Room.findById(id)
-      .populate("property", "name slug badge city")
+      .populate("property", "name slug badge status city")
       .populate("city", "name slug");
     if (!room) return apiError("Room not found", 404);
     return apiSuccess(room);
@@ -80,18 +81,23 @@ export async function PUT(request: NextRequest, { params }: Params) {
       updateData,
       { new: true, runValidators: true }
     )
-      .populate("property", "name slug badge")
+      .populate("property", "name slug badge status")
       .populate("city", "name slug");
 
     if (!room) return apiError("Room not found", 404);
 
     clearDestinationsCache();
+    clearPropertyCache();
     try {
       revalidatePath("/chennai");
       revalidatePath("/madurai");
       revalidatePath("/coimbatore");
+      revalidatePath("/colachel");
       revalidatePath("/destinations");
       revalidatePath("/rooms");
+      if (room.property) {
+        revalidatePath(`/properties/${(room.property as any).slug}`);
+      }
       revalidatePath("/");
     } catch {}
 
@@ -106,17 +112,22 @@ export async function DELETE(_request: NextRequest, { params }: Params) {
   try {
     await connectDB();
     const { id } = await params;
-    const room = await Room.findByIdAndDelete(id);
+    const room = await Room.findByIdAndDelete(id).populate("property", "slug");
     if (!room) return apiError("Room not found", 404);
     await deleteUploadedFiles(room.images ?? []);
 
     clearDestinationsCache();
+    clearPropertyCache();
     try {
       revalidatePath("/chennai");
       revalidatePath("/madurai");
       revalidatePath("/coimbatore");
+      revalidatePath("/colachel");
       revalidatePath("/destinations");
       revalidatePath("/rooms");
+      if (room.property) {
+        revalidatePath(`/properties/${(room.property as any).slug}`);
+      }
       revalidatePath("/");
     } catch {}
 

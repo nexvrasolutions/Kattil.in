@@ -23,6 +23,7 @@ import {
   BellRing,
   ArrowRight,
   Check,
+  X,
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import RoomStickyBookingWidget from "./RoomStickyBookingWidget";
@@ -111,11 +112,27 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
 
   // Ensure minimum 3 items for full side-peek wrapping
   const images = useMemo(() => {
+    if (baseImages.length === 1) {
+      return [baseImages[0], baseImages[0], baseImages[0]];
+    }
     if (baseImages.length === 2) {
       return [...baseImages, ...baseImages];
     }
     return baseImages;
   }, [baseImages]);
+
+  // 3. Unified photo collection for Fullscreen Lightbox View
+  const allPhotos = useMemo(() => {
+    const list: string[] = [];
+    const seen = new Set<string>();
+    [...(propertyGalleryImages || []), ...(images || [])].forEach((url) => {
+      if (url && !seen.has(url)) {
+        seen.add(url);
+        list.push(url);
+      }
+    });
+    return list.length > 0 ? list : DEFAULT_GALLERY_IMAGES;
+  }, [propertyGalleryImages, images]);
 
   // Triple set for infinite looping buffer
   const extendedImages = useMemo(() => {
@@ -138,6 +155,41 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
       setCurrentIndex(0);
     }
   }, [images.length]);
+
+  // Fullscreen Lightbox for Property Gallery
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  const handleLightboxPrev = () => {
+    if (lightboxIndex === null || allPhotos.length <= 1) return;
+    setLightboxIndex((prev) => (prev! > 0 ? prev! - 1 : allPhotos.length - 1));
+  };
+
+  const handleLightboxNext = () => {
+    if (lightboxIndex === null || allPhotos.length <= 1) return;
+    setLightboxIndex((prev) => (prev! < allPhotos.length - 1 ? prev! + 1 : 0));
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (lightboxIndex === null) return;
+      if (e.key === "Escape") setLightboxIndex(null);
+      if (e.key === "ArrowLeft") handleLightboxPrev();
+      if (e.key === "ArrowRight") handleLightboxNext();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [lightboxIndex, allPhotos.length]);
+
+  useEffect(() => {
+    if (lightboxIndex !== null) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [lightboxIndex]);
 
   const activeDotIndex = images.length > 0 ? currentIndex % images.length : 0;
 
@@ -254,19 +306,20 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
             >
               {extendedImages.map((img, idx) => {
                 const isActive = idx === currentIndex;
+                const photoIdx = allPhotos.indexOf(img) !== -1 ? allPhotos.indexOf(img) : idx % images.length;
                 return (
-                  <Link
+                  <div
                     key={idx}
-                    href={galleryHref}
-                    onClick={(e) => {
-                      if (Math.abs(touchDeltaX) > 10) {
-                        e.preventDefault();
-                        return;
+                    onClick={() => {
+                      if (isActive) {
+                        setLightboxIndex(photoIdx);
+                      } else {
+                        setCurrentIndex(idx);
                       }
                     }}
-                    className={`shrink-0 w-[var(--slide-width)] aspect-[4/3] sm:aspect-[16/10] md:aspect-[21/10] max-h-[580px] rounded-[14px] sm:rounded-[20px] md:rounded-[24px] overflow-hidden relative transition-all duration-500 cursor-pointer block ${isActive
+                    className={`shrink-0 w-[var(--slide-width)] aspect-[4/3] sm:aspect-[16/10] md:aspect-[21/10] max-h-[580px] rounded-[14px] sm:rounded-[20px] md:rounded-[24px] overflow-hidden relative transition-all duration-500 block cursor-pointer group ${isActive
                       ? "opacity-100 scale-100 ring-1 ring-black/5"
-                      : "opacity-80 hover:opacity-95 scale-[0.99]"
+                      : "opacity-80 scale-[0.99]"
                       }`}
                   >
                     <Image
@@ -276,7 +329,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                       priority={idx === images.length}
                       className="object-cover"
                     />
-                  </Link>
+                  </div>
                 );
               })}
             </div>
@@ -375,127 +428,135 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                   Select Room
                 </motion.h2>
 
-                <div className="space-y-6">
-                  {data.rooms.map((room, rIdx) => {
-                    const roomImg =
-                      (room.images && room.images.length > 0 && room.images[0]) ||
-                      "/assets/ac-double-room.webp";
-                    const roomBadge =
-                      room.badge ||
-                      (rIdx === 0
-                        ? "Private room"
-                        : rIdx === 1
-                          ? "Dormitory"
-                          : "Private rooms");
-                    const roomAmenities =
-                      room.amenities && room.amenities.length > 0
-                        ? room.amenities
-                        : ["Free Wifi", "Restaurant", "Study Desk", "Double Occupancy"];
-                    const destSlug = (data.destinationSlug || data.destinationName || "kanniyakumari").toLowerCase().trim();
-                    const roomNameLower = (room.name || "").toLowerCase().trim();
-                    const roomSlugLower = (room.slug || "").toLowerCase().trim();
+                {data.rooms.length === 0 ? (
+                  <div className="py-12 px-6 text-center bg-white rounded-[8px] border border-gray-100 max-w-xl">
+                    <p className="font-sans text-sm md:text-base text-[#6b7280]">
+                      No rooms are currently available for this property. Please check back later or contact us for booking inquiries.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {data.rooms.map((room, rIdx) => {
+                      const roomImg =
+                        (room.images && room.images.length > 0 && room.images[0]) ||
+                        "/assets/ac-double-room.webp";
+                      const roomBadge =
+                        room.badge ||
+                        (rIdx === 0
+                          ? "Private room"
+                          : rIdx === 1
+                            ? "Dormitory"
+                            : "Private rooms");
+                      const roomAmenities =
+                        room.amenities && room.amenities.length > 0
+                          ? room.amenities
+                          : ["Free Wifi", "Restaurant", "Study Desk", "Double Occupancy"];
+                      const destSlug = (data.destinationSlug || data.destinationName || "kanniyakumari").toLowerCase().trim();
+                      const roomNameLower = (room.name || "").toLowerCase().trim();
+                      const roomSlugLower = (room.slug || "").toLowerCase().trim();
 
-                    // Determine external booking URL
-                    let externalBookUrl = "";
-                    if (room.bookingLink && (room.bookingLink.startsWith("http://") || room.bookingLink.startsWith("https://"))) {
-                      externalBookUrl = room.bookingLink;
-                    } else {
-                      const staticRooms = (locationRooms as Record<string, any[]>)[destSlug];
-                      const matched = staticRooms?.find(
-                        (sr) =>
-                          (sr.slug && roomSlugLower && sr.slug.toLowerCase() === roomSlugLower) ||
-                          (sr.name && roomNameLower && sr.name.toLowerCase() === roomNameLower) ||
-                          (sr.name && roomNameLower && (roomNameLower.includes(sr.name.toLowerCase()) || sr.name.toLowerCase().includes(roomNameLower)))
-                      );
-                      if (matched?.external_url) {
-                        externalBookUrl = matched.external_url;
-                      } else if (destSlug === "chennai") {
-                        externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattilchennai";
-                      } else if (destSlug === "madurai") {
-                        externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattil";
-                      } else if (destSlug === "coimbatore") {
-                        externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattilcoimbatore";
-                      } else if (destSlug === "colachel") {
-                        externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattilcolachel";
+                      // Determine external booking URL
+                      let externalBookUrl = "";
+                      if (room.bookingLink && (room.bookingLink.startsWith("http://") || room.bookingLink.startsWith("https://"))) {
+                        externalBookUrl = room.bookingLink;
                       } else {
-                        externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattil";
+                        const staticRooms = (locationRooms as Record<string, any[]>)[destSlug];
+                        const matched = staticRooms?.find(
+                          (sr) =>
+                            (sr.slug && roomSlugLower && sr.slug.toLowerCase() === roomSlugLower) ||
+                            (sr.name && roomNameLower && sr.name.toLowerCase() === roomNameLower) ||
+                            (sr.name && roomNameLower && (roomNameLower.includes(sr.name.toLowerCase()) || sr.name.toLowerCase().includes(roomNameLower)))
+                        );
+                        if (matched?.external_url) {
+                          externalBookUrl = matched.external_url;
+                        } else if (destSlug === "chennai") {
+                          externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattilchennai";
+                        } else if (destSlug === "madurai") {
+                          externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattil";
+                        } else if (destSlug === "coimbatore") {
+                          externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattilcoimbatore";
+                        } else if (destSlug === "colachel") {
+                          externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattilcolachel";
+                        } else {
+                          externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattil";
+                        }
                       }
-                    }
 
-                    return (
-                      <motion.div
-                        key={room._id || rIdx}
-                        initial={{ opacity: 0, y: 24 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, margin: "-40px" }}
-                        transition={{ duration: 0.5, delay: rIdx * 0.09, ease: EASE }}
-                        className="bg-white rounded-[8px] overflow-hidden border border-gray-100"
-                      >
-                        <div className="w-full max-w-[865px] flex flex-col sm:flex-row gap-0 sm:gap-[20px] md:gap-[26px] h-auto sm:h-[290px]">
+                      return (
+                        <motion.div
+                          key={room._id || rIdx}
+                          initial={{ opacity: 0, y: 24 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true, margin: "-40px" }}
+                          transition={{ duration: 0.5, delay: rIdx * 0.09, ease: EASE }}
+                          className="bg-white rounded-[8px] overflow-hidden border border-gray-100"
+                        >
+                          <div className="w-full max-w-[865px] flex flex-col sm:flex-row gap-0 sm:gap-[20px] md:gap-[26px] h-auto sm:h-[290px]">
 
-                          {/* Room Image (Full width on mobile, side-by-side on sm/md/lg) */}
-                          <div className="relative w-full sm:w-[320px] md:w-[405px] h-[220px] sm:h-full rounded-t-[8px] sm:rounded-l-[8px] sm:rounded-tr-none overflow-hidden shrink-0">
-                            <Image
-                              src={roomImg}
-                              alt={room.name}
-                              fill
-                              sizes="(max-width: 640px) 100vw, 405px"
-                              className="object-cover"
-                            />
-                          </div>
+                            {/* Room Image (Full width on mobile, side-by-side on sm/md/lg) */}
+                            <div className="relative w-full sm:w-[320px] md:w-[405px] h-[220px] sm:h-full rounded-t-[8px] sm:rounded-l-[8px] sm:rounded-tr-none overflow-hidden shrink-0">
+                              <Image
+                                src={roomImg}
+                                alt={room.name}
+                                fill
+                                sizes="(max-width: 640px) 100vw, 405px"
+                                className="object-cover"
+                              />
+                            </div>
 
-                          {/* Room Info (Below image on mobile, right side on sm/md/lg) */}
-                          <div className="w-full sm:flex-1 md:w-[434px] flex flex-col justify-between p-5 sm:p-0 sm:pt-6 sm:pb-5 sm:pr-4">
-                            <div>
+                            {/* Room Info (Below image on mobile, right side on sm/md/lg) */}
+                            <div className="w-full sm:flex-1 md:w-[434px] flex flex-col justify-between p-5 sm:p-0 sm:pt-6 sm:pb-5 sm:pr-4">
+                              <div>
 
-                              {/* Badge / Category */}
-                              <p className="font-[Public_Sans] text-[13.5px] sm:text-[14px] font-medium leading-[14px] tracking-[-0.5px] text-[#526442] mb-1.5 sm:mb-2">
-                                {roomBadge}
-                              </p>
+                                {/* Badge / Category */}
+                                <p className="font-[Public_Sans] text-[13.5px] sm:text-[14px] font-medium leading-[14px] tracking-[-0.5px] text-[#526442] mb-1.5 sm:mb-2">
+                                  {roomBadge}
+                                </p>
 
-                              {/* Room Title */}
-                              <h3 className="font-[Public_Sans] text-[22px] sm:text-[24px] font-medium text-[#111827] leading-[28px] sm:leading-[30px] tracking-[-0.5px]">
-                                {room.name}
-                              </h3>
+                                {/* Room Title */}
+                                <h3 className="font-[Public_Sans] text-[22px] sm:text-[24px] font-medium text-[#111827] leading-[28px] sm:leading-[30px] tracking-[-0.5px]">
+                                  {room.name}
+                                </h3>
 
-                              {/* Room Subtitle */}
-                              <p className="font-[Public_Sans] text-[13.5px] sm:text-[14px] font-normal leading-[18px] tracking-[-0.5px] text-[#6b7280] mt-1.5 sm:mt-2 mb-3.5 sm:mb-4">
-                                {room.description ||
-                                  "Spacious Double occupancy room with extra comfort"}
-                              </p>
+                                {/* Room Subtitle */}
+                                <p className="font-[Public_Sans] text-[13.5px] sm:text-[14px] font-normal leading-[18px] tracking-[-0.5px] text-[#6b7280] mt-1.5 sm:mt-2 mb-3.5 sm:mb-4">
+                                  {room.description ||
+                                    "Spacious Double occupancy room with extra comfort"}
+                                </p>
 
-                              {/* Amenities */}
-                              <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                                {roomAmenities.map((amenity, aIdx) => (
-                                  <span
-                                    key={aIdx}
-                                    className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#F5F3EB] text-[11.5px] sm:text-[12px] font-medium text-[#4b5563]"
-                                  >
-                                    {amenity}
-                                  </span>
-                                ))}
+                                {/* Amenities */}
+                                <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                                  {roomAmenities.map((amenity, aIdx) => (
+                                    <span
+                                      key={aIdx}
+                                      className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#F5F3EB] text-[11.5px] sm:text-[12px] font-medium text-[#4b5563]"
+                                    >
+                                      {amenity}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Book Now */}
+                              <div className="mt-5 sm:mt-0 sm:mb-1">
+                                <motion.a
+
+                                  whileTap={{ scale: 0.98 }}
+                                  href={externalBookUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="w-full min-h-[44px] py-[12px] px-[32px] rounded-[6px] border border-[#111827] flex items-center justify-center text-[#111827] font-[Public_Sans] font-medium text-[14px] hover:bg-[#0d1b2e] hover:text-white transition-all text-center"
+                                >
+                                  Book Now
+                                </motion.a>
                               </div>
                             </div>
-
-                            {/* Book Now */}
-                            <div className="mt-5 sm:mt-0 sm:mb-1">
-                              <motion.a
-
-                                whileTap={{ scale: 0.98 }}
-                                href={externalBookUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-full min-h-[44px] py-[12px] px-[32px] rounded-[6px] border border-[#111827] flex items-center justify-center text-[#111827] font-[Public_Sans] font-medium text-[14px] hover:bg-[#0d1b2e] hover:text-white transition-all text-center"
-                              >
-                                Book Now
-                              </motion.a>
-                            </div>
                           </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                )}
               </section>
 
               {/* ── C. Gallery ── */}
@@ -506,7 +567,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
                     transition={{ duration: 0.5, ease: EASE }}
-                    className="font-sans text-2xl md:text-3xl font-semibold text-[#111827] mb-10"
+                    className="font-sans text-2xl md:text-[28px] font-semibold text-[#111827] mb-10"
                   >
                     Gallery
                   </motion.h2>
@@ -515,10 +576,6 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                     {propertyGalleryImages.slice(0, 4).map((imgUrl, idx, arr) => {
                       const isLastOrFourth =
                         idx === 3 || (idx === arr.length - 1 && propertyGalleryImages.length <= 4 && arr.length >= 3);
-                      const galleryCity = data.destinationSlug || data.destinationName?.toLowerCase() || "";
-                      const galleryHref = galleryCity
-                        ? `/gallery?city=${encodeURIComponent(galleryCity)}`
-                        : "/gallery";
 
                       if (isLastOrFourth && (propertyGalleryImages.length >= 4 || arr.length === 4)) {
                         return (
@@ -531,18 +588,18 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                           >
                             <Link
                               href={galleryHref}
-                              className="relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-900 shadow-xs block cursor-pointer"
+                              className="relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-900 shadow-xs block cursor-pointer text-left w-full border-0 p-0 group"
                             >
                               <Image
                                 src={imgUrl}
                                 alt={`${data.name} photo ${idx + 1}`}
                                 fill
                                 sizes="(max-width: 768px) 100vw, 50vw"
-                                className="object-cover opacity-60"
+                                className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-500"
                               />
                               <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
                                 <span className="font-sans text-[15px] md:text-[16px] font-medium text-white flex items-center gap-2">
-                                  View all <ArrowRight className="w-4 h-4" />
+                                  View all ({propertyGalleryImages.length}) <ArrowRight className="w-4 h-4" />
                                 </span>
                               </div>
                             </Link>
@@ -558,18 +615,22 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                           viewport={{ once: true, margin: "-40px" }}
                           transition={{ duration: 0.5, delay: 0.05 * (idx + 1), ease: EASE }}
                         >
-                          <Link
-                            href={galleryHref}
-                            className="relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-100 shadow-xs block cursor-pointer"
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const photoIdx = allPhotos.indexOf(imgUrl) !== -1 ? allPhotos.indexOf(imgUrl) : idx;
+                              setLightboxIndex(photoIdx);
+                            }}
+                            className="relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-100 shadow-xs block cursor-pointer text-left w-full border-0 p-0 group"
                           >
                             <Image
                               src={imgUrl}
                               alt={`${data.name} photo ${idx + 1}`}
                               fill
                               sizes="(max-width: 768px) 100vw, 50vw"
-                              className="object-cover"
+                              className="object-cover group-hover:scale-105 transition-transform duration-500"
                             />
-                          </Link>
+                          </button>
                         </motion.div>
                       );
                     })}
@@ -610,20 +671,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                       >
                         View on map
                       </a>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          window.open(
-                            `https://maps.google.com/?q=${encodeURIComponent(data.address || data.name)}`,
-                            "_blank"
-                          )
-                        }
-                        className="px-5 py-2 rounded-[8px] border border-[#374151] text-[#1f2937] text-xs font-semibold hover:bg-black/5 transition-colors self-start sm:self-auto cursor-pointer"
-                      >
-                        View on map
-                      </button>
-                    )}
+                    ) : null}
                   </div>
 
                   {/* Accordion header */}
@@ -799,6 +847,87 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
           </div>
         </div>
       </div>
+
+      {/* ── Fullscreen Lightbox Modal for Property Gallery ── */}
+      <AnimatePresence>
+        {lightboxIndex !== null && allPhotos[lightboxIndex] && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8"
+            onClick={() => setLightboxIndex(null)}
+          >
+            {/* Close / Redirect to Gallery button */}
+            <Link
+              href={galleryHref}
+              onClick={() => setLightboxIndex(null)}
+              className="absolute top-5 right-5 sm:top-6 sm:right-6 w-11 h-11 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer z-30"
+              aria-label="View property gallery"
+            >
+              <X className="w-6 h-6" />
+            </Link>
+
+            {/* Prev button */}
+            {allPhotos.length > 1 && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleLightboxPrev();
+                }}
+                className="absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer z-30"
+                aria-label="Previous photo"
+              >
+                <ChevronLeft className="w-7 h-7" />
+              </button>
+            )}
+
+            {/* Next button */}
+            {allPhotos.length > 1 && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleLightboxNext();
+                }}
+                className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors cursor-pointer z-30"
+                aria-label="Next photo"
+              >
+                <ChevronRight className="w-7 h-7" />
+              </button>
+            )}
+
+            {/* Modal Image Box */}
+            <div
+              className="relative max-w-5xl max-h-[82vh] w-full h-[75vh] flex flex-col items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="relative w-full h-full">
+                <Image
+                  src={allPhotos[lightboxIndex]}
+                  alt={`${data.name} photo ${lightboxIndex + 1}`}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 1200px"
+                  className="object-contain"
+                  priority
+                />
+              </div>
+
+              {/* Caption Bar */}
+              <div className="mt-4 text-center">
+                <p className="font-[Public_Sans] text-white/90 text-[14px] font-medium">
+                  {data.name} — Photo {lightboxIndex + 1}
+                </p>
+                <p className="font-[Public_Sans] text-white/50 text-[12px] mt-1">
+                  {lightboxIndex + 1} / {allPhotos.length}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

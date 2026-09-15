@@ -29,6 +29,7 @@ interface PropertySummary {
   name: string;
   slug: string;
   badge?: string;
+  status?: "active" | "inactive" | "maintenance";
 }
 
 interface Room {
@@ -360,8 +361,13 @@ function RoomsContent() {
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div className="flex items-center gap-2 flex-wrap">
                         {room.property && (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[hsl(var(--adm-primary))] bg-[hsl(var(--adm-primary)/0.1)] px-2 py-0.5 rounded-md">
+                          <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-md ${
+                            room.property.status === "inactive"
+                              ? "text-[hsl(var(--adm-muted-foreground))] bg-[hsl(var(--adm-muted))]"
+                              : "text-[hsl(var(--adm-primary))] bg-[hsl(var(--adm-primary)/0.1)]"
+                          }`}>
                             <Building2 className="w-3 h-3" /> {room.property.name}
+                            {room.property.status === "inactive" && " (Inactive)"}
                           </span>
                         )}
                         {room.city && (
@@ -470,9 +476,22 @@ function RoomsContent() {
                       </td>
                       <td className="px-4 py-3">
                         {room.property ? (
-                          <span className="inline-flex items-center gap-1 text-xs font-medium text-[hsl(var(--adm-foreground))]">
-                            <Building2 className="w-3.5 h-3.5 text-[hsl(var(--adm-primary))]" />
+                          <span className={`inline-flex items-center gap-1 text-xs font-medium ${
+                            room.property.status === "inactive"
+                              ? "text-[hsl(var(--adm-muted-foreground))]"
+                              : "text-[hsl(var(--adm-foreground))]"
+                          }`}>
+                            <Building2 className={`w-3.5 h-3.5 ${
+                              room.property.status === "inactive"
+                                ? "text-[hsl(var(--adm-muted-foreground))]"
+                                : "text-[hsl(var(--adm-primary))]"
+                            }`} />
                             {room.property.name}
+                            {room.property.status === "inactive" && (
+                              <span className="text-[10px] font-semibold text-[hsl(var(--adm-muted-foreground))] bg-[hsl(var(--adm-muted))] px-1.5 py-0.5 rounded ml-1">
+                                Property Inactive
+                              </span>
+                            )}
                           </span>
                         ) : (
                           <span className="text-xs text-[hsl(var(--adm-muted-foreground))]">—</span>

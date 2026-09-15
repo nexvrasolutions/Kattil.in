@@ -485,6 +485,7 @@ function RoomFormContent() {
               <AdminDropzone
                 label="Main Room Image"
                 hint="Upload the main bedroom/bed photo for this room type."
+                folder="rooms"
                 value={form.images[0] ?? ""}
                 onChange={(url) =>
                   setForm((f) => ({
@@ -514,6 +515,7 @@ function RoomFormContent() {
               <AdminDropzone
                 label="Add Additional Room Photo"
                 hint="Upload bathroom, workspace, or interior angle photos."
+                folder="rooms"
                 value=""
                 onChange={addGalleryImage}
               />

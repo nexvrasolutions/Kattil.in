@@ -38,6 +38,132 @@ export const STATIC_CATEGORIES: PublicGalleryCategory[] = [
 ];
 
 export const STATIC_ITEMS: PublicGalleryItem[] = [
+  // ── Madurai (9 images) ───────────────────────────────────────
+  {
+    id: "m-1",
+    src: "/assets/madurai-gallery/image-1.jpeg",
+    alt: "Private room with carved wooden bed",
+    caption: "Carved Wooden Bed & Traditional Aesthetic",
+    category: "rooms",
+    citySlug: "madurai",
+    cityName: "Madurai",
+    featured: true,
+  },
+  {
+    id: "m-2",
+    src: "/assets/madurai-gallery/image-2.jpeg",
+    alt: "In-room AC unit",
+    caption: "Modern Air-Conditioned Comfort",
+    category: "rooms",
+    citySlug: "madurai",
+    cityName: "Madurai",
+  },
+  {
+    id: "m-3",
+    src: "/assets/madurai-gallery/image-3.jpeg",
+    alt: "Private room with wooden bed and curtains",
+    caption: "Serene Private Room Setting",
+    category: "rooms",
+    citySlug: "madurai",
+    cityName: "Madurai",
+  },
+  {
+    id: "m-4",
+    src: "/assets/madurai-gallery/image-4.jpeg",
+    alt: "Bathroom with white marble tiles",
+    caption: "Spotless Modern Marble Bathroom",
+    category: "rooms",
+    citySlug: "madurai",
+    cityName: "Madurai",
+  },
+  {
+    id: "m-5",
+    src: "/assets/madurai-gallery/image-5.jpeg",
+    alt: "Lit building entrance at evening",
+    caption: "Warm Evening Welcome at Kattil",
+    category: "exterior",
+    citySlug: "madurai",
+    cityName: "Madurai",
+    featured: true,
+  },
+  {
+    id: "m-6",
+    src: "/assets/madurai-gallery/image-6.jpeg",
+    alt: "Guests arriving at the property",
+    caption: "Welcoming Grounds & Surrounding Spaces",
+    category: "outdoor",
+    citySlug: "madurai",
+    cityName: "Madurai",
+  },
+  {
+    id: "m-7",
+    src: "/assets/madurai-gallery/image-7.jpeg",
+    alt: "Building exterior at dusk",
+    caption: "Architectural Exterior at Twilight",
+    category: "exterior",
+    citySlug: "madurai",
+    cityName: "Madurai",
+  },
+  {
+    id: "m-8",
+    src: "/assets/madurai-gallery/image-8.jpeg",
+    alt: "Dormitory room with bunk beds",
+    caption: "Comfortable Dormitory Pods",
+    category: "rooms",
+    citySlug: "madurai",
+    cityName: "Madurai",
+  },
+  {
+    id: "m-9",
+    src: "/assets/madurai-gallery/image-9.jpeg",
+    alt: "Private room with wooden furniture",
+    caption: "Handcrafted Heritage Interior",
+    category: "rooms",
+    citySlug: "madurai",
+    cityName: "Madurai",
+  },
+
+  // ── Chennai (4 images) ───────────────────────────────────────
+  {
+    id: "c-1",
+    src: "/assets/chennai-gallery/image-1.jpeg",
+    alt: "Dormitory room with bunk beds",
+    caption: "Spacious Bunk Bed Dormitory",
+    category: "rooms",
+    citySlug: "chennai",
+    cityName: "Chennai",
+    featured: true,
+  },
+  {
+    id: "c-2",
+    src: "/assets/chennai-gallery/image-2.jpeg",
+    alt: "Bathroom with marble tiles",
+    caption: "Contemporary Clean En-suite Bathroom",
+    category: "rooms",
+    citySlug: "chennai",
+    cityName: "Chennai",
+  },
+  {
+    id: "c-3",
+    src: "/assets/chennai-gallery/image-3.jpeg",
+    alt: "Building exterior at night",
+    caption: "Illuminated Facade at Night",
+    category: "exterior",
+    citySlug: "chennai",
+    cityName: "Chennai",
+    featured: true,
+  },
+  {
+    id: "c-4",
+    src: "/assets/chennai-gallery/image-4.jpeg",
+    alt: "Dormitory room overview",
+    caption: "Thoughtfully Appointed Living Space",
+    category: "rooms",
+    citySlug: "chennai",
+    cityName: "Chennai",
+  },
+
+  // ── General / Experience ─────────────────────────────────────
   {
     id: "g-1",
     src: "/images/gallery/luxury-suite-bedroom.jpg",
@@ -80,27 +206,6 @@ export const STATIC_ITEMS: PublicGalleryItem[] = [
     caption: "Memorable Gatherings in the Lounge",
     category: "experience",
   },
-  {
-    id: "g-7",
-    src: "/images/home/ocean-sunset.png",
-    alt: "Coastal Resort Panorama",
-    caption: "Golden Sunset & Relaxing Stays",
-    category: "resort",
-  },
-  {
-    id: "g-8",
-    src: "/images/home/temple-offer.png",
-    alt: "Heritage Architecture at Kattil",
-    caption: "Heritage Architectural Beauty & Surroundings",
-    category: "resort",
-  },
-  {
-    id: "g-9",
-    src: "/images/home/hills-offer.png",
-    alt: "Nature Getaway Stay",
-    caption: "Signature Kattil Hospitality in Nature",
-    category: "experience",
-  },
 ];
 
 export default function GalleryContent({
@@ -116,10 +221,20 @@ export default function GalleryContent({
 }) {
   usePageView();
 
+  const [selectedCity, setSelectedCity] = useState<string | undefined>(
+    initialCity && initialCity.toLowerCase() !== "all" ? initialCity : undefined
+  );
   const [activeCategory, setActiveCategory] = useState<string>(
     initialCategory ? initialCategory.toLowerCase() : "all"
   );
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  // Sync selectedCity if initialCity changes
+  useEffect(() => {
+    if (initialCity && initialCity.toLowerCase() !== "all") {
+      setSelectedCity(initialCity);
+    }
+  }, [initialCity]);
 
   // Gallery items fallback
   const allItems = useMemo(() => {
@@ -162,8 +277,8 @@ export default function GalleryContent({
     let result = allItems;
 
     // Filter by city if navigated from a particular property or URL param
-    if (initialCity && initialCity.toLowerCase() !== "all") {
-      const lowerCity = initialCity.toLowerCase().trim();
+    if (selectedCity && selectedCity.toLowerCase() !== "all") {
+      const lowerCity = selectedCity.toLowerCase().trim();
       result = result.filter((item) => {
         const itemCitySlug = item.citySlug?.toLowerCase();
         const itemCityName = item.cityName?.toLowerCase();
@@ -186,7 +301,7 @@ export default function GalleryContent({
     }
 
     return result;
-  }, [allItems, initialCity, activeCategory]);
+  }, [allItems, selectedCity, activeCategory]);
 
   // Split into 3 columns for staggered masonry layout
   const staggeredColumns = useMemo(() => {
@@ -230,6 +345,10 @@ export default function GalleryContent({
       document.body.style.overflow = "";
     };
   }, [lightboxIndex]);
+
+  const displayCityName = selectedCity
+    ? selectedCity.charAt(0).toUpperCase() + selectedCity.slice(1)
+    : "";
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF8F5]">
@@ -287,6 +406,7 @@ export default function GalleryContent({
       <section className="relative z-20 w-full py-10 sm:py-12 md:py-16 bg-[#FAF8F5] rounded-t-[20px] md:rounded-t-[24px] overflow-hidden -mt-3 md:-mt-4">
         <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15">
+
             {/* Category Filter Tabs */}
             <motion.div
               initial={{ opacity: 0, y: 14 }}

@@ -49,7 +49,8 @@ export default function DestinationStaysView({
     fetch(`/api/properties?city=${encodeURIComponent(citySlug)}`)
       .then((res) => res.json())
       .then((data) => {
-        if (isMounted && data.success && Array.isArray(data.data?.properties) && data.data.properties.length > 0) {
+        if (!isMounted) return;
+        if (data.success && Array.isArray(data.data?.properties)) {
           const mapped: PropertyStay[] = data.data.properties.map(
             (p: any) => ({
               _id: String(p._id),
@@ -64,29 +65,6 @@ export default function DestinationStaysView({
             })
           );
           setStays(mapped);
-        } else {
-          // Fallback to rooms if no properties created yet
-          fetch(`/api/rooms?city=${encodeURIComponent(citySlug)}`)
-            .then((res) => res.json())
-            .then((rData) => {
-              if (isMounted && rData.success && Array.isArray(rData.data?.rooms) && rData.data.rooms.length > 0) {
-                const mapped: PropertyStay[] = rData.data.rooms.map(
-                  (r: any, idx: number) => ({
-                    _id: String(r._id),
-                    name: r.name,
-                    slug: r.slug,
-                    badge: r.badge?.trim() || (idx % 2 === 0 ? "Private room" : "Home stay"),
-                    category: r.category,
-                    images: Array.isArray(r.images) && r.images.length > 0 ? r.images : ["/assets/ac-double-room.webp"],
-                    amenities: Array.isArray(r.amenities) && r.amenities.length > 0 ? r.amenities : ["Free Wifi", "Restaurant"],
-                    link: r.link?.trim() || `/properties/${r.slug || r._id}`,
-                    description: r.description,
-                  })
-                );
-                setStays(mapped);
-              }
-            })
-            .catch(() => { });
         }
       })
       .catch(() => { });

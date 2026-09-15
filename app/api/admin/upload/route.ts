@@ -7,15 +7,15 @@ import { put, del } from "@vercel/blob";
 
 // Allowed MIME types
 const ALLOWED_TYPES = new Set([
-  "image/jpeg", "image/jpg", "image/png", "image/webp",
-  "image/gif", "image/svg+xml", "image/avif",
+  "image/jpeg", "image/jpg", "image/pjpeg", "image/png", "image/x-png",
+  "image/webp", "image/gif", "image/svg+xml", "image/avif", "image/bmp",
 ]);
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
 
 const VALID_FOLDERS = new Set([
   "gallery", "blog", "rooms", "footer", "sidebar", "social", "faq", "general",
-  "destinations", "cities", "madurai-gallery", "chennai-gallery",
+  "destinations", "cities", "madurai-gallery", "chennai-gallery", "properties", "about",
 ]);
 
 // Gallery subfolders go to /public/images/ — everything else to /public/uploads/
@@ -31,24 +31,33 @@ export async function POST(request: NextRequest) {
     if (!file) {
       return Response.json({ success: false, error: "No file provided" }, { status: 400 });
     }
-    if (!ALLOWED_TYPES.has(file.type)) {
-      return Response.json({ success: false, error: "Invalid file type. Only images are allowed." }, { status: 400 });
+
+    const hasValidMime = !!(file.type && (file.type.startsWith("image/") || ALLOWED_TYPES.has(file.type)));
+    const hasValidExt = /\.(jpe?g|png|webp|gif|svg|avif|bmp)$/i.test(file.name);
+
+    if (!hasValidMime && !hasValidExt) {
+      return Response.json({ success: false, error: "Invalid file type. Only images (JPG, PNG, WebP, GIF, SVG, AVIF) are allowed." }, { status: 400 });
     }
     if (file.size > MAX_SIZE) {
       return Response.json({ success: false, error: "File too large. Maximum size is 5 MB." }, { status: 400 });
     }
 
     const safeFolder = VALID_FOLDERS.has(folder) ? folder : "general";
-    const ext = extname(file.name).toLowerCase() || `.${file.type.split("/")[1]}`;
+    const ext = extname(file.name).toLowerCase() || `.${file.type.split("/")[1] || "jpg"}`;
     const filename = `${Date.now()}_${randomUUID().split("-")[0]}${ext}`;
 
-    // ── Vercel Blob (production) ──────────────────────────────────────────────
+    // ── Vercel Blob (production / when token is configured) ────────────────────
     if (process.env.BLOB_READ_WRITE_TOKEN) {
-      const blob = await put(`${safeFolder}/${filename}`, file, { access: "public" });
-      return Response.json({ success: true, data: { path: blob.url, filename: blob.pathname } });
+      try {
+        const blob = await put(`${safeFolder}/${filename}`, file, { access: "public" });
+        return Response.json({ success: true, data: { path: blob.url, filename: blob.pathname } });
+      } catch (blobError) {
+        console.warn("[POST /api/admin/upload] Vercel Blob upload failed, falling back to local filesystem:", blobError);
+        // Fall back to local filesystem storage below
+      }
     }
 
-    // ── Local filesystem (development) ───────────────────────────────────────
+    // ── Local filesystem (development / fallback) ─────────────────────────────
     let uploadDir: string;
     let publicPath: string;
 
@@ -66,7 +75,8 @@ export async function POST(request: NextRequest) {
     return Response.json({ success: true, data: { path: publicPath, filename } });
   } catch (error) {
     console.error("[POST /api/admin/upload]", error);
-    return Response.json({ success: false, error: "Upload failed" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Upload failed";
+    return Response.json({ success: false, error: message }, { status: 500 });
   }
 }
 
@@ -81,8 +91,12 @@ export async function DELETE(request: NextRequest) {
 
     // Blob URL
     if ((path.startsWith("https://") || path.startsWith("http://")) && process.env.BLOB_READ_WRITE_TOKEN) {
-      await del(path);
-      return Response.json({ success: true, data: { deleted: path } });
+      try {
+        await del(path);
+        return Response.json({ success: true, data: { deleted: path } });
+      } catch (blobErr) {
+        console.warn("[DELETE /api/admin/upload] Blob delete failed:", blobErr);
+      }
     }
 
     // Relative path — filesystem (dev only)
@@ -96,6 +110,8 @@ export async function DELETE(request: NextRequest) {
     return Response.json({ success: true, data: { deleted: path } });
   } catch (error) {
     console.error("[DELETE /api/admin/upload]", error);
-    return Response.json({ success: false, error: "Delete failed" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Delete failed";
+    return Response.json({ success: false, error: message }, { status: 500 });
   }
 }
+
