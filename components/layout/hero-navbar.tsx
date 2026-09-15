@@ -475,21 +475,15 @@ export default function HeroNavbar({
   }, [mobileOpen]);
 
   // ───────────────────────────────────────────────────────────────────────────
-  // Wheel / keyboard scroll interception (desktop only)
+  // Wheel / touch / keyboard scroll interception
   //
-  // While the hero is visible, the first downward scroll intent (wheel, or
-  // ArrowDown/PageDown/Space) is captured, default scrolling is prevented,
-  // and the page is jumped straight to its post-collapse resting position
-  // (the top of the Destinations section) in one shot. The hero → compact
-  // navbar transition then plays out on its own fixed-duration eased curve
-  // (see the motion.div below), completely decoupled from the raw scroll
-  // deltas that would otherwise scrub it frame-by-frame and cause jank.
-  //
-  // Mobile has no touch handling here: native touch scrolling and momentum
-  // are left entirely alone, and the Hero → Destinations collapse is instead
-  // driven by the plain, passive "scroll" listener below (see "Scroll
-  // handler"), which flips heroVisible on scroll-position boundary crossings
-  // — no preventDefault, no per-frame React state, no wall-clock locks.
+  // While the hero is visible, the first downward scroll intent (wheel,
+  // swipe, or ArrowDown/PageDown/Space) is captured, default scrolling is
+  // prevented, and the page is jumped straight to its post-collapse resting
+  // position (the top of the Destinations section) in one shot. The hero →
+  // compact navbar transition then plays out on its own fixed-duration eased
+  // curve (see the motion.div below), completely decoupled from the raw
+  // scroll deltas that would otherwise scrub it frame-by-frame and cause jank.
   // ───────────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
@@ -504,8 +498,8 @@ export default function HeroNavbar({
       // Don't latch heroJumpedRef until we know we can actually complete the
       // jump — on a genuinely fresh mount the destinations section is always
       // in the initial HTML, but latching first and finding no element would
-      // permanently disable every future wheel/keyboard attempt for this
-      // page view with no way to recover.
+      // permanently disable every future scroll/touch/keyboard attempt for
+      // this page view with no way to recover.
       const el = document.getElementById("destinations");
       if (!el) return;
 
@@ -556,6 +550,77 @@ export default function HeroNavbar({
       }
     };
 
+    // Touch: mirrors the wheel handler above. Native touch scrolling is not
+    // intercepted by default (touchstart/touchend alone can't stop it — only
+    // a non-passive touchmove can), so without this the browser scrolls the
+    // hero and #destinations together in real time before the 30px swipe
+    // threshold below ever fires, and jump()'s programmatic scrollTo then
+    // lands on top of wherever that native scroll left off. Preventing
+    // default on touchmove while the hero is visible (or for the remainder
+    // of the gesture that triggered the jump) blocks that native scroll
+    // entirely so the section swap is the single, deliberate jump() below
+    // instead of a blended scroll.
+    //
+    // touchLockActive is scoped to the current finger-down gesture (reset on
+    // touchstart/touchend/touchcancel) rather than a wall-clock timer like
+    // the wheel handler's `lockUntil`. A timed lock would keep swallowing
+    // touchmove events — via preventDefault with no compensating scroll,
+    // since jump() is already a no-op after the first call — on any new
+    // swipe that starts within that window, which is exactly what happens
+    // during normal rapid swiping and made the page feel stuck after a few
+    // swipes. Tying the lock to the gesture instead means it can never
+    // outlive the swipe that set it, so native scrolling is immediately
+    // available again on the very next touch.
+    let touchStartY = 0;
+    let touchActive = false;
+    let touchLockActive = false;
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (mobileOpenRef.current) return;
+      touchStartY = e.touches[0].clientY;
+      touchActive = true;
+      touchLockActive = false;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (mobileOpenRef.current || !touchActive) return;
+
+      const heroNow = heroVisibleRef.current;
+      if (heroNow && !prevHeroVisible) {
+        heroJumpedRef.current = false;
+        touchLockActive = false;
+      }
+      prevHeroVisible = heroNow;
+
+      // Positive deltaY == finger dragging up == scroll-down intent (same
+      // sign convention as wheel's deltaY). Dragging down (returning toward
+      // the hero) is left alone so native scroll keeps working for that
+      // direction, same as the wheel handler's `deltaY <= 0` early return.
+      const deltaY = touchStartY - e.touches[0].clientY;
+      if (deltaY <= 0) return;
+
+      if (heroNow || touchLockActive) {
+        e.preventDefault();
+        if (deltaY > 30) {
+          jump();
+          // Keep intercepting only for the rest of THIS gesture so the
+          // browser doesn't try to "catch up" a scroll it never started,
+          // then release fully on touchend — never carried into the next
+          // swipe.
+          if (heroJumpedRef.current) touchLockActive = true;
+        }
+      }
+    };
+
+    const onTouchEnd = () => {
+      touchActive = false;
+      touchLockActive = false;
+    };
+
+    const onTouchCancel = () => {
+      touchActive = false;
+      touchLockActive = false;
+    };
     const onKeyDown = (e: KeyboardEvent) => {
       if (mobileOpenRef.current) return;
       if (!heroVisibleRef.current) return;
@@ -566,10 +631,18 @@ export default function HeroNavbar({
     };
 
     window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", onTouchCancel, { passive: true });
     window.addEventListener("keydown", onKeyDown);
 
     return () => {
       window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", onTouchCancel);
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [isHome, navbarH]);
