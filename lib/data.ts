@@ -279,15 +279,6 @@ export const locations = [
     mapSrc:
       "https://maps.google.com/maps?q=274%2C+1st+Main+Road%2C+Secretariat+Colony%2C+Thoraipakkam%2C+Chennai%2C+Tamil+Nadu+600097&t=m&z=16&ie=UTF8&iwloc=&output=embed",
   },
-  {
-    id: "coimbatore",
-    label: "COIMBATORE",
-    address: "124, Race Course Road, Gopalapuram, Coimbatore, Tamil Nadu 641018",
-    phone: "+91 74487 49779",
-    email: "hostelsparrow@gmail.com",
-    mapSrc:
-      "https://maps.google.com/maps?q=Race+Course+Road%2C+Coimbatore%2C+Tamil+Nadu+641018&t=m&z=16&ie=UTF8&iwloc=&output=embed",
-  },
 ];
 
 export const locationRooms = {

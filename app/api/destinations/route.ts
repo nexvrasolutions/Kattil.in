@@ -91,9 +91,9 @@ export async function GET(_request: NextRequest) {
       }
 
       // Hotel count subtitle
+      const customHotelCount = c.hotelCount?.trim();
       const hotelCount =
-        c.hotelCount?.trim() ||
-        (count === 0 ? "Coming Soon" : `${count} ${count === 1 ? "hotel" : "hotels"}`);
+        customHotelCount || (count > 0 ? `${count} ${count === 1 ? "hotel" : "hotels"}` : "");
 
       return {
         _id: idStr,
@@ -103,7 +103,14 @@ export async function GET(_request: NextRequest) {
         hotelCount,
         link: destinationLink,
         order: c.order ?? 0,
+        count,
       };
+    }).filter((d) => {
+      // Exclude inactive destinations and "Coming Soon"
+      if (d.hotelCount && d.hotelCount.toLowerCase().includes("coming soon")) {
+        return false;
+      }
+      return d.count > 0;
     });
 
     return apiSuccess(destinations);

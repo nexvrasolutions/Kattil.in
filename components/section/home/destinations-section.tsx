@@ -24,18 +24,11 @@ const DEFAULT_DESTINATIONS: DestinationItem[] = [
     href: "/chennai",
   },
   {
-    id: "coimbatore",
-    name: "Coimbatore",
-    pillLabel: "Coimbatore",
-    image: "/images/destinations/coimbatore.png",
-    href: "/coimbatore",
-  },
-  {
-    id: "colachel",
-    name: "Colachel",
-    pillLabel: "Colachel",
-    image: "/images/destinations/kanyakumari.png",
-    href: "/colachel",
+    id: "madurai",
+    name: "Madurai",
+    pillLabel: "Madurai",
+    image: "/images/destinations/madurai.png",
+    href: "/madurai",
   },
   {
     id: "view-all",
@@ -108,7 +101,7 @@ export default function DestinationsSection() {
         </motion.div>
 
         {/* Dynamic Destination Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-6 lg:gap-6 justify-items-stretch">
+        <div className="flex flex-wrap justify-center items-stretch gap-6 sm:gap-6 lg:gap-7 max-w-5xl mx-auto">
           {destinations.map((dest, index) => (
             <motion.div
               key={dest.id}
@@ -120,7 +113,7 @@ export default function DestinationsSection() {
                 duration: 0.45,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="w-full"
+              className="w-full sm:w-[calc(50%-12px)] lg:w-[270px] xl:w-[280px] shrink-0"
             >
               {dest.isViewAll ? (
                 /* 4th Card: View all our Destination */

@@ -80,15 +80,18 @@ export default function Navbar() {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [navRowHeight, setNavRowHeight] = useState(84);
 
-  const handleBookNowClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
-    setMobileOpen(false);
-    setDestinationsOpen(false);
-    document.body.style.overflow = "";
-    if (pathname === "/") {
+  const handleBookNowClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
       e.preventDefault();
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }, [pathname]);
+      setMobileOpen(false);
+      setDestinationsOpen(false);
+      document.body.style.overflow = "";
+      if (pathname === "/") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    },
+    [pathname]
+  );
 
   const handleDestinationsMouseEnter = useCallback(() => {
     if (timeoutRef.current) {
@@ -343,13 +346,13 @@ export default function Navbar() {
               >
                 Contact Us
               </Link>
-              <Link
-                href="/"
+              <button
+                type="button"
                 onClick={handleBookNowClick}
-                className="w-[122px] h-[40px] rounded-[8px] border border-white px-6 text-white text-[14px] leading-none font-medium inline-flex items-center justify-center transition-all duration-300 hover:border-white hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-95 font-sans"
+                className="w-[122px] h-[40px] rounded-[8px] border border-white px-6 text-white text-[14px] leading-none font-medium inline-flex items-center justify-center transition-all duration-300 hover:border-white hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-95 font-sans cursor-pointer"
               >
                 Book Now
-              </Link>
+              </button>
             </div>
 
             {/* Mobile menu toggle */}
@@ -485,16 +488,16 @@ export default function Navbar() {
 
                 {/* CTAs */}
                 <motion.div variants={MENU_ITEM_VARIANTS} className="pt-4">
-                  <Link
-                    href="/"
+                  <button
+                    type="button"
                     onClick={(e) => {
                       setMobileOpen(false);
                       handleBookNowClick(e);
                     }}
-                    className="flex items-center justify-center w-full border border-white hover:border-white text-white rounded-[8px] py-3.5 text-[15px] font-semibold tracking-wide transition-all duration-300 font-sans hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-[0.99]"
+                    className="flex items-center justify-center w-full border border-white hover:border-white text-white rounded-[8px] py-3.5 text-[15px] font-semibold tracking-wide transition-all duration-300 font-sans hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-[0.99] cursor-pointer"
                   >
                     Book Now
-                  </Link>
+                  </button>
                 </motion.div>
               </motion.div>
             )}

@@ -12,6 +12,7 @@ export interface DestinationStaysData {
   cityDescription?: string;
   banner?: string;
   properties: PropertyStay[];
+  citySlugFound: boolean;
 }
 
 // In-memory cache with 60-second TTL to avoid repeated slow DB connections
@@ -151,6 +152,7 @@ export async function getDestinationStaysData(
       cityDescription: city?.description,
       banner: city?.banner,
       properties,
+      citySlugFound: !!city,
     };
 
     staysCache.set(cacheKey, { data: result, timestamp: Date.now() });
@@ -161,6 +163,7 @@ export async function getDestinationStaysData(
       cityName: fallbackName,
       citySlug: cleanSlug,
       properties: getFallbackProperties(cleanSlug),
+      citySlugFound: true,
     };
   }
 }

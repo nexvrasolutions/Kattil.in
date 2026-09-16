@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { SITE_URL } from "@/lib/seo";
 import { connectDB } from "@/lib/db/mongodb";
 import CityModel from "@/lib/models/City";
+import Property from "@/lib/models/Property";
+import Room from "@/lib/models/Room";
+import { locations as staticLocations } from "@/lib/data";
 import ContactContent from "./_content";
 
 export const metadata: Metadata = {
@@ -29,12 +32,26 @@ export interface LocationItem {
 async function getLocations(): Promise<LocationItem[]> {
   try {
     await connectDB();
-    const cities = await CityModel.find({ active: true })
+
+    // Check which cities actually have active properties or rooms
+    const activeProps = await Property.find({ status: { $ne: "inactive" } }).select("city").lean();
+    const activeCityIds = new Set(activeProps.map((p) => String(p.city)));
+
+    const activeRooms = await Room.find({ status: { $ne: "inactive" } }).select("city").lean();
+    for (const r of activeRooms) {
+      if (r.city) activeCityIds.add(String(r.city));
+    }
+
+    const cities = await CityModel.find({ active: { $ne: false } })
       .sort({ order: 1 })
       .select("name slug label address phone email mapSrc")
       .lean();
 
-    return cities
+    const mapped = cities
+      .filter((c) => {
+        const idStr = String(c._id);
+        return activeCityIds.has(idStr) || c.slug === "madurai" || c.slug === "chennai";
+      })
       .map((c) => {
         const label = (c.label && c.label.trim()) || (c.name ? c.name.trim() : "");
         return {
@@ -48,12 +65,25 @@ async function getLocations(): Promise<LocationItem[]> {
         };
       })
       .filter((loc) => Boolean(loc.label && (loc.address || loc.phone || loc.email || loc.mapSrc)));
+
+    if (mapped.length > 0) return mapped;
   } catch {
-    return [];
+    // fallback below
   }
+
+  return staticLocations.map((l) => ({
+    _id: l.id,
+    id: l.id,
+    label: l.label,
+    address: l.address,
+    phone: l.phone,
+    email: l.email,
+    mapSrc: l.mapSrc,
+  }));
 }
 
 export default async function ContactPage() {
   const locations = await getLocations();
   return <ContactContent locations={locations} />;
 }
+

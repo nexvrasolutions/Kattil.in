@@ -342,7 +342,7 @@ export default function DestinationStaysView({
                   />
                 </div>
 
-                <h3
+                <h2
                   className="
                     font-sans
                     text-xl
@@ -352,7 +352,7 @@ export default function DestinationStaysView({
                   "
                 >
                   Stays in {cityName} Coming Soon
-                </h3>
+                </h2>
 
                 <p
                   className="
@@ -563,7 +563,7 @@ export default function DestinationStaysView({
                             prefetch={true}
                             className="block"
                           >
-                            <h3
+                            <h2
                               className="
                                 font-sans
                                 text-[24px]
@@ -576,7 +576,7 @@ export default function DestinationStaysView({
                               "
                             >
                               {stay.name}
-                            </h3>
+                            </h2>
                           </Link>
 
                         </div>

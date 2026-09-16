@@ -22,27 +22,18 @@ export const FALLBACK_DESTINATIONS: DestinationItem[] = [
     name: "Chennai",
     slug: "chennai",
     image: "/images/destinations/kanyakumari.png",
-    hotelCount: "1 hotels",
+    hotelCount: "1 hotel",
     link: "/chennai",
     order: 1,
   },
   {
-    _id: "default-coimbatore",
-    name: "Coimbatore",
-    slug: "coimbatore",
-    image: "/images/destinations/coimbatore.png",
-    hotelCount: "1 hotels",
-    link: "/coimbatore",
+    _id: "default-madurai",
+    name: "Madurai",
+    slug: "madurai",
+    image: "/images/destinations/madurai.png",
+    hotelCount: "1 hotel",
+    link: "/madurai",
     order: 2,
-  },
-  {
-    _id: "default-colachel",
-    name: "Colachel",
-    slug: "colachel",
-    image: "/images/destinations/kanyakumari.png",
-    hotelCount: "1 hotels",
-    link: "/colachel",
-    order: 3,
   },
 ];
 
@@ -73,8 +64,11 @@ export default function DestinationsDropdown({
       .then((res) => res.json())
       .then((data) => {
         if (isMounted && data && data.success && Array.isArray(data.data)) {
-          cachedDestinations = data.data;
-          setDestinations(data.data);
+          const activeOnly = data.data.filter(
+            (d: DestinationItem) => !d.hotelCount?.toLowerCase().includes("coming soon")
+          );
+          cachedDestinations = activeOnly;
+          setDestinations(activeOnly);
         }
       })
       .catch(() => { });
@@ -83,8 +77,11 @@ export default function DestinationsDropdown({
     };
   }, []);
 
-  const displayedDestinations = destinations.length > 8 ? destinations.slice(0, 8) : destinations;
-  const hasMoreThan8 = destinations.length > 8;
+  const activeDestinations = destinations.filter(
+    (d) => !d.hotelCount?.toLowerCase().includes("coming soon")
+  );
+  const displayedDestinations = activeDestinations.length > 8 ? activeDestinations.slice(0, 8) : activeDestinations;
+  const hasMoreThan8 = activeDestinations.length > 8;
 
   return (
     <AnimatePresence>
@@ -203,8 +200,11 @@ export function MobileDestinationsList({
       .then((res) => res.json())
       .then((data) => {
         if (isMounted && data && data.success && Array.isArray(data.data)) {
-          cachedDestinations = data.data;
-          setDestinations(data.data);
+          const activeOnly = data.data.filter(
+            (d: DestinationItem) => !d.hotelCount?.toLowerCase().includes("coming soon")
+          );
+          cachedDestinations = activeOnly;
+          setDestinations(activeOnly);
         }
       })
       .catch(() => { });
@@ -213,8 +213,11 @@ export function MobileDestinationsList({
     };
   }, []);
 
-  const displayedDestinations = destinations.length > 8 ? destinations.slice(0, 8) : destinations;
-  const hasMore = destinations.length > 8;
+  const activeDestinations = destinations.filter(
+    (d) => !d.hotelCount?.toLowerCase().includes("coming soon")
+  );
+  const displayedDestinations = activeDestinations.length > 8 ? activeDestinations.slice(0, 8) : activeDestinations;
+  const hasMore = activeDestinations.length > 8;
 
   return (
     <div className="mt-3.5 bg-white rounded-[8px] p-3 sm:p-4 shadow-xl border border-gray-100/90 overflow-hidden text-left">

@@ -57,22 +57,6 @@ const DEFAULT_HOTEL_PLACES: HotelPlaceItem[] = [
     slug: "madurai",
     hotelValue: "kattil",
   },
-  {
-    id: "dest-coimbatore",
-    name: "Kattil Coimbatore",
-    place: "Coimbatore",
-    state: "Tamil Nadu",
-    slug: "coimbatore",
-    hotelValue: "kattilcoimbatore",
-  },
-  {
-    id: "dest-colachel",
-    name: "Kattil Colachel",
-    place: "Colachel",
-    state: "Tamil Nadu",
-    slug: "colachel",
-    hotelValue: "kattilcolachel",
-  },
 ];
 
 function forPost(d: Date | null): string {

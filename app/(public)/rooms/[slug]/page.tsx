@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { getPropertyDetailsData } from "@/lib/db/rooms";
 import PropertyDetailsView from "@/components/section/rooms/PropertyDetailsView";
 import { SITE_URL } from "@/lib/seo";
@@ -32,5 +33,32 @@ export default async function PropertyRoomDetailsPage({ params }: PageProps) {
   const { slug } = await params;
   const data = await getPropertyDetailsData(slug);
 
-  return <PropertyDetailsView data={data} />;
+  if (!data.entityFound) {
+    notFound();
+  }
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Rooms", item: `${SITE_URL}/rooms` },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: data.name,
+        item: `${SITE_URL}/rooms/${slug}`,
+      },
+    ],
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <PropertyDetailsView data={data} />
+    </>
+  );
 }

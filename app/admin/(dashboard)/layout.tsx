@@ -7,6 +7,7 @@ import AdminHeader from "@/components/admin/layout/AdminHeader";
 export const metadata: Metadata = {
   title: "Kattil Admin",
   description: "Hotel CMS Administration",
+  robots: { index: false, follow: false },
 };
 
 export default function AdminDashboardLayout({ children }: { children: React.ReactNode }) {

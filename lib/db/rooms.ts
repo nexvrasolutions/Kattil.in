@@ -172,6 +172,13 @@ export async function getPropertyDetailsData(
   try {
     await connectDB();
 
+    // Tracks whether a real Property or Room document was directly matched for this
+    // slug (steps 1-3 below), as opposed to the step 4 fuzzy city-level fallback that
+    // substitutes an unrelated property. Used to distinguish "genuinely doesn't exist"
+    // from "exists but has zero active listings" for the /properties/[slug] and
+    // /rooms/[slug] pages, without affecting the /rooms listing page's city-based lookups.
+    let matchedEntity = false;
+
     // 1. Try finding a Property first by slug, name regex, or _id
     let property: any = null;
 
@@ -185,6 +192,7 @@ export async function getPropertyDetailsData(
         .populate("city")
         .lean();
     }
+    if (property) matchedEntity = true;
 
     // If property exists and is inactive, return property with 0 rooms (do not fallback to dummy rooms)
     if (property && property.status === "inactive") {
@@ -209,6 +217,7 @@ export async function getPropertyDetailsData(
         whatsapp: property.whatsapp,
         directions: property.directions,
         rooms: [],
+        entityFound: true,
       };
 
       propertyDetailsCache.set(cacheKey, { data: inactiveResult, timestamp: Date.now() });
@@ -242,6 +251,7 @@ export async function getPropertyDetailsData(
           .populate("property")
           .lean();
       }
+      if (primaryRoom) matchedEntity = true;
 
       // If room or its parent property is inactive, do not show active rooms
       if (primaryRoom?.status === "inactive" || (primaryRoom?.property && (primaryRoom.property as any)?.status === "inactive")) {
@@ -434,6 +444,7 @@ export async function getPropertyDetailsData(
       whatsapp: property?.whatsapp,
       directions: property?.directions,
       rooms: roomOptions,
+      entityFound: matchedEntity,
     };
 
     propertyDetailsCache.set(cacheKey, { data: result, timestamp: Date.now() });
@@ -480,6 +491,7 @@ export async function getPropertyDetailsData(
       phone: cityConfig.phone,
       email: cityConfig.email,
       rooms: getFallbackRoomOptions(cityConfig.destinationSlug),
+      entityFound: true,
     };
     return fallbackResult;
   }

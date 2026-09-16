@@ -138,7 +138,6 @@ export default function OffersSection() {
                   alt="Exclusive Stays Map"
                   width={467}
                   height={633}
-                  priority
                   className="
   relative 
   w-full 

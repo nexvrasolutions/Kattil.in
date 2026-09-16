@@ -111,18 +111,7 @@ export default function AllDestinationsView({
       <section className="relative z-20 w-full py-16 md:py-24 bg-[#FAF8F5] rounded-t-[20px] md:rounded-t-[24px] overflow-hidden -mt-3 md:-mt-4">
         <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15">
-            <div
-              className="
-          grid
-          grid-cols-1
-          sm:grid-cols-2
-          md:grid-cols-3
-          lg:grid-cols-4
-          gap-7
-          md:gap-7
-          justify-items-center
-        "
-            >
+            <div className="flex flex-wrap items-center justify-start gap-6 sm:gap-7">
               {destinations.map((dest, index) => {
                 const targetLink =
                   dest.link?.trim() ||
@@ -151,7 +140,7 @@ export default function AllDestinationsView({
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
                     transition={{ duration: 0.5, delay: index * 0.08, ease: EASE }}
-                    className="w-full max-w-[303px]"
+                    className="w-full sm:w-[calc(50%-14px)] md:w-[270px] lg:w-[280px] xl:w-[295px] shrink-0"
                   >
                     <Link
                       href={targetLink}

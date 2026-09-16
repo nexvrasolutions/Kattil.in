@@ -219,7 +219,6 @@ export default function PartnersView() {
                 fill
                 sizes="(max-width: 1920px) 100vw, 1920px"
                 className="object-cover object-center group-hover:scale-[1.02] transition-transform duration-700 ease-out"
-                priority
               />
             </motion.div>
           </div>

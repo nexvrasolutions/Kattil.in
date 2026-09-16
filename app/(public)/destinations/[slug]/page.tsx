@@ -35,11 +35,36 @@ export default async function DynamicDestinationPage({ params }: PageProps) {
   const formattedName = slug.charAt(0).toUpperCase() + slug.slice(1);
   const data = await getDestinationStaysData(slug, formattedName);
 
+  if (!data.citySlugFound) {
+    notFound();
+  }
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Destinations", item: `${SITE_URL}/destinations` },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: data.cityName,
+        item: `${SITE_URL}/destinations/${data.citySlug}`,
+      },
+    ],
+  };
+
   return (
-    <DestinationStaysView
-      cityName={data.cityName}
-      citySlug={data.citySlug}
-      properties={data.properties}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <DestinationStaysView
+        cityName={data.cityName}
+        citySlug={data.citySlug}
+        properties={data.properties}
+      />
+    </>
   );
 }

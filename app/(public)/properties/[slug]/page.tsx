@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { getPropertyDetailsData } from "@/lib/db/rooms";
 import PropertyDetailsView from "@/components/section/rooms/PropertyDetailsView";
 import { SITE_URL } from "@/lib/seo";
@@ -35,11 +36,50 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
+const RESERVED_DESTINATION_SLUGS = new Set(["chennai", "madurai", "coimbatore", "colachel"]);
+
 export default async function PropertyPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
   const sParams = searchParams ? await searchParams : {};
   const data = await getPropertyDetailsData(slug, "Kanniyakumari", sParams?.city);
 
-  return <PropertyDetailsView data={data} />;
+  if (!data.entityFound) {
+    notFound();
+  }
+
+  const destSlug = (data.destinationSlug || "").toLowerCase().trim();
+  const destinationHref = destSlug
+    ? RESERVED_DESTINATION_SLUGS.has(destSlug)
+      ? `/${destSlug}`
+      : `/destinations/${destSlug}`
+    : "/destinations";
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Destinations", item: `${SITE_URL}/destinations` },
+      ...(data.destinationName
+        ? [{ "@type": "ListItem", position: 3, name: data.destinationName, item: `${SITE_URL}${destinationHref}` }]
+        : []),
+      {
+        "@type": "ListItem",
+        position: data.destinationName ? 4 : 3,
+        name: data.name,
+        item: `${SITE_URL}/properties/${slug}`,
+      },
+    ],
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <PropertyDetailsView data={data} />
+    </>
+  );
 }
 

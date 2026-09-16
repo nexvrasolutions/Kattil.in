@@ -59,6 +59,7 @@ export interface PropertyDetailsData {
   email: string;
   whatsapp?: string;
   rooms: PropertyRoomOption[];
+  entityFound: boolean;
   directions?: {
     railway?: string;
     busStand?: string;
@@ -276,6 +277,14 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
     ? `/gallery?city=${encodeURIComponent(galleryCity)}`
     : "/gallery";
 
+  const RESERVED_DESTINATION_SLUGS = new Set(["chennai", "madurai", "coimbatore", "colachel"]);
+  const destSlugLower = (data.destinationSlug || "").toLowerCase().trim();
+  const destinationHref = destSlugLower
+    ? RESERVED_DESTINATION_SLUGS.has(destSlugLower)
+      ? `/${destSlugLower}`
+      : `/destinations/${destSlugLower}`
+    : "/destinations";
+
   return (
     <div className="min-h-screen bg-[#F5F3EB] text-[#111827]">
       {/* Top Navbar */}
@@ -385,6 +394,16 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                     `${data.name} offers thoughtfully designed spaces with modern amenities, warm hospitality, and a vibrant community experience for students and professionals. vibrant community experience for students and professionals.`}
                 </p>
 
+                {data.destinationName && (
+                  <Link
+                    href={destinationHref}
+                    className="inline-flex items-center gap-1.5 mt-4 font-[Public_Sans] text-[13px] md:text-[14px] font-medium text-[#526442] hover:text-[#374b2f] transition-colors"
+                  >
+                    <MapPin className="w-3.5 h-3.5" />
+                    See more stays in {data.destinationName}
+                  </Link>
+                )}
+
                 {/* Premium Amenities */}
                 <div className="mt-12">
                   <h2 className="font-sans text-2xl md:text-[28px] font-semibold text-[#111827] mb-10">
@@ -482,6 +501,8 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                         }
                       }
 
+                      const roomHref = room.slug ? `/rooms/${room.slug}` : null;
+
                       return (
                         <motion.div
                           key={room._id || rIdx}
@@ -494,15 +515,30 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                           <div className="w-full max-w-[865px] flex flex-col sm:flex-row gap-0 sm:gap-[20px] md:gap-[26px] h-auto sm:h-[290px]">
 
                             {/* Room Image (Full width on mobile, side-by-side on sm/md/lg) */}
-                            <div className="relative w-full sm:w-[320px] md:w-[405px] h-[220px] sm:h-full rounded-t-[8px] sm:rounded-l-[8px] sm:rounded-tr-none overflow-hidden shrink-0">
-                              <Image
-                                src={roomImg}
-                                alt={room.name}
-                                fill
-                                sizes="(max-width: 640px) 100vw, 405px"
-                                className="object-cover"
-                              />
-                            </div>
+                            {roomHref ? (
+                              <Link
+                                href={roomHref}
+                                className="relative block w-full sm:w-[320px] md:w-[405px] h-[220px] sm:h-full rounded-t-[8px] sm:rounded-l-[8px] sm:rounded-tr-none overflow-hidden shrink-0"
+                              >
+                                <Image
+                                  src={roomImg}
+                                  alt={room.name}
+                                  fill
+                                  sizes="(max-width: 640px) 100vw, 405px"
+                                  className="object-cover"
+                                />
+                              </Link>
+                            ) : (
+                              <div className="relative w-full sm:w-[320px] md:w-[405px] h-[220px] sm:h-full rounded-t-[8px] sm:rounded-l-[8px] sm:rounded-tr-none overflow-hidden shrink-0">
+                                <Image
+                                  src={roomImg}
+                                  alt={room.name}
+                                  fill
+                                  sizes="(max-width: 640px) 100vw, 405px"
+                                  className="object-cover"
+                                />
+                              </div>
+                            )}
 
                             {/* Room Info (Below image on mobile, right side on sm/md/lg) */}
                             <div className="w-full sm:flex-1 md:w-[434px] flex flex-col justify-between p-5 sm:p-0 sm:pt-6 sm:pb-5 sm:pr-4">
@@ -514,9 +550,17 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                                 </p>
 
                                 {/* Room Title */}
-                                <h3 className="font-[Public_Sans] text-[22px] sm:text-[24px] font-medium text-[#111827] leading-[28px] sm:leading-[30px] tracking-[-0.5px]">
-                                  {room.name}
-                                </h3>
+                                {roomHref ? (
+                                  <Link href={roomHref} className="block">
+                                    <h3 className="font-[Public_Sans] text-[22px] sm:text-[24px] font-medium text-[#111827] leading-[28px] sm:leading-[30px] tracking-[-0.5px]">
+                                      {room.name}
+                                    </h3>
+                                  </Link>
+                                ) : (
+                                  <h3 className="font-[Public_Sans] text-[22px] sm:text-[24px] font-medium text-[#111827] leading-[28px] sm:leading-[30px] tracking-[-0.5px]">
+                                    {room.name}
+                                  </h3>
+                                )}
 
                                 {/* Room Subtitle */}
                                 <p className="font-[Public_Sans] text-[13.5px] sm:text-[14px] font-normal leading-[18px] tracking-[-0.5px] text-[#6b7280] mt-1.5 sm:mt-2 mb-3.5 sm:mb-4">
