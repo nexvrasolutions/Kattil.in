@@ -37,8 +37,8 @@ export default function ComfortSection() {
         background: "linear-gradient(180deg, rgba(240, 234, 210, 0.8) 0%, rgba(240, 234, 210, 0) 100%)",
       }}
     >
-      <div className="w-full max-w-[1560px] 2xl:max-w-[1680px] mx-auto min-h-[500px] lg:min-h-[540px] flex items-center pt-12 pb-20 sm:pt-16 sm:pb-24 lg:pt-[85px] lg:pb-[70px] px-5 sm:px-10 lg:px-14 xl:px-20 box-border">
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 xl:gap-12 items-center">
+      <div className="w-full max-w-[1920px] mx-auto min-h-[500px] lg:min-h-[540px] flex items-center pt-12 pb-20 sm:pt-16 sm:pb-24 lg:pt-[85px] lg:pb-[70px] px-5 md:px-8 lg:px-15 box-border">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-16 items-center">
           {/* Left Column: Community Dining Image */}
           <motion.div
             initial={{ opacity: 0, x: -25 }}
@@ -47,13 +47,14 @@ export default function ComfortSection() {
             transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
             className="lg:col-span-5"
           >
-            <div className="relative w-full max-w-full lg:max-w-[432px] aspect-[432/340] rounded-[8px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.08)]">              <Image
-              src="/images/home/dining-community.png"
-              alt="Community and comfort at Kattil"
-              fill
-              sizes="(max-width: 1024px) 100vw, 45vw"
-              className="object-cover object-center"
-            />
+            <div className="relative w-full max-w-full lg:max-w-[480px] xl:max-w-[540px] aspect-[432/340] rounded-[8px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+              <Image
+                src="/images/home/dining-community.png"
+                alt="Community and comfort at Kattil"
+                fill
+                sizes="(max-width: 1024px) 100vw, 45vw"
+                className="object-cover object-center"
+              />
             </div>
           </motion.div>
 
@@ -63,11 +64,11 @@ export default function ComfortSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-7 lg:translate-x-[12px] lg:w-[calc(100%-12px)]"
+            className="lg:col-span-7"
           >
             {/* Heading */}
             <h2 className="text-[#0d1b2e] text-[24px] sm:text-[32px] md:text-[36px] font-sans font-normal leading-[1.18] tracking-tight mb-10">
-              Designed for{"  "}
+              Designed for{" "}
               <span className="font-serif italic font-normal text-[#0d1b2e]">
                 Your
               </span>
@@ -92,12 +93,12 @@ export default function ComfortSection() {
                   }}
                   className="flex items-start gap-3.5"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-[#FFFCF2] flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#FFFCF2] flex items-center justify-center shrink-0 mt-0.5 shadow-xs">
                     <ShieldCheck className="w-4 h-4 text-[#526442]" />
                   </div>
 
                   <div>
-                    <h3 className="text-[20px text-[#0d1b2e] leading-snug">
+                    <h3 className="text-[18px] sm:text-[20px] font-semibold text-[#0d1b2e] leading-snug">
                       {feature.title}
                     </h3>
                     <p className="text-[13px] text-gray-500 mt-2 leading-relaxed">
