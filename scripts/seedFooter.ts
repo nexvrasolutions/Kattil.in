@@ -22,14 +22,10 @@ export async function seedFooter() {
           ],
         },
         {
-          section: "Navigation", order: 1,
+          section: "Locations", order: 1,
           links: [
-            { label: "Home",         href: "/",           newTab: false, order: 0 },
-            { label: "About Us",     href: "/about-us",   newTab: false, order: 1 },
-            { label: "Destinations", href: "/destinations", newTab: false, order: 2 },
-            { label: "Gallery",      href: "/gallery",    newTab: false, order: 3 },
-            { label: "Blog",         href: "/blog",       newTab: false, order: 4 },
-            { label: "Contact",      href: "/contact-us", newTab: false, order: 5 },
+            { label: "Chennai",      href: "https://maps.app.goo.gl/qNiPXnskwA6fQv8a8", newTab: true, order: 0 },
+            { label: "Madurai",      href: "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8", newTab: true, order: 1 },
           ],
         },
         {
@@ -106,14 +102,10 @@ export async function seedFooter() {
           ],
         },
         {
-          section: "Navigation", order: 1,
+          section: "Locations", order: 1,
           links: [
-            { label: "Home",         href: "/",           newTab: false, order: 0 },
-            { label: "About Us",     href: "/about-us",   newTab: false, order: 1 },
-            { label: "Destinations", href: "/destinations", newTab: false, order: 2 },
-            { label: "Gallery",      href: "/gallery",    newTab: false, order: 3 },
-            { label: "Blog",         href: "/blog",       newTab: false, order: 4 },
-            { label: "Contact",      href: "/contact-us", newTab: false, order: 5 },
+            { label: "Chennai",      href: "https://maps.app.goo.gl/qNiPXnskwA6fQv8a8", newTab: true, order: 0 },
+            { label: "Madurai",      href: "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8", newTab: true, order: 1 },
           ],
         },
         {

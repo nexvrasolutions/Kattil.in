@@ -32,14 +32,10 @@ const FOOTER_FALLBACK: FooterProps = {
       ],
     },
     {
-      section: "NAVIGATION", order: 1,
+      section: "LOCATIONS", order: 1,
       links: [
-        { label: "Home", href: "/", newTab: false, order: 0 },
-        { label: "About Us", href: "/about-us", newTab: false, order: 1 },
-        { label: "Destinations", href: "/destinations", newTab: false, order: 2 },
-        { label: "Gallery", href: "/gallery", newTab: false, order: 3 },
-        { label: "Blog", href: "/blog", newTab: false, order: 4 },
-        { label: "Contact", href: "/contact-us", newTab: false, order: 5 },
+        { label: "Chennai", href: "https://maps.app.goo.gl/qNiPXnskwA6fQv8a8", newTab: true, order: 0 },
+        { label: "Madurai", href: "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8", newTab: true, order: 1 },
       ],
     },
     {
@@ -82,12 +78,56 @@ async function getFooterData(): Promise<{ footer: FooterProps; sidebar: SidebarI
 
     const parsed = JSON.parse(JSON.stringify(raw));
 
+    let footerLinks: FooterProps["footerLinks"] =
+      (parsed.footerLinks as FooterProps["footerLinks"]) ?? FOOTER_FALLBACK.footerLinks;
+
+    // Normalize second column to active location Google Maps links (Chennai and Madurai)
+    if (Array.isArray(footerLinks) && footerLinks.length >= 2) {
+      const isLocationsSection =
+        footerLinks[1]?.section?.toUpperCase() === "LOCATIONS" ||
+        footerLinks[1]?.section?.toUpperCase() === "DESTINATIONS" ||
+        (footerLinks[1]?.section?.toUpperCase() === "NAVIGATION" &&
+          footerLinks[0]?.section?.toUpperCase() === "NAVIGATION");
+
+      const needsMapUpdate =
+        isLocationsSection &&
+        (footerLinks[1]?.links?.length !== 2 ||
+          footerLinks[1]?.links?.some(
+            (l) =>
+              !l.href?.startsWith("http") ||
+              l.label === "Coimbatore" ||
+              l.label === "Colachel" ||
+              l.label?.toLowerCase().includes("view all")
+          ));
+
+      if (needsMapUpdate) {
+        footerLinks = [
+          footerLinks[0],
+          {
+            section: "LOCATIONS",
+            order: 1,
+            links: [
+              { label: "Chennai", href: "https://maps.app.goo.gl/qNiPXnskwA6fQv8a8", newTab: true, order: 0 },
+              { label: "Madurai", href: "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8", newTab: true, order: 1 },
+            ],
+          },
+          ...footerLinks.slice(2),
+        ];
+
+        // Persist update in DB
+        FooterModel.updateOne(
+          { _id: parsed._id },
+          { $set: { footerLinks } }
+        ).catch(() => {});
+      }
+    }
+
     const footer: FooterProps = {
       logo: (parsed.logo as string) || FOOTER_FALLBACK.logo,
       headline: (parsed.headline as string) || FOOTER_FALLBACK.headline,
       description: (parsed.description as string) || "",
       copyright: (parsed.copyright as string) || FOOTER_FALLBACK.copyright,
-      footerLinks: (parsed.footerLinks as FooterProps["footerLinks"]) ?? FOOTER_FALLBACK.footerLinks,
+      footerLinks,
       socialLinks: (parsed.socialLinks as FooterProps["socialLinks"]) ?? FOOTER_FALLBACK.socialLinks,
       locations: (parsed.locations as FooterProps["locations"])?.length
         ? (parsed.locations as FooterProps["locations"])

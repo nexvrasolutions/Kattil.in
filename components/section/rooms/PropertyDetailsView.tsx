@@ -24,6 +24,7 @@ import {
   ArrowRight,
   Check,
   X,
+  ExternalLink,
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import RoomStickyBookingWidget from "./RoomStickyBookingWidget";
@@ -284,6 +285,20 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
       ? `/${destSlugLower}`
       : `/destinations/${destSlugLower}`
     : "/destinations";
+
+  const directMapUrl = useMemo(() => {
+    if (
+      data.mapLink &&
+      !data.mapLink.includes("output=embed") &&
+      (data.mapLink.startsWith("http://") || data.mapLink.startsWith("https://"))
+    ) {
+      return data.mapLink;
+    }
+    const query = encodeURIComponent(
+      data.address || `${data.name || "Kattil"} ${data.destinationName || ""}`
+    );
+    return `https://www.google.com/maps/search/?api=1&query=${query}`;
+  }, [data.mapLink, data.address, data.name, data.destinationName]);
 
   return (
     <div className="min-h-screen bg-[#F5F3EB] text-[#111827]">
@@ -706,16 +721,15 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                     <p className="font-sans text-[15px] md:text-[16px] text-[#374151]">
                       {data.address || "Karzu Road, Near circuit house, Karzu-194101"}
                     </p>
-                    {data.mapLink ? (
-                      <a
-                        href={data.mapLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block px-5 py-2 rounded-[8px] border border-[#374151] text-[#1f2937] text-xs font-semibold hover:bg-black/5 transition-colors self-start sm:self-auto text-center"
-                      >
-                        View on map
-                      </a>
-                    ) : null}
+                    <a
+                      href={directMapUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-1.5 px-5 py-2 rounded-[8px] border border-[#374151] text-[#1f2937] text-xs font-semibold hover:bg-black/5 transition-colors self-start sm:self-auto text-center shrink-0 cursor-pointer"
+                    >
+                      <span>View on map</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
                   </div>
 
                   {/* Accordion header */}
