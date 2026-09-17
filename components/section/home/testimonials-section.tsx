@@ -353,7 +353,7 @@ export default function TestimonialsSection() {
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-[17px] sm:text-[18px] font-bold text-[#0d1b2e] mt-3.5 leading-snug">
+                    <h3 className="text-[17px] sm:text-[18px] text-[#0d1b2e] mt-3.5 leading-snug">
                       {item.title}
                     </h3>
 
@@ -366,7 +366,7 @@ export default function TestimonialsSection() {
                   {/* Author Info */}
                   <div className="mt-5 pt-3.5 border-t border-gray-100 flex items-center justify-between">
                     <div>
-                      <p className="text-[13.5px] font-bold text-[#0d1b2e]">
+                      <p className="text-[13.5px] text-[#0d1b2e]">
                         {item.author}
                       </p>
                       <p className="text-[11.5px] text-gray-400 mt-0.5">
@@ -435,7 +435,7 @@ export default function TestimonialsSection() {
                           </div>
 
                           {/* Title */}
-                          <h3 className="text-[20px] font-bold text-[#0d1b2e] mt-4 leading-snug">
+                          <h3 className="text-[20px] text-[#0d1b2e] mt-4 leading-snug">
                             {item.title}
                           </h3>
 
@@ -447,7 +447,7 @@ export default function TestimonialsSection() {
 
                         {/* Author Info */}
                         <div className="mt-6 pt-4 border-t border-gray-100">
-                          <p className="text-[14px] font-bold text-[#0d1b2e]">
+                          <p className="text-[14px] text-[#0d1b2e]">
                             {item.author}
                           </p>
                           <p className="text-[12px] text-gray-400 mt-0.5">

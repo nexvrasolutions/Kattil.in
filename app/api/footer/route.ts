@@ -26,8 +26,8 @@ const STATIC_FALLBACK = {
       section: "LOCATIONS",
       order: 1,
       links: [
-        { label: "Chennai", href: "https://maps.app.goo.gl/qNiPXnskwA6fQv8a8", newTab: true, order: 0 },
-        { label: "Madurai", href: "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8", newTab: true, order: 1 },
+        { label: "Chennai", href: "/chennai", newTab: false, order: 0 },
+        { label: "Madurai", href: "/madurai", newTab: false, order: 1 },
       ],
     },
     {

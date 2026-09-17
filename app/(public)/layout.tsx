@@ -34,8 +34,8 @@ const FOOTER_FALLBACK: FooterProps = {
     {
       section: "LOCATIONS", order: 1,
       links: [
-        { label: "Chennai", href: "https://maps.app.goo.gl/qNiPXnskwA6fQv8a8", newTab: true, order: 0 },
-        { label: "Madurai", href: "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8", newTab: true, order: 1 },
+        { label: "Chennai", href: "/chennai", newTab: false, order: 0 },
+        { label: "Madurai", href: "/madurai", newTab: false, order: 1 },
       ],
     },
     {
@@ -81,7 +81,7 @@ async function getFooterData(): Promise<{ footer: FooterProps; sidebar: SidebarI
     let footerLinks: FooterProps["footerLinks"] =
       (parsed.footerLinks as FooterProps["footerLinks"]) ?? FOOTER_FALLBACK.footerLinks;
 
-    // Normalize second column to active location Google Maps links (Chennai and Madurai)
+    // Normalize second column to active location destination pages (Chennai and Madurai)
     if (Array.isArray(footerLinks) && footerLinks.length >= 2) {
       const isLocationsSection =
         footerLinks[1]?.section?.toUpperCase() === "LOCATIONS" ||
@@ -89,26 +89,26 @@ async function getFooterData(): Promise<{ footer: FooterProps; sidebar: SidebarI
         (footerLinks[1]?.section?.toUpperCase() === "NAVIGATION" &&
           footerLinks[0]?.section?.toUpperCase() === "NAVIGATION");
 
-      const needsMapUpdate =
+      const needsDestUpdate =
         isLocationsSection &&
         (footerLinks[1]?.links?.length !== 2 ||
           footerLinks[1]?.links?.some(
             (l) =>
-              !l.href?.startsWith("http") ||
+              l.href?.startsWith("http") ||
               l.label === "Coimbatore" ||
               l.label === "Colachel" ||
               l.label?.toLowerCase().includes("view all")
           ));
 
-      if (needsMapUpdate) {
+      if (needsDestUpdate) {
         footerLinks = [
           footerLinks[0],
           {
             section: "LOCATIONS",
             order: 1,
             links: [
-              { label: "Chennai", href: "https://maps.app.goo.gl/qNiPXnskwA6fQv8a8", newTab: true, order: 0 },
-              { label: "Madurai", href: "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8", newTab: true, order: 1 },
+              { label: "Chennai", href: "/chennai", newTab: false, order: 0 },
+              { label: "Madurai", href: "/madurai", newTab: false, order: 1 },
             ],
           },
           ...footerLinks.slice(2),

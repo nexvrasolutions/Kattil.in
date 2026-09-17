@@ -45,14 +45,22 @@ export default function ComfortSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-5"
+            className="lg:col-span-5 flex items-center justify-center lg:justify-start"
           >
-            <div className="relative w-full max-w-full lg:max-w-[480px] xl:max-w-[540px] aspect-[432/340] rounded-[8px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+            <div
+              className="relative w-full max-w-[432px] aspect-[432/340] sm:h-[340px] rounded-[8px] overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.08)]"
+              style={{
+                maxWidth: "432px",
+                maxHeight: "340px",
+                borderRadius: "8px",
+                opacity: 1,
+              }}
+            >
               <Image
                 src="/images/home/dining-community.png"
                 alt="Community and comfort at Kattil"
                 fill
-                sizes="(max-width: 1024px) 100vw, 45vw"
+                sizes="(max-width: 1024px) 100vw, 432px"
                 className="object-cover object-center"
               />
             </div>
@@ -98,7 +106,7 @@ export default function ComfortSection() {
                   </div>
 
                   <div>
-                    <h3 className="text-[18px] sm:text-[20px] font-semibold text-[#0d1b2e] leading-snug">
+                    <h3 className="text-[18px] sm:text-[20px] text-[#0d1b2e] leading-snug">
                       {feature.title}
                     </h3>
                     <p className="text-[13px] text-gray-500 mt-2 leading-relaxed">
