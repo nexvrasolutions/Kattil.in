@@ -36,15 +36,6 @@ export const FALLBACK_DESTINATIONS: DestinationItem[] = [
     link: "/madurai",
     order: 2,
   },
-  {
-    _id: "default-coimbatore",
-    name: "Coimbatore",
-    slug: "coimbatore",
-    image: "/images/destinations/coimbatore.png",
-    hotelCount: "1 hotel",
-    link: "/coimbatore",
-    order: 3,
-  },
 ];
 
 interface DestinationsDropdownProps {

@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { safeFetchJson } from "@/lib/utils/safeFetch";
 
-interface DestinationItem {
+export interface DestinationItem {
   id: string;
   name: string;
   pillLabel: string;
@@ -16,7 +16,7 @@ interface DestinationItem {
   isViewAll?: boolean;
 }
 
-const DEFAULT_DESTINATIONS: DestinationItem[] = [
+export const DEFAULT_DESTINATIONS: DestinationItem[] = [
   {
     id: "chennai",
     name: "Chennai",
@@ -32,13 +32,6 @@ const DEFAULT_DESTINATIONS: DestinationItem[] = [
     href: "/madurai",
   },
   {
-    id: "coimbatore",
-    name: "Coimbatore",
-    pillLabel: "Coimbatore",
-    image: "/images/destinations/coimbatore.png",
-    href: "/coimbatore",
-  },
-  {
     id: "view-all",
     name: "View all our Destination",
     pillLabel: "",
@@ -48,8 +41,16 @@ const DEFAULT_DESTINATIONS: DestinationItem[] = [
   },
 ];
 
-export default function DestinationsSection() {
-  const [destinations, setDestinations] = useState<DestinationItem[]>(DEFAULT_DESTINATIONS);
+export default function DestinationsSection({
+  initialDestinations,
+}: {
+  initialDestinations?: DestinationItem[];
+}) {
+  const [destinations, setDestinations] = useState<DestinationItem[]>(
+    initialDestinations && initialDestinations.length > 0
+      ? initialDestinations
+      : DEFAULT_DESTINATIONS
+  );
 
   useEffect(() => {
     let isMounted = true;
