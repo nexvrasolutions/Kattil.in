@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin } from "lucide-react";
+import { safeFetchJson } from "@/lib/utils/safeFetch";
 
 export interface DestinationItem {
   _id: string;
@@ -21,7 +22,7 @@ export const FALLBACK_DESTINATIONS: DestinationItem[] = [
     _id: "default-chennai",
     name: "Chennai",
     slug: "chennai",
-    image: "/images/destinations/kanyakumari.png",
+    image: "/images/destinations/chennai.png",
     hotelCount: "1 hotel",
     link: "/chennai",
     order: 1,
@@ -34,6 +35,15 @@ export const FALLBACK_DESTINATIONS: DestinationItem[] = [
     hotelCount: "1 hotel",
     link: "/madurai",
     order: 2,
+  },
+  {
+    _id: "default-coimbatore",
+    name: "Coimbatore",
+    slug: "coimbatore",
+    image: "/images/destinations/coimbatore.png",
+    hotelCount: "1 hotel",
+    link: "/coimbatore",
+    order: 3,
   },
 ];
 
@@ -60,8 +70,7 @@ export default function DestinationsDropdown({
 
   useEffect(() => {
     let isMounted = true;
-    fetch("/api/destinations")
-      .then((res) => res.json())
+    safeFetchJson<{ success: boolean; data: DestinationItem[] }>("/api/destinations")
       .then((data) => {
         if (isMounted && data && data.success && Array.isArray(data.data)) {
           const activeOnly = data.data.filter(
@@ -120,7 +129,18 @@ export default function DestinationsDropdown({
                         : dest.slug === "colachel"
                           ? "/colachel"
                           : `/destinations/${dest.slug}`);
-                const imgSrc = dest.image?.trim() || "/images/destinations/kanyakumari.png";
+                const imgSrc =
+                  dest.slug === "chennai"
+                    ? "/images/destinations/chennai.png"
+                    : dest.image && !dest.image.includes("kanyakumari")
+                      ? dest.image.trim()
+                      : (dest.slug === "madurai"
+                        ? "/images/destinations/madurai.png"
+                        : dest.slug === "coimbatore"
+                          ? "/images/destinations/coimbatore.png"
+                          : dest.slug === "colachel"
+                            ? "/images/destinations/kanyakumari.png"
+                            : "/images/destinations/chennai.png");
 
                 return (
                   <Link
@@ -196,8 +216,7 @@ export function MobileDestinationsList({
 
   useEffect(() => {
     let isMounted = true;
-    fetch("/api/destinations")
-      .then((res) => res.json())
+    safeFetchJson<{ success: boolean; data: DestinationItem[] }>("/api/destinations")
       .then((data) => {
         if (isMounted && data && data.success && Array.isArray(data.data)) {
           const activeOnly = data.data.filter(
@@ -234,7 +253,18 @@ export function MobileDestinationsList({
                   : dest.slug === "colachel"
                     ? "/colachel"
                     : `/destinations/${dest.slug}`);
-          const imgSrc = dest.image?.trim() || "/images/destinations/kanyakumari.png";
+          const imgSrc =
+            dest.slug === "chennai"
+              ? "/images/destinations/chennai.png"
+              : dest.image && !dest.image.includes("kanyakumari")
+                ? dest.image.trim()
+                : (dest.slug === "madurai"
+                  ? "/images/destinations/madurai.png"
+                  : dest.slug === "coimbatore"
+                    ? "/images/destinations/coimbatore.png"
+                    : dest.slug === "colachel"
+                      ? "/images/destinations/kanyakumari.png"
+                      : "/images/destinations/chennai.png");
 
           return (
             <Link

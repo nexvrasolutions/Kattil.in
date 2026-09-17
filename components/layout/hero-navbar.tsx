@@ -149,7 +149,7 @@ export const HERO_NAV_LINKS = [
   { label: "Home", href: "/" },
   { label: "Destinations", href: "/rooms" },
   { label: "Partners", href: "/partners" },
-  { label: "Offering", href: "" },
+  // { label: "Offering", href: "" },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────

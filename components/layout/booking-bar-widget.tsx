@@ -12,6 +12,7 @@ import {
   MapPin,
   Info,
 } from "lucide-react";
+import { safeFetchJson } from "@/lib/utils/safeFetch";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export interface HotelPlaceItem {
@@ -188,11 +189,9 @@ export default function BookingBarWidget({
 
     async function loadDestinations() {
       try {
-        const res = await fetch("/api/destinations")
-          .then((r) => r.json())
-          .catch(() => ({ success: false }));
+        const res = await safeFetchJson<{ success: boolean; data: any[] }>("/api/destinations");
 
-        if (!isMounted) return;
+        if (!isMounted || !res) return;
 
         if (res.success && Array.isArray(res.data) && res.data.length > 0) {
           const items: HotelPlaceItem[] = res.data.map((d: any) => {
@@ -625,11 +624,9 @@ export default function BookingBarWidget({
                       </div>
 
                       {/* Header Info */}
-                      <div className="px-3 py-1 flex items-center justify-between text-[10.5px] sm:text-[11px] font-bold text-gray-500 uppercase tracking-wider bg-gray-50/70">
+                      <div className="px-3 py-1 flex items-center justify-between text-[10.5px] sm:text-[11px] font-bold text-gray-500 bg-gray-50/70">
                         <span>Places & Hotels</span>
-                        <span className="text-[10.5px] text-gray-400 font-medium lowercase">
-                          {filteredHotels.length} {filteredHotels.length === 1 ? "location" : "locations"}
-                        </span>
+
                       </div>
 
                       {/* Scrollable Hotels / Places List - Displays 3 properties on desktop, balance in scroll */}
@@ -667,11 +664,11 @@ export default function BookingBarWidget({
                                     );
                                   }
                                 }}
-                                className={`w-full h-[40px] shrink-0 px-2.5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors rounded-[5px] cursor-pointer ${isSelected ? "bg-emerald-50 text-gray-900 font-semibold" : "text-gray-700"
+                                className={`w-full h-[40px] shrink-0 px-2.5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors rounded-[5px] cursor-pointer ${isSelected ? " bg-[#D2E6BC66] text-gray-900 font-semibold" : "text-gray-700"
                                   }`}
                               >
                                 <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                                  <div className="w-7.5 h-7.5 rounded-[5px] bg-[#0E2E4E]/10 flex items-center justify-center shrink-0">
+                                  <div className="w-7.5 h-7.5 rounded-[5px] flex items-center justify-center shrink-0">
                                     <MapPin className="w-3.5 h-3.5 text-[#0E2E4E]" />
                                   </div>
                                   <div className="flex flex-col min-w-0 leading-tight">
@@ -679,11 +676,11 @@ export default function BookingBarWidget({
                                       {hotel.name}
                                     </span>
                                     <span className="text-[11px] sm:text-[11.5px] text-gray-500 truncate leading-tight mt-0.5">
-                                      {hotel.place}, {hotel.state}
+                                      {hotel.place}
                                     </span>
                                   </div>
                                 </div>
-                                {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />}
+
                               </button>
                             );
                           })

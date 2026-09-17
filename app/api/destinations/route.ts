@@ -83,11 +83,12 @@ export async function GET(_request: NextRequest) {
 
       // Smart thumbnail image resolution
       let destinationImage = c.image?.trim() || c.banner?.trim();
-      if (!destinationImage) {
-        if (c.slug === "coimbatore") destinationImage = "/images/destinations/coimbatore.png";
+      if (!destinationImage || (c.slug === "chennai" && destinationImage.includes("kanyakumari"))) {
+        if (c.slug === "chennai") destinationImage = "/images/destinations/chennai.png";
+        else if (c.slug === "coimbatore") destinationImage = "/images/destinations/coimbatore.png";
         else if (c.slug === "madurai") destinationImage = "/images/destinations/madurai.png";
         else if (c.slug === "colachel") destinationImage = "/images/destinations/kanyakumari.png";
-        else destinationImage = "/images/destinations/kanyakumari.png";
+        else destinationImage = "/images/destinations/chennai.png";
       }
 
       // Hotel count subtitle

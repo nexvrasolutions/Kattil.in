@@ -14,6 +14,7 @@ import {
 import AdminButton from "@/components/admin/ui/AdminButton";
 import { AdminInput } from "@/components/admin/ui/AdminInput";
 import PageHeader from "@/components/admin/ui/PageHeader";
+import { safeFetchJson } from "@/lib/utils/safeFetch";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -112,8 +113,8 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<"branding" | "features" | "social" | "seo" | "advanced">("branding");
 
   useEffect(() => {
-    fetch("/api/admin/settings").then((r) => r.json()).then((r) => {
-      if (r.success && r.data && Object.keys(r.data).length > 0) {
+    safeFetchJson<{ success: boolean; data: any }>("/api/admin/settings").then((r) => {
+      if (r?.success && r.data && Object.keys(r.data).length > 0) {
         setData((prev) => ({
           ...prev,
           ...r.data,
@@ -130,12 +131,12 @@ export default function SettingsPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await fetch("/api/admin/settings", {
+      const res = await safeFetchJson<{ success: boolean }>("/api/admin/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-      }).then((r) => r.json());
-      if (res.success) { setSaved(true); setTimeout(() => setSaved(false), 2500); }
+      });
+      if (res?.success) { setSaved(true); setTimeout(() => setSaved(false), 2500); }
     } finally { setSaving(false); }
   };
 

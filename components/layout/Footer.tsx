@@ -52,7 +52,7 @@ function LocationBlock({ location }: { location: FooterLocation }) {
       </p>
       {location.phone && (
         <div>
-          <h5 className="text-[11px] sm:text-[12px] font-bold tracking-[0.2em] uppercase text-white mb-2">
+          <h5 className="text-[11px] sm:text-[12px] font-bold uppercase text-white mb-2">
             PHONE
           </h5>
           <a
@@ -65,7 +65,7 @@ function LocationBlock({ location }: { location: FooterLocation }) {
       )}
       {location.email && (
         <div>
-          <h5 className="text-[11px] sm:text-[12px] font-bold tracking-[0.2em] uppercase text-white mb-2">
+          <h5 className="text-[11px] sm:text-[12px] font-bold uppercase text-white mb-2">
             MAIL
           </h5>
           <a
@@ -142,7 +142,7 @@ export default function Footer({
           {/* Navigation + Legal (and any other CMS sections) */}
           {sortedSections.map((section, idx) => (
             <motion.div key={`${section.section}-${idx}`} variants={columnVariants}>
-              <h4 className="text-[11px] sm:text-[12px] font-bold tracking-[0.2em] uppercase text-white mb-4">
+              <h4 className="text-[11px] sm:text-[12px] font-bold uppercase text-white mb-4">
                 {section.section}
               </h4>
               <ul className="space-y-3">
@@ -172,7 +172,7 @@ export default function Footer({
           {visibleLocations.length > 0 ? (
             visibleLocations.slice(0, 1).map((loc) => (
               <motion.div key={loc.city || "head-office"} variants={columnVariants}>
-                <h4 className="text-[11px] sm:text-[12px] font-bold tracking-[0.2em] uppercase text-white mb-4">
+                <h4 className="text-[11px] sm:text-[12px] font-bold uppercase text-white mb-4">
                   HEAD OFFICE
                 </h4>
                 <LocationBlock location={loc} />
@@ -180,7 +180,7 @@ export default function Footer({
             ))
           ) : (
             <motion.div variants={columnVariants}>
-              <h4 className="text-[11px] sm:text-[12px] font-bold tracking-[0.2em] uppercase text-white mb-4">
+              <h4 className="text-[11px] sm:text-[12px] font-bold uppercase text-white mb-4">
                 HEAD OFFICE
               </h4>
               <LocationBlock
@@ -196,7 +196,7 @@ export default function Footer({
 
           {/* Social links */}
           <motion.div variants={columnVariants}>
-            <h4 className="text-[11px] sm:text-[12px] font-bold tracking-[0.2em] uppercase text-white mb-4">
+            <h4 className="text-[11px] sm:text-[12px] font-bold uppercase text-white mb-4">
               SOCIAL LINKS
             </h4>
             <div className="flex flex-wrap gap-3">

@@ -19,6 +19,7 @@ import {
 import AdminBadge from "@/components/admin/ui/AdminBadge";
 import PageHeader from "@/components/admin/ui/PageHeader";
 import { SkeletonDashboard } from "@/components/admin/ui/SkeletonLoader";
+import { safeFetchJson } from "@/lib/utils/safeFetch";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } } };
@@ -102,8 +103,8 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/admin/dashboard").then((r) => r.json()),
-      fetch("/api/admin/analytics").then((r) => r.json()),
+      safeFetchJson<{ success: boolean; data: CMSData }>("/api/admin/dashboard"),
+      safeFetchJson<{ success: boolean; data: AnalyticsData }>("/api/admin/analytics"),
     ])
       .then(([cmsRes, aRes]) => {
         if (cmsRes?.success) setCms(cmsRes.data);

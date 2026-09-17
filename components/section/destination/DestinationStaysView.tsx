@@ -6,6 +6,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, MapPin } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
+import { safeFetchJson } from "@/lib/utils/safeFetch";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -19,24 +20,25 @@ export interface PropertyStay {
   amenities?: string[];
   link?: string;
   description?: string;
-  occupancy?: string;
-  price?: string;
 }
 
 interface DestinationStaysViewProps {
   cityName: string;
   citySlug: string;
-  properties: PropertyStay[];
+  properties?: PropertyStay[];
+  initialStays?: PropertyStay[];
 }
 
 export default function DestinationStaysView({
   cityName,
   citySlug,
   properties: initialProperties,
+  initialStays,
 }: DestinationStaysViewProps) {
+  const initialData = initialProperties || initialStays;
   const [stays, setStays] = useState<PropertyStay[]>(
-    initialProperties && initialProperties.length > 0
-      ? initialProperties
+    initialData && initialData.length > 0
+      ? initialData
       : []
   );
 
@@ -46,10 +48,11 @@ export default function DestinationStaysView({
   useEffect(() => {
     let isMounted = true;
 
-    fetch(`/api/properties?city=${encodeURIComponent(citySlug)}`)
-      .then((res) => res.json())
+    safeFetchJson<{ success: boolean; data?: { properties: any[] } }>(
+      `/api/properties?city=${encodeURIComponent(citySlug)}`
+    )
       .then((data) => {
-        if (!isMounted) return;
+        if (!isMounted || !data) return;
         if (data.success && Array.isArray(data.data?.properties)) {
           const mapped: PropertyStay[] = data.data.properties.map(
             (p: any) => ({

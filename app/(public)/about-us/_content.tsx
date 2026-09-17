@@ -249,7 +249,7 @@ export default function AboutContent({ about }: { about: AboutData | null }) {
 
                   <h2 className="font-sans text-[#0d1b2e] text-[28px] sm:text-[32px] md:text-[36px] leading-[1.12] tracking-tight">
                     The people
-                    <span className="block font-sans font-semibold mt-1">
+                    <span className="block font-sans mt-1">
                       behind{" "}
                       <span className="font-serif italic font-normal text-[#0d1b2e]">
                         Kattil

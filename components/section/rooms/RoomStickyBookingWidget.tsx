@@ -9,6 +9,7 @@ import {
   MapPin,
   Check,
 } from "lucide-react";
+import { safeFetchJson } from "@/lib/utils/safeFetch";
 
 export interface HotelOption {
   id: string;
@@ -162,10 +163,9 @@ export default function RoomStickyBookingWidget({
   // Fetch live active destinations from database API
   useEffect(() => {
     let isMounted = true;
-    fetch("/api/destinations")
-      .then((r) => r.json())
+    safeFetchJson<{ success: boolean; data: any[] }>("/api/destinations")
       .then((res) => {
-        if (isMounted && res.success && Array.isArray(res.data) && res.data.length > 0) {
+        if (isMounted && res?.success && Array.isArray(res.data) && res.data.length > 0) {
           const mapped: HotelOption[] = res.data.map((d: any) => {
             const place = d.name || "Destination";
             const slug = d.slug || place.toLowerCase();

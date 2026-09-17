@@ -99,7 +99,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.dark .admin-root {
+.dark .admin-root,
+.dark.admin-root {
   --adm-background: 215 55% 8%;
   --adm-foreground: 44 22% 93%;
   --adm-card: 215 48% 11%;

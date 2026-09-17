@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/admin/providers/AdminThemeProvider";
 import {
   Moon, Sun, Globe, ChevronRight,
   LogOut, User, AlertTriangle, Loader2,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { safeFetchJson } from "@/lib/utils/safeFetch";
 
 function buildBreadcrumbs(pathname: string): { label: string; href: string }[] {
   const segments = pathname.split("/").filter(Boolean);
@@ -48,10 +49,9 @@ export default function AdminHeader() {
 
   // Load maintenance state
   useEffect(() => {
-    fetch("/api/admin/settings")
-      .then((r) => r.json())
+    safeFetchJson<{ success: boolean; data?: { maintenance?: { enabled?: boolean } } }>("/api/admin/settings")
       .then((r) => {
-        if (r.success) setMaintenanceOn(!!r.data?.maintenance?.enabled);
+        if (r?.success) setMaintenanceOn(!!r.data?.maintenance?.enabled);
       })
       .catch(() => {});
   }, []);

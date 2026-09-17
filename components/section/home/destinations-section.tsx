@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { safeFetchJson } from "@/lib/utils/safeFetch";
 
 interface DestinationItem {
   id: string;
@@ -20,7 +21,7 @@ const DEFAULT_DESTINATIONS: DestinationItem[] = [
     id: "chennai",
     name: "Chennai",
     pillLabel: "Chennai",
-    image: "/images/destinations/kanyakumari.png",
+    image: "/images/destinations/chennai.png",
     href: "/chennai",
   },
   {
@@ -29,6 +30,13 @@ const DEFAULT_DESTINATIONS: DestinationItem[] = [
     pillLabel: "Madurai",
     image: "/images/destinations/madurai.png",
     href: "/madurai",
+  },
+  {
+    id: "coimbatore",
+    name: "Coimbatore",
+    pillLabel: "Coimbatore",
+    image: "/images/destinations/coimbatore.png",
+    href: "/coimbatore",
   },
   {
     id: "view-all",
@@ -46,21 +54,76 @@ export default function DestinationsSection() {
   useEffect(() => {
     let isMounted = true;
 
-    fetch("/api/destinations")
-      .then((res) => res.json())
+    safeFetchJson<{ success: boolean; data: any[] }>("/api/destinations")
       .then((res) => {
-        if (!isMounted || !res.success || !Array.isArray(res.data)) return;
+        if (!isMounted || !res?.success || !Array.isArray(res.data) || res.data.length === 0) return;
 
-        const activeList: DestinationItem[] = res.data.map((d: any) => ({
-          id: d._id || d.slug,
-          name: d.name,
-          pillLabel: d.name,
-          image: d.image || "/images/destinations/kanyakumari.png",
-          href: d.link || (d.slug === "chennai" ? "/chennai" : d.slug === "coimbatore" ? "/coimbatore" : d.slug === "madurai" ? "/madurai" : d.slug === "colachel" ? "/colachel" : `/destinations/${d.slug}`),
-        }));
+        const priorityOrder: Record<string, number> = {
+          chennai: 1,
+          madurai: 2,
+          coimbatore: 3,
+          colachel: 4,
+          kanyakumari: 5,
+        };
 
-        // Limit to 3 preview items so the 4th item is the "View all our Destination" card
-        const previewItems = activeList.slice(0, 3);
+        const activeList: DestinationItem[] = res.data
+          .map((d: any) => {
+            const displayName =
+              d.name ||
+              (d.slug === "chennai"
+                ? "Chennai"
+                : d.slug === "madurai"
+                  ? "Madurai"
+                  : d.slug === "coimbatore"
+                    ? "Coimbatore"
+                    : d.slug === "colachel" || d.slug === "kanyakumari"
+                      ? "Kanyakumari"
+                      : d.slug);
+
+            const imgSrc =
+              d.slug === "chennai"
+                ? "/images/destinations/chennai.png"
+                : d.slug === "madurai"
+                  ? "/images/destinations/madurai.png"
+                  : d.slug === "coimbatore"
+                    ? "/images/destinations/coimbatore.png"
+                    : d.slug === "colachel" || d.slug === "kanyakumari"
+                      ? "/images/destinations/kanyakumari.png"
+                      : d.image || "/images/destinations/chennai.png";
+
+            const href =
+              d.link ||
+              (d.slug === "chennai"
+                ? "/chennai"
+                : d.slug === "coimbatore"
+                  ? "/coimbatore"
+                  : d.slug === "madurai"
+                    ? "/madurai"
+                    : d.slug === "colachel" || d.slug === "kanyakumari"
+                      ? "/colachel"
+                      : `/destinations/${d.slug}`);
+
+            return {
+              id: d._id || d.slug,
+              name: displayName,
+              pillLabel: displayName,
+              image: imgSrc,
+              href,
+              slug: d.slug,
+            };
+          })
+          .sort((a: any, b: any) => {
+            const pA = priorityOrder[a.slug] ?? 99;
+            const pB = priorityOrder[b.slug] ?? 99;
+            return pA - pB;
+          });
+
+        const baseItems =
+          activeList.length > 0
+            ? activeList.slice(0, 3)
+            : DEFAULT_DESTINATIONS.filter((d) => !d.isViewAll);
+
+        const previewItems = [...baseItems];
         previewItems.push({
           id: "view-all",
           name: "View all our Destination",
@@ -82,17 +145,17 @@ export default function DestinationsSection() {
   return (
     <section
       id="destinations"
-      className="bg-transparent pt-20 sm:pt-24 md:pt-28 pb-10 md:pb-20 lg:pb-24 scroll-mt-[120px] 2xl:scroll-mt-[140px] px-3 md:px-5"
+      className="bg-transparent pt-16 sm:pt-20 md:pt-24 pb-12 md:pb-20 lg:pb-24 scroll-mt-[120px] 2xl:scroll-mt-[140px] px-4 sm:px-6 lg:px-8"
     >
-      <div className="max-w-5xl mx-auto px-5 sm:px-6 lg:px-8">
+      <div className="max-w-[1160px] mx-auto">
         {/* Section Heading */}
         <motion.div
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-          className="text-center mb-6 sm:mb-10"
+          className="text-center mb-8 sm:mb-12"
         >
-          <h2 className="text-[#0d1b2e] text-[24px] sm:text-[32px] md:text-[36px] font-sans font-normal leading-[1.18] tracking-tight mb-10">
+          <h2 className="text-[#0d1b2e] text-[28px] sm:text-[32px] md:text-[36px] font-sans font-normal leading-[1.18] tracking-tight">
             Destinations to{" "}
             <span className="font-serif italic font-normal text-[#0d1b2e]">
               Discover
@@ -100,8 +163,8 @@ export default function DestinationsSection() {
           </h2>
         </motion.div>
 
-        {/* Dynamic Destination Cards */}
-        <div className="flex flex-wrap justify-center items-stretch gap-6 sm:gap-6 lg:gap-7 max-w-5xl mx-auto">
+        {/* Dynamic Destination Cards - centered for any number of cards (1, 2, 3, or 4) */}
+        <div className="flex flex-wrap justify-center items-center gap-5 lg:gap-6 max-w-[1140px] mx-auto">
           {destinations.map((dest, index) => (
             <motion.div
               key={dest.id}
@@ -113,13 +176,19 @@ export default function DestinationsSection() {
                 duration: 0.45,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="w-full sm:w-[calc(50%-12px)] lg:w-[270px] xl:w-[280px] shrink-0"
+              className="w-[260px] h-[331px] shrink-0"
             >
               {dest.isViewAll ? (
                 /* 4th Card: View all our Destination */
                 <Link
                   href={dest.href}
-                  className="group relative flex flex-col aspect-[3/3.9] sm:aspect-[3/4.2] rounded-[8px] overflow-hidden bg-[#C5D9B0] text-white transition-all duration-300 block"
+                  className="group relative flex flex-col w-[260px] h-[331px] rounded-[8px] overflow-hidden bg-[#A7BD91] text-white transition-all duration-300 shadow-xs hover:shadow-md block"
+                  style={{
+                    width: 260,
+                    height: 331,
+                    borderRadius: 8,
+                    opacity: 1,
+                  }}
                 >
                   {/* Full Artwork Background */}
                   <div className="relative w-full h-full">
@@ -127,18 +196,18 @@ export default function DestinationsSection() {
                       src={dest.image}
                       alt={dest.name}
                       fill
-                      sizes="(max-width: 640px) 320px, (max-width: 1024px) 50vw, 25vw"
-                      className="object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+                      sizes="260px"
+                      className="object-cover object-top group-hover:scale-105 transition-transform duration-500 ease-out rounded-[8px]"
                     />
                   </div>
 
                   {/* Bottom CTA */}
-                  <div className="absolute bottom-4 sm:bottom-5 left-4 sm:left-5 right-4 sm:right-5 z-10 flex items-end justify-between gap-3">
-                    <p className="text-white text-[24px] sm:text-[24px] font-normal leading-[1.15] tracking-tight">
+                  <div className="absolute bottom-4 left-4 right-4 z-10 flex items-end justify-between gap-2">
+                    <p className="text-white text-[20px] sm:text-[22px] font-normal leading-[1.18] tracking-tight font-sans">
                       View all our <br />Destination
                     </p>
 
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-[8px] bg-white text-[#8FAE80] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-300">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-[8px] bg-white text-[#8FAE80] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-300 shadow-xs">
                       <ArrowRight className="w-5 h-5 stroke-[1.8]" />
                     </div>
                   </div>
@@ -147,24 +216,31 @@ export default function DestinationsSection() {
                 /* Standard Destination Card */
                 <Link
                   href={dest.href}
-                  className="group relative block aspect-[3/3.9] sm:aspect-[3/4.2] rounded-[8px] overflow-hidden bg-white transition-all duration-300"
+                  className="group relative block w-[260px] h-[331px] rounded-[8px] overflow-hidden bg-white transition-all duration-300 shadow-xs hover:shadow-md"
+                  style={{
+                    width: 260,
+                    height: 331,
+                    borderRadius: 8,
+                    opacity: 1,
+                  }}
                 >
                   {/* Top Pill Tag */}
-                  <div className="absolute top-3 sm:top-4 left-3 sm:left-4 right-3 sm:right-4 flex justify-center z-10">
+                  <div className="absolute top-3.5 left-3.5 right-3.5 flex justify-center z-10">
                     <div
                       className="
                         w-full
-                        h-[32px] sm:h-[35px]
+                        max-w-[190px]
+                        h-[34px]
                         flex items-center justify-center
-                        bg-[#FFFCF2]
-                        backdrop-blur-[4px]
+                        bg-[#FFFDF6]/95
+                        backdrop-blur-[6px]
                         rounded-[70px]
-                        px-3 sm:px-4
-                        text-[12.5px] sm:text-[13px]
+                        px-3
+                        text-[13px]
                         font-medium
                         text-[#52613F]
                         tracking-tight
-                        translate-y-1 sm:translate-y-2.5
+                        shadow-xs
                         transition-colors
                       "
                     >
@@ -178,8 +254,8 @@ export default function DestinationsSection() {
                       src={dest.image}
                       alt={dest.name}
                       fill
-                      sizes="(max-width: 640px) 320px, (max-width: 1024px) 50vw, 25vw"
-                      className="object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+                      sizes="260px"
+                      className="object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out rounded-[8px]"
                     />
                   </div>
                 </Link>

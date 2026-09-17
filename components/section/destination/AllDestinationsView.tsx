@@ -6,6 +6,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import Navbar from "@/components/layout/Navbar";
 import { FALLBACK_DESTINATIONS } from "@/components/layout/destinations-dropdown";
+import { safeFetchJson } from "@/lib/utils/safeFetch";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -35,12 +36,11 @@ export default function AllDestinationsView({
   useEffect(() => {
     if (initialDestinations && initialDestinations.length > 0) return;
     let isMounted = true;
-    fetch("/api/destinations")
-      .then((res) => res.json())
+    safeFetchJson<{ success: boolean; data: DestinationItemData[] }>("/api/destinations")
       .then((data) => {
         if (
           isMounted &&
-          data.success &&
+          data?.success &&
           Array.isArray(data.data) &&
           data.data.length > 0
         ) {
@@ -126,12 +126,17 @@ export default function AllDestinationsView({
                           : `/destinations/${dest.slug}`);
 
                 const imgSrc =
-                  dest.image?.trim() ||
-                  (dest.slug === "coimbatore"
-                    ? "/images/destinations/coimbatore.png"
-                    : dest.slug === "madurai"
-                      ? "/images/destinations/madurai.png"
-                      : "/images/destinations/kanyakumari.png");
+                  dest.slug === "chennai"
+                    ? "/images/destinations/chennai.png"
+                    : dest.image && !dest.image.includes("kanyakumari")
+                      ? dest.image.trim()
+                      : (dest.slug === "coimbatore"
+                        ? "/images/destinations/coimbatore.png"
+                        : dest.slug === "madurai"
+                          ? "/images/destinations/madurai.png"
+                          : dest.slug === "colachel"
+                            ? "/images/destinations/kanyakumari.png"
+                            : "/images/destinations/chennai.png");
 
                 return (
                   <motion.div
