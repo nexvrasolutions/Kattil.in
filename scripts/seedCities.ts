@@ -4,15 +4,15 @@ import City from "../lib/models/City";
 export async function seedCities() {
   const cities = [
     {
-      name: "Madurai",
-      slug: "madurai",
-      label: "MADURAI",
-      description: "Kattil's Madurai property in the heart of the city.",
-      address: "2nd St, Park Town, Bama Nagar, Madurai, Tamil Nadu 625017, India",
-      phone: "+91 7358127921",
-      email: "sadhu_burlington@live.com",
+      name: "Kaniyakumari",
+      slug: "kaniyakumari",
+      label: "KANIYAKUMARI",
+      description: "Kattil's The Sparrow in Kaniyakumari near the ocean.",
+      address: "Main Road, Near Sunset Point, Kaniyakumari, Tamil Nadu 629702",
+      phone: "+91 74487 49779",
+      email: "hostelsparrow@gmail.com",
       mapSrc:
-        "https://maps.google.com/maps?q=2nd+St%2C+Park+Town%2C+Bama+Nagar%2C+Madurai%2C+Tamil+Nadu+625017%2C+India&t=m&z=16&ie=UTF8&iwloc=&output=embed",
+        "https://maps.google.com/maps?q=Kaniyakumari%2C+Tamil+Nadu+629702&t=m&z=16&ie=UTF8&iwloc=&output=embed",
       active: true,
       order: 0,
     },
@@ -20,7 +20,7 @@ export async function seedCities() {
       name: "Chennai",
       slug: "chennai",
       label: "CHENNAI",
-      description: "Kattil's Chennai property in Thoraipakkam.",
+      description: "Kattil's Chennai properties in Thoraipakkam and Central Chennai.",
       address:
         "274, 1st Main Road, Secretariat Colony, Chennai, Thoraipakkam, Tamil Nadu 600097",
       phone: "+91 6385197921",
@@ -60,7 +60,7 @@ export async function seedCities() {
   }
   console.log(`Cities: ${inserted} created, ${cities.length - inserted} updated`);
   return {
-    madurai: await City.findOne({ slug: "madurai" }),
+    kaniyakumari: await City.findOne({ slug: "kaniyakumari" }),
     chennai: await City.findOne({ slug: "chennai" }),
     coimbatore: await City.findOne({ slug: "coimbatore" }),
   };

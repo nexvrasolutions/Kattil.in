@@ -4,16 +4,81 @@ import Property from "../lib/models/Property";
 import Room from "../lib/models/Room";
 
 export async function seedProperties() {
-  const madurai = await City.findOne({ slug: "madurai" });
+  const kaniyakumari = await City.findOne({ slug: "kaniyakumari" });
   const chennai = await City.findOne({ slug: "chennai" });
   const coimbatore = await City.findOne({ slug: "coimbatore" });
 
-  if (!madurai || !chennai) {
+  if (!kaniyakumari || !chennai) {
     console.error("  ✗ Cities not found — seed cities first");
     return;
   }
 
   const properties = [
+    {
+      name: "Hostel Gandhi",
+      slug: "hostel-gandhi",
+      city: chennai._id,
+      badge: "Hostel & Community",
+      category: "hostel",
+      tagline: "Vibrant Backpackers Community in Chennai",
+      description:
+        "Located in the cultural heartbeat of Chennai, Hostel Gandhi provides vibrant community living, clean dorms, and cozy private spaces tailored for travelers, explorers, and digital nomads.",
+      images: [
+        "/assets/kattil-room-hero.webp",
+        "/assets/deluxe-garden-suite.webp",
+        "/assets/ac-double-room.webp",
+      ],
+      address: "274, 1st Main Road, Secretariat Colony, Chennai, Thoraipakkam, Tamil Nadu 600097",
+      phone: "+91 63851 97921",
+      email: "sadhu_burlington@live.com",
+      whatsapp: "+916385197921",
+      mapSrc: "https://maps.google.com/maps?q=274%2C+1st+Main+Road%2C+Secretariat+Colony%2C+Thoraipakkam%2C+Chennai%2C+Tamil+Nadu+600097&t=m&z=16&ie=UTF8&iwloc=&output=embed",
+      amenities: ["Free Wifi", "Restaurant", "AC", "Community Lounge", "High-Speed Wi-Fi", "Locker"],
+      directions: {
+        railway: "Chennai Central Railway Station — 18 km",
+        busStand: "Thoraipakkam Bus Stop — 500 meters",
+        landmark: "Near Secretariat Colony Park",
+        byCar: "Direct access via Old Mahabalipuram Road (OMR)",
+      },
+      hotelCode: "hostelgandhi",
+      bookingEngineUrl: "https://live.ipms247.com/booking/book-rooms-hostelgandhi",
+      featured: true,
+      status: "active",
+      order: 0,
+    },
+    {
+      name: "The Sparrow",
+      slug: "the-sparrow",
+      city: kaniyakumari._id,
+      badge: "Hostel & Stays",
+      category: "hostel",
+      tagline: "Scenic Coastal Stay near Sunset Point",
+      description:
+        "Located near the scenic coast in Kaniyakumari, The Sparrow offers clean, tranquil rooms combining vintage warmth with modern convenience, just minutes from iconic landmarks and sunset viewpoints.",
+      images: [
+        "/assets/ac-double-room.webp",
+        "/assets/six-bed-dormitory.webp",
+        "/assets/kattil-room-hero.webp",
+        "/assets/deluxe-garden-suite.webp",
+      ],
+      address: "Main Road, Near Sunset Point, Kaniyakumari, Tamil Nadu 629702",
+      phone: "+91 74487 49779",
+      email: "hostelsparrow@gmail.com",
+      whatsapp: "+917448749779",
+      mapSrc: "https://maps.google.com/maps?q=Kaniyakumari%2C+Tamil+Nadu+629702&t=m&z=16&ie=UTF8&iwloc=&output=embed",
+      amenities: ["Free Wifi", "Restaurant", "Study Desk", "AC", "Lockers", "24/7 Butler"],
+      directions: {
+        railway: "Kaniyakumari Railway Station — 1.5 km",
+        busStand: "Kaniyakumari Bus Stand — 1.2 km",
+        landmark: "Near Sunset Point & Seashore",
+        byCar: "Direct access via Main Beach Road",
+      },
+      hotelCode: "kattil",
+      bookingEngineUrl: "https://live.ipms247.com/booking/book-rooms-kattil",
+      featured: true,
+      status: "active",
+      order: 1,
+    },
     {
       name: "Kattil Executive Stay",
       slug: "kattil-executive-stay",
@@ -40,39 +105,11 @@ export async function seedProperties() {
         landmark: "Near Secretariat Colony Park",
         byCar: "Direct access via Old Mahabalipuram Road (OMR)",
       },
+      hotelCode: "kattilchennai",
+      bookingEngineUrl: "https://live.ipms247.com/booking/book-rooms-kattilchennai",
       featured: true,
       status: "active",
-      order: 0,
-    },
-    {
-      name: "Kattil The Sparrow",
-      slug: "kattil-the-sparrow-madurai",
-      city: madurai._id,
-      badge: "Private room",
-      category: "homestay",
-      tagline: "Homely Comfort in the Temple City",
-      description:
-        "Nestled in Anna Nagar, Madurai, Kattil The Sparrow offers clean, tranquil rooms combining vintage warmth with modern convenience, just minutes from iconic cultural landmarks.",
-      images: [
-        "/assets/ac-double-room.webp",
-        "/assets/six-bed-dormitory.webp",
-        "/assets/kattil-room-hero.webp",
-      ],
-      address: "2nd St, Park Town, Bama Nagar, Madurai, Tamil Nadu 625017",
-      phone: "+91 74487 49779",
-      email: "hostelsparrow@gmail.com",
-      whatsapp: "+917448749779",
-      mapSrc: "https://maps.google.com/maps?q=2nd+St%2C+Park+Town%2C+Bama+Nagar%2C+Madurai%2C+Tamil+Nadu+625017&t=m&z=16&ie=UTF8&iwloc=&output=embed",
-      amenities: ["Free Wifi", "Restaurant", "Study Desk", "AC", "Lockers"],
-      directions: {
-        railway: "Madurai Junction — 4.5 km",
-        busStand: "Mattuthavani Bus Stand — 3.2 km",
-        landmark: "Near Bama Nagar Park",
-        byCar: "Easy access via Anna Nagar Main Road",
-      },
-      featured: true,
-      status: "active",
-      order: 1,
+      order: 2,
     },
     ...(coimbatore
       ? [
@@ -102,6 +139,8 @@ export async function seedProperties() {
               landmark: "Near Race Course Promenade",
               byCar: "Direct access via Race Course Road",
             },
+            hotelCode: "kattilcoimbatore",
+            bookingEngineUrl: "https://live.ipms247.com/booking/book-rooms-kattilcoimbatore",
             featured: true,
             status: "active",
             order: 2,

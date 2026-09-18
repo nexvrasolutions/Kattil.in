@@ -6,6 +6,7 @@ export async function seedGallery() {
 
   const madurai = await City.findOne({ slug: "madurai" });
   const chennai = await City.findOne({ slug: "chennai" });
+  const kaniyakumari = await City.findOne({ slug: { $in: ["kaniyakumari", "kanyakumari"] } });
 
   const images = [
     // ── Madurai ───────────────────────────────────────────────
@@ -75,8 +76,75 @@ export async function seedGallery() {
       alt: "Dormitory room overview",
       category: "Rooms", city: chennai?._id, featured: false, order: 12,
     },
+    // ── Kaniyakumari ──────────────────────────────────────────
+    {
+      src: "/assets/ac-double-room.webp",
+      alt: "Deluxe AC Double Room — Tranquil Coastal Stay",
+      caption: "Deluxe AC Double Room",
+      category: "Rooms", city: kaniyakumari?._id, featured: true, order: 13,
+    },
+    {
+      src: "/assets/six-bed-dormitory.webp",
+      alt: "Six-Bed Community Dormitory — The Sparrow",
+      caption: "Spacious Six-Bed Dormitory",
+      category: "Rooms", city: kaniyakumari?._id, featured: false, order: 15,
+    },
+    {
+      src: "/assets/non-ac-double-room.webp",
+      alt: "Cozy Standard Room — The Sparrow Kaniyakumari",
+      caption: "Cozy Standard Double Room",
+      category: "Rooms", city: kaniyakumari?._id, featured: false, order: 16,
+    },
+    {
+      src: "/assets/deluxe-garden-suite.webp",
+      alt: "Deluxe Ocean & Garden Suite",
+      caption: "Deluxe Suite with Private Balcony",
+      category: "Rooms", city: kaniyakumari?._id, featured: false, order: 17,
+    },
+    {
+      src: "/images/gallery/sunny-balcony-guest.jpg",
+      alt: "Sunlit Resort Balcony with Coastal Views",
+      caption: "Sunlit Coastal Balcony",
+      category: "Resort", city: kaniyakumari?._id, featured: false, order: 18,
+    },
+    {
+      src: "/images/home/ocean-sunset.png",
+      alt: "Iconic Sunset Point — Kaniyakumari",
+      caption: "Sunset Point Ocean Horizons",
+      category: "Experience", city: kaniyakumari?._id, featured: true, order: 19,
+    },
+    {
+      src: "/images/home/dining-community.png",
+      alt: "Authentic Coastal Dining & Cuisine",
+      caption: "Artisan Coastal Flavors & Dining",
+      category: "Dining", city: kaniyakumari?._id, featured: false, order: 20,
+    },
+    {
+      src: "/images/gallery/bikers-adventure.jpg",
+      alt: "Coastal Explorers & Southernmost Tip Tours",
+      caption: "Coastal Expeditions & Exploration",
+      category: "Experience", city: kaniyakumari?._id, featured: false, order: 21,
+    },
+    {
+      src: "/images/gallery/community-group.jpg",
+      alt: "Lively Lounge Gatherings & Community",
+      caption: "Common Lounge Gatherings",
+      category: "Experience", city: kaniyakumari?._id, featured: false, order: 22,
+    },
+    {
+      src: "/assets/about-us-1.webp",
+      alt: "Tranquil Courtyard & Coastal Breeze",
+      caption: "Tranquil Courtyard & Grounds",
+      category: "Outdoor", city: kaniyakumari?._id, featured: false, order: 23,
+    },
+    {
+      src: "/assets/kattil-room-hero.webp",
+      alt: "Master Bedroom Suite — The Sparrow",
+      caption: "Handcrafted Luxury Bedroom",
+      category: "Rooms", city: kaniyakumari?._id, featured: false, order: 24,
+    },
   ];
 
   await Gallery.insertMany(images);
-  console.log(`Gallery: ${images.length} images created (9 Madurai, 4 Chennai)`);
+  console.log(`Gallery: ${images.length} images created (9 Madurai, 4 Chennai, 12 Kaniyakumari)`);
 }

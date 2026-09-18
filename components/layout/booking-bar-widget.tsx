@@ -22,6 +22,7 @@ export interface HotelPlaceItem {
   state: string; // e.g. "Tamil Nadu"
   slug: string;
   hotelValue: string;
+  bookingEngineUrl?: string;
   hotelCount?: string;
 }
 
@@ -29,9 +30,12 @@ interface FpInstance {
   destroy: () => void;
   close: () => void;
   open: () => void;
+  isOpen?: boolean;
+  calendarContainer?: HTMLElement;
   setDate: (d: (Date | string)[] | Date | string, triggerChange?: boolean) => void;
   set: (opt: string, val: unknown) => void;
   selectedDates: Date[];
+  [key: string]: any;
 }
 
 declare global {
@@ -43,20 +47,40 @@ declare global {
 // Default fallback list of places & hotels
 const DEFAULT_HOTEL_PLACES: HotelPlaceItem[] = [
   {
-    id: "dest-chennai",
-    name: "Kattil Chennai",
+    id: "prop-hostel-gandhi",
+    name: "Hostel Gandhi",
     place: "Chennai",
     state: "Tamil Nadu",
-    slug: "chennai",
-    hotelValue: "kattilchennai",
+    slug: "hostel-gandhi",
+    hotelValue: "hostelgandhi",
+    bookingEngineUrl: "https://live.ipms247.com/booking/book-rooms-hostelgandhi",
   },
   {
-    id: "dest-madurai",
-    name: "Kattil Madurai",
-    place: "Madurai",
+    id: "prop-the-sparrow",
+    name: "The Sparrow",
+    place: "Kaniyakumari",
     state: "Tamil Nadu",
-    slug: "madurai",
-    hotelValue: "kattil",
+    slug: "the-sparrow",
+    hotelValue: "thesparrow",
+    bookingEngineUrl: "https://live.ipms247.com/booking/book-rooms-thesparrow",
+  },
+  {
+    id: "prop-kattil-executive-stay",
+    name: "Kattil Executive Stay",
+    place: "Chennai",
+    state: "Tamil Nadu",
+    slug: "kattil-executive-stay",
+    hotelValue: "kattilchennai",
+    bookingEngineUrl: "https://live.ipms247.com/booking/book-rooms-kattilchennai",
+  },
+  {
+    id: "prop-kattil-coimbatore",
+    name: "Kattil Stay Coimbatore",
+    place: "Coimbatore",
+    state: "Tamil Nadu",
+    slug: "kattil-stay-coimbatore",
+    hotelValue: "kattilcoimbatore",
+    bookingEngineUrl: "https://live.ipms247.com/booking/book-rooms-kattilcoimbatore",
   },
 ];
 
@@ -72,11 +96,12 @@ function formatDateDisplay(d: Date): string {
 
 function getHotelValueForSlug(slug: string): string {
   const s = slug.toLowerCase().trim();
+  if (s.includes("gandhi")) return "hostelgandhi";
+  if (s.includes("sparrow")) return "thesparrow";
   if (s === "chennai") return "kattilchennai";
-  if (s === "madurai") return "kattil";
   if (s === "coimbatore") return "kattilcoimbatore";
   if (s === "colachel") return "kattilcolachel";
-  if (s === "kanniyakumari") return "kattilkanniyakumari";
+  if (s === "kanniyakumari" || s === "kaniyakumari" || s === "kanyakumari") return "thesparrow";
   return `kattil${s}`;
 }
 
@@ -98,13 +123,15 @@ export default function BookingBarWidget({
     const propLower = (initialProperty || "").toLowerCase().trim();
     const match = DEFAULT_HOTEL_PLACES.find((h) => {
       return (
+        (propLower &&
+          (h.name.toLowerCase().includes(propLower) ||
+            propLower.includes(h.name.toLowerCase()) ||
+            h.slug.toLowerCase() === propLower)) ||
         (destLower &&
           (h.slug.toLowerCase() === destLower ||
             h.place.toLowerCase() === destLower ||
             destLower.includes(h.slug.toLowerCase()) ||
-            destLower.includes(h.place.toLowerCase()))) ||
-        (propLower &&
-          (h.name.toLowerCase().includes(propLower) || propLower.includes(h.name.toLowerCase())))
+            destLower.includes(h.place.toLowerCase())))
       );
     });
     if (match) return match;
@@ -156,13 +183,15 @@ export default function BookingBarWidget({
 
     const match = hotelsList.find((h) => {
       return (
+        (propLower &&
+          (h.name.toLowerCase().includes(propLower) ||
+            propLower.includes(h.name.toLowerCase()) ||
+            h.slug.toLowerCase() === propLower)) ||
         (destLower &&
           (h.slug.toLowerCase() === destLower ||
             h.place.toLowerCase() === destLower ||
             destLower.includes(h.slug.toLowerCase()) ||
-            destLower.includes(h.place.toLowerCase()))) ||
-        (propLower &&
-          (h.name.toLowerCase().includes(propLower) || propLower.includes(h.name.toLowerCase())))
+            destLower.includes(h.place.toLowerCase())))
       );
     });
 
@@ -183,33 +212,67 @@ export default function BookingBarWidget({
     }
   }, [initialDestination, initialProperty, hotelsList]);
 
-  // Dynamically load active destinations/hotels from database API
+  // Dynamically load active properties & destinations from database API
   useEffect(() => {
     let isMounted = true;
 
     async function loadDestinations() {
       try {
-        const res = await safeFetchJson<{ success: boolean; data: any[] }>("/api/destinations");
+        const [propsRes, destsRes] = await Promise.all([
+          safeFetchJson<{ success: boolean; data: any[] | { count: number; properties: any[] } }>("/api/properties"),
+          safeFetchJson<{ success: boolean; data: any[] }>("/api/destinations"),
+        ]);
 
-        if (!isMounted || !res) return;
+        if (!isMounted) return;
 
-        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
-          const items: HotelPlaceItem[] = res.data.map((d: any) => {
+        let items: HotelPlaceItem[] = [];
+
+        // 1. Map all active properties from database
+        const rawProps = Array.isArray(propsRes?.data)
+          ? propsRes.data
+          : (propsRes?.data as any)?.properties || (propsRes as any)?.properties || [];
+
+        if (Array.isArray(rawProps) && rawProps.length > 0) {
+          items = rawProps.map((p: any) => {
+            const cityName = p.city?.name || "Destination";
+            const citySlug = p.city?.slug || cityName.toLowerCase();
+            let extractedCode = "";
+            if (p.bookingEngineUrl) {
+              const match = p.bookingEngineUrl.match(/book-rooms-([^/?#]+)/);
+              if (match) extractedCode = match[1];
+            }
+            const hotelVal = p.hotelCode || extractedCode || getHotelValueForSlug(p.slug || citySlug);
+
+            return {
+              id: `prop-${p._id || p.slug}`,
+              name: p.name,
+              place: cityName,
+              state: "Tamil Nadu",
+              slug: p.slug || citySlug,
+              hotelValue: hotelVal,
+              bookingEngineUrl: p.bookingEngineUrl,
+            };
+          });
+        }
+
+        // 2. Fallback to destinations if no properties exist
+        if (items.length === 0 && destsRes?.success && Array.isArray(destsRes.data) && destsRes.data.length > 0) {
+          items = destsRes.data.map((d: any) => {
             const placeName = d.name || "Destination";
             const slug = d.slug || placeName.toLowerCase();
-            const hotelVal = getHotelValueForSlug(slug);
-
             return {
               id: `dest-${d._id || slug}`,
               name: `Kattil ${placeName}`,
               place: placeName,
               state: "Tamil Nadu",
               slug: slug,
-              hotelValue: hotelVal,
+              hotelValue: getHotelValueForSlug(slug),
               hotelCount: d.hotelCount,
             };
           });
+        }
 
+        if (items.length > 0) {
           setHotelsList(items);
 
           // Auto-match if initial destination is provided
@@ -218,14 +281,15 @@ export default function BookingBarWidget({
             const propLower = (initialProperty || "").toLowerCase().trim();
             const matched = items.find((h) => {
               return (
+                (propLower &&
+                  (h.name.toLowerCase().includes(propLower) ||
+                    propLower.includes(h.name.toLowerCase()) ||
+                    h.slug.toLowerCase() === propLower)) ||
                 (destLower &&
                   (h.slug.toLowerCase() === destLower ||
                     h.place.toLowerCase() === destLower ||
                     destLower.includes(h.slug.toLowerCase()) ||
-                    destLower.includes(h.place.toLowerCase()))) ||
-                (propLower &&
-                  (h.name.toLowerCase().includes(propLower) ||
-                    propLower.includes(h.name.toLowerCase())))
+                    destLower.includes(h.place.toLowerCase())))
               );
             });
             if (matched) {
@@ -234,7 +298,7 @@ export default function BookingBarWidget({
           }
         }
       } catch (err) {
-        console.warn("Failed to load destinations:", err);
+        console.warn("Failed to load properties for booking bar:", err);
       }
     }
 
@@ -343,6 +407,12 @@ export default function BookingBarWidget({
       });
     }
 
+    const handleScrollOrResize = () => {
+      if (fpInstance.current?.isOpen) {
+        repositionCalendar(fpInstance.current);
+      }
+    };
+
     (async () => {
       try {
         injectStyle("https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css");
@@ -424,10 +494,8 @@ export default function BookingBarWidget({
           },
         });
 
-        window.addEventListener("scroll", closeFlatpickr, { passive: true });
-        window.addEventListener("resize", () => {
-          if (fpInstance.current) repositionCalendar(fpInstance.current);
-        });
+        window.addEventListener("scroll", handleScrollOrResize, { passive: true });
+        window.addEventListener("resize", handleScrollOrResize, { passive: true });
       } catch (e) {
         console.error("[BookingWidget]", e);
       }
@@ -438,7 +506,8 @@ export default function BookingBarWidget({
       if (closeTimerRef.current) {
         clearTimeout(closeTimerRef.current);
       }
-      window.removeEventListener("scroll", closeFlatpickr);
+      window.removeEventListener("scroll", handleScrollOrResize);
+      window.removeEventListener("resize", handleScrollOrResize);
       fpInstance.current?.destroy();
     };
   }, []);
@@ -471,14 +540,15 @@ export default function BookingBarWidget({
       return;
     }
 
-    const targetHotel = selectedHotel!.hotelValue;
+    const targetHotel = selectedHotel!.hotelValue || "thesparrow";
     const ci = checkin!;
     const co = checkout!;
+    const actionUrl = selectedHotel!.bookingEngineUrl || `https://live.ipms247.com/booking/book-rooms-${targetHotel}`;
 
     const form = document.createElement("form");
     form.method = "post";
     form.target = "_blank";
-    form.action = `https://live.ipms247.com/booking/book-rooms-${targetHotel}`;
+    form.action = actionUrl;
 
     const fields: Record<string, string> = {
       eZ_chkin: forPost(ci),
@@ -559,9 +629,8 @@ export default function BookingBarWidget({
                   </div>
 
                   <ChevronDown
-                    className={`w-4.5 h-4.5 text-gray-400 shrink-0 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""
+                    className={`w-4.5 h-4.5 ${hotelError ? "text-[#0E2E4E]" : "text-[#0E2E4E]/70"} shrink-0 stroke-[1.6] transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""
                       }`}
-
                   />
                 </button>
 
@@ -664,11 +733,11 @@ export default function BookingBarWidget({
                                     );
                                   }
                                 }}
-                                className={`w-full h-[40px] shrink-0 px-2.5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors rounded-[5px] cursor-pointer ${isSelected ? " bg-[#D2E6BC66] text-gray-900 font-semibold" : "text-gray-700"
+                                className={`w-full h-[40px] shrink-0 px-2 flex items-center justify-between text-left hover:bg-gray-50 transition-colors rounded-[5px] cursor-pointer ${isSelected ? " bg-[#D2E6BC66] text-gray-900 font-semibold" : "text-gray-700"
                                   }`}
                               >
-                                <div className="flex items-center gap-2.5 min-w-0 pr-2">
-                                  <div className="w-7.5 h-7.5 rounded-[5px] flex items-center justify-center shrink-0">
+                                <div className="flex items-start gap-2 min-w-0 pr-2">
+                                  <div className="w-4 h-4 flex items-center justify-center shrink-0 mt-0.5">
                                     <MapPin className="w-3.5 h-3.5 text-[#0E2E4E]" />
                                   </div>
                                   <div className="flex flex-col min-w-0 leading-tight">
@@ -710,16 +779,25 @@ export default function BookingBarWidget({
 
                 <div
                   ref={dateBoxRef}
-                  onClick={() => {
-                    fpInstance.current?.open();
-                    dateInputRef.current?.blur();
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (fpInstance.current) {
+                      if (fpInstance.current.isOpen) {
+                        fpInstance.current.close();
+                      } else {
+                        fpInstance.current.open();
+                        dateInputRef.current?.blur();
+                      }
+                    }
                   }}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchEnd={(e) => e.stopPropagation()}
                   className={`w-full h-[58px] sm:h-[60px] md:h-[48px] lg:h-[50px] border-[1px] ${dateError
                     ? "border-[#0E2E4E] bg-[#0E2E4E]/[0.03] ring-1 ring-[#0E2E4E]/20"
                     : "border-[#E5E7EB] bg-[#F9FAFB] hover:bg-gray-50/80"
                     } rounded-[8px] px-4 sm:px-[16px] flex items-center gap-3 transition-all cursor-pointer select-none`}
                 >
-                  <Calendar className={`w-5 h-5 ${dateError ? "text-[#0E2E4E]" : "text-gray-400"} shrink-0 stroke-[1.6] pointer-events-none`} />
+                  <Calendar className={`w-5 h-5 ${dateError ? "text-[#0E2E4E]" : "text-[#0E2E4E]/70"} shrink-0 stroke-[1.6] pointer-events-none`} />
 
                   <input
                     ref={dateInputRef}
@@ -851,26 +929,92 @@ const STYLES = `
     background: transparent !important;
     margin-bottom: 2px !important;
     width: 100% !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 30px !important;
   }
   .flatpickr-month {
-    height: 28px !important;
+    height: 100% !important;
     color: #0d1b2e !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
   }
 
   .flatpickr-current-month {
     font-size: 13.5px !important;
     font-weight: 700 !important;
     color: #0d1b2e !important;
-    padding-top: 0px !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    position: static !important;
+    width: auto !important;
+    left: auto !important;
+    right: auto !important;
+    height: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    transform: none !important;
+    pointer-events: auto !important;
   }
-  .flatpickr-current-month .flatpickr-monthDropdown-months,
+  .flatpickr-current-month .flatpickr-monthDropdown-months {
+    color: #0d1b2e !important;
+    font-weight: 700 !important;
+    font-size: 13.5px !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    width: auto !important;
+    display: inline-block !important;
+  }
+  .flatpickr-current-month .flatpickr-monthDropdown-months::-ms-expand {
+    display: none !important;
+  }
+  .flatpickr-current-month .numInputWrapper {
+    width: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .flatpickr-current-month .numInputWrapper span.arrowUp,
+  .flatpickr-current-month .numInputWrapper span.arrowDown,
+  .flatpickr-current-month .numInputWrapper span {
+    display: none !important;
+  }
   .flatpickr-current-month input.cur-year {
     color: #0d1b2e !important;
     font-weight: 700 !important;
+    font-size: 13.5px !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 4.2ch !important;
+    text-align: left !important;
+  }
+  .flatpickr-current-month input.cur-year::-webkit-inner-spin-button,
+  .flatpickr-current-month input.cur-year::-webkit-outer-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+    display: none !important;
   }
 
   .flatpickr-prev-month, .flatpickr-next-month {
-    top: 8px !important;
+    position: absolute !important;
+    top: 4px !important;
     height: 24px !important;
     width: 24px !important;
     fill: #0d1b2e !important;
@@ -880,12 +1024,14 @@ const STYLES = `
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    z-index: 10 !important;
+    cursor: pointer !important;
   }
   .flatpickr-prev-month {
-    left: 20px !important;
+    left: 8px !important;
   }
   .flatpickr-next-month {
-    right: 20px !important;
+    right: 8px !important;
   }
   .flatpickr-prev-month svg,
   .flatpickr-next-month svg {
@@ -942,11 +1088,34 @@ const STYLES = `
       font-size: 11px !important;
     }
   }
-  .flatpickr-day:hover,
-  .flatpickr-day.prevMonthDay:hover,
+  .flatpickr-day:hover {
+    background: #f1f5f9 !important;
+    color: #0d1b2e !important;
+  }
+  .flatpickr-day.prevMonthDay {
+    visibility: hidden !important;
+    pointer-events: none !important;
+    cursor: default !important;
+  }
+  .flatpickr-day.nextMonthDay {
+    visibility: visible !important;
+    color: #94a3b8 !important;
+    opacity: 0.8 !important;
+    cursor: pointer !important;
+  }
   .flatpickr-day.nextMonthDay:hover {
     background: #f1f5f9 !important;
     color: #0d1b2e !important;
+  }
+  .flatpickr-day.flatpickr-disabled,
+  .flatpickr-day.flatpickr-disabled:hover,
+  .flatpickr-day.disabled,
+  .flatpickr-day.disabled:hover {
+    color: #94a3b8 !important;
+    background: transparent !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+    opacity: 0.8 !important;
   }
   .flatpickr-day.selected,
   .flatpickr-day.startRange,
@@ -970,11 +1139,6 @@ const STYLES = `
   }
   .flatpickr-day.today {
     border: 1.5px solid #0d1b2e !important;
-  }
-  .flatpickr-day.disabled,
-  .flatpickr-day.prevMonthDay,
-  .flatpickr-day.nextMonthDay {
-    color: #cbd5e1 !important;
   }
 `;
 

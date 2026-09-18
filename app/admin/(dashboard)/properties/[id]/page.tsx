@@ -507,41 +507,7 @@ export default function PropertyFormPage() {
             </div>
           </section>
 
-          {/* Section: Booking Engine API & Let's Book Link */}
-          <section>
-            <SectionTitle>Booking API & Let's Book Links</SectionTitle>
-            <div className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <FormField
-                  label="Hotel PMS / API Code"
-                  hint="The unique hotel value used by eZee / IPMS247 booking bar (e.g. kattilchennai, kattil, kattilcoimbatore)"
-                >
-                  <input
-                    type="text"
-                    value={form.hotelCode}
-                    onChange={(e) => setForm((f) => ({ ...f, hotelCode: e.target.value }))}
-                    placeholder="e.g. kattilchennai"
-                    className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
-                  />
-                </FormField>
-
-                <FormField
-                  label="Custom Let's Book URL (Optional Override)"
-                  hint="Full direct Let's Book / Booking Engine URL for this property if different from base URL"
-                >
-                  <input
-                    type="text"
-                    value={form.bookingEngineUrl}
-                    onChange={(e) => setForm((f) => ({ ...f, bookingEngineUrl: e.target.value }))}
-                    placeholder="https://live.ipms247.com/booking/book-rooms-..."
-                    className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
-                  />
-                </FormField>
-              </div>
-            </div>
-          </section>
-
-          {/* Section 3: Photos & Gallery */}
+          {/* Section 2: Photos & Gallery */}
           <section>
             <SectionTitle>Property Photos</SectionTitle>
             <div className="space-y-4">
@@ -717,13 +683,13 @@ export default function PropertyFormPage() {
             <div className="grid md:grid-cols-2 gap-4">
               <FormField
                 label="Hotel Code / Booking Slug"
-                hint="e.g. 'kattilchennai', 'kattilcoimbatore', or 'kattil' used by eZee / IPMS247 booking engine."
+                hint="e.g. 'kattilchennai', 'kattilcoimbatore', 'kattil', or 'hostelgandhi' used by eZee / IPMS247 booking engine."
               >
                 <input
                   type="text"
                   value={form.hotelCode}
                   onChange={(e) => setForm((f) => ({ ...f, hotelCode: e.target.value }))}
-                  placeholder="e.g. kattilchennai"
+                  placeholder={form.slug ? `e.g. kattil${form.slug.replace(/^kattil-?/, "").replace(/-/g, "")}` : "e.g. kattilchennai, hostelgandhi"}
                   className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                 />
               </FormField>
@@ -736,7 +702,7 @@ export default function PropertyFormPage() {
                   type="url"
                   value={form.bookingEngineUrl}
                   onChange={(e) => setForm((f) => ({ ...f, bookingEngineUrl: e.target.value }))}
-                  placeholder="https://live.ipms247.com/booking/book-rooms-kattilchennai"
+                  placeholder={form.slug ? `https://live.ipms247.com/booking/book-rooms-kattil${form.slug.replace(/^kattil-?/, "").replace(/-/g, "")}` : "https://live.ipms247.com/booking/book-rooms-..."}
                   className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                 />
               </FormField>

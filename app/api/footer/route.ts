@@ -27,7 +27,9 @@ const STATIC_FALLBACK = {
       order: 1,
       links: [
         { label: "Chennai", href: "/chennai", newTab: false, order: 0 },
-        { label: "Madurai", href: "/madurai", newTab: false, order: 1 },
+        { label: "Kaniyakumari", href: "/kaniyakumari", newTab: false, order: 1 },
+        { label: "Coimbatore", href: "/coimbatore", newTab: false, order: 2 },
+        { label: "Madurai", href: "/madurai", newTab: false, order: 3 },
       ],
     },
     {

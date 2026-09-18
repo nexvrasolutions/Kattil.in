@@ -95,19 +95,31 @@ export default async function DestinationsPage() {
             count = roomCountMap.get(idStr) ?? 0;
           }
 
-          let destinationLink = c.link?.trim();
-          if (!destinationLink) {
-            if (c.slug === "chennai") destinationLink = "/chennai";
-            else if (c.slug === "coimbatore") destinationLink = "/coimbatore";
-            else if (c.slug === "madurai") destinationLink = "/madurai";
-            else if (c.slug === "colachel") destinationLink = "/colachel";
-            else destinationLink = `/destinations/${c.slug}`;
-          }
+          const isKanya =
+            c.slug === "kaniyakumari" ||
+            c.slug === "kanyakumari" ||
+            c.slug === "kanniyakumari" ||
+            /kany|kaniy/i.test(c.name);
+
+          let destinationLink = isKanya
+            ? "/kaniyakumari"
+            : c.link?.trim() ||
+              (c.slug === "chennai"
+                ? "/chennai"
+                : c.slug === "coimbatore"
+                  ? "/coimbatore"
+                  : c.slug === "madurai"
+                    ? "/madurai"
+                    : c.slug === "colachel"
+                      ? "/colachel"
+                      : `/destinations/${c.slug}`);
 
           let destinationImage = c.image?.trim() || c.banner?.trim();
           if (!destinationImage || (c.slug === "chennai" && destinationImage.includes("kanyakumari"))) {
             if (c.slug === "chennai")
               destinationImage = "/images/destinations/chennai.png";
+            else if (isKanya)
+              destinationImage = "/images/destinations/kanyakumari.png";
             else if (c.slug === "coimbatore")
               destinationImage = "/images/destinations/coimbatore.png";
             else if (c.slug === "madurai")

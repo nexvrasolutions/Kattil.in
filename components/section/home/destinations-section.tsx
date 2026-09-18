@@ -25,11 +25,11 @@ export const DEFAULT_DESTINATIONS: DestinationItem[] = [
     href: "/chennai",
   },
   {
-    id: "madurai",
-    name: "Madurai",
-    pillLabel: "Madurai",
-    image: "/images/destinations/madurai.png",
-    href: "/madurai",
+    id: "kaniyakumari",
+    name: "Kaniyakumari",
+    pillLabel: "Kaniyakumari",
+    image: "/images/destinations/kanyakumari.png",
+    href: "/kaniyakumari",
   },
   {
     id: "view-all",
@@ -61,14 +61,22 @@ export default function DestinationsSection({
 
         const priorityOrder: Record<string, number> = {
           chennai: 1,
-          madurai: 2,
+          kaniyakumari: 2,
+          kanniyakumari: 2,
+          kanyakumari: 2,
           coimbatore: 3,
-          colachel: 4,
-          kanyakumari: 5,
+          madurai: 4,
+          colachel: 5,
         };
 
         const activeList: DestinationItem[] = res.data
           .map((d: any) => {
+            const isKanya =
+              d.slug === "kaniyakumari" ||
+              d.slug === "kanyakumari" ||
+              d.slug === "kanniyakumari" ||
+              (d.name && /kany|kaniy/i.test(d.name));
+
             const displayName =
               d.name ||
               (d.slug === "chennai"
@@ -77,9 +85,11 @@ export default function DestinationsSection({
                   ? "Madurai"
                   : d.slug === "coimbatore"
                     ? "Coimbatore"
-                    : d.slug === "colachel" || d.slug === "kanyakumari"
-                      ? "Kanyakumari"
-                      : d.slug);
+                    : isKanya
+                      ? "Kaniyakumari"
+                      : d.slug === "colachel"
+                        ? "Colachel"
+                        : d.slug);
 
             const imgSrc =
               d.slug === "chennai"
@@ -88,21 +98,24 @@ export default function DestinationsSection({
                   ? "/images/destinations/madurai.png"
                   : d.slug === "coimbatore"
                     ? "/images/destinations/coimbatore.png"
-                    : d.slug === "colachel" || d.slug === "kanyakumari"
+                    : isKanya
                       ? "/images/destinations/kanyakumari.png"
-                      : d.image || "/images/destinations/chennai.png";
+                      : d.slug === "colachel"
+                        ? "/images/destinations/kanyakumari.png"
+                        : d.image || "/images/destinations/chennai.png";
 
-            const href =
-              d.link ||
-              (d.slug === "chennai"
-                ? "/chennai"
-                : d.slug === "coimbatore"
-                  ? "/coimbatore"
-                  : d.slug === "madurai"
-                    ? "/madurai"
-                    : d.slug === "colachel" || d.slug === "kanyakumari"
-                      ? "/colachel"
-                      : `/destinations/${d.slug}`);
+            const href = isKanya
+              ? "/kaniyakumari"
+              : d.link ||
+                (d.slug === "chennai"
+                  ? "/chennai"
+                  : d.slug === "coimbatore"
+                    ? "/coimbatore"
+                    : d.slug === "madurai"
+                      ? "/madurai"
+                      : d.slug === "colachel"
+                        ? "/colachel"
+                        : `/destinations/${d.slug}`);
 
             return {
               id: d._id || d.slug,
@@ -226,15 +239,14 @@ export default function DestinationsSection({
                   }}
                 >
                   {/* Top Pill Tag */}
-                  <div className="absolute top-3.5 left-3.5 right-3.5 flex justify-center z-10">
+                  <div className="absolute top-3.5 left-3.5 right-3.5 flex justify-center z-10 pointer-events-none">
                     <div
                       className="
                         w-full
                         max-w-[190px]
                         h-[34px]
                         flex items-center justify-center
-                        bg-[#FFFDF6]/95
-                        backdrop-blur-[6px]
+                        bg-[#FFFDF6]
                         rounded-[70px]
                         px-3
                         text-[13px]
@@ -243,6 +255,9 @@ export default function DestinationsSection({
                         tracking-tight
                         shadow-xs
                         transition-colors
+                        overflow-hidden
+                        select-none
+                        no-underline
                       "
                     >
                       {dest.pillLabel}

@@ -96,15 +96,8 @@ roomSchema.index({ city: 1 });
 roomSchema.index({ status: 1 });
 roomSchema.index({ featured: 1 });
 
-let Room: Model<IRoom>;
-
-if (process.env.NODE_ENV !== "production") {
-  if (mongoose.models["Room"]) {
-    delete mongoose.models["Room"];
-  }
-  Room = mongoose.model<IRoom>("Room", roomSchema);
-} else {
-  Room = (mongoose.models.Room as Model<IRoom>) ?? mongoose.model<IRoom>("Room", roomSchema);
-}
+const Room: Model<IRoom> =
+  (mongoose.models.Room as Model<IRoom>) ||
+  mongoose.model<IRoom>("Room", roomSchema);
 
 export default Room;

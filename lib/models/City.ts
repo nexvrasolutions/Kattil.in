@@ -58,15 +58,8 @@ const citySchema = new Schema<ICity>(
 
 citySchema.index({ active: 1 });
 
-let City: Model<ICity>;
-
-if (process.env.NODE_ENV !== "production") {
-  if (mongoose.models["City"]) {
-    delete mongoose.models["City"];
-  }
-  City = mongoose.model<ICity>("City", citySchema);
-} else {
-  City = (mongoose.models.City as Model<ICity>) ?? mongoose.model<ICity>("City", citySchema);
-}
+const City: Model<ICity> =
+  (mongoose.models.City as Model<ICity>) ||
+  mongoose.model<ICity>("City", citySchema);
 
 export default City;

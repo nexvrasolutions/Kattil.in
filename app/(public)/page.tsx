@@ -86,10 +86,12 @@ async function getHomeDestinations(): Promise<DestinationItem[]> {
 
     const priorityOrder: Record<string, number> = {
       chennai: 1,
-      madurai: 2,
+      kaniyakumari: 2,
+      kanniyakumari: 2,
+      kanyakumari: 2,
       coimbatore: 3,
-      colachel: 4,
-      kanyakumari: 5,
+      madurai: 4,
+      colachel: 5,
     };
 
     const activeList = cities
@@ -100,14 +102,24 @@ async function getHomeDestinations(): Promise<DestinationItem[]> {
           ? propertyCountMap.get(idStr) ?? 0
           : roomCountMap.get(idStr) ?? 0;
 
-        let destinationLink = c.link?.trim();
-        if (!destinationLink) {
-          if (c.slug === "chennai") destinationLink = "/chennai";
-          else if (c.slug === "coimbatore") destinationLink = "/coimbatore";
-          else if (c.slug === "madurai") destinationLink = "/madurai";
-          else if (c.slug === "colachel") destinationLink = "/colachel";
-          else destinationLink = `/destinations/${c.slug}`;
-        }
+        const isKanya =
+          c.slug === "kaniyakumari" ||
+          c.slug === "kanyakumari" ||
+          c.slug === "kanniyakumari" ||
+          /kany|kaniy/i.test(c.name);
+
+        let destinationLink = isKanya
+          ? "/kaniyakumari"
+          : c.link?.trim() ||
+            (c.slug === "chennai"
+              ? "/chennai"
+              : c.slug === "coimbatore"
+                ? "/coimbatore"
+                : c.slug === "madurai"
+                  ? "/madurai"
+                  : c.slug === "colachel"
+                    ? "/colachel"
+                    : `/destinations/${c.slug}`);
 
         let destinationImage = c.image?.trim() || c.banner?.trim();
         if (
@@ -116,6 +128,8 @@ async function getHomeDestinations(): Promise<DestinationItem[]> {
         ) {
           if (c.slug === "chennai")
             destinationImage = "/images/destinations/chennai.png";
+          else if (isKanya)
+            destinationImage = "/images/destinations/kanyakumari.png";
           else if (c.slug === "coimbatore")
             destinationImage = "/images/destinations/coimbatore.png";
           else if (c.slug === "madurai")
@@ -133,9 +147,11 @@ async function getHomeDestinations(): Promise<DestinationItem[]> {
               ? "Madurai"
               : c.slug === "coimbatore"
                 ? "Coimbatore"
-                : c.slug === "colachel"
-                  ? "Kanyakumari"
-                  : c.slug);
+                : isKanya
+                  ? "Kaniyakumari"
+                  : c.slug === "colachel"
+                    ? "Colachel"
+                    : c.slug);
 
         return {
           id: idStr,

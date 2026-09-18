@@ -113,30 +113,39 @@ export default function AllDestinationsView({
           <div className="px-5 md:px-8 lg:px-15">
             <div className="flex flex-wrap items-center justify-start gap-6 sm:gap-7">
               {destinations.map((dest, index) => {
-                const targetLink =
-                  dest.link?.trim() ||
-                  (dest.slug === "chennai"
-                    ? "/chennai"
-                    : dest.slug === "coimbatore"
-                      ? "/coimbatore"
-                      : dest.slug === "madurai"
-                        ? "/madurai"
-                        : dest.slug === "colachel"
-                          ? "/colachel"
-                          : `/destinations/${dest.slug}`);
+                const isKanya =
+                  dest.slug === "kaniyakumari" ||
+                  dest.slug === "kanyakumari" ||
+                  dest.slug === "kanniyakumari" ||
+                  (dest.name && /kany|kaniy/i.test(dest.name));
+
+                const targetLink = isKanya
+                  ? "/kaniyakumari"
+                  : dest.link?.trim() ||
+                    (dest.slug === "chennai"
+                      ? "/chennai"
+                      : dest.slug === "coimbatore"
+                        ? "/coimbatore"
+                        : dest.slug === "madurai"
+                          ? "/madurai"
+                          : dest.slug === "colachel"
+                            ? "/colachel"
+                            : `/destinations/${dest.slug}`);
 
                 const imgSrc =
                   dest.slug === "chennai"
                     ? "/images/destinations/chennai.png"
-                    : dest.image && !dest.image.includes("kanyakumari")
-                      ? dest.image.trim()
-                      : (dest.slug === "coimbatore"
-                        ? "/images/destinations/coimbatore.png"
-                        : dest.slug === "madurai"
-                          ? "/images/destinations/madurai.png"
-                          : dest.slug === "colachel"
-                            ? "/images/destinations/kanyakumari.png"
-                            : "/images/destinations/chennai.png");
+                    : isKanya
+                      ? "/images/destinations/kanyakumari.png"
+                      : dest.image && !dest.image.includes("kanyakumari")
+                        ? dest.image.trim()
+                        : (dest.slug === "coimbatore"
+                          ? "/images/destinations/coimbatore.png"
+                          : dest.slug === "madurai"
+                            ? "/images/destinations/madurai.png"
+                            : dest.slug === "colachel"
+                              ? "/images/destinations/kanyakumari.png"
+                              : "/images/destinations/chennai.png");
 
                 return (
                   <motion.div
@@ -162,14 +171,13 @@ export default function AllDestinationsView({
                       "
                     >
                       {/* Top Pill Tag */}
-                      <div className="absolute top-3 sm:top-4 left-3 sm:left-4 right-3 sm:right-4 flex justify-center z-10">
+                      <div className="absolute top-3 sm:top-4 left-3 sm:left-4 right-3 sm:right-4 flex justify-center z-10 pointer-events-none">
                         <div
                           className="
                             w-full
                             h-[34px] sm:h-[36px]
                             flex items-center justify-center
                             bg-[#FFFCF2]
-                            backdrop-blur-[4px]
                             rounded-[70px]
                             px-3 sm:px-4
                             text-[13px] sm:text-[14px]
@@ -177,6 +185,10 @@ export default function AllDestinationsView({
                             text-[#52613F]
                             tracking-tight
                             shadow-xs
+                            transition-colors
+                            overflow-hidden
+                            select-none
+                            no-underline
                           "
                         >
                           {dest.name}

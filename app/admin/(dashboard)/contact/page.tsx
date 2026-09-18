@@ -10,6 +10,7 @@ import {
 import AdminButton from "@/components/admin/ui/AdminButton";
 import { AdminInput, AdminTextarea } from "@/components/admin/ui/AdminInput";
 import PageHeader from "@/components/admin/ui/PageHeader";
+import { getGoogleMapsEmbedUrl } from "@/lib/utils/mapUtils";
 import Link from "next/link";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -267,7 +268,7 @@ export default function ContactPage() {
                           </FieldHint>
 
                           <AnimatePresence>
-                            {mapPreviewId === activeLoc.id && activeLoc.mapSrc && (
+                            {mapPreviewId === activeLoc.id && (
                               <motion.div
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: "auto" }}
@@ -277,7 +278,7 @@ export default function ContactPage() {
                               >
                                 <div className="relative overflow-hidden rounded-2xl border border-[hsl(var(--adm-border))]" style={{ height: 280 }}>
                                   <iframe
-                                    src={activeLoc.mapSrc}
+                                    src={getGoogleMapsEmbedUrl(activeLoc.mapSrc, activeLoc.address || `${activeLoc.label}, Tamil Nadu, India`)}
                                     width="100%"
                                     height="280"
                                     style={{ border: 0, display: "block" }}

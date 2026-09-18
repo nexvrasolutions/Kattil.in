@@ -25,7 +25,9 @@ export async function seedFooter() {
           section: "Locations", order: 1,
           links: [
             { label: "Chennai",      href: "/chennai", newTab: false, order: 0 },
-            { label: "Madurai",      href: "/madurai", newTab: false, order: 1 },
+            { label: "Kaniyakumari", href: "/kaniyakumari", newTab: false, order: 1 },
+            { label: "Coimbatore",   href: "/coimbatore", newTab: false, order: 2 },
+            { label: "Madurai",      href: "/madurai", newTab: false, order: 3 },
           ],
         },
         {
@@ -46,9 +48,10 @@ export async function seedFooter() {
           url: "", bgColor: "#25D366", iconColor: "#ffffff",
           type: "multi", pulse: true, order: 0, visible: true,
           locations: [
-            { label: "Madurai", url: "https://wa.me/917358127921" },
             { label: "Chennai", url: "https://wa.me/916385197921" },
+            { label: "Kaniyakumari", url: "https://wa.me/917448749779" },
             { label: "Coimbatore", url: "https://wa.me/917448749779" },
+            { label: "Madurai", url: "https://wa.me/917358127921" },
           ],
         },
         {
@@ -62,9 +65,10 @@ export async function seedFooter() {
           url: "", bgColor: "#ffffff", iconColor: "#4285F4",
           type: "multi", pulse: false, order: 2, visible: true,
           locations: [
-            { label: "Madurai", url: "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8" },
             { label: "Chennai", url: "https://maps.app.goo.gl/qNiPXnskwA6fQv8a8" },
+            { label: "Kaniyakumari", url: "https://maps.google.com/maps?q=Kaniyakumari%2C+Tamil+Nadu+629702" },
             { label: "Coimbatore", url: "https://maps.app.goo.gl/RaceCourseCoimbatore" },
+            { label: "Madurai", url: "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8" },
           ],
         },
       ];
@@ -105,7 +109,9 @@ export async function seedFooter() {
           section: "Locations", order: 1,
           links: [
             { label: "Chennai",      href: "/chennai", newTab: false, order: 0 },
-            { label: "Madurai",      href: "/madurai", newTab: false, order: 1 },
+            { label: "Kaniyakumari", href: "/kaniyakumari", newTab: false, order: 1 },
+            { label: "Coimbatore",   href: "/coimbatore", newTab: false, order: 2 },
+            { label: "Madurai",      href: "/madurai", newTab: false, order: 3 },
           ],
         },
         {

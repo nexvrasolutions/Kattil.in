@@ -137,12 +137,8 @@ const footerSchema = new Schema<IFooter>(
   { timestamps: true }
 );
 
-// Dev: always re-compile to pick up schema changes without restart
-if (process.env.NODE_ENV !== "production" && mongoose.models["Footer"]) {
-  delete mongoose.models["Footer"];
-}
-
 const Footer: Model<IFooter> =
-  (mongoose.models.Footer as Model<IFooter>) ?? mongoose.model<IFooter>("Footer", footerSchema);
+  (mongoose.models.Footer as Model<IFooter>) ||
+  mongoose.model<IFooter>("Footer", footerSchema);
 
 export default Footer;

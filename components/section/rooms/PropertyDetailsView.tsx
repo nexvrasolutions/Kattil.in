@@ -59,6 +59,8 @@ export interface PropertyDetailsData {
   phone: string;
   email: string;
   whatsapp?: string;
+  hotelCode?: string;
+  bookingEngineUrl?: string;
   rooms: PropertyRoomOption[];
   entityFound: boolean;
   directions?: {
@@ -409,15 +411,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                     `${data.name} offers thoughtfully designed spaces with modern amenities, warm hospitality, and a vibrant community experience for students and professionals. vibrant community experience for students and professionals.`}
                 </p>
 
-                {data.destinationName && (
-                  <Link
-                    href={destinationHref}
-                    className="inline-flex items-center gap-1.5 mt-4 font-[Public_Sans] text-[13px] md:text-[14px] font-medium text-[#526442] hover:text-[#374b2f] transition-colors"
-                  >
-                    <MapPin className="w-3.5 h-3.5" />
-                    See more stays in {data.destinationName}
-                  </Link>
-                )}
+
 
                 {/* Premium Amenities */}
                 <div className="mt-12">
@@ -493,6 +487,10 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                       let externalBookUrl = "";
                       if (room.bookingLink && (room.bookingLink.startsWith("http://") || room.bookingLink.startsWith("https://"))) {
                         externalBookUrl = room.bookingLink;
+                      } else if (data.bookingEngineUrl && (data.bookingEngineUrl.startsWith("http://") || data.bookingEngineUrl.startsWith("https://"))) {
+                        externalBookUrl = data.bookingEngineUrl;
+                      } else if (data.hotelCode) {
+                        externalBookUrl = `https://live.ipms247.com/booking/book-rooms-${data.hotelCode}`;
                       } else {
                         const staticRooms = (locationRooms as Record<string, any[]>)[destSlug];
                         const matched = staticRooms?.find(
@@ -505,14 +503,14 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                           externalBookUrl = matched.external_url;
                         } else if (destSlug === "chennai") {
                           externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattilchennai";
-                        } else if (destSlug === "madurai") {
-                          externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattil";
+                        } else if (destSlug === "kaniyakumari" || destSlug === "kanniyakumari" || destSlug.includes("sparrow")) {
+                          externalBookUrl = "https://live.ipms247.com/booking/book-rooms-thesparrow";
                         } else if (destSlug === "coimbatore") {
                           externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattilcoimbatore";
                         } else if (destSlug === "colachel") {
                           externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattilcolachel";
                         } else {
-                          externalBookUrl = "https://live.ipms247.com/booking/book-rooms-kattil";
+                          externalBookUrl = "https://live.ipms247.com/booking/book-rooms-thesparrow";
                         }
                       }
 
@@ -899,6 +897,8 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                 initialDestinationName={data.destinationName}
                 initialPropertyName={data.name}
                 initialDestinationSlug={data.destinationSlug}
+                initialHotelCode={data.hotelCode}
+                initialBookingEngineUrl={data.bookingEngineUrl}
                 lockedDestination={true}
               />
             </div>

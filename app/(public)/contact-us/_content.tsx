@@ -5,6 +5,7 @@ import { usePageView } from "@/hooks/usePageView";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Phone, Mail } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
+import { getGoogleMapsEmbedUrl } from "@/lib/utils/mapUtils";
 import type { LocationItem } from "./page";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -137,24 +138,30 @@ export default function ContactContent({ locations }: { locations: LocationItem[
 
               {/* Map */}
               <div className="relative overflow-hidden rounded-2xl h-80 sm:h-96 lg:h-auto min-h-[360px] shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
-                {active.mapSrc ? (
-                  <iframe
-                    key={mapKey}
-                    src={active.mapSrc}
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0, display: "block" }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title={`${active.label} location map`}
-                    onLoad={() => setMapLoading(false)}
-                  />
-                ) : (
-                  <div className="h-full w-full bg-primary/20 flex items-center justify-center">
-                    <p className="font-sans text-white/40 text-sm">Map not available</p>
-                  </div>
-                )}
+                {(() => {
+                  const embedUrl = getGoogleMapsEmbedUrl(
+                    active.mapSrc,
+                    active.address || `${active.label}, Tamil Nadu, India`
+                  );
+                  return embedUrl ? (
+                    <iframe
+                      key={mapKey}
+                      src={embedUrl}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0, display: "block" }}
+                      allowFullScreen
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                      title={`${active.label} location map`}
+                      onLoad={() => setMapLoading(false)}
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-primary/20 flex items-center justify-center">
+                      <p className="font-sans text-white/40 text-sm">Map not available</p>
+                    </div>
+                  );
+                })()}
 
                 <AnimatePresence>
                   {mapLoading && (

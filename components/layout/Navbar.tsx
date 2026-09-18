@@ -64,6 +64,8 @@ const isDestinationsRoute = (path: string) => {
     path.startsWith("/chennai") ||
     path.startsWith("/coimbatore") ||
     path.startsWith("/madurai") ||
+    path.startsWith("/kaniyakumari") ||
+    path.startsWith("/kanyakumari") ||
     path.startsWith("/colachel")
   );
 };
@@ -259,7 +261,7 @@ export default function Navbar() {
                 { label: "Home", href: "/" },
                 { label: "Destinations", href: "/rooms" },
                 { label: "Partners", href: "/partners" },
-                { label: "Offering", href: "" },
+                // { label: "Offering", href: "" },
               ].map((link) => {
                 const isDestinations = link.label === "Destinations";
                 const isActive = isDestinations
@@ -461,7 +463,7 @@ export default function Navbar() {
                   </motion.div>
 
                   {/* 4. Offering */}
-                  <motion.div variants={MENU_ITEM_VARIANTS}>
+                  {/* <motion.div variants={MENU_ITEM_VARIANTS}>
                     <Link
                       href="#"
                       onClick={() => setMobileOpen(false)}
@@ -469,7 +471,7 @@ export default function Navbar() {
                     >
                       Offering
                     </Link>
-                  </motion.div>
+                  </motion.div> */}
 
                   {/* 5. Contact Us */}
                   <motion.div variants={MENU_ITEM_VARIANTS}>

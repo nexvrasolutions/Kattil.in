@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
@@ -166,6 +166,8 @@ export const isDestinationsRoute = (path: string) => {
     path.startsWith("/chennai") ||
     path.startsWith("/coimbatore") ||
     path.startsWith("/madurai") ||
+    path.startsWith("/kaniyakumari") ||
+    path.startsWith("/kanyakumari") ||
     path.startsWith("/colachel")
   );
 };
@@ -475,8 +477,16 @@ export default function HeroNavbar({
   // listeners on every render).
   // ───────────────────────────────────────────────────────────────────────────
 
-  useEffect(() => {
+  // useLayoutEffect (not useEffect) so this ref is guaranteed current before
+  // the browser dispatches the next native wheel/scroll event — a plain
+  // useEffect flushes asynchronously and can leave heroVisibleRef stale
+  // across rapid consecutive events, letting the wheel handler's lockUntil
+  // bookkeeping re-arm against an out-of-date heroVisible reading.
+  useLayoutEffect(() => {
     heroVisibleRef.current = heroVisible;
+    if (heroVisible) {
+      heroJumpedRef.current = false;
+    }
   }, [heroVisible]);
 
   useEffect(() => {
@@ -484,74 +494,46 @@ export default function HeroNavbar({
   }, [mobileOpen]);
 
   // ───────────────────────────────────────────────────────────────────────────
-  // Wheel / touch / keyboard scroll interception
+  // Wheel / keyboard scroll interception (Desktop)
   //
-  // While the hero is visible, the first downward scroll intent (wheel,
-  // swipe, or ArrowDown/PageDown/Space) is captured, default scrolling is
-  // prevented, and the page is jumped straight to its post-collapse resting
-  // position (the top of the Destinations section) in one shot. The hero →
-  // compact navbar transition then plays out on its own fixed-duration eased
-  // curve (see the motion.div below), completely decoupled from the raw
-  // scroll deltas that would otherwise scrub it frame-by-frame and cause jank.
+  // On desktop, the first downward wheel/arrow intent smoothly jumps to the
+  // content section while Framer Motion handles the hero collapse.
+  // On mobile touch devices, native scroll handles momentum without blocking
+  // so scrolling never gets stuck.
   // ───────────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
     if (!isHome) return;
 
     let lockUntil = 0;
-    let prevHeroVisible = heroVisibleRef.current;
 
     const jump = () => {
       if (heroJumpedRef.current) return;
 
-      // Don't latch heroJumpedRef until we know we can actually complete the
-      // jump — on a genuinely fresh mount the destinations section is always
-      // in the initial HTML, but latching first and finding no element would
-      // permanently disable every future scroll/touch/keyboard attempt for
-      // this page view with no way to recover.
       const el = document.getElementById("destinations");
       if (!el) return;
 
       heroJumpedRef.current = true;
-      lockUntil = Date.now() + 600;
-
-      // The mount / route-change effect below sets a 1.5s scrollLockUntilRef
-      // so its own scroll-to-top reset can't be interrupted by the passive
-      // scroll handler collapsing the hero mid-reset. If the user scrolls
-      // (triggering this jump) while that window is still open — very
-      // possible right after a fast client-side navigation to "/" — the
-      // scroll handler would otherwise see our programmatic scroll, treat it
-      // as still "locked", and force heroVisible back to true, undoing this
-      // jump before it's visible. Clear it and flip heroVisible ourselves so
-      // the collapse is immediate and deterministic instead of depending on
-      // the next "scroll" event to arrive before that lock expires.
+      lockUntil = Date.now() + 500;
       scrollLockUntilRef.current = 0;
       setHeroVisible(false);
 
-      // Spacer below collapses from 100svh -> (navbarH + 32) once the hero
-      // is dismissed; pre-compensate so the landing spot accounts for that
-      // shrink instead of drifting once layout settles.
       const spacerShrink = window.innerHeight - (navbarH + 32);
-
-      // Respect the section's own scroll-margin-top (its intended gap below
-      // a fixed header) rather than a value tuned for a different section.
       const scrollMarginTop =
         parseFloat(getComputedStyle(el).scrollMarginTop) || navbarH + 32;
 
       const futureAbsPos =
         el.getBoundingClientRect().top + window.scrollY - spacerShrink;
       const top = Math.max(81, futureAbsPos - scrollMarginTop);
-      window.scrollTo(0, top);
+      window.scrollTo({ top, behavior: "smooth" });
     };
 
     const onWheel = (e: WheelEvent) => {
       if (mobileOpenRef.current) return;
       const heroNow = heroVisibleRef.current;
-      if (heroNow && !prevHeroVisible) {
+      if (heroNow && Date.now() >= lockUntil) {
         heroJumpedRef.current = false;
-        lockUntil = 0;
       }
-      prevHeroVisible = heroNow;
       if (e.deltaY <= 0) return;
       if (heroNow || Date.now() < lockUntil) {
         e.preventDefault();
@@ -559,77 +541,6 @@ export default function HeroNavbar({
       }
     };
 
-    // Touch: mirrors the wheel handler above. Native touch scrolling is not
-    // intercepted by default (touchstart/touchend alone can't stop it — only
-    // a non-passive touchmove can), so without this the browser scrolls the
-    // hero and #destinations together in real time before the 30px swipe
-    // threshold below ever fires, and jump()'s programmatic scrollTo then
-    // lands on top of wherever that native scroll left off. Preventing
-    // default on touchmove while the hero is visible (or for the remainder
-    // of the gesture that triggered the jump) blocks that native scroll
-    // entirely so the section swap is the single, deliberate jump() below
-    // instead of a blended scroll.
-    //
-    // touchLockActive is scoped to the current finger-down gesture (reset on
-    // touchstart/touchend/touchcancel) rather than a wall-clock timer like
-    // the wheel handler's `lockUntil`. A timed lock would keep swallowing
-    // touchmove events — via preventDefault with no compensating scroll,
-    // since jump() is already a no-op after the first call — on any new
-    // swipe that starts within that window, which is exactly what happens
-    // during normal rapid swiping and made the page feel stuck after a few
-    // swipes. Tying the lock to the gesture instead means it can never
-    // outlive the swipe that set it, so native scrolling is immediately
-    // available again on the very next touch.
-    let touchStartY = 0;
-    let touchActive = false;
-    let touchLockActive = false;
-
-    const onTouchStart = (e: TouchEvent) => {
-      if (mobileOpenRef.current) return;
-      touchStartY = e.touches[0].clientY;
-      touchActive = true;
-      touchLockActive = false;
-    };
-
-    const onTouchMove = (e: TouchEvent) => {
-      if (mobileOpenRef.current || !touchActive) return;
-
-      const heroNow = heroVisibleRef.current;
-      if (heroNow && !prevHeroVisible) {
-        heroJumpedRef.current = false;
-        touchLockActive = false;
-      }
-      prevHeroVisible = heroNow;
-
-      // Positive deltaY == finger dragging up == scroll-down intent (same
-      // sign convention as wheel's deltaY). Dragging down (returning toward
-      // the hero) is left alone so native scroll keeps working for that
-      // direction, same as the wheel handler's `deltaY <= 0` early return.
-      const deltaY = touchStartY - e.touches[0].clientY;
-      if (deltaY <= 0) return;
-
-      if (heroNow || touchLockActive) {
-        e.preventDefault();
-        if (deltaY > 30) {
-          jump();
-          // Keep intercepting only for the rest of THIS gesture so the
-          // browser doesn't try to "catch up" a scroll it never started,
-          // then release fully on touchend — never carried into the next
-          // swipe.
-          if (heroJumpedRef.current) touchLockActive = true;
-        }
-      }
-    };
-
-    const onTouchEnd = () => {
-      touchActive = false;
-      touchLockActive = false;
-    };
-
-    const onTouchCancel = () => {
-      touchActive = false;
-      touchLockActive = false;
-    };
     const onKeyDown = (e: KeyboardEvent) => {
       if (mobileOpenRef.current) return;
       if (!heroVisibleRef.current) return;
@@ -640,34 +551,32 @@ export default function HeroNavbar({
     };
 
     window.addEventListener("wheel", onWheel, { passive: false });
-    window.addEventListener("touchstart", onTouchStart, { passive: true });
-    window.addEventListener("touchmove", onTouchMove, { passive: false });
-    window.addEventListener("touchend", onTouchEnd, { passive: true });
-    window.addEventListener("touchcancel", onTouchCancel, { passive: true });
     window.addEventListener("keydown", onKeyDown);
 
     return () => {
       window.removeEventListener("wheel", onWheel);
-      window.removeEventListener("touchstart", onTouchStart);
-      window.removeEventListener("touchmove", onTouchMove);
-      window.removeEventListener("touchend", onTouchEnd);
-      window.removeEventListener("touchcancel", onTouchCancel);
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [isHome, navbarH]);
 
   // ───────────────────────────────────────────────────────────────────────────
   // Scroll handler — manages the scrolled shadow + hero expand/collapse.
-  //
-  // Two-state (boundary-crossing): heroVisible only flips when currentY
-  // crosses 80px scrolling down or 20px scrolling up, so this triggers at
-  // most two re-renders per pass instead of one per scroll frame. The actual
-  // collapse animation is handled entirely by Framer Motion once heroVisible
-  // flips (see isExpanded below) — not by this handler.
   // ───────────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
-    const onScroll = () => {
+    // rAF-coalesced: a fast wheel burst or touch-momentum scroll can fire
+    // many "scroll" events within a single frame. Without this, each one
+    // independently flips heroVisible, repeatedly restarting the 650ms
+    // height tween on the fixed header capsule and page spacer WHILE the
+    // gesture is still live — which is what lets a rapid scroll/swipe keep
+    // re-triggering the hero to re-expand instead of settling. Collapsing
+    // to at most one evaluation per frame doesn't change any threshold or
+    // timing, it just stops redundant same-frame state flips.
+    let ticking = false;
+
+    const evaluate = () => {
+      ticking = false;
+
       const currentY = window.scrollY;
       const isLocked = Date.now() < scrollLockUntilRef.current;
 
@@ -681,10 +590,20 @@ export default function HeroNavbar({
 
       if (isHome) {
         const scrollingDown = currentY > lastScrollY.current;
-        if (scrollingDown && currentY > 80) setHeroVisible(false);
-        if (!scrollingDown && currentY < 20) setHeroVisible(true);
+        if (scrollingDown && currentY > 50) {
+          setHeroVisible(false);
+        } else if (!scrollingDown && currentY < 20) {
+          setHeroVisible(true);
+          heroJumpedRef.current = false;
+        }
         lastScrollY.current = currentY;
       }
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(evaluate);
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -702,7 +621,7 @@ export default function HeroNavbar({
       }
 
       if (isHome) {
-        scrollLockUntilRef.current = Date.now() + 1500;
+        scrollLockUntilRef.current = Date.now() + 300;
         heroJumpedRef.current = false;
         window.scrollTo(0, 0);
         setHeroVisible(true);
@@ -1366,7 +1285,7 @@ export default function HeroNavbar({
                     </motion.div>
 
                     {/* 4. Offering */}
-                    <motion.div variants={MENU_ITEM_VARIANTS}>
+                    {/* <motion.div variants={MENU_ITEM_VARIANTS}>
                       <Link
                         href="#"
                         onClick={() => setMobileOpen(false)}
@@ -1374,7 +1293,7 @@ export default function HeroNavbar({
                       >
                         Offering
                       </Link>
-                    </motion.div>
+                    </motion.div> */}
 
                     {/* 5. Contact Us */}
                     <motion.div variants={MENU_ITEM_VARIANTS}>
@@ -1471,24 +1390,7 @@ export default function HeroNavbar({
                 >
                   {/* EYEBROW */}
 
-                  <motion.p
-                    initial={{
-                      opacity: 0,
-                      y: 10,
-                    }}
-                    animate={{
-                      opacity: heroVisible
-                        ? 1
-                        : 0,
-                      y: heroVisible
-                        ? 0
-                        : 10,
-                    }}
-                    transition={{
-                      delay: 0.3,
-                      duration: 0.45,
-                      ease: HERO_EASE,
-                    }}
+                  <p
                     className="
                     text-[11px]
                     sm:text-xs
@@ -1496,7 +1398,7 @@ export default function HeroNavbar({
                     font-semibold
                     text-white/90
                     uppercase
-                    tracking-[0.14em]
+                    
                     mb-1
                     sm:mb-1.5
                     font-sans
@@ -1504,7 +1406,7 @@ export default function HeroNavbar({
                   >
                     {heroEyebrow ||
                       "THE HOMELY RESET"}
-                  </motion.p>
+                  </p>
 
                   {/* HEADLINE — continuous blur sweep, left to right */}
 
@@ -1655,52 +1557,18 @@ export default function HeroNavbar({
 
                   {/* BOOKING WIDGET */}
 
-                  <motion.div
-                    initial={{
-                      opacity: 0,
-                      y: 22,
-                    }}
-                    animate={{
-                      opacity: heroVisible
-                        ? 1
-                        : 0,
-                      y: heroVisible
-                        ? 0
-                        : 22,
-                    }}
-                    transition={{
-                      delay: 0.5,
-                      duration: 0.5,
-                      ease: HERO_EASE,
-                    }}
+                  <div
                     className="
                     w-full
                     max-w-4xl
                   "
                   >
                     <BookingBarWidget />
-                  </motion.div>
+                  </div>
 
                   {/* TRUST BADGES */}
 
-                  <motion.div
-                    initial={{
-                      opacity: 0,
-                      y: 14,
-                    }}
-                    animate={{
-                      opacity: heroVisible
-                        ? 1
-                        : 0,
-                      y: heroVisible
-                        ? 0
-                        : 14,
-                    }}
-                    transition={{
-                      delay: 0.58,
-                      duration: 0.5,
-                      ease: HERO_EASE,
-                    }}
+                  <div
                     className="
                     flex
                     justify-center
@@ -1937,7 +1805,7 @@ export default function HeroNavbar({
                         </div>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>

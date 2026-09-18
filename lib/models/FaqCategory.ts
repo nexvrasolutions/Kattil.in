@@ -22,11 +22,8 @@ const faqCategorySchema = new Schema<IFaqCategory>(
 faqCategorySchema.index({ slug: 1 }, { unique: true });
 faqCategorySchema.index({ active: 1, order: 1 });
 
-let FaqCategory: Model<IFaqCategory>;
-if (process.env.NODE_ENV !== "production" && mongoose.models["FaqCategory"]) {
-  delete mongoose.models["FaqCategory"];
-}
-FaqCategory = mongoose.models.FaqCategory as Model<IFaqCategory>
-  ?? mongoose.model<IFaqCategory>("FaqCategory", faqCategorySchema);
+const FaqCategory: Model<IFaqCategory> =
+  (mongoose.models.FaqCategory as Model<IFaqCategory>) ||
+  mongoose.model<IFaqCategory>("FaqCategory", faqCategorySchema);
 
 export default FaqCategory;

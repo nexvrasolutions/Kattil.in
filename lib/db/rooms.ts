@@ -26,14 +26,23 @@ const CITY_CONFIGS: Record<string, CityConfig> = {
     email: "sadhu_burlington@live.com",
     mapSrc: "https://maps.google.com/maps?q=274%2C+1st+Main+Road%2C+Secretariat+Colony%2C+Thoraipakkam%2C+Chennai%2C+Tamil+Nadu+600097&t=m&z=16&ie=UTF8&iwloc=&output=embed",
   },
-  madurai: {
-    destinationName: "Madurai",
-    destinationSlug: "madurai",
-    defaultPropertyName: "Kattil The Sparrow",
-    address: "2nd St, Park Town, Bama Nagar, Madurai, Tamil Nadu 625017",
+  kaniyakumari: {
+    destinationName: "Kaniyakumari",
+    destinationSlug: "kaniyakumari",
+    defaultPropertyName: "The Sparrow",
+    address: "Main Road, Near Sunset Point, Kaniyakumari, Tamil Nadu 629702",
     phone: "+91 74487 49779",
     email: "hostelsparrow@gmail.com",
-    mapSrc: "https://maps.google.com/maps?q=2nd+St%2C+Park+Town%2C+Bama+Nagar%2C+Madurai%2C+Tamil+Nadu+625017&t=m&z=16&ie=UTF8&iwloc=&output=embed",
+    mapSrc: "https://maps.google.com/maps?q=Kaniyakumari%2C+Tamil+Nadu+629702&t=m&z=16&ie=UTF8&iwloc=&output=embed",
+  },
+  kanniyakumari: {
+    destinationName: "Kaniyakumari",
+    destinationSlug: "kaniyakumari",
+    defaultPropertyName: "The Sparrow",
+    address: "Main Road, Near Sunset Point, Kaniyakumari, Tamil Nadu 629702",
+    phone: "+91 74487 49779",
+    email: "hostelsparrow@gmail.com",
+    mapSrc: "https://maps.google.com/maps?q=Kaniyakumari%2C+Tamil+Nadu+629702&t=m&z=16&ie=UTF8&iwloc=&output=embed",
   },
   coimbatore: {
     destinationName: "Coimbatore",
@@ -53,14 +62,14 @@ const CITY_CONFIGS: Record<string, CityConfig> = {
     email: "hostelsparrow@gmail.com",
     mapSrc: "https://maps.google.com/maps?q=Colachel%2C+Tamil+Nadu+629251&t=m&z=16&ie=UTF8&iwloc=&output=embed",
   },
-  kanniyakumari: {
-    destinationName: "Kanniyakumari",
-    destinationSlug: "kanniyakumari",
-    defaultPropertyName: "Kattil The Sparrow",
-    address: "Main Road, Near Sunset Point, Kanniyakumari, Tamil Nadu 629702",
-    phone: "+91 74487 49779",
-    email: "hostelsparrow@gmail.com",
-    mapSrc: "https://maps.google.com/maps?q=Kanniyakumari%2C+Tamil+Nadu+629702&t=m&z=16&ie=UTF8&iwloc=&output=embed",
+  madurai: {
+    destinationName: "Madurai",
+    destinationSlug: "madurai",
+    defaultPropertyName: "Kattil Stay Madurai",
+    address: "2nd St, Park Town, Bama Nagar, Madurai, Tamil Nadu 625017",
+    phone: "+91 73581 27921",
+    email: "sadhu_burlington@live.com",
+    mapSrc: "https://maps.google.com/maps?q=2nd+St%2C+Park+Town%2C+Bama+Nagar%2C+Madurai%2C+Tamil+Nadu+625017&t=m&z=16&ie=UTF8&iwloc=&output=embed",
   },
 };
 
@@ -73,6 +82,7 @@ export function detectCitySlug(slug: string): string {
     s.includes("urban-sanctuary") ||
     s.includes("coastal-heritage") ||
     s.includes("garden-villa") ||
+    s.includes("gandhi") ||
     s.includes("executive")
   ) {
     return "chennai";
@@ -84,22 +94,20 @@ export function detectCitySlug(slug: string): string {
     return "colachel";
   }
   if (
-    s === "madurai" ||
-    s.includes("madurai") ||
-    s.includes("sparrow-madurai")
-  ) {
-    return "madurai";
-  }
-  if (
     s === "kanniyakumari" ||
+    s === "kaniyakumari" ||
     s === "kanyakumari" ||
     s.includes("kanniyakumari") ||
+    s.includes("kaniyakumari") ||
     s.includes("kanyakumari") ||
     s.includes("sparrow")
   ) {
-    return "kanniyakumari";
+    return "kaniyakumari";
   }
-  return "kanniyakumari";
+  if (s === "madurai" || s.includes("madurai")) {
+    return "madurai";
+  }
+  return "kaniyakumari";
 }
 
 function getFallbackRoomOptions(citySlug: string): PropertyRoomOption[] {
@@ -146,7 +154,17 @@ const CACHE_TTL_MS = 60 * 1000; // 60 seconds
 
 export function clearPropertyCache(slug?: string) {
   if (slug) {
-    propertyDetailsCache.delete(slug.toLowerCase().trim());
+    const cleanSlug = slug.toLowerCase().trim();
+    for (const key of propertyDetailsCache.keys()) {
+      if (key === cleanSlug || key.startsWith(`${cleanSlug}-`)) {
+        propertyDetailsCache.delete(key);
+      }
+    }
+    for (const key of roomsPageCache.keys()) {
+      if (key === cleanSlug || key.startsWith(`${cleanSlug}-`)) {
+        roomsPageCache.delete(key);
+      }
+    }
   } else {
     propertyDetailsCache.clear();
     roomsPageCache.clear();
@@ -186,8 +204,19 @@ export async function getPropertyDetailsData(
       property = await Property.findById(cleanSlug).populate("city").lean();
     }
     if (!property) {
+      const hyphenSlug = cleanSlug.replace(/_/g, "-");
+      const spaceSlug = cleanSlug.replace(/[_-]/g, " ");
       property = await Property.findOne({
-        $or: [{ slug: cleanSlug }, { name: { $regex: new RegExp(`^${cleanSlug}$`, "i") } }],
+        $or: [
+          { slug: cleanSlug },
+          { slug: hyphenSlug },
+          { slug: `kattil-${hyphenSlug}` },
+          { slug: hyphenSlug.replace(/^kattil-/, "") },
+          { name: { $regex: new RegExp(`^${spaceSlug}$`, "i") } },
+          { name: { $regex: new RegExp(`^${cleanSlug}$`, "i") } },
+          { name: { $regex: new RegExp(`^kattil ${spaceSlug}$`, "i") } },
+          { name: { $regex: new RegExp(`^${spaceSlug}`, "i") } },
+        ],
       })
         .populate("city")
         .lean();
@@ -245,7 +274,12 @@ export async function getPropertyDetailsData(
       }
       if (!primaryRoom) {
         primaryRoom = await Room.findOne({
-          $or: [{ slug: cleanSlug }, { name: { $regex: new RegExp(`^${cleanSlug}$`, "i") } }],
+          $or: [
+            { slug: cleanSlug },
+            { slug: cleanSlug.replace(/-/g, " ") },
+            { name: { $regex: new RegExp(`^${cleanSlug.replace(/-/g, " ")}$`, "i") } },
+            { name: { $regex: new RegExp(`^${cleanSlug}$`, "i") } },
+          ],
         })
           .populate("city")
           .populate("property")
@@ -261,6 +295,7 @@ export async function getPropertyDetailsData(
       if (primaryRoom?.property) {
         property = primaryRoom.property;
         city = primaryRoom.city || property.city;
+        matchedEntity = true;
         roomsList = await Room.find({
           property: property._id,
           status: { $ne: "inactive" },
@@ -269,6 +304,7 @@ export async function getPropertyDetailsData(
           .lean();
       } else if (primaryRoom?.city) {
         city = primaryRoom.city;
+        matchedEntity = true;
         // Only rooms from active properties in this city
         const activePropsInCity = (await Property.find({ city: city._id, status: { $ne: "inactive" } }).select("_id").lean()).map((p) => p._id);
         roomsList = await Room.find({
@@ -297,6 +333,12 @@ export async function getPropertyDetailsData(
       }).lean();
 
       if (city) {
+        // A real City document was matched, so this is a genuine destination on
+        // the site — never 404 it, even if it has no properties yet (mirrors the
+        // "property found but inactive" case above, which also renders with 0 rooms
+        // instead of calling notFound()).
+        matchedEntity = true;
+
         // Check if properties exist for this city in DB
         const cityProps = await Property.find({ city: city._id }).lean();
         if (cityProps.length > 0) {
@@ -408,20 +450,20 @@ export async function getPropertyDetailsData(
             "/assets/ac-double-room.webp",
           ];
 
-    // Hero carousel uses gallery photos from Admin Panel (or property photos)
+    // Hero carousel uses property photos from Admin Panel first, or falls back to admin gallery / defaults
     const heroImages =
-      effectiveAdminGallery.length > 0
-        ? effectiveAdminGallery
-        : propertyPhotos.length > 0
+      propertyPhotos.length > 0
         ? propertyPhotos
+        : effectiveAdminGallery.length > 0
+        ? effectiveAdminGallery
         : DEFAULT_PROPERTY_IMAGES;
 
-    // Gallery section shows EXACTLY the gallery photos from Admin Panel
+    // Gallery section shows property photos from Admin Panel first, or falls back to admin gallery / defaults
     const galleryImages =
-      effectiveAdminGallery.length > 0
-        ? effectiveAdminGallery
-        : propertyPhotos.length > 0
+      propertyPhotos.length > 0
         ? propertyPhotos
+        : effectiveAdminGallery.length > 0
+        ? effectiveAdminGallery
         : DEFAULT_PROPERTY_IMAGES;
 
     const result: PropertyDetailsData = {
@@ -442,12 +484,16 @@ export async function getPropertyDetailsData(
       phone: property?.phone || city?.phone || cityConfig.phone,
       email: property?.email || city?.email || cityConfig.email,
       whatsapp: property?.whatsapp,
+      hotelCode: property?.hotelCode,
+      bookingEngineUrl: property?.bookingEngineUrl,
       directions: property?.directions,
       rooms: roomOptions,
       entityFound: matchedEntity,
     };
 
-    propertyDetailsCache.set(cacheKey, { data: result, timestamp: Date.now() });
+    if (result.entityFound) {
+      propertyDetailsCache.set(cacheKey, { data: result, timestamp: Date.now() });
+    }
     return result;
   } catch (error) {
     console.error(`[getPropertyDetailsData] Failed for slug "${slug}":`, error);

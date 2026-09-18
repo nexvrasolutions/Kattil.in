@@ -18,48 +18,45 @@ export interface HotelOption {
   state?: string;
   slug: string;
   hotelValue: string;
+  bookingEngineUrl?: string;
 }
 
 const DEFAULT_HOTEL_OPTIONS: HotelOption[] = [
   {
-    id: "dest-chennai",
-    name: "Kattil Executive",
-    place: "Chennai",
+    id: "prop-the-sparrow",
+    name: "The Sparrow",
+    place: "Kaniyakumari",
     state: "Tamil Nadu",
-    slug: "chennai",
-    hotelValue: "kattilchennai",
+    slug: "the-sparrow",
+    hotelValue: "thesparrow",
+    bookingEngineUrl: "https://live.ipms247.com/booking/book-rooms-thesparrow",
   },
   {
-    id: "dest-madurai",
-    name: "Kattil The Sparrow",
-    place: "Madurai",
+    id: "prop-hostel-gandhi",
+    name: "Hostel Gandhi",
+    place: "Chennai",
     state: "Tamil Nadu",
-    slug: "madurai",
-    hotelValue: "kattil",
+    slug: "hostel-gandhi",
+    hotelValue: "hostelgandhi",
+    bookingEngineUrl: "https://live.ipms247.com/booking/book-rooms-hostelgandhi",
+  },
+  {
+    id: "dest-chennai",
+    name: "Kattil Executive Stay",
+    place: "Chennai",
+    state: "Tamil Nadu",
+    slug: "kattil-executive-stay",
+    hotelValue: "kattilchennai",
+    bookingEngineUrl: "https://live.ipms247.com/booking/book-rooms-kattilchennai",
   },
   {
     id: "dest-coimbatore",
-    name: "Kattil Stay",
+    name: "Kattil Stay Coimbatore",
     place: "Coimbatore",
     state: "Tamil Nadu",
-    slug: "coimbatore",
+    slug: "kattil-stay-coimbatore",
     hotelValue: "kattilcoimbatore",
-  },
-  {
-    id: "dest-colachel",
-    name: "Kattil Colachel",
-    place: "Colachel",
-    state: "Tamil Nadu",
-    slug: "colachel",
-    hotelValue: "kattilcolachel",
-  },
-  {
-    id: "dest-kanniyakumari",
-    name: "Kattil The Sparrow",
-    place: "Kanniyakumari",
-    state: "Tamil Nadu",
-    slug: "kanniyakumari",
-    hotelValue: "kattil",
+    bookingEngineUrl: "https://live.ipms247.com/booking/book-rooms-kattilcoimbatore",
   },
 ];
 
@@ -78,11 +75,12 @@ function formatDateDisplay(d: Date): string {
 
 function getHotelValueForSlug(slug: string): string {
   const s = slug.toLowerCase().trim();
+  if (s.includes("gandhi")) return "hostelgandhi";
+  if (s.includes("sparrow")) return "thesparrow";
   if (s === "chennai") return "kattilchennai";
-  if (s === "madurai") return "kattil";
   if (s === "coimbatore") return "kattilcoimbatore";
   if (s === "colachel") return "kattilcolachel";
-  if (s === "kanniyakumari" || s.includes("sparrow")) return "kattil";
+  if (s === "kaniyakumari" || s === "kanniyakumari" || s === "kanyakumari") return "thesparrow";
   return `kattil${s}`;
 }
 
@@ -90,13 +88,17 @@ interface RoomStickyBookingWidgetProps {
   initialDestinationName?: string;
   initialPropertyName?: string;
   initialDestinationSlug?: string;
+  initialHotelCode?: string;
+  initialBookingEngineUrl?: string;
   lockedDestination?: boolean;
 }
 
 export default function RoomStickyBookingWidget({
-  initialDestinationName = "Kanniyakumari",
-  initialPropertyName = "Kattil The Sparrow",
-  initialDestinationSlug = "kanniyakumari",
+  initialDestinationName = "Kaniyakumari",
+  initialPropertyName = "The Sparrow",
+  initialDestinationSlug = "kaniyakumari",
+  initialHotelCode,
+  initialBookingEngineUrl,
   lockedDestination = true,
 }: RoomStickyBookingWidgetProps) {
   // Resolve initial hotel based on page parameters
@@ -105,21 +107,26 @@ export default function RoomStickyBookingWidget({
     const nameLower = (initialDestinationName || "").toLowerCase().trim();
     const propLower = (initialPropertyName || "").toLowerCase().trim();
 
-    const slugMatch = DEFAULT_HOTEL_OPTIONS.find(
-      (h) =>
-        (slugLower && (h.slug.toLowerCase() === slugLower || slugLower.includes(h.slug.toLowerCase()) || h.slug.toLowerCase().includes(slugLower))) ||
-        (nameLower && (h.place.toLowerCase() === nameLower || nameLower.includes(h.place.toLowerCase()) || h.place.toLowerCase().includes(nameLower))) ||
-        (propLower && (h.name.toLowerCase() === propLower || propLower.includes(h.name.toLowerCase()) || h.name.toLowerCase().includes(propLower)))
-    );
-    if (slugMatch) return slugMatch;
+    let extractedCode = "";
+    if (initialBookingEngineUrl) {
+      const match = initialBookingEngineUrl.match(/book-rooms-([^/?#]+)/);
+      if (match) extractedCode = match[1];
+    }
+
+    const hotelValue =
+      initialHotelCode ||
+      extractedCode ||
+      getHotelValueForSlug(propLower || slugLower);
+
     return {
-      id: `dest-${initialDestinationSlug}`,
-      name: initialPropertyName,
+      id: initialHotelCode ? `prop-${initialHotelCode}` : `dest-${initialDestinationSlug}`,
+      name: initialPropertyName || `Kattil ${initialDestinationName}`,
       place: initialDestinationName,
       slug: initialDestinationSlug,
-      hotelValue: getHotelValueForSlug(initialDestinationSlug),
+      hotelValue,
+      bookingEngineUrl: initialBookingEngineUrl,
     };
-  }, [initialDestinationName, initialPropertyName, initialDestinationSlug]);
+  }, [initialDestinationName, initialPropertyName, initialDestinationSlug, initialHotelCode, initialBookingEngineUrl]);
 
   const [selectedHotel, setSelectedHotel] = useState<HotelOption>(initialHotel);
   const [hotelsList, setHotelsList] = useState<HotelOption[]>(DEFAULT_HOTEL_OPTIONS);
@@ -160,13 +167,47 @@ export default function RoomStickyBookingWidget({
     return () => observer.disconnect();
   }, []);
 
-  // Fetch live active destinations from database API
+  // Fetch live active properties & destinations from database API
   useEffect(() => {
     let isMounted = true;
-    safeFetchJson<{ success: boolean; data: any[] }>("/api/destinations")
-      .then((res) => {
-        if (isMounted && res?.success && Array.isArray(res.data) && res.data.length > 0) {
-          const mapped: HotelOption[] = res.data.map((d: any) => {
+    Promise.all([
+      safeFetchJson<{ success: boolean; data: any[] | { count: number; properties: any[] } }>("/api/properties"),
+      safeFetchJson<{ success: boolean; data: any[] }>("/api/destinations"),
+    ])
+      .then(([propsRes, destsRes]) => {
+        if (!isMounted) return;
+
+        let mapped: HotelOption[] = [];
+
+        const rawProps = Array.isArray(propsRes?.data)
+          ? propsRes.data
+          : (propsRes?.data as any)?.properties || (propsRes as any)?.properties || [];
+
+        if (Array.isArray(rawProps) && rawProps.length > 0) {
+          mapped = rawProps.map((p: any) => {
+            const cityName = p.city?.name || "Destination";
+            const citySlug = p.city?.slug || cityName.toLowerCase();
+            let extractedCode = "";
+            if (p.bookingEngineUrl) {
+              const match = p.bookingEngineUrl.match(/book-rooms-([^/?#]+)/);
+              if (match) extractedCode = match[1];
+            }
+            const hotelVal = p.hotelCode || extractedCode || getHotelValueForSlug(p.slug || citySlug);
+
+            return {
+              id: `prop-${p._id || p.slug}`,
+              name: p.name,
+              place: cityName,
+              state: "Tamil Nadu",
+              slug: p.slug || citySlug,
+              hotelValue: hotelVal,
+              bookingEngineUrl: p.bookingEngineUrl,
+            };
+          });
+        }
+
+        if (mapped.length === 0 && destsRes?.success && Array.isArray(destsRes.data) && destsRes.data.length > 0) {
+          mapped = destsRes.data.map((d: any) => {
             const place = d.name || "Destination";
             const slug = d.slug || place.toLowerCase();
             return {
@@ -178,16 +219,24 @@ export default function RoomStickyBookingWidget({
               hotelValue: getHotelValueForSlug(slug),
             };
           });
+        }
+
+        if (mapped.length > 0) {
           setHotelsList(mapped);
 
-          // If current selectedHotel matches one from DB, sync it
-          const matched = mapped.find(
-            (m) =>
-              (initialDestinationSlug && m.slug.toLowerCase() === initialDestinationSlug.toLowerCase()) ||
-              (initialDestinationName && m.place.toLowerCase() === initialDestinationName.toLowerCase())
-          );
-          if (matched) {
-            setSelectedHotel(matched);
+          // If current selectedHotel matches one from DB, sync it ONLY if not explicitly bound to a property
+          if (!initialHotelCode && !initialPropertyName && !initialBookingEngineUrl) {
+            const matched = mapped.find(
+              (m) =>
+                (initialDestinationSlug && m.slug.toLowerCase() === initialDestinationSlug.toLowerCase()) ||
+                (initialDestinationName && m.place.toLowerCase() === initialDestinationName.toLowerCase())
+            );
+            if (matched) {
+              setSelectedHotel(matched);
+            }
+          } else {
+            // Ensure hotelsList includes the property option
+            setSelectedHotel(initialHotel);
           }
         }
       })
@@ -196,7 +245,7 @@ export default function RoomStickyBookingWidget({
     return () => {
       isMounted = false;
     };
-  }, [initialDestinationSlug, initialDestinationName]);
+  }, [initialDestinationName, initialDestinationSlug, initialHotel, initialHotelCode, initialPropertyName, initialBookingEngineUrl]);
 
   // Sync initialHotel when props change (e.g. navigating to different destination)
   useEffect(() => {
@@ -226,44 +275,47 @@ export default function RoomStickyBookingWidget({
         const mobileBox = mobileDateBoxRef.current;
         const rect = mobileBox ? mobileBox.getBoundingClientRect() : null;
         const distFromBottom = rect
-          ? Math.round(window.innerHeight - rect.top + 2)
-          : 138;
-        instance.calendarContainer.style.position = "fixed";
-        instance.calendarContainer.style.bottom = `${distFromBottom}px`;
-        instance.calendarContainer.style.top = "auto";
-        if (rect) {
-          instance.calendarContainer.style.left = `${rect.left}px`;
-          instance.calendarContainer.style.right = "auto";
-          instance.calendarContainer.style.transform = "none";
-          instance.calendarContainer.style.width = `${rect.width}px`;
-          instance.calendarContainer.style.minWidth = `${rect.width}px`;
-          instance.calendarContainer.style.maxWidth = `${rect.width}px`;
+          ? Math.max(10, Math.round(window.innerHeight - rect.top + 8))
+          : 140;
+
+        instance.calendarContainer.style.setProperty("position", "fixed", "important");
+        instance.calendarContainer.style.setProperty("bottom", `${distFromBottom}px`, "important");
+        instance.calendarContainer.style.setProperty("top", "auto", "important");
+
+        if (rect && rect.width > 0) {
+          instance.calendarContainer.style.setProperty("left", `${rect.left}px`, "important");
+          instance.calendarContainer.style.setProperty("right", "auto", "important");
+          instance.calendarContainer.style.setProperty("transform", "none", "important");
+          instance.calendarContainer.style.setProperty("width", `${rect.width}px`, "important");
+          instance.calendarContainer.style.setProperty("min-width", `${Math.min(rect.width, 300)}px`, "important");
+          instance.calendarContainer.style.setProperty("max-width", `${rect.width}px`, "important");
         } else {
-          instance.calendarContainer.style.left = "50%";
-          instance.calendarContainer.style.right = "auto";
-          instance.calendarContainer.style.transform = "translateX(-50%)";
-          instance.calendarContainer.style.width = "calc(100vw - 20px)";
-          instance.calendarContainer.style.maxWidth = "512px";
+          instance.calendarContainer.style.setProperty("left", "10px", "important");
+          instance.calendarContainer.style.setProperty("right", "10px", "important");
+          instance.calendarContainer.style.setProperty("margin", "0 auto", "important");
+          instance.calendarContainer.style.setProperty("width", "calc(100vw - 20px)", "important");
+          instance.calendarContainer.style.setProperty("max-width", "512px", "important");
+          instance.calendarContainer.style.setProperty("transform", "none", "important");
         }
-        instance.calendarContainer.style.boxSizing = "border-box";
-        instance.calendarContainer.style.zIndex = "999999";
+        instance.calendarContainer.style.setProperty("box-sizing", "border-box", "important");
+        instance.calendarContainer.style.setProperty("z-index", "999999", "important");
         instance.calendarContainer.classList.remove("arrowTop");
         instance.calendarContainer.classList.add("arrowBottom");
       } else {
         const box = dateBoxRef.current;
         if (!box) return;
         const rect = box.getBoundingClientRect();
-        instance.calendarContainer.style.position = "absolute";
-        instance.calendarContainer.style.top = `${rect.bottom + window.scrollY + 6}px`;
-        instance.calendarContainer.style.left = `${rect.left + window.scrollX}px`;
-        instance.calendarContainer.style.width = `${rect.width}px`;
-        instance.calendarContainer.style.minWidth = `${rect.width}px`;
-        instance.calendarContainer.style.maxWidth = `${rect.width}px`;
-        instance.calendarContainer.style.transform = "none";
-        instance.calendarContainer.style.boxSizing = "border-box";
-        instance.calendarContainer.style.bottom = "auto";
-        instance.calendarContainer.style.right = "auto";
-        instance.calendarContainer.style.zIndex = "99999";
+        instance.calendarContainer.style.setProperty("position", "absolute", "important");
+        instance.calendarContainer.style.setProperty("top", `${rect.bottom + window.scrollY + 6}px`, "important");
+        instance.calendarContainer.style.setProperty("left", `${rect.left + window.scrollX}px`, "important");
+        instance.calendarContainer.style.setProperty("width", `${rect.width}px`, "important");
+        instance.calendarContainer.style.setProperty("min-width", `${rect.width}px`, "important");
+        instance.calendarContainer.style.setProperty("max-width", `${rect.width}px`, "important");
+        instance.calendarContainer.style.setProperty("transform", "none", "important");
+        instance.calendarContainer.style.setProperty("box-sizing", "border-box", "important");
+        instance.calendarContainer.style.setProperty("bottom", "auto", "important");
+        instance.calendarContainer.style.setProperty("right", "auto", "important");
+        instance.calendarContainer.style.setProperty("z-index", "99999", "important");
         instance.calendarContainer.classList.remove("arrowBottom");
         instance.calendarContainer.classList.add("arrowTop");
       }
@@ -345,13 +397,13 @@ export default function RoomStickyBookingWidget({
               setDateDisplay(`${formatDateDisplay(d1)} - ${formatDateDisplay(d2)}`);
               setDateError(null);
 
-              // Keep calendar visible for 1 second so user sees the selected check-out date & range
+              // Keep calendar visible for 500ms so user sees the selected check-out date & range
               if (closeTimerRef.current) {
                 clearTimeout(closeTimerRef.current);
               }
               closeTimerRef.current = setTimeout(() => {
                 instance?.close();
-              }, 1000);
+              }, 500);
             } else if (dates.length === 1) {
               if (closeTimerRef.current) {
                 clearTimeout(closeTimerRef.current);
@@ -395,8 +447,22 @@ export default function RoomStickyBookingWidget({
     };
   }, []);
 
+  const toggleCalendar = (e?: React.SyntheticEvent) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    if (!fpRef.current) return;
+    if (fpRef.current.isOpen) {
+      fpRef.current.close();
+    } else {
+      fpRef.current.open();
+    }
+  };
+
   const openCalendar = () => {
-    fpRef.current?.open();
+    if (fpRef.current && !fpRef.current.isOpen) {
+      fpRef.current.open();
+    }
   };
 
   // Submit to IPMS247 booking engine
@@ -408,12 +474,31 @@ export default function RoomStickyBookingWidget({
     }
 
     setDateError(null);
-    const targetHotel = selectedHotel.hotelValue || "kattil";
+    let targetHotel =
+      selectedHotel.hotelValue ||
+      initialHotelCode ||
+      "";
+
+    let actionUrl =
+      selectedHotel.bookingEngineUrl ||
+      initialBookingEngineUrl ||
+      "";
+
+    if (!targetHotel && actionUrl) {
+      const match = actionUrl.match(/book-rooms-([^/?#]+)/);
+      if (match) targetHotel = match[1];
+    }
+    if (!targetHotel) {
+      targetHotel = getHotelValueForSlug(selectedHotel.slug || initialDestinationSlug || "thesparrow");
+    }
+    if (!actionUrl) {
+      actionUrl = `https://live.ipms247.com/booking/book-rooms-${targetHotel}`;
+    }
 
     const form = document.createElement("form");
     form.method = "post";
     form.target = "_blank";
-    form.action = `https://live.ipms247.com/booking/book-rooms-${targetHotel}`;
+    form.action = actionUrl;
 
     const fields: Record<string, string> = {
       eZ_chkin: formatDateForDisplay(checkin),
@@ -497,6 +582,7 @@ export default function RoomStickyBookingWidget({
                       ? hotelsList.filter(
                         (h) =>
                           h.id === selectedHotel.id ||
+                          h.hotelValue === selectedHotel.hotelValue ||
                           h.slug.toLowerCase() === selectedHotel.slug.toLowerCase() ||
                           h.place.toLowerCase() === selectedHotel.place.toLowerCase() ||
                           (initialDestinationSlug &&
@@ -512,6 +598,7 @@ export default function RoomStickyBookingWidget({
                         ? hotelsList.filter(
                           (h) =>
                             h.id === selectedHotel.id ||
+                            h.hotelValue === selectedHotel.hotelValue ||
                             h.slug.toLowerCase() === selectedHotel.slug.toLowerCase() ||
                             h.place.toLowerCase() === selectedHotel.place.toLowerCase() ||
                             (initialDestinationSlug &&
@@ -566,9 +653,8 @@ export default function RoomStickyBookingWidget({
             </label>
             <div
               ref={dateBoxRef}
-              onClick={() => {
-                openCalendar();
-              }}
+              onClick={toggleCalendar}
+              onMouseDown={(e) => e.stopPropagation()}
               className={`w-full h-[44px] px-3.5 sm:px-[32px] rounded-[6px] border ${dateError
                 ? "border-red-400 bg-red-50/50 ring-1 ring-red-400/20"
                 : "border-gray-200 bg-gray-50/70 hover:bg-gray-100/70"
@@ -614,15 +700,17 @@ export default function RoomStickyBookingWidget({
           {/* Top Date Selection Card matching user mockup */}
           <div
             ref={mobileDateBoxRef}
-            onClick={() => {
-              openCalendar();
+            onClick={toggleCalendar}
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => {
+              e.stopPropagation();
             }}
             className={`w-full h-[58px] sm:h-[60px] px-4 sm:px-[32px] bg-white border ${dateError
               ? "border-red-400 ring-1 ring-red-400/30"
               : "border-[#d8e0ea] hover:border-gray-400"
               } rounded-[8px] flex items-center justify-between cursor-pointer transition-colors shadow-2xs select-none`}
           >
-            <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
+            <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pointer-events-none">
               <Calendar
                 className={`w-5 h-5 sm:w-5.5 sm:h-5.5 ${dateError ? "text-red-500" : "text-[#0d1b2e]"
                   } shrink-0 stroke-[1.6]`}
@@ -636,7 +724,7 @@ export default function RoomStickyBookingWidget({
                 </span>
               </div>
             </div>
-            <ChevronRight className="w-5 h-5 text-[#0d1b2e] shrink-0 stroke-[2.5]" />
+            <ChevronRight className="w-5 h-5 text-[#0d1b2e] shrink-0 stroke-[2.5] pointer-events-none" />
           </div>
 
           {/* Mobile Date Error */}
@@ -670,6 +758,7 @@ const STYLES = `
     padding: 6px 8px !important;
     box-sizing: border-box !important;
     z-index: 999999 !important;
+    background: #ffffff !important;
   }
   .flatpickr-calendar:before,
   .flatpickr-calendar:after,
@@ -683,7 +772,13 @@ const STYLES = `
   @media (max-width: 1023px) {
     .flatpickr-calendar {
       position: fixed !important;
-      bottom: 138px;
+      top: auto !important;
+      bottom: 140px !important;
+      left: 10px !important;
+      right: 10px !important;
+      margin: 0 auto !important;
+      max-width: 512px !important;
+      width: calc(100vw - 20px) !important;
       box-sizing: border-box !important;
       z-index: 999999 !important;
     }
@@ -709,26 +804,92 @@ const STYLES = `
     background: transparent !important;
     margin-bottom: 2px !important;
     width: 100% !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 30px !important;
   }
   .flatpickr-month {
-    height: 28px !important;
+    height: 100% !important;
     color: #0d1b2e !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
   }
 
   .flatpickr-current-month {
     font-size: 13.5px !important;
     font-weight: 700 !important;
     color: #0d1b2e !important;
-    padding-top: 0px !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    position: static !important;
+    width: auto !important;
+    left: auto !important;
+    right: auto !important;
+    height: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    transform: none !important;
+    pointer-events: auto !important;
   }
-  .flatpickr-current-month .flatpickr-monthDropdown-months,
+  .flatpickr-current-month .flatpickr-monthDropdown-months {
+    color: #0d1b2e !important;
+    font-weight: 700 !important;
+    font-size: 13.5px !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+    width: auto !important;
+    display: inline-block !important;
+  }
+  .flatpickr-current-month .flatpickr-monthDropdown-months::-ms-expand {
+    display: none !important;
+  }
+  .flatpickr-current-month .numInputWrapper {
+    width: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .flatpickr-current-month .numInputWrapper span.arrowUp,
+  .flatpickr-current-month .numInputWrapper span.arrowDown,
+  .flatpickr-current-month .numInputWrapper span {
+    display: none !important;
+  }
   .flatpickr-current-month input.cur-year {
     color: #0d1b2e !important;
     font-weight: 700 !important;
+    font-size: 13.5px !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: textfield !important;
+    appearance: textfield !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 4.2ch !important;
+    text-align: left !important;
+  }
+  .flatpickr-current-month input.cur-year::-webkit-inner-spin-button,
+  .flatpickr-current-month input.cur-year::-webkit-outer-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+    display: none !important;
   }
 
   .flatpickr-prev-month, .flatpickr-next-month {
-    top: 8px !important;
+    position: absolute !important;
+    top: 4px !important;
     height: 24px !important;
     width: 24px !important;
     fill: #0d1b2e !important;
@@ -738,12 +899,14 @@ const STYLES = `
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    z-index: 10 !important;
+    cursor: pointer !important;
   }
   .flatpickr-prev-month {
-    left: 20px !important;
+    left: 8px !important;
   }
   .flatpickr-next-month {
-    right: 20px !important;
+    right: 8px !important;
   }
   .flatpickr-prev-month svg,
   .flatpickr-next-month svg {
@@ -800,11 +963,34 @@ const STYLES = `
       font-size: 11px !important;
     }
   }
-  .flatpickr-day:hover,
-  .flatpickr-day.prevMonthDay:hover,
+  .flatpickr-day:hover {
+    background: #f1f5f9 !important;
+    color: #0d1b2e !important;
+  }
+  .flatpickr-day.prevMonthDay {
+    visibility: hidden !important;
+    pointer-events: none !important;
+    cursor: default !important;
+  }
+  .flatpickr-day.nextMonthDay {
+    visibility: visible !important;
+    color: #94a3b8 !important;
+    opacity: 0.8 !important;
+    cursor: pointer !important;
+  }
   .flatpickr-day.nextMonthDay:hover {
     background: #f1f5f9 !important;
     color: #0d1b2e !important;
+  }
+  .flatpickr-day.flatpickr-disabled,
+  .flatpickr-day.flatpickr-disabled:hover,
+  .flatpickr-day.disabled,
+  .flatpickr-day.disabled:hover {
+    color: #94a3b8 !important;
+    background: transparent !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+    opacity: 0.8 !important;
   }
   .flatpickr-day.selected,
   .flatpickr-day.startRange,
@@ -828,11 +1014,6 @@ const STYLES = `
   }
   .flatpickr-day.today {
     border: 1.5px solid #0d1b2e !important;
-  }
-  .flatpickr-day.disabled,
-  .flatpickr-day.prevMonthDay,
-  .flatpickr-day.nextMonthDay {
-    color: #cbd5e1 !important;
   }
 `;
 

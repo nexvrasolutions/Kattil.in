@@ -58,11 +58,8 @@ blogSchema.index({ status: 1 });
 blogSchema.index({ featured: 1 });
 blogSchema.index({ category: 1 });
 
-// Dev: always re-compile to pick up schema changes without restart
-if (process.env.NODE_ENV !== "production" && mongoose.models["Blog"]) {
-  delete mongoose.models["Blog"];
-}
 const Blog: Model<IBlog> =
-  (mongoose.models.Blog as Model<IBlog>) ?? mongoose.model<IBlog>("Blog", blogSchema);
+  (mongoose.models.Blog as Model<IBlog>) ||
+  mongoose.model<IBlog>("Blog", blogSchema);
 
 export default Blog;

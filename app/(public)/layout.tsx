@@ -35,7 +35,9 @@ const FOOTER_FALLBACK: FooterProps = {
       section: "LOCATIONS", order: 1,
       links: [
         { label: "Chennai", href: "/chennai", newTab: false, order: 0 },
-        { label: "Madurai", href: "/madurai", newTab: false, order: 1 },
+        { label: "Kaniyakumari", href: "/kaniyakumari", newTab: false, order: 1 },
+        { label: "Coimbatore", href: "/coimbatore", newTab: false, order: 2 },
+        { label: "Madurai", href: "/madurai", newTab: false, order: 3 },
       ],
     },
     {
@@ -62,9 +64,9 @@ const FOOTER_FALLBACK: FooterProps = {
 };
 
 const SIDEBAR_FALLBACK: SidebarIconData[] = [
-  { label: "WhatsApp", tooltip: "Chat on WhatsApp", iconName: "whatsapp", iconUrl: "", url: "", bgColor: "#25D366", iconColor: "#ffffff", type: "multi", pulse: true, order: 0, visible: true, locations: [{ label: "Madurai", url: "https://wa.me/917358127921" }, { label: "Chennai", url: "https://wa.me/916385197921" }, { label: "Coimbatore", url: "https://wa.me/917448749779" }] },
+  { label: "WhatsApp", tooltip: "Chat on WhatsApp", iconName: "whatsapp", iconUrl: "", url: "", bgColor: "#25D366", iconColor: "#ffffff", type: "multi", pulse: true, order: 0, visible: true, locations: [{ label: "Chennai", url: "https://wa.me/916385197921" }, { label: "Kaniyakumari", url: "https://wa.me/917448749779" }, { label: "Coimbatore", url: "https://wa.me/917448749779" }, { label: "Madurai", url: "https://wa.me/917358127921" }] },
   { label: "Instagram", tooltip: "Follow on Instagram", iconName: "instagram", iconUrl: "", url: "https://www.instagram.com/kattilthehome", bgColor: "linear-gradient(45deg,#833ab4,#fd1d1d,#fcb045)", iconColor: "#ffffff", type: "link", pulse: false, order: 1, visible: true, locations: [] },
-  { label: "Google Maps", tooltip: "Find us on Maps", iconName: "googlemaps", iconUrl: "", url: "", bgColor: "#ffffff", iconColor: "#4285F4", type: "multi", pulse: false, order: 2, visible: true, locations: [{ label: "Madurai", url: "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8" }, { label: "Chennai", url: "https://maps.app.goo.gl/qNiPXnskwA6fQv8a8" }, { label: "Coimbatore", url: "https://maps.app.goo.gl/RaceCourseCoimbatore" }] },
+  { label: "Google Maps", tooltip: "Find us on Maps", iconName: "googlemaps", iconUrl: "", url: "", bgColor: "#ffffff", iconColor: "#4285F4", type: "multi", pulse: false, order: 2, visible: true, locations: [{ label: "Chennai", url: "https://maps.app.goo.gl/qNiPXnskwA6fQv8a8" }, { label: "Kaniyakumari", url: "https://maps.google.com/maps?q=Kaniyakumari%2C+Tamil+Nadu+629702" }, { label: "Coimbatore", url: "https://maps.app.goo.gl/RaceCourseCoimbatore" }, { label: "Madurai", url: "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8" }] },
 ];
 
 async function getFooterData(): Promise<{ footer: FooterProps; sidebar: SidebarIconData[] }> {
@@ -81,38 +83,36 @@ async function getFooterData(): Promise<{ footer: FooterProps; sidebar: SidebarI
     let footerLinks: FooterProps["footerLinks"] =
       (parsed.footerLinks as FooterProps["footerLinks"]) ?? FOOTER_FALLBACK.footerLinks;
 
-    // Normalize second column to active location destination pages (Chennai and Madurai)
+    // Ensure LOCATIONS section has all active locations if empty or missing, and links point to destination pages
     if (Array.isArray(footerLinks) && footerLinks.length >= 2) {
-      const isLocationsSection =
-        footerLinks[1]?.section?.toUpperCase() === "LOCATIONS" ||
-        footerLinks[1]?.section?.toUpperCase() === "DESTINATIONS" ||
-        (footerLinks[1]?.section?.toUpperCase() === "NAVIGATION" &&
-          footerLinks[0]?.section?.toUpperCase() === "NAVIGATION");
+      const locIdx = footerLinks.findIndex(
+        (f) => f.section?.toUpperCase() === "LOCATIONS" || f.section?.toUpperCase() === "DESTINATIONS"
+      );
 
-      const needsDestUpdate =
-        isLocationsSection &&
-        (footerLinks[1]?.links?.length !== 2 ||
-          footerLinks[1]?.links?.some(
-            (l) =>
-              l.href?.startsWith("http") ||
-              l.label === "Coimbatore" ||
-              l.label === "Colachel" ||
-              l.label?.toLowerCase().includes("view all")
-          ));
-
-      if (needsDestUpdate) {
-        footerLinks = [
-          footerLinks[0],
-          {
+      if (locIdx >= 0) {
+        if (!footerLinks[locIdx]?.links?.length || footerLinks[locIdx]?.links?.length < 3) {
+          footerLinks[locIdx] = {
             section: "LOCATIONS",
             order: 1,
             links: [
               { label: "Chennai", href: "/chennai", newTab: false, order: 0 },
-              { label: "Madurai", href: "/madurai", newTab: false, order: 1 },
+              { label: "Kaniyakumari", href: "/kaniyakumari", newTab: false, order: 1 },
+              { label: "Coimbatore", href: "/coimbatore", newTab: false, order: 2 },
+              { label: "Madurai", href: "/madurai", newTab: false, order: 3 },
             ],
-          },
-          ...footerLinks.slice(2),
-        ];
+          };
+        } else {
+          // Normalize any legacy "/properties/the-sparrow" link to "/kaniyakumari"
+          for (const link of footerLinks[locIdx].links) {
+            if (
+              link.label.toLowerCase().includes("kanya") ||
+              link.label.toLowerCase().includes("kaniya") ||
+              link.href === "/properties/the-sparrow"
+            ) {
+              link.href = "/kaniyakumari";
+            }
+          }
+        }
 
         // Persist update in DB
         FooterModel.updateOne(

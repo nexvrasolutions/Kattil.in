@@ -84,6 +84,7 @@ export async function seedRooms() {
       images: [
         "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80",
       ],
+      link: "https://live.ipms247.com/booking/book-rooms-kattilchennai",
       description:
         "Floor-to-ceiling windows frame the Bay of Bengal in this contemporary suite, where the horizon becomes your living wall.",
       features: ["Sea View", "Floor-to-Ceiling Windows", "Premium Amenities"],
@@ -102,6 +103,7 @@ export async function seedRooms() {
       images: [
         "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800&q=80",
       ],
+      link: "https://live.ipms247.com/booking/book-rooms-kattilchennai",
       description:
         "A calm retreat above the city, designed for the modern traveller who seeks stillness in the heart of Chennai.",
       features: ["City Panorama", "Modern Design", "Premium Amenities"],
@@ -120,6 +122,7 @@ export async function seedRooms() {
       images: [
         "https://images.unsplash.com/photo-1631049421450-348ccd7f8949?w=800&q=80",
       ],
+      link: "https://live.ipms247.com/booking/book-rooms-kattilchennai",
       description:
         "Colonial architecture meets coastal luxury in this expansive suite with its own private plunge pool.",
       features: ["Private Plunge Pool", "Colonial Architecture", "Coastal Views"],
@@ -138,6 +141,7 @@ export async function seedRooms() {
       images: [
         "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=800&q=80",
       ],
+      link: "https://live.ipms247.com/booking/book-rooms-kattilchennai",
       description:
         "Step onto your private garden terrace and hear the city's rhythm slow to a whisper.",
       features: ["Garden Terrace", "Private Outdoor Space", "Premium Amenities"],

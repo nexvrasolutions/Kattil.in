@@ -61,9 +61,11 @@ export async function getDestinationStaysData(
     await connectDB();
 
     // 1. Direct query city by slug or regex
+    const isKanya = cleanSlug.includes("kanya") || cleanSlug.includes("kanniya") || cleanSlug.includes("kaniyakumari") || cleanSlug === "kanyakumari" || cleanSlug === "kaniyakumari";
     const city = await City.findOne({
       $or: [
         { slug: cleanSlug },
+        ...(isKanya ? [{ slug: "kaniyakumari" }, { slug: "kanniyakumari" }, { slug: "kanyakumari" }, { name: /kany|kaniy/i }] : []),
         { name: { $regex: new RegExp(`^${cleanSlug}$`, "i") } },
         { label: { $regex: new RegExp(`^${cleanSlug}$`, "i") } },
       ],

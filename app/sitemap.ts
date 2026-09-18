@@ -12,6 +12,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`, lastModified, changeFrequency: "weekly", priority: 1.0 },
     { url: `${SITE_URL}/chennai`, lastModified, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${SITE_URL}/kaniyakumari`, lastModified, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${SITE_URL}/kanyakumari`, lastModified, changeFrequency: "monthly", priority: 0.9 },
     { url: `${SITE_URL}/madurai`, lastModified, changeFrequency: "monthly", priority: 0.9 },
     { url: `${SITE_URL}/coimbatore`, lastModified, changeFrequency: "monthly", priority: 0.9 },
     { url: `${SITE_URL}/colachel`, lastModified, changeFrequency: "monthly", priority: 0.9 },
@@ -32,10 +34,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
-  // These cities already have dedicated static routes above (/chennai, /madurai,
+  // These cities already have dedicated static routes above (/chennai, /kaniyakumari, /kanyakumari, /madurai,
   // /coimbatore, /colachel) — exclude them here so /destinations/[slug] doesn't
   // duplicate those URLs.
-  const RESERVED_DESTINATION_SLUGS = new Set(["chennai", "madurai", "coimbatore", "colachel"]);
+  const RESERVED_DESTINATION_SLUGS = new Set(["chennai", "kaniyakumari", "kanyakumari", "kanniyakumari", "madurai", "coimbatore", "colachel"]);
 
   let destinationRoutes: MetadataRoute.Sitemap = [];
   let propertyRoutes: MetadataRoute.Sitemap = [];

@@ -22,11 +22,8 @@ const blogCategorySchema = new Schema<IBlogCategory>(
 blogCategorySchema.index({ slug: 1 }, { unique: true });
 blogCategorySchema.index({ active: 1, order: 1 });
 
-let BlogCategory: Model<IBlogCategory>;
-if (process.env.NODE_ENV !== "production" && mongoose.models["BlogCategory"]) {
-  delete mongoose.models["BlogCategory"];
-}
-BlogCategory = mongoose.models.BlogCategory as Model<IBlogCategory>
-  ?? mongoose.model<IBlogCategory>("BlogCategory", blogCategorySchema);
+const BlogCategory: Model<IBlogCategory> =
+  (mongoose.models.BlogCategory as Model<IBlogCategory>) ||
+  mongoose.model<IBlogCategory>("BlogCategory", blogCategorySchema);
 
 export default BlogCategory;

@@ -23,18 +23,27 @@ export const FALLBACK_DESTINATIONS: DestinationItem[] = [
     name: "Chennai",
     slug: "chennai",
     image: "/images/destinations/chennai.png",
-    hotelCount: "1 hotel",
+    hotelCount: "2 hotels",
     link: "/chennai",
     order: 1,
   },
   {
-    _id: "default-madurai",
-    name: "Madurai",
-    slug: "madurai",
-    image: "/images/destinations/madurai.png",
+    _id: "default-kaniyakumari",
+    name: "Kaniyakumari",
+    slug: "kaniyakumari",
+    image: "/images/destinations/kanyakumari.png",
     hotelCount: "1 hotel",
-    link: "/madurai",
+    link: "/kaniyakumari",
     order: 2,
+  },
+  {
+    _id: "default-coimbatore",
+    name: "Coimbatore",
+    slug: "coimbatore",
+    image: "/images/destinations/coimbatore.png",
+    hotelCount: "1 hotel",
+    link: "/coimbatore",
+    order: 3,
   },
 ];
 
@@ -109,29 +118,38 @@ export default function DestinationsDropdown({
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-6">
               {displayedDestinations.map((dest) => {
-                const targetLink =
-                  dest.link?.trim() ||
-                  (dest.slug === "chennai"
-                    ? "/chennai"
-                    : dest.slug === "coimbatore"
-                      ? "/coimbatore"
-                      : dest.slug === "madurai"
-                        ? "/madurai"
-                        : dest.slug === "colachel"
-                          ? "/colachel"
-                          : `/destinations/${dest.slug}`);
+                const isKanya =
+                  dest.slug === "kaniyakumari" ||
+                  dest.slug === "kanyakumari" ||
+                  dest.slug === "kanniyakumari" ||
+                  (dest.name && /kany|kaniy/i.test(dest.name));
+
+                const targetLink = isKanya
+                  ? "/kaniyakumari"
+                  : dest.link?.trim() ||
+                    (dest.slug === "chennai"
+                      ? "/chennai"
+                      : dest.slug === "coimbatore"
+                        ? "/coimbatore"
+                        : dest.slug === "madurai"
+                          ? "/madurai"
+                          : dest.slug === "colachel"
+                            ? "/colachel"
+                            : `/destinations/${dest.slug}`);
                 const imgSrc =
                   dest.slug === "chennai"
                     ? "/images/destinations/chennai.png"
-                    : dest.image && !dest.image.includes("kanyakumari")
-                      ? dest.image.trim()
-                      : (dest.slug === "madurai"
-                        ? "/images/destinations/madurai.png"
-                        : dest.slug === "coimbatore"
-                          ? "/images/destinations/coimbatore.png"
-                          : dest.slug === "colachel"
-                            ? "/images/destinations/kanyakumari.png"
-                            : "/images/destinations/chennai.png");
+                    : isKanya
+                      ? "/images/destinations/kanyakumari.png"
+                      : dest.image && !dest.image.includes("kanyakumari")
+                        ? dest.image.trim()
+                        : (dest.slug === "madurai"
+                          ? "/images/destinations/madurai.png"
+                          : dest.slug === "coimbatore"
+                            ? "/images/destinations/coimbatore.png"
+                            : dest.slug === "colachel"
+                              ? "/images/destinations/kanyakumari.png"
+                              : "/images/destinations/chennai.png");
 
                 return (
                   <Link
@@ -226,36 +244,45 @@ export function MobileDestinationsList({
   const activeDestinations = destinations.filter(
     (d) => !d.hotelCount?.toLowerCase().includes("coming soon")
   );
-  const displayedDestinations = activeDestinations.length > 8 ? activeDestinations.slice(0, 8) : activeDestinations;
-  const hasMore = activeDestinations.length > 8;
+  const displayedDestinations = activeDestinations.length > 3 ? activeDestinations.slice(0, 3) : activeDestinations;
+  const hasMore = activeDestinations.length > 3;
 
   return (
     <div className="mt-3.5 bg-white rounded-[8px] p-3 sm:p-4 shadow-xl border border-gray-100/90 overflow-hidden text-left">
       <div className="flex flex-col gap-2.5">
         {displayedDestinations.map((dest) => {
-          const targetLink =
-            dest.link?.trim() ||
-            (dest.slug === "chennai"
-              ? "/chennai"
-              : dest.slug === "coimbatore"
-                ? "/coimbatore"
-                : dest.slug === "madurai"
-                  ? "/madurai"
-                  : dest.slug === "colachel"
-                    ? "/colachel"
-                    : `/destinations/${dest.slug}`);
+          const isKanya =
+            dest.slug === "kaniyakumari" ||
+            dest.slug === "kanyakumari" ||
+            dest.slug === "kanniyakumari" ||
+            (dest.name && /kany|kaniy/i.test(dest.name));
+
+          const targetLink = isKanya
+            ? "/kaniyakumari"
+            : dest.link?.trim() ||
+              (dest.slug === "chennai"
+                ? "/chennai"
+                : dest.slug === "coimbatore"
+                  ? "/coimbatore"
+                  : dest.slug === "madurai"
+                    ? "/madurai"
+                    : dest.slug === "colachel"
+                      ? "/colachel"
+                      : `/destinations/${dest.slug}`);
           const imgSrc =
             dest.slug === "chennai"
               ? "/images/destinations/chennai.png"
-              : dest.image && !dest.image.includes("kanyakumari")
-                ? dest.image.trim()
-                : (dest.slug === "madurai"
-                  ? "/images/destinations/madurai.png"
-                  : dest.slug === "coimbatore"
-                    ? "/images/destinations/coimbatore.png"
-                    : dest.slug === "colachel"
-                      ? "/images/destinations/kanyakumari.png"
-                      : "/images/destinations/chennai.png");
+              : isKanya
+                ? "/images/destinations/kanyakumari.png"
+                : dest.image && !dest.image.includes("kanyakumari")
+                  ? dest.image.trim()
+                  : (dest.slug === "madurai"
+                    ? "/images/destinations/madurai.png"
+                    : dest.slug === "coimbatore"
+                      ? "/images/destinations/coimbatore.png"
+                      : dest.slug === "colachel"
+                        ? "/images/destinations/kanyakumari.png"
+                        : "/images/destinations/chennai.png");
 
           return (
             <Link
@@ -293,10 +320,10 @@ export function MobileDestinationsList({
             href="/destinations"
             prefetch={true}
             onClick={onItemClick}
-            className="flex items-center justify-center gap-2 py-2 text-[#0d1b2e] hover:text-[#526442] font-semibold text-[13.5px] font-sans transition-colors"
+            className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-[8px] bg-slate-50 hover:bg-[#526442]/10 text-[#0d1b2e] hover:text-[#526442] font-semibold text-[13.5px] font-sans transition-all duration-200 group"
           >
-            <span>View all destinations ({destinations.length})</span>
-            <span className="text-[14px]">→</span>
+            <span>View all destinations ({activeDestinations.length})</span>
+            <span className="text-[14px] transition-transform duration-200 group-hover:translate-x-1">→</span>
           </Link>
         </div>
       )}

@@ -35,15 +35,14 @@ export async function connectDB(): Promise<typeof mongoose> {
 
   const cached = global._mongooseCache;
 
-  if (cached.conn) return cached.conn;
+  if (cached.conn && mongoose.connection.readyState === 1) return cached.conn;
 
-  if (!cached.promise) {
+  if (!cached.promise || mongoose.connection.readyState === 0) {
     cached.promise = mongoose.connect(MONGODB_URI, {
-      bufferCommands: false,
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 5000,
-      socketTimeoutMS: 15000,
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
+      socketTimeoutMS: 20000,
     });
   }
 

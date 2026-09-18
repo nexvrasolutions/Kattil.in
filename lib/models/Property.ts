@@ -85,15 +85,8 @@ propertySchema.index({ city: 1 });
 propertySchema.index({ status: 1 });
 propertySchema.index({ featured: 1 });
 
-let Property: Model<IProperty>;
-
-if (process.env.NODE_ENV !== "production") {
-  if (mongoose.models["Property"]) {
-    delete mongoose.models["Property"];
-  }
-  Property = mongoose.model<IProperty>("Property", propertySchema);
-} else {
-  Property = (mongoose.models.Property as Model<IProperty>) ?? mongoose.model<IProperty>("Property", propertySchema);
-}
+const Property: Model<IProperty> =
+  (mongoose.models.Property as Model<IProperty>) ||
+  mongoose.model<IProperty>("Property", propertySchema);
 
 export default Property;

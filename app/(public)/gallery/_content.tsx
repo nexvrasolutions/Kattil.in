@@ -163,6 +163,109 @@ export const STATIC_ITEMS: PublicGalleryItem[] = [
     cityName: "Chennai",
   },
 
+  // ── Kaniyakumari (11 images) ──────────────────────────────────
+  {
+    id: "k-2",
+    src: "/assets/ac-double-room.webp",
+    alt: "Deluxe AC Double Room — Tranquil Coastal Stay",
+    caption: "Deluxe AC Double Room",
+    category: "rooms",
+    citySlug: "kaniyakumari",
+    cityName: "Kaniyakumari",
+    featured: true,
+  },
+  {
+    id: "k-3",
+    src: "/assets/six-bed-dormitory.webp",
+    alt: "Six-Bed Community Dormitory — The Sparrow",
+    caption: "Spacious Six-Bed Dormitory",
+    category: "rooms",
+    citySlug: "kaniyakumari",
+    cityName: "Kaniyakumari",
+  },
+  {
+    id: "k-4",
+    src: "/assets/non-ac-double-room.webp",
+    alt: "Cozy Standard Room — The Sparrow Kaniyakumari",
+    caption: "Cozy Standard Double Room",
+    category: "rooms",
+    citySlug: "kaniyakumari",
+    cityName: "Kaniyakumari",
+  },
+  {
+    id: "k-5",
+    src: "/assets/deluxe-garden-suite.webp",
+    alt: "Deluxe Ocean & Garden Suite",
+    caption: "Deluxe Suite with Private Balcony",
+    category: "rooms",
+    citySlug: "kaniyakumari",
+    cityName: "Kaniyakumari",
+  },
+  {
+    id: "k-6",
+    src: "/images/gallery/sunny-balcony-guest.jpg",
+    alt: "Sunlit Resort Balcony with Coastal Views",
+    caption: "Sunlit Coastal Balcony",
+    category: "resort",
+    citySlug: "kaniyakumari",
+    cityName: "Kaniyakumari",
+  },
+  {
+    id: "k-7",
+    src: "/images/home/ocean-sunset.png",
+    alt: "Iconic Sunset Point — Kaniyakumari",
+    caption: "Sunset Point Ocean Horizons",
+    category: "experience",
+    citySlug: "kaniyakumari",
+    cityName: "Kaniyakumari",
+    featured: true,
+  },
+  {
+    id: "k-8",
+    src: "/images/home/dining-community.png",
+    alt: "Authentic Coastal Dining & Cuisine",
+    caption: "Artisan Coastal Flavors & Dining",
+    category: "dining",
+    citySlug: "kaniyakumari",
+    cityName: "Kaniyakumari",
+  },
+  {
+    id: "k-9",
+    src: "/images/gallery/bikers-adventure.jpg",
+    alt: "Coastal Explorers & Southernmost Tip Tours",
+    caption: "Coastal Expeditions & Exploration",
+    category: "experience",
+    citySlug: "kaniyakumari",
+    cityName: "Kaniyakumari",
+  },
+  {
+    id: "k-10",
+    src: "/images/gallery/community-group.jpg",
+    alt: "Lively Lounge Gatherings & Community",
+    caption: "Common Lounge Gatherings",
+    category: "experience",
+    citySlug: "kaniyakumari",
+    cityName: "Kaniyakumari",
+  },
+  {
+    id: "k-11",
+    src: "/assets/about-us-1.webp",
+    alt: "Tranquil Courtyard & Coastal Breeze",
+    caption: "Tranquil Courtyard & Grounds",
+    category: "outdoor",
+    citySlug: "kaniyakumari",
+    cityName: "Kaniyakumari",
+  },
+  {
+    id: "k-12",
+    src: "/assets/kattil-room-hero.webp",
+    alt: "Master Bedroom Suite — The Sparrow",
+    caption: "Handcrafted Luxury Bedroom",
+    category: "rooms",
+    citySlug: "kaniyakumari",
+    cityName: "Kaniyakumari",
+  },
+
   // ── General / Experience ─────────────────────────────────────
   {
     id: "g-1",
@@ -244,9 +347,10 @@ export default function GalleryContent({
     return STATIC_ITEMS;
   }, [initialItems]);
 
+
   // Build categories list
   const categoriesList = useMemo(() => {
-    const list: PublicGalleryCategory[] = [{ slug: "all", name: "All" }];
+    const list: PublicGalleryCategory[] = [{ slug: "all", name: "All Categories" }];
     const seen = new Set<string>(["all"]);
 
     if (initialCategories && initialCategories.length > 0) {
@@ -282,11 +386,21 @@ export default function GalleryContent({
       result = result.filter((item) => {
         const itemCitySlug = item.citySlug?.toLowerCase();
         const itemCityName = item.cityName?.toLowerCase();
+        const matchKanya =
+          (lowerCity.includes("kanya") || lowerCity.includes("kaniya")) &&
+          Boolean(
+            itemCitySlug?.includes("kanya") ||
+            itemCitySlug?.includes("kaniya") ||
+            itemCityName?.includes("kanya") ||
+            itemCityName?.includes("kaniya")
+          );
+
         return (
           itemCitySlug === lowerCity ||
           itemCityName === lowerCity ||
           itemCitySlug?.includes(lowerCity) ||
-          itemCityName?.includes(lowerCity)
+          itemCityName?.includes(lowerCity) ||
+          matchKanya
         );
       });
     }
@@ -383,7 +497,7 @@ export default function GalleryContent({
               transition={{ duration: 0.5, ease: EASE, delay: 0.1 }}
               className="font-[Public_Sans] font-semibold text-[14px] leading-[14px] tracking-normal text-left align-middle uppercase text-white/95 mb-3 drop-shadow-xs"
             >
-              CAPTURE OUR MOMENTS
+              {selectedCity ? `${displayCityName} Gallery` : "CAPTURE OUR MOMENTS"}
             </motion.p>
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
@@ -392,10 +506,10 @@ export default function GalleryContent({
               className="text-white tracking-tight"
             >
               <span className="block font-sans text-[26px] sm:text-4xl md:text-5xl lg:text-[40px] leading-[1.12]">
-                Moments to
+                {selectedCity ? `Moments in ${displayCityName}` : "Moments to"}
               </span>
               <span className="block font-serif text-[26px] sm:text-4xl md:text-5xl lg:text-[40px] font-normal italic text-[#f4f7ef] leading-[1.15] mt-1 whitespace-nowrap">
-                Remember our hotel
+                {selectedCity ? "Discover our spaces" : "Remember our hotel"}
               </span>
             </motion.h1>
           </div>
@@ -425,10 +539,11 @@ export default function GalleryContent({
                       key={cat.slug}
                       type="button"
                       onClick={() => setActiveCategory(cat.slug)}
-                      className={`font-[Public_Sans] text-[13px] sm:text-[13.5px] transition-all whitespace-nowrap cursor-pointer px-3.5 sm:px-4 py-1.5 rounded-[6px] ${isSelected
-                        ? "bg-[#b4c7a5] text-[#22301c] font-semibold shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
-                        : "text-[#6b7280] hover:text-[#111827] font-medium hover:bg-[#eae8e3]"
-                        }`}
+                      className={`font-[Public_Sans] text-[13px] sm:text-[13.5px] transition-all whitespace-nowrap cursor-pointer px-3.5 sm:px-4 py-1.5 rounded-[6px] ${
+                        isSelected
+                          ? "bg-[#b4c7a5] text-[#22301c] font-semibold shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+                          : "text-[#6b7280] hover:text-[#111827] font-medium hover:bg-[#eae8e3]"
+                      }`}
                     >
                       {cat.name}
                     </button>
