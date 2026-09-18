@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { connectDB } from "@/lib/db/mongodb";
 import Room from "@/lib/models/Room";
 import Property from "@/lib/models/Property";
@@ -171,7 +172,10 @@ export function clearPropertyCache(slug?: string) {
   }
 }
 
-export async function getPropertyDetailsData(
+// Wrapped in React's cache() so that generateMetadata and the page component — which
+// both call this with the same arguments for a given request — share a single
+// invocation instead of running the whole query chain twice per navigation.
+export const getPropertyDetailsData = cache(async function getPropertyDetailsData(
   slug: string,
   fallbackDestination: string = "Kanniyakumari",
   cityHint?: string
@@ -189,6 +193,15 @@ export async function getPropertyDetailsData(
 
   try {
     await connectDB();
+
+    // These two counts are unrelated to the slug being resolved below (they only check
+    // whether the DB has been bootstrapped with any data at all), so kick them off now
+    // and let them run in the background while the sequential property/room/city lookup
+    // below happens. They're awaited later at the point they're actually used.
+    // .exec() is called once here to get a real Promise — a Mongoose Query can only be
+    // executed (via .then()/.catch()/.exec()) once, so it must not also be awaited later.
+    const propertyCountPromise = Property.countDocuments().exec();
+    const roomCountPromise = Room.countDocuments().exec();
 
     // Tracks whether a real Property or Room document was directly matched for this
     // slug (steps 1-3 below), as opposed to the step 4 fuzzy city-level fallback that
@@ -364,8 +377,9 @@ export async function getPropertyDetailsData(
     const propertyName = property?.name || cityConfig.defaultPropertyName;
 
     // Check if DB has any properties or rooms configured at all
-    const totalPropsInDb = await Property.countDocuments();
-    const totalRoomsInDb = await Room.countDocuments();
+    // (fired near the top of this function — already in flight or resolved by now)
+    const totalPropsInDb = await propertyCountPromise;
+    const totalRoomsInDb = await roomCountPromise;
     const isDbBootstrapped = totalPropsInDb > 0 || totalRoomsInDb > 0;
 
     // Map room options
@@ -541,7 +555,7 @@ export async function getPropertyDetailsData(
     };
     return fallbackResult;
   }
-}
+});
 
 export function getHotelValueForSlug(slug: string): string {
   const s = slug.toLowerCase().trim();
@@ -579,10 +593,19 @@ export async function getRoomsPageData(
 
   try {
     await connectDB();
-    const allCitiesDocs = await City.find({ active: true }).select("name slug").sort({ order: 1 }).lean();
-    const allCities = allCitiesDocs.map((c) => ({ name: c.name, slug: c.slug }));
 
-    const activeProperties = await Property.find({ status: { $ne: "inactive" } }).select("_id").lean();
+    // Unrelated to the city/property lookups below — kick off now, awaited where used.
+    // .exec() is called once here to get a real Promise — a Mongoose Query can only be
+    // executed (via .then()/.catch()/.exec()) once, so it must not also be awaited later.
+    const propertyCountPromise = Property.countDocuments().exec();
+    const roomCountPromise = Room.countDocuments().exec();
+
+    // Neither depends on the other's result, so run them concurrently.
+    const [allCitiesDocs, activeProperties] = await Promise.all([
+      City.find({ active: true }).select("name slug").sort({ order: 1 }).lean(),
+      Property.find({ status: { $ne: "inactive" } }).select("_id").lean(),
+    ]);
+    const allCities = allCitiesDocs.map((c) => ({ name: c.name, slug: c.slug }));
     const activePropertyIds = activeProperties.map((p) => p._id);
 
     let roomsDocs: any[] = [];
@@ -626,8 +649,8 @@ export async function getRoomsPageData(
         .lean();
     }
 
-    const totalPropsInDb = await Property.countDocuments();
-    const totalRoomsInDb = await Room.countDocuments();
+    const totalPropsInDb = await propertyCountPromise;
+    const totalRoomsInDb = await roomCountPromise;
     const isDbBootstrapped = totalPropsInDb > 0 || totalRoomsInDb > 0;
 
     let rooms: PropertyRoomOption[] = [];

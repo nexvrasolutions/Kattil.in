@@ -36,7 +36,7 @@ function RelatedCard({ post, index }: { post: RelatedPost; index: number }) {
       initial={{ opacity: 0, y: 20 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.5, ease: EASE, delay: index * 0.1 }}
-      className="group flex flex-col bg-white rounded-[12px] overflow-hidden border border-[#EBE8DF] shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300"
+      className="group flex flex-col bg-white rounded-[12px] overflow-hidden  transition-all duration-300"
     >
       <Link href={`/blog/${post.slug}`} className="block flex flex-col flex-1">
         <div className="relative aspect-[16/10] w-full overflow-hidden bg-gray-100 rounded-t-[12px]">
@@ -346,7 +346,7 @@ export default function BlogDetailContent({
                   {post.additionalImages && post.additionalImages.length > 0 && (
                     <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {post.additionalImages.map((src, i) => (
-                        <div key={i} className="relative aspect-[4/3] overflow-hidden rounded-[10px] shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+                        <div key={i} className="relative aspect-[4/3] overflow-hidden rounded-[10px]">
                           <Image
                             src={src}
                             alt={`${post.title} photo ${i + 1}`}

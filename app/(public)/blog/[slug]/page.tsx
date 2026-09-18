@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import { SITE_URL } from "@/lib/seo";
 import { connectDB } from "@/lib/db/mongodb";
@@ -151,7 +152,10 @@ function findStaticPost(slug: string): BlogDocLean | null {
   return found || null;
 }
 
-async function getPost(slug: string): Promise<{ post: BlogDocLean; related: RelatedPost[] } | null> {
+// Wrapped in React's cache() so that generateMetadata and the page component — which
+// both call this with the same slug for a given request — share a single invocation
+// instead of running the DB query twice per navigation.
+const getPost = cache(async function getPost(slug: string): Promise<{ post: BlogDocLean; related: RelatedPost[] } | null> {
   const cleanSlug = slug.toLowerCase().trim();
   try {
     await connectDB();
@@ -227,7 +231,7 @@ async function getPost(slug: string): Promise<{ post: BlogDocLean; related: Rela
     }));
 
   return { post: staticPost, related };
-}
+});
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;

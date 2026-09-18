@@ -104,15 +104,15 @@ export default async function DestinationsPage() {
           let destinationLink = isKanya
             ? "/kaniyakumari"
             : c.link?.trim() ||
-              (c.slug === "chennai"
-                ? "/chennai"
-                : c.slug === "coimbatore"
-                  ? "/coimbatore"
-                  : c.slug === "madurai"
-                    ? "/madurai"
-                    : c.slug === "colachel"
-                      ? "/colachel"
-                      : `/destinations/${c.slug}`);
+            (c.slug === "chennai"
+              ? "/chennai"
+              : c.slug === "coimbatore"
+                ? "/coimbatore"
+                : c.slug === "madurai"
+                  ? "/madurai"
+                  : c.slug === "colachel"
+                    ? "/colachel"
+                    : `/destinations/${c.slug}`);
 
           let destinationImage = c.image?.trim() || c.banner?.trim();
           if (!destinationImage || (c.slug === "chennai" && destinationImage.includes("kanyakumari"))) {
@@ -124,8 +124,6 @@ export default async function DestinationsPage() {
               destinationImage = "/images/destinations/coimbatore.png";
             else if (c.slug === "madurai")
               destinationImage = "/images/destinations/madurai.png";
-            else if (c.slug === "colachel")
-              destinationImage = "/images/destinations/kanyakumari.png";
             else destinationImage = "/images/destinations/chennai.png";
           }
 

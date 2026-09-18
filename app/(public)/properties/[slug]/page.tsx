@@ -12,10 +12,13 @@ interface PageProps {
   searchParams?: Promise<{ city?: string }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
   try {
     const { slug } = await params;
-    const data = await getPropertyDetailsData(slug);
+    const sParams = searchParams ? await searchParams : {};
+    // Same args as the page component's call below, so React's cache() dedupes them
+    // into a single invocation instead of running the query chain twice per request.
+    const data = await getPropertyDetailsData(slug, "Kanniyakumari", sParams?.city);
 
     return {
       title: `${data.name} in ${data.destinationName} | Property Details — Kattil`,

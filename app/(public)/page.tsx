@@ -44,26 +44,26 @@ async function getHomeDestinations(): Promise<DestinationItem[]> {
 
     if (!cities || cities.length === 0) return [];
 
-    const propertyCounts = await Property.aggregate([
-      { $match: { status: { $ne: "inactive" } } },
-      { $group: { _id: "$city", count: { $sum: 1 } } },
+    // None of these three depend on each other's results, so run them concurrently.
+    const [propertyCounts, allPropertyCounts, activeProps] = await Promise.all([
+      Property.aggregate([
+        { $match: { status: { $ne: "inactive" } } },
+        { $group: { _id: "$city", count: { $sum: 1 } } },
+      ]),
+      Property.aggregate([{ $group: { _id: "$city", count: { $sum: 1 } } }]),
+      Property.find({ status: { $ne: "inactive" } }).select("_id").lean(),
     ]);
+
     const propertyCountMap = new Map<string, number>();
     for (const p of propertyCounts) {
       if (p._id) propertyCountMap.set(String(p._id), p.count);
     }
 
-    const allPropertyCounts = await Property.aggregate([
-      { $group: { _id: "$city", count: { $sum: 1 } } },
-    ]);
     const allPropertyCountMap = new Map<string, number>();
     for (const p of allPropertyCounts) {
       if (p._id) allPropertyCountMap.set(String(p._id), p.count);
     }
 
-    const activeProps = await Property.find({ status: { $ne: "inactive" } })
-      .select("_id")
-      .lean();
     const activePropIds = activeProps.map((p) => p._id);
 
     const roomCounts = await Room.aggregate([

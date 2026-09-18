@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { connectDB } from "@/lib/db/mongodb";
 import City from "@/lib/models/City";
 import Property from "@/lib/models/Property";
@@ -45,7 +46,10 @@ function getFallbackProperties(citySlug: string): PropertyStay[] {
   return [];
 }
 
-export async function getDestinationStaysData(
+// Wrapped in React's cache() so that generateMetadata and the page component — which
+// both call this with the same (slug, fallbackName) for a given request — share a
+// single invocation instead of running the whole query chain twice per navigation.
+export const getDestinationStaysData = cache(async function getDestinationStaysData(
   slug: string,
   fallbackName: string
 ): Promise<DestinationStaysData> {
@@ -137,8 +141,10 @@ export async function getDestinationStaysData(
       } else if (legacyRooms.length > 0) {
         properties = [];
       } else {
-        const totalPropsInDb = await Property.countDocuments();
-        const totalRoomsInDb = await Room.countDocuments();
+        const [totalPropsInDb, totalRoomsInDb] = await Promise.all([
+          Property.countDocuments(),
+          Room.countDocuments(),
+        ]);
         if (totalPropsInDb === 0 && totalRoomsInDb === 0) {
           properties = getFallbackProperties(cleanSlug);
         } else {
@@ -168,4 +174,4 @@ export async function getDestinationStaysData(
       citySlugFound: true,
     };
   }
-}
+});
