@@ -304,6 +304,12 @@ export default function HeroNavbar({
   const lastScrollY = useRef(0);
   const heroJumpedRef = useRef(false);
   const heroVisibleRef = useRef(heroVisible);
+  // True from a touch-triggered jump() until its hero collapse has finished
+  // (spacer's onAnimationComplete), the next touchstart, or the hero being
+  // shown again. While the spacer shrinks, scroll anchoring can nudge
+  // scrollY to ~0, which the scroll handler below would misread as the user
+  // scrolling back up and re-expand the hero. Never set by wheel/keyboard.
+  const touchJumpSettlingRef = useRef(false);
   // Latches true the first time the hero becomes visible (initial load) and
   // never resets — lets the headline's blur-reveal play once only, while
   // heroVisible itself keeps driving the hero/compact-navbar crossfade as
@@ -486,6 +492,7 @@ export default function HeroNavbar({
     heroVisibleRef.current = heroVisible;
     if (heroVisible) {
       heroJumpedRef.current = false;
+      touchJumpSettlingRef.current = false;
     }
   }, [heroVisible]);
 
@@ -550,12 +557,74 @@ export default function HeroNavbar({
       }
     };
 
+    // Touch: an upward swipe on the expanded hero triggers the same jump() as
+    // the wheel. Everything here is passive and never calls preventDefault —
+    // the hero panel carries `touch-action: none` while expanded (see the
+    // panel style below), so the browser never starts a native scroll from it
+    // and there is nothing to cancel. All state is scoped to the current
+    // finger-down gesture and cleared on touchstart/touchend/touchcancel, so
+    // it can never carry over into the next swipe.
+    const TOUCH_SWIPE_MIN = 12;
+    let touchStartY = 0;
+    let touchActive = false;
+    let touchJumped = false;
+
+    const resetTouch = () => {
+      touchActive = false;
+      touchJumped = false;
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      resetTouch();
+      touchJumpSettlingRef.current = false;
+      if (mobileOpenRef.current) return;
+      if (e.touches.length !== 1) return;
+      touchStartY = e.touches[0].clientY;
+      touchActive = true;
+      // Hero is on screen, so no jump can legitimately be pending; clear a
+      // latch left over from a collapse/expand that batched into one render.
+      if (heroVisibleRef.current) heroJumpedRef.current = false;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (!touchActive || touchJumped) return;
+      if (mobileOpenRef.current || e.touches.length !== 1) return;
+      // Positive == finger dragging up == scroll-down intent (same sign
+      // convention as wheel's deltaY).
+      const dragUp = touchStartY - e.touches[0].clientY;
+      if (heroVisibleRef.current) {
+        if (dragUp > TOUCH_SWIPE_MIN) {
+          touchJumped = true;
+          jump();
+          if (heroJumpedRef.current) touchJumpSettlingRef.current = true;
+        }
+      } else if (
+        dragUp < -TOUCH_SWIPE_MIN &&
+        window.scrollY <= 0 &&
+        !touchJumpSettlingRef.current
+      ) {
+        // Collapsed but resting at exactly scrollY 0 (scroll anchoring can
+        // land there): a downward swipe can't produce a scroll event, so the
+        // scroll handler would never bring the hero back. Do it here.
+        touchJumped = true;
+        setHeroVisible(true);
+      }
+    };
+
     window.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("touchend", resetTouch, { passive: true });
+    window.addEventListener("touchcancel", resetTouch, { passive: true });
 
     return () => {
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", resetTouch);
+      window.removeEventListener("touchcancel", resetTouch);
     };
   }, [isHome, navbarH]);
 
@@ -592,7 +661,11 @@ export default function HeroNavbar({
         const scrollingDown = currentY > lastScrollY.current;
         if (scrollingDown && currentY > 50) {
           setHeroVisible(false);
-        } else if (!scrollingDown && currentY < 20) {
+        } else if (
+          !scrollingDown &&
+          currentY < 20 &&
+          !touchJumpSettlingRef.current
+        ) {
           setHeroVisible(true);
           heroJumpedRef.current = false;
         }
@@ -837,6 +910,15 @@ export default function HeroNavbar({
 
               transform: "translateZ(0)",
               willChange: "height",
+
+              // Expanded hero only: stops the browser starting a native
+              // scroll from it so the touch handler's jump() is the single
+              // scroll. Released as soon as the hero collapses or the mobile
+              // menu opens.
+              touchAction:
+                isExpanded && !mobileOpen
+                  ? "none"
+                  : undefined,
             }}
           >
             {/* ═══════════════════════════════════════════════════════════════
@@ -1860,6 +1942,9 @@ export default function HeroNavbar({
               : `${navbarH + 32}px`,
         }}
         transition={{ duration: HERO_DURATION, ease: HERO_EASE }}
+        onAnimationComplete={() => {
+          touchJumpSettlingRef.current = false;
+        }}
         aria-hidden
       />
     </>
