@@ -645,6 +645,7 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                           >
                             <Link
                               href={galleryHref}
+                              prefetch={true}
                               className="relative w-full h-[240px] sm:h-[280px] md:h-[300px] aspect-[416/300] rounded-[8px] overflow-hidden bg-gray-900 shadow-xs block cursor-pointer text-left w-full border-0 p-0 group"
                             >
                               <Image

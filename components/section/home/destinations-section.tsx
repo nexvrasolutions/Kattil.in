@@ -196,6 +196,7 @@ export default function DestinationsSection({
                 /* 4th Card: View all our Destination */
                 <Link
                   href={dest.href}
+                  prefetch={true}
                   className="group relative flex flex-col w-[260px] h-[331px] rounded-[8px] overflow-hidden bg-[#A7BD91] text-white transition-all duration-300 shadow-xs hover:shadow-md block"
                   style={{
                     width: 260,
@@ -230,6 +231,7 @@ export default function DestinationsSection({
                 /* Standard Destination Card */
                 <Link
                   href={dest.href}
+                  prefetch={true}
                   className="group relative block w-[260px] h-[331px] rounded-[8px] overflow-hidden bg-white transition-all duration-300 shadow-xs hover:shadow-md"
                   style={{
                     width: 260,
