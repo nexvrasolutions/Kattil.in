@@ -19,7 +19,6 @@ const faqCategorySchema = new Schema<IFaqCategory>(
   { timestamps: true }
 );
 
-faqCategorySchema.index({ slug: 1 }, { unique: true });
 faqCategorySchema.index({ active: 1, order: 1 });
 
 const FaqCategory: Model<IFaqCategory> =

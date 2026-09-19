@@ -539,11 +539,10 @@ export default function GalleryContent({
                       key={cat.slug}
                       type="button"
                       onClick={() => setActiveCategory(cat.slug)}
-                      className={`font-[Public_Sans] text-[13px] sm:text-[13.5px] transition-all whitespace-nowrap cursor-pointer px-3.5 sm:px-4 py-1.5 rounded-[6px] ${
-                        isSelected
+                      className={`font-[Public_Sans] text-[13px] sm:text-[13.5px] transition-all whitespace-nowrap cursor-pointer px-3.5 sm:px-4 py-1.5 rounded-[6px] ${isSelected
                           ? "bg-[#b4c7a5] text-[#22301c] font-semibold shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
                           : "text-[#6b7280] hover:text-[#111827] font-medium hover:bg-[#eae8e3]"
-                      }`}
+                        }`}
                     >
                       {cat.name}
                     </button>
@@ -683,3 +682,4 @@ export default function GalleryContent({
     </div>
   );
 }
+

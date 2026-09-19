@@ -26,8 +26,6 @@ const seoSchema = new Schema<ISeo>(
   { timestamps: true }
 );
 
-seoSchema.index({ page: 1 }, { unique: true });
-
 const Seo: Model<ISeo> =
   mongoose.models.Seo ?? mongoose.model<ISeo>("Seo", seoSchema);
 

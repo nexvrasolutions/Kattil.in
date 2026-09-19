@@ -13,7 +13,7 @@ export async function seedGallery() {
     {
       src: "/assets/madurai-gallery/image-1.jpeg",
       alt: "Private room with carved wooden bed",
-      category: "Rooms", city: madurai?._id, featured: true,  order: 0,
+      category: "Rooms", city: madurai?._id, featured: true, order: 0,
     },
     {
       src: "/assets/madurai-gallery/image-2.jpeg",
@@ -59,7 +59,7 @@ export async function seedGallery() {
     {
       src: "/assets/chennai-gallery/image-1.jpeg",
       alt: "Dormitory room with bunk beds",
-      category: "Rooms", city: chennai?._id, featured: true,  order: 9,
+      category: "Rooms", city: chennai?._id, featured: true, order: 9,
     },
     {
       src: "/assets/chennai-gallery/image-2.jpeg",
@@ -147,4 +147,10 @@ export async function seedGallery() {
 
   await Gallery.insertMany(images);
   console.log(`Gallery: ${images.length} images created (9 Madurai, 4 Chennai, 12 Kaniyakumari)`);
+}
+    },
+  ];
+
+await Gallery.insertMany(images);
+console.log(`Gallery: ${images.length} images created (9 Madurai, 4 Chennai, 4 Coimbatore, 12 Kaniyakumari)`);
 }

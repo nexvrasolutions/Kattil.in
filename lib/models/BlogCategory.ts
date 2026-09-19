@@ -19,7 +19,6 @@ const blogCategorySchema = new Schema<IBlogCategory>(
   { timestamps: true }
 );
 
-blogCategorySchema.index({ slug: 1 }, { unique: true });
 blogCategorySchema.index({ active: 1, order: 1 });
 
 const BlogCategory: Model<IBlogCategory> =
