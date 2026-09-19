@@ -339,6 +339,7 @@ export default function TestimonialsSection() {
               {INFINITE_TESTIMONIALS.map((item, index) => (
                 <div
                   key={`mobile-${index}`}
+                  aria-hidden={index >= ALL_TESTIMONIALS.length ? true : undefined}
                   className="w-[calc(100vw-64px)] max-w-[340px] shrink-0 snap-start bg-white rounded-[20px] p-5 sm:p-6 flex flex-col justify-between border border-black/[0.04] select-none min-h-[260px]"
                 >
                   <div>
@@ -353,9 +354,15 @@ export default function TestimonialsSection() {
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-[17px] sm:text-[18px] text-[#0d1b2e] mt-3.5 leading-snug">
-                      {item.title}
-                    </h3>
+                    {index >= ALL_TESTIMONIALS.length ? (
+                      <p className="text-[17px] sm:text-[18px] text-[#0d1b2e] mt-3.5 leading-snug">
+                        {item.title}
+                      </p>
+                    ) : (
+                      <h3 className="text-[17px] sm:text-[18px] text-[#0d1b2e] mt-3.5 leading-snug">
+                        {item.title}
+                      </h3>
+                    )}
 
                     {/* Review Text */}
                     <p className="text-gray-600 text-[14px] sm:text-[15px] leading-relaxed mt-2.5 font-light">
@@ -421,6 +428,7 @@ export default function TestimonialsSection() {
                     {pageReviews.map((item, index) => (
                       <div
                         key={`${pageIdx}-${index}`}
+                        aria-hidden={pageIdx >= TESTIMONIALS_DATA.length ? true : undefined}
                         className="bg-white rounded-[20px] p-6 sm:p-7 md:p-8 flex flex-col justify-between border border-black/[0.03] transition-all duration-300 min-h-[290px]"
                       >
                         <div>
@@ -435,9 +443,15 @@ export default function TestimonialsSection() {
                           </div>
 
                           {/* Title */}
-                          <h3 className="text-[20px] text-[#0d1b2e] mt-4 leading-snug">
-                            {item.title}
-                          </h3>
+                          {pageIdx >= TESTIMONIALS_DATA.length ? (
+                            <p className="text-[20px] text-[#0d1b2e] mt-4 leading-snug">
+                              {item.title}
+                            </p>
+                          ) : (
+                            <h3 className="text-[20px] text-[#0d1b2e] mt-4 leading-snug">
+                              {item.title}
+                            </h3>
+                          )}
 
                           {/* Review Text */}
                           <p className="text-gray-600 text-[15.5px] leading-relaxed mt-4 font-light">

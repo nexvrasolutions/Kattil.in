@@ -269,6 +269,7 @@ export default function RoomsListingView({
                           {destinationSlug && (
                             <Link
                               href={`/properties/${destinationSlug}`}
+                              aria-label={`Details of ${room.name}`}
                               className="px-3.5 py-2.5 rounded-[8px] border border-gray-300 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                             >
                               Details
@@ -278,6 +279,7 @@ export default function RoomsListingView({
                             whileHover={{ scale: 1.04 }}
                             whileTap={{ scale: 0.98 }}
                             href={directBookingUrl}
+                            aria-label={`Book ${room.name}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="px-5 py-2.5 rounded-[8px] bg-[#0d1b2e] hover:bg-[#162840] text-white text-xs font-semibold inline-flex items-center gap-1.5 shadow-sm transition-all"

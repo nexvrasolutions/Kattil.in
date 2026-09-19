@@ -613,6 +613,7 @@ export default function DestinationStaysView({
                           <Link
                             href={targetLink}
                             prefetch={true}
+                            aria-label={`View ${stay.name}`}
                             className="
                               inline-flex
                               items-center
