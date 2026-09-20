@@ -405,11 +405,10 @@ export default function PropertyFormPage() {
                     key={badge}
                     type="button"
                     onClick={() => setForm((f) => ({ ...f, badge }))}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                      form.badge === badge
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${form.badge === badge
                         ? "bg-[hsl(var(--adm-primary))] text-white border-[hsl(var(--adm-primary))]"
                         : "bg-[hsl(var(--adm-background))] border-[hsl(var(--adm-border))] text-[hsl(var(--adm-foreground))] hover:border-[hsl(var(--adm-primary)/0.5)]"
-                    }`}
+                      }`}
                   >
                     {badge}
                   </button>
@@ -573,11 +572,10 @@ export default function PropertyFormPage() {
                       key={amenity}
                       type="button"
                       onClick={() => toggleAmenity(amenity)}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                        selected
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${selected
                           ? "bg-[hsl(var(--adm-primary)/0.15)] text-[hsl(var(--adm-primary))] border-[hsl(var(--adm-primary)/0.4)]"
                           : "bg-[hsl(var(--adm-background))] border-[hsl(var(--adm-border))] text-[hsl(var(--adm-muted-foreground))] hover:border-[hsl(var(--adm-primary)/0.4)]"
-                      }`}
+                        }`}
                     >
                       {selected && <Check className="w-3.5 h-3.5" />}
                       {amenity}
@@ -780,14 +778,12 @@ export default function PropertyFormPage() {
                     status: f.status === "active" ? "inactive" : "active",
                   }))
                 }
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  form.status === "active" ? "bg-[hsl(var(--adm-primary))]" : "bg-[hsl(var(--adm-muted))]"
-                }`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.status === "active" ? "bg-[hsl(var(--adm-primary))]" : "bg-[hsl(var(--adm-muted))]"
+                  }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
-                    form.status === "active" ? "translate-x-6" : "translate-x-1"
-                  }`}
+                  className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${form.status === "active" ? "translate-x-6" : "translate-x-1"
+                    }`}
                 />
               </button>
               <span className="text-sm font-medium text-[hsl(var(--adm-foreground))]">

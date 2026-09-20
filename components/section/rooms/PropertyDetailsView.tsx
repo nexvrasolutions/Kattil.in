@@ -308,10 +308,10 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
       <Navbar />
 
       <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
-        <div className="px-5 md:px-8 lg:px-15 pt-24 sm:pt-28 md:pt-36 lg:pt-40 pb-48 sm:pb-44 lg:pb-20">
+        <div className="px-5 md:px-8 lg:px-15 pt-22 sm:pt-24 md:pt-28 lg:pt-30 pb-48 sm:pb-44 lg:pb-20">
           {/* ── 1. Top Panoramic Hero Carousel (Edge-to-Edge Full-Bleed Slideshow) ── */}
           <section
-            className="relative w-screen left-1/2 -translate-x-1/2 overflow-hidden select-none mb-8 sm:mb-12 md:mb-16 py-1 [--slide-width:calc(100vw-64px)] [--slide-offset:32px] [--slide-gap:12px] md:[--slide-width:76vw] md:[--slide-offset:12vw] md:[--slide-gap:16px]"
+            className="relative w-screen left-1/2 -translate-x-1/2 overflow-hidden select-none mb-8 sm:mb-12 md:mb-16 py-1 [--slide-gap:12px] [--slide-width:calc(100vw-48px)] [--slide-offset:calc((100vw-var(--slide-width))/2)] sm:[--slide-gap:16px] sm:[--slide-width:calc(100vw-80px)] lg:[--slide-gap:20px] lg:[--slide-width:min(1183px,calc(100vw-80px))] xl:[--slide-width:1183px]"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
@@ -343,9 +343,9 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                         setCurrentIndex(idx);
                       }
                     }}
-                    className={`shrink-0 w-[var(--slide-width)] aspect-[4/3] sm:aspect-[16/10] md:aspect-[21/10] max-h-[580px] rounded-[14px] sm:rounded-[20px] md:rounded-[24px] overflow-hidden relative transition-all duration-500 block cursor-pointer group ${isActive
+                    className={`shrink-0 w-[var(--slide-width)] h-[320px] sm:h-[400px] md:h-[480px] lg:h-[580px] rounded-[16px] overflow-hidden relative transition-all duration-500 block cursor-pointer group ${isActive
                       ? "opacity-100 scale-100 ring-1 ring-black/5"
-                      : "opacity-80 scale-[0.99]"
+                      : "opacity-75 scale-[0.99] hover:opacity-90"
                       }`}
                   >
                     <Image

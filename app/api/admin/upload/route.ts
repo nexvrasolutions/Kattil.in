@@ -52,9 +52,33 @@ export async function POST(request: NextRequest) {
         const blob = await put(`${safeFolder}/${filename}`, file, { access: "public" });
         return Response.json({ success: true, data: { path: blob.url, filename: blob.pathname } });
       } catch (blobError) {
-        console.warn("[POST /api/admin/upload] Vercel Blob upload failed, falling back to local filesystem:", blobError);
-        // Fall back to local filesystem storage below
+        console.warn("[POST /api/admin/upload] Vercel Blob upload failed:", blobError);
+        const errMsg = blobError instanceof Error ? blobError.message : "Vercel Blob upload failed";
+
+        // In local development, gracefully fall back to local disk so you're not blocked
+        if (process.env.NODE_ENV === "development" && !process.env.VERCEL) {
+          console.info("[POST /api/admin/upload] Development mode: smoothly falling back to local filesystem storage");
+        } else {
+          if (errMsg.includes("private store")) {
+            return Response.json(
+              {
+                success: false,
+                error: "Your Vercel Blob store is configured as 'Private'. Website images need public access. Please create/reconnect a 'Public' Blob store in your Vercel Dashboard → Storage.",
+              },
+              { status: 500 }
+            );
+          }
+          return Response.json({ success: false, error: `Cloud upload failed: ${errMsg}` }, { status: 500 });
+        }
       }
+    } else if (process.env.VERCEL || process.env.NODE_ENV === "production") {
+      return Response.json(
+        {
+          success: false,
+          error: "Vercel Blob storage token (BLOB_READ_WRITE_TOKEN) is not configured in Vercel environment variables. Please add Vercel Blob store or use the 'Use URL instead' option.",
+        },
+        { status: 500 }
+      );
     }
 
     // ── Local filesystem (development / fallback) ─────────────────────────────

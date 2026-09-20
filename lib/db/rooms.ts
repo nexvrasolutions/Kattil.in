@@ -21,7 +21,7 @@ const CITY_CONFIGS: Record<string, CityConfig> = {
   chennai: {
     destinationName: "Chennai",
     destinationSlug: "chennai",
-    defaultPropertyName: "Kattil Executive Stay",
+    defaultPropertyName: "Kattil Chennai",
     address: "274, 1st Main Road, Secretariat Colony, Chennai, Thoraipakkam, Tamil Nadu 600097",
     phone: "+91 63851 97921",
     email: "sadhu_burlington@live.com",
@@ -48,7 +48,7 @@ const CITY_CONFIGS: Record<string, CityConfig> = {
   coimbatore: {
     destinationName: "Coimbatore",
     destinationSlug: "coimbatore",
-    defaultPropertyName: "Kattil Stay Coimbatore",
+    defaultPropertyName: "Kattil Coimbatore",
     address: "124, Race Course Road, Gopalapuram, Coimbatore, Tamil Nadu 641018",
     phone: "+91 74487 49779",
     email: "hostelsparrow@gmail.com",

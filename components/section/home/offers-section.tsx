@@ -87,7 +87,7 @@ export default function OffersSection() {
                 <br className="hidden sm:inline" /> make your stay more rewarding, from special rates
                 <br className="hidden sm:inline" /> to exclusive experiences.
               </p>
-              <div className="mt-6 sm:mt-8 md:mt-10 lg:mt-[80px]">
+              {/* <div className="mt-6 sm:mt-8 md:mt-10 lg:mt-[80px]">
                 <Link
                   href=""
                   className="
@@ -104,7 +104,7 @@ export default function OffersSection() {
                 >
                   Explore Offers
                 </Link>
-              </div>
+              </div> */}
             </motion.div>
 
             {/* ================= RIGHT VISUAL ================= */}

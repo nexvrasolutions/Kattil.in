@@ -9,7 +9,6 @@ import {
   Search,
   X,
   MapPin,
-  Info,
 } from "lucide-react";
 import { safeFetchJson } from "@/lib/utils/safeFetch";
 
@@ -65,7 +64,7 @@ const DEFAULT_HOTEL_PLACES: HotelPlaceItem[] = [
   },
   {
     id: "prop-kattil-executive-stay",
-    name: "Kattil Executive Stay",
+    name: "Kattil Chennai",
     place: "Chennai",
     state: "Tamil Nadu",
     slug: "kattil-executive-stay",
@@ -74,7 +73,7 @@ const DEFAULT_HOTEL_PLACES: HotelPlaceItem[] = [
   },
   {
     id: "prop-kattil-coimbatore",
-    name: "Kattil Stay Coimbatore",
+    name: "Kattil Coimbatore",
     place: "Coimbatore",
     state: "Tamil Nadu",
     slug: "kattil-stay-coimbatore",
@@ -134,15 +133,15 @@ export default function BookingBarWidget({
       );
     });
     if (match) return match;
-    if (destLower) {
-      const placeName = destLower.charAt(0).toUpperCase() + destLower.slice(1);
+    if (destLower || propLower) {
+      const placeName = destLower ? destLower.charAt(0).toUpperCase() + destLower.slice(1) : "";
       return {
-        id: `dest-${destLower}`,
-        name: `Kattil ${placeName}`,
-        place: placeName,
+        id: `dest-${destLower || propLower}`,
+        name: initialProperty || `Kattil ${placeName}`,
+        place: placeName || "Tamil Nadu",
         state: "Tamil Nadu",
-        slug: destLower,
-        hotelValue: getHotelValueForSlug(destLower),
+        slug: destLower || propLower,
+        hotelValue: getHotelValueForSlug(propLower || destLower),
       };
     }
     return null;
@@ -155,6 +154,7 @@ export default function BookingBarWidget({
   const [hotelsList, setHotelsList] = useState<HotelPlaceItem[]>(DEFAULT_HOTEL_PLACES);
   const [hotelError, setHotelError] = useState<string | null>(null);
   const [dateError, setDateError] = useState<string | null>(null);
+  const [shakeCount, setShakeCount] = useState(0);
 
   const dateInputRef = useRef<HTMLInputElement>(null);
   const dateBoxRef = useRef<HTMLDivElement>(null);
@@ -197,15 +197,15 @@ export default function BookingBarWidget({
     if (match) {
       setSelectedHotel(match);
       setHotelError(null);
-    } else if (destLower) {
-      const placeName = destLower.charAt(0).toUpperCase() + destLower.slice(1);
+    } else if (destLower || propLower) {
+      const placeName = destLower ? destLower.charAt(0).toUpperCase() + destLower.slice(1) : "";
       setSelectedHotel({
-        id: `dest-${destLower}`,
-        name: `Kattil ${placeName}`,
-        place: placeName,
+        id: `dest-${destLower || propLower}`,
+        name: initialProperty || `Kattil ${placeName}`,
+        place: placeName || "Tamil Nadu",
         state: "Tamil Nadu",
-        slug: destLower,
-        hotelValue: getHotelValueForSlug(destLower),
+        slug: destLower || propLower,
+        hotelValue: getHotelValueForSlug(propLower || destLower),
       });
       setHotelError(null);
     }
@@ -481,7 +481,7 @@ export default function BookingBarWidget({
               d1.setHours(0, 0, 0, 0);
               setCheckin(d1);
               setCheckout(null);
-              setDateDisplay(`${formatDateDisplay(d1)} - ...`);
+              setDateDisplay(`${formatDateDisplay(d1)} - Select Check-out`);
             } else {
               if (closeTimerRef.current) {
                 clearTimeout(closeTimerRef.current);
@@ -536,6 +536,7 @@ export default function BookingBarWidget({
     }
 
     if (hasError) {
+      setShakeCount((prev) => prev + 1);
       return;
     }
 
@@ -590,6 +591,7 @@ export default function BookingBarWidget({
 
               {/* ── 1. Choose your stay ────────────────────────────────────────── */}
               <motion.div
+                key={`hotel-field-${shakeCount}`}
                 animate={hotelError ? { x: [0, -4, 4, -2, 2, 0] } : {}}
                 transition={{ duration: 0.25 }}
                 className="relative w-full"
@@ -632,22 +634,6 @@ export default function BookingBarWidget({
                       }`}
                   />
                 </button>
-
-                {/* Required Guidance Message */}
-                <AnimatePresence>
-                  {hotelError && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -4 }}
-                      transition={{ duration: 0.15 }}
-                      className="text-[13.5px] sm:text-[14px] text-[#0E2E4E] mt-1.5 font-medium flex items-center gap-1.5 font-sans"
-                    >
-                      <Info className="w-4 h-4 shrink-0 text-[#0E2E4E]" />
-                      <span>{hotelError}</span>
-                    </motion.p>
-                  )}
-                </AnimatePresence>
 
                 {/* ── Dropdown Menu ────────────────────────────────────────────── */}
                 <AnimatePresence>
@@ -761,6 +747,7 @@ export default function BookingBarWidget({
 
               {/* ── 2. Check In & Out ─────────────────────────────────────────── */}
               <motion.div
+                key={`date-field-${shakeCount}`}
                 animate={dateError ? { x: [0, -4, 4, -2, 2, 0] } : {}}
                 transition={{ duration: 0.25 }}
                 className="relative w-full"
@@ -798,6 +785,27 @@ export default function BookingBarWidget({
                 >
                   <Calendar className={`w-5 h-5 ${dateError ? "text-[#0E2E4E]" : "text-[#0E2E4E]/70"} shrink-0 stroke-[1.6] pointer-events-none`} />
 
+                  <div className="w-full text-[14.5px] sm:text-[15px] md:text-[14px] lg:text-[14.5px] truncate font-sans pointer-events-none select-none">
+                    {checkin && checkout ? (
+                      <span className="text-gray-900 font-medium">
+                        {formatDateDisplay(checkin)} - {formatDateDisplay(checkout)}
+                      </span>
+                    ) : checkin ? (
+                      <>
+                        <span className="text-gray-900 font-medium">
+                          {formatDateDisplay(checkin)} -{" "}
+                        </span>
+                        <span className="text-gray-400 font-normal">
+                          Select Check-out
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-gray-400 font-normal">
+                        Select check-in & check-out
+                      </span>
+                    )}
+                  </div>
+
                   <input
                     ref={dateInputRef}
                     type="text"
@@ -807,26 +815,10 @@ export default function BookingBarWidget({
                     autoComplete="off"
                     value={dateDisplay}
                     onFocus={(e) => e.target.blur()}
-                    placeholder="Select check-in & check-out"
-                    className="w-full bg-transparent text-[14.5px] sm:text-[15px] md:text-[14px] lg:text-[14.5px] text-gray-900 font-medium outline-none cursor-pointer placeholder:text-gray-400 font-sans truncate pointer-events-none select-none"
+                    className="sr-only pointer-events-none"
+                    aria-hidden="true"
                   />
                 </div>
-
-                {/* Required Guidance Message */}
-                <AnimatePresence>
-                  {dateError && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -4 }}
-                      transition={{ duration: 0.15 }}
-                      className="text-[13.5px] sm:text-[14px] text-[#0E2E4E] mt-1.5 font-medium flex items-center gap-1.5 font-sans"
-                    >
-                      <Info className="w-4 h-4 shrink-0 text-[#0E2E4E]" />
-                      <span>{dateError}</span>
-                    </motion.p>
-                  )}
-                </AnimatePresence>
               </motion.div>
 
               {/* ── 3. Check Availability CTA ─────────────────────────────────── */}

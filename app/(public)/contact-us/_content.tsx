@@ -120,11 +120,10 @@ export default function ContactContent({ locations }: { locations: LocationItem[
                         key={loc.id}
                         type="button"
                         onClick={() => handleTabChange(loc.id)}
-                        className={`font-[Public_Sans] text-[13px] sm:text-[13.5px] transition-all whitespace-nowrap cursor-pointer px-3.5 sm:px-4 py-1.5 rounded-[6px] ${
-                          isActive
-                            ? "bg-[#b4c7a5] text-[#22301c] font-semibold shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
-                            : "text-[#6b7280] hover:text-[#111827] font-medium hover:bg-[#eae8e3]"
-                        }`}
+                        className={`font-[Public_Sans] text-[13px] sm:text-[13.5px] transition-all whitespace-nowrap cursor-pointer px-3.5 sm:px-4 py-1.5 rounded-[6px] ${isActive
+                          ? "bg-[#b4c7a5] text-[#22301c] font-semibold shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+                          : "text-[#6b7280] hover:text-[#111827] font-medium hover:bg-[#eae8e3]"
+                          }`}
                       >
                         {formattedName}
                       </button>
@@ -241,7 +240,7 @@ export default function ContactContent({ locations }: { locations: LocationItem[
                         <Phone className="w-4.5 h-4.5 text-[#D2E6BC]" />
                       </div>
                       <div className="flex flex-col gap-1 min-w-0">
-                        <span className="font-[Public_Sans] text-[12px] font-semibold uppercase tracking-[0.14em] text-[#D2E6BC]">
+                        <span className="font-[Public_Sans] text-[14px] font-semibold uppercase text-[#D2E6BC]">
                           Phone
                         </span>
                         <a
@@ -260,7 +259,7 @@ export default function ContactContent({ locations }: { locations: LocationItem[
                         <Mail className="w-4.5 h-4.5 text-[#D2E6BC]" />
                       </div>
                       <div className="flex flex-col gap-1 min-w-0">
-                        <span className="font-[Public_Sans] text-[12px] font-semibold uppercase tracking-[0.14em] text-[#D2E6BC]">
+                        <span className="font-[Public_Sans] text-[14px] font-semibold uppercase text-[#D2E6BC]">
                           Email
                         </span>
                         <a

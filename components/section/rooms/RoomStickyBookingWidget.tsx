@@ -4,9 +4,9 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Calendar,
-  ChevronDown,
   ChevronRight,
   MapPin,
+  Building2,
   Check,
 } from "lucide-react";
 import { safeFetchJson } from "@/lib/utils/safeFetch";
@@ -42,7 +42,7 @@ const DEFAULT_HOTEL_OPTIONS: HotelOption[] = [
   },
   {
     id: "dest-chennai",
-    name: "Kattil Executive Stay",
+    name: "Kattil Chennai",
     place: "Chennai",
     state: "Tamil Nadu",
     slug: "kattil-executive-stay",
@@ -51,7 +51,7 @@ const DEFAULT_HOTEL_OPTIONS: HotelOption[] = [
   },
   {
     id: "dest-coimbatore",
-    name: "Kattil Stay Coimbatore",
+    name: "Kattil Coimbatore",
     place: "Coimbatore",
     state: "Tamil Nadu",
     slug: "kattil-stay-coimbatore",
@@ -138,6 +138,7 @@ export default function RoomStickyBookingWidget({
   const [dateDisplay, setDateDisplay] = useState<string>("");
 
   const [dateError, setDateError] = useState<string | null>(null);
+  const [shakeCount, setShakeCount] = useState(0);
   const [isFooterVisible, setIsFooterVisible] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -469,6 +470,7 @@ export default function RoomStickyBookingWidget({
   const handleCheckAvailability = () => {
     if (!checkin || !checkout) {
       setDateError("Please select check-in and check-out dates");
+      setShakeCount((prev) => prev + 1);
       openCalendar();
       return;
     }
@@ -546,142 +548,74 @@ export default function RoomStickyBookingWidget({
       {/* ── Desktop Sticky Sidebar Widget (Hidden on mobile <lg, visible on lg+) ── */}
       <div className="hidden lg:block sticky top-40 lg:top-40 bg-white rounded-[8px] p-6 md:p-7 border border-gray-100">
         <div className="space-y-4">
-          {/* Location Dropdown */}
-          <div className="relative" ref={dropdownRef}>
-            <label className="block text-xs font-semibold text-gray-700 mb-1.5 font-sans">
-              Location
-            </label>
-
-            <button
-              type="button"
-              onClick={() => setDropdownOpen((prev) => !prev)}
-              className="w-full h-11 px-3.5 pr-9 rounded-[8px] border border-gray-200 bg-gray-50/70 text-[13.5px] font-medium text-gray-800 flex items-center justify-between text-left transition-colors hover:bg-gray-100/70 focus:outline-none focus:ring-2 focus:ring-[#0d1b2e] cursor-pointer font-sans"
-            >
-              <span className="truncate">
-                {selectedHotel.place}, {selectedHotel.name}
-              </span>
-              <ChevronDown
-                className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""
-                  }`}
-              />
-            </button>
-
-            {/* Animated Dropdown Menu */}
-            <AnimatePresence>
-              {dropdownOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: -6, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -6, scale: 0.98 }}
-                  transition={{ duration: 0.18, ease: "easeOut" }}
-                  className="absolute left-0 right-0 top-full mt-1.5 z-50 bg-white rounded-[8px] border border-gray-200 shadow-xl overflow-hidden p-1"
-                >
-                  {/* List of Destinations & Hotels */}
-                  <div className="max-h-[260px] overflow-y-auto space-y-0.5">
-                    {(lockedDestination
-                      ? hotelsList.filter(
-                        (h) =>
-                          h.id === selectedHotel.id ||
-                          h.hotelValue === selectedHotel.hotelValue ||
-                          h.slug.toLowerCase() === selectedHotel.slug.toLowerCase() ||
-                          h.place.toLowerCase() === selectedHotel.place.toLowerCase() ||
-                          (initialDestinationSlug &&
-                            h.slug.toLowerCase() === initialDestinationSlug.toLowerCase())
-                      )
-                      : hotelsList
-                    ).length === 0 ? (
-                      <div className="px-2.5 py-1.5 text-xs text-gray-500">
-                        {selectedHotel.place}, {selectedHotel.name}
-                      </div>
-                    ) : (
-                      (lockedDestination
-                        ? hotelsList.filter(
-                          (h) =>
-                            h.id === selectedHotel.id ||
-                            h.hotelValue === selectedHotel.hotelValue ||
-                            h.slug.toLowerCase() === selectedHotel.slug.toLowerCase() ||
-                            h.place.toLowerCase() === selectedHotel.place.toLowerCase() ||
-                            (initialDestinationSlug &&
-                              h.slug.toLowerCase() === initialDestinationSlug.toLowerCase())
-                        )
-                        : hotelsList
-                      ).map((h) => {
-                        const isSelected =
-                          h.id === selectedHotel.id ||
-                          h.place.toLowerCase() === selectedHotel.place.toLowerCase();
-
-                        return (
-                          <button
-                            key={h.id || h.slug}
-                            type="button"
-                            onClick={() => {
-                              setSelectedHotel(h);
-                              setDropdownOpen(false);
-                            }}
-                            className={`w-full px-2 py-1 rounded-[6px] text-left text-xs flex items-center justify-between transition-colors cursor-pointer ${isSelected
-                              ? "bg-[#edf5e4] text-[#2d3f27] font-semibold"
-                              : "text-gray-700 hover:bg-gray-50"
-                              }`}
-                          >
-                            <div className="flex items-center gap-2 truncate">
-                              <MapPin
-                                className={`w-3 h-3 shrink-0 ${isSelected ? "text-[#526442]" : "text-gray-400"
-                                  }`}
-                              />
-                              <span className="truncate text-[12px]">
-                                <span className="font-semibold text-gray-900">{h.place}</span>
-                                <span className="text-gray-500 font-normal">, {h.name}</span>
-                              </span>
-                            </div>
-                            {isSelected && (
-                              <Check className="w-3.5 h-3.5 text-[#526442] shrink-0 stroke-[2.5]" />
-                            )}
-                          </button>
-                        );
-                      })
-                    )}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Check In & Out */}
+          {/* Property Display */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1.5 font-sans">
-              Check In & Out
+              Choose your stay
             </label>
-            <div
-              ref={dateBoxRef}
-              onClick={toggleCalendar}
-              onMouseDown={(e) => e.stopPropagation()}
-              className={`w-full h-[44px] px-3.5 sm:px-[32px] rounded-[6px] border ${dateError
-                ? "border-red-400 bg-red-50/50 ring-1 ring-red-400/20"
-                : "border-gray-200 bg-gray-50/70 hover:bg-gray-100/70"
-                } text-[13.5px] font-medium text-gray-800 flex items-center justify-between cursor-pointer transition-colors select-none`}
-            >
-              <div className="flex items-center gap-2.5 min-w-0 flex-1 pointer-events-none">
-                <Calendar
-                  className={`w-4 h-4 ${dateError ? "text-red-500" : "text-gray-500"} shrink-0`}
-                />
-                <span className={`w-full bg-transparent text-[13.5px] font-medium truncate font-sans ${dateDisplay ? "text-gray-900" : "text-gray-400"}`}>
-                  {dateDisplay || "Select check-in & check-out"}
+
+            <div className="w-full h-11 px-3.5 rounded-[8px] border border-gray-200 bg-gray-50/70 text-[13.5px] font-medium text-gray-800 flex items-center text-left font-sans select-none">
+              <div className="flex items-center gap-2.5 overflow-hidden">
+                <Building2 className="w-4.5 h-4.5 text-[#0d1b2e]/70 shrink-0 stroke-[1.6]" />
+                <span className="text-[13.5px] font-medium text-gray-900 truncate font-sans">
+                  {selectedHotel.name}{selectedHotel.place ? ` (${selectedHotel.place})` : ""}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Error message */}
-          {dateError && (
-            <p className="text-[12px] text-red-500 font-medium font-sans">{dateError}</p>
-          )}
+          {/* Check In & Out */}
+          <motion.div
+            key={`date-box-${shakeCount}`}
+            animate={dateError ? { x: [0, -4, 4, -2, 2, 0] } : {}}
+            transition={{ duration: 0.25 }}
+            className="relative w-full"
+          >
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold text-gray-700 font-sans">
+                Check In & Out
+              </label>
+              {dateError && (
+                <span className="text-[10.5px] font-medium text-[#0d1b2e] bg-[#0d1b2e]/10 px-1.5 py-0.5 rounded-[4px]">
+                  Required
+                </span>
+              )}
+            </div>
+            <div
+              ref={dateBoxRef}
+              onClick={toggleCalendar}
+              onMouseDown={(e) => e.stopPropagation()}
+              className={`w-full h-11 px-3.5 rounded-[8px] border ${dateError
+                ? "border-[#0d1b2e] bg-[#0d1b2e]/[0.03] ring-1 ring-[#0d1b2e]/20"
+                : "border-gray-200 bg-gray-50/70 hover:bg-gray-100/70"
+                } text-[13.5px] font-medium text-gray-800 flex items-center justify-between cursor-pointer transition-colors select-none`}
+            >
+              <div className="flex items-center gap-2.5 min-w-0 flex-1 pointer-events-none">
+                <Calendar
+                  className={`w-4.5 h-4.5 ${dateError ? "text-[#0d1b2e]" : "text-[#0d1b2e]/70"} shrink-0 stroke-[1.6]`}
+                />
+                <div className="w-full bg-transparent text-[13.5px] font-medium truncate font-sans">
+                  {checkin && checkout ? (
+                    <span className="text-gray-900">{formatDateDisplay(checkin)} - {formatDateDisplay(checkout)}</span>
+                  ) : checkin ? (
+                    <>
+                      <span className="text-gray-900">{formatDateDisplay(checkin)} - </span>
+                      <span className="text-gray-400 font-normal">Select Check-out</span>
+                    </>
+                  ) : (
+                    <span className="text-gray-400 font-normal">Select check-in & check-out</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </motion.div>
 
           {/* Check Availability CTA */}
           <div className="pt-2">
             <button
               type="button"
               onClick={handleCheckAvailability}
-              className="w-full h-[44px] px-3.5 sm:px-[32px] rounded-[6px] bg-[#0d1b2e] hover:bg-[#162840] text-white font-semibold text-[14px] shadow-sm transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center font-sans"
+              className="w-full h-11 px-4 rounded-[8px] bg-[#0d1b2e] hover:bg-[#162840] text-white font-semibold text-[14px] shadow-sm transition-all duration-200 active:scale-[0.98] cursor-pointer flex items-center justify-center font-sans"
             >
               Check Availability
             </button>
@@ -698,7 +632,10 @@ export default function RoomStickyBookingWidget({
       >
         <div className="w-full">
           {/* Top Date Selection Card matching user mockup */}
-          <div
+          <motion.div
+            key={`mobile-date-box-${shakeCount}`}
+            animate={dateError ? { x: [0, -4, 4, -2, 2, 0] } : {}}
+            transition={{ duration: 0.25 }}
             ref={mobileDateBoxRef}
             onClick={toggleCalendar}
             onMouseDown={(e) => e.stopPropagation()}
@@ -706,33 +643,42 @@ export default function RoomStickyBookingWidget({
               e.stopPropagation();
             }}
             className={`w-full h-[58px] sm:h-[60px] px-4 sm:px-[32px] bg-white border ${dateError
-              ? "border-red-400 ring-1 ring-red-400/30"
+              ? "border-[#0d1b2e] ring-1 ring-[#0d1b2e]/20"
               : "border-[#d8e0ea] hover:border-gray-400"
               } rounded-[8px] flex items-center justify-between cursor-pointer transition-colors shadow-2xs select-none`}
           >
             <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pointer-events-none">
               <Calendar
-                className={`w-5 h-5 sm:w-5.5 sm:h-5.5 ${dateError ? "text-red-500" : "text-[#0d1b2e]"
+                className={`w-5 h-5 sm:w-5.5 sm:h-5.5 ${dateError ? "text-[#0d1b2e]" : "text-[#0d1b2e]"
                   } shrink-0 stroke-[1.6]`}
               />
               <div className="flex flex-col text-left justify-center min-w-0 leading-tight">
-                <span className="text-[11px] sm:text-[11.5px] font-semibold text-[#64748b] font-sans truncate">
-                  Check In - Check Out
-                </span>
-                <span className="text-[14px] sm:text-[14.5px] font-bold text-[#0d1b2e] font-sans truncate mt-0.5">
-                  {dateDisplay || "Select dates"}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] sm:text-[11.5px] font-semibold text-[#64748b] font-sans truncate">
+                    Check In - Check Out
+                  </span>
+                  {dateError && (
+                    <span className="text-[10px] font-medium text-[#0d1b2e] bg-[#0d1b2e]/10 px-1.5 py-0.5 rounded-[4px]">
+                      Required
+                    </span>
+                  )}
+                </div>
+                <div className="text-[14px] sm:text-[14.5px] font-bold font-sans truncate mt-0.5">
+                  {checkin && checkout ? (
+                    <span className="text-[#0d1b2e]">{formatDateDisplay(checkin)} - {formatDateDisplay(checkout)}</span>
+                  ) : checkin ? (
+                    <>
+                      <span className="text-[#0d1b2e]">{formatDateDisplay(checkin)} - </span>
+                      <span className="text-gray-400 font-normal">Select Check-out</span>
+                    </>
+                  ) : (
+                    <span className="text-gray-400 font-normal">Select dates</span>
+                  )}
+                </div>
               </div>
             </div>
             <ChevronRight className="w-5 h-5 text-[#0d1b2e] shrink-0 stroke-[2.5] pointer-events-none" />
-          </div>
-
-          {/* Mobile Date Error */}
-          {dateError && (
-            <p className="text-[11px] text-red-500 font-medium font-sans mt-1 text-center">
-              {dateError}
-            </p>
-          )}
+          </motion.div>
 
           {/* Bottom Check Availability Button */}
           <button

@@ -80,14 +80,14 @@ export async function seedProperties() {
       order: 1,
     },
     {
-      name: "Kattil Executive Stay",
+      name: "Kattil Chennai",
       slug: "kattil-executive-stay",
       city: chennai._id,
       badge: "Executive Stay",
       category: "hotel",
       tagline: "Your Peaceful Sanctuary in Chennai",
       description:
-        "Located in Thoraipakkam, Kattil Executive Stay Chennai offers premium accommodations with contemporary amenities, warm South Indian hospitality, and effortless access to the city's key hubs.",
+        "Located in Thoraipakkam, Kattil Chennai offers premium accommodations with contemporary amenities, warm South Indian hospitality, and effortless access to the city's key hubs.",
       images: [
         "/assets/kattil-room-hero.webp",
         "/assets/deluxe-garden-suite.webp",
@@ -114,14 +114,14 @@ export async function seedProperties() {
     ...(coimbatore
       ? [
           {
-            name: "Kattil Stay Coimbatore",
+            name: "Kattil Coimbatore",
             slug: "kattil-stay-coimbatore",
             city: coimbatore._id,
             badge: "Luxury Suite",
             category: "hotel",
             tagline: "Modern Living Near Race Course",
             description:
-              "Kattil Stay Coimbatore provides stylish, restful accommodations located near Race Course Road, offering serene suites and high-speed amenities for discerning guests.",
+              "Kattil Coimbatore provides stylish, restful accommodations located near Race Course Road, offering serene suites and high-speed amenities for discerning guests.",
             images: [
               "/assets/deluxe-garden-suite.webp",
               "/assets/ac-double-room.webp",
