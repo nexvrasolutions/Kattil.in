@@ -45,14 +45,9 @@ export async function seedFooter() {
       updates.sidebarIcons = [
         {
           label: "WhatsApp", tooltip: "Chat on WhatsApp", iconName: "whatsapp", iconUrl: "",
-          url: "", bgColor: "#25D366", iconColor: "#ffffff",
-          type: "multi", pulse: true, order: 0, visible: true,
-          locations: [
-            { label: "Chennai", url: "https://wa.me/916385197921" },
-            { label: "Kaniyakumari", url: "https://wa.me/917448749779" },
-            { label: "Coimbatore", url: "https://wa.me/917448749779" },
-            { label: "Madurai", url: "https://wa.me/917358127921" },
-          ],
+          url: "https://wa.me/917358127921", bgColor: "#25D366", iconColor: "#ffffff",
+          type: "link", pulse: true, order: 0, visible: true,
+          locations: [],
         },
         {
           label: "Instagram", tooltip: "Follow on Instagram", iconName: "instagram", iconUrl: "",
@@ -132,13 +127,9 @@ export async function seedFooter() {
       sidebarIcons: [
         {
           label: "WhatsApp", tooltip: "Chat on WhatsApp", iconName: "whatsapp", iconUrl: "",
-          url: "", bgColor: "#25D366", iconColor: "#ffffff",
-          type: "multi", pulse: true, order: 0, visible: true,
-          locations: [
-            { label: "Madurai", url: "https://wa.me/917358127921" },
-            { label: "Chennai", url: "https://wa.me/916385197921" },
-            { label: "Coimbatore", url: "https://wa.me/917448749779" },
-          ],
+          url: "https://wa.me/917358127921", bgColor: "#25D366", iconColor: "#ffffff",
+          type: "link", pulse: true, order: 0, visible: true,
+          locations: [],
         },
         {
           label: "Instagram", tooltip: "Follow on Instagram", iconName: "instagram", iconUrl: "",

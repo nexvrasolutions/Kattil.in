@@ -602,7 +602,7 @@ export default function BookingBarWidget({
                     Choose your stay
                   </label>
                   {hotelError && (
-                    <span className="text-[10.5px] font-medium text-[#0E2E4E] bg-[#0E2E4E]/10 px-1.5 py-0.5 rounded-[4px]">
+                    <span className="text-[10.5px] font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded-[4px]">
                       Required
                     </span>
                   )}
@@ -757,7 +757,7 @@ export default function BookingBarWidget({
                     Check In & Out
                   </label>
                   {dateError && (
-                    <span className="text-[10.5px] font-medium text-[#0E2E4E] bg-[#0E2E4E]/10 px-1.5 py-0.5 rounded-[4px]">
+                    <span className="text-[10.5px] font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded-[4px]">
                       Required
                     </span>
                   )}

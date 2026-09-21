@@ -576,7 +576,7 @@ export default function RoomStickyBookingWidget({
                 Check In & Out
               </label>
               {dateError && (
-                <span className="text-[10.5px] font-medium text-[#0d1b2e] bg-[#0d1b2e]/10 px-1.5 py-0.5 rounded-[4px]">
+                <span className="text-[10.5px] font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded-[4px]">
                   Required
                 </span>
               )}
@@ -649,8 +649,7 @@ export default function RoomStickyBookingWidget({
           >
             <div className="flex items-center gap-3 sm:gap-3.5 min-w-0 pointer-events-none">
               <Calendar
-                className={`w-5 h-5 sm:w-5.5 sm:h-5.5 ${dateError ? "text-[#0d1b2e]" : "text-[#0d1b2e]"
-                  } shrink-0 stroke-[1.6]`}
+                className={`w-5 h-5 sm:w-5.5 sm:h-5.5 ${dateError ? "text-[#0d1b2e]" : "text-[#0d1b2e]"} shrink-0 stroke-[1.6]`}
               />
               <div className="flex flex-col text-left justify-center min-w-0 leading-tight">
                 <div className="flex items-center gap-2">
@@ -658,7 +657,7 @@ export default function RoomStickyBookingWidget({
                     Check In - Check Out
                   </span>
                   {dateError && (
-                    <span className="text-[10px] font-medium text-[#0d1b2e] bg-[#0d1b2e]/10 px-1.5 py-0.5 rounded-[4px]">
+                    <span className="text-[10px] font-medium text-red-600 bg-red-50 px-1.5 py-0.5 rounded-[4px]">
                       Required
                     </span>
                   )}
