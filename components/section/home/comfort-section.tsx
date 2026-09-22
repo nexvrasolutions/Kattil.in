@@ -8,6 +8,7 @@ import { ShieldCheck } from "lucide-react";
 interface ComfortFeature {
   title: string;
   description: string;
+  href?: string;
 }
 
 const FEATURES: ComfortFeature[] = [
@@ -22,6 +23,7 @@ const FEATURES: ComfortFeature[] = [
   {
     title: "Hassle-free Booking",
     description: "Simple, secure and quick booking experience.",
+    href: "/destinations",
   },
   {
     title: "Trusted Hospitality",
@@ -105,14 +107,25 @@ export default function ComfortSection() {
                     <ShieldCheck className="w-4 h-4 text-[#526442]" />
                   </div>
 
-                  <div>
-                    <h3 className="text-[18px] sm:text-[20px] text-[#0d1b2e] leading-snug">
-                      {feature.title}
-                    </h3>
-                    <p className="text-[13px] text-gray-500 mt-2 leading-relaxed">
-                      {feature.description}
-                    </p>
-                  </div>
+                  {feature.href ? (
+                    <Link href={feature.href} className="contents">
+                      <h3 className="text-[18px] sm:text-[20px] text-[#0d1b2e] leading-snug">
+                        {feature.title}
+                      </h3>
+                      <p className="text-[13px] text-gray-500 mt-2 leading-relaxed">
+                        {feature.description}
+                      </p>
+                    </Link>
+                  ) : (
+                    <div>
+                      <h3 className="text-[18px] sm:text-[20px] text-[#0d1b2e] leading-snug">
+                        {feature.title}
+                      </h3>
+                      <p className="text-[13px] text-gray-500 mt-2 leading-relaxed">
+                        {feature.description}
+                      </p>
+                    </div>
+                  )}
                 </motion.div>
               ))}
             </div>
