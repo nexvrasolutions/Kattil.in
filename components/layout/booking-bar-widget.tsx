@@ -660,6 +660,12 @@ export default function BookingBarWidget({
                             placeholder="Search place or hotel..."
                             className="w-full h-8 pl-8.5 pr-7 text-[13px] sm:text-[13.5px] bg-gray-50 border border-gray-200 rounded-[5px] outline-none focus:bg-white focus:border-[#0E2E4E] transition-colors text-gray-800 placeholder-gray-400 font-sans"
                             onClick={(e) => e.stopPropagation()}
+                            onKeyDown={(e) => {
+                              e.stopPropagation();
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                              }
+                            }}
                           />
                           {searchQuery && (
                             <button
