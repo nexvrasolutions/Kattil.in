@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ChevronLeft, Loader2, Save, Building2, Plus, X, Check, BedDouble, MapPin, ExternalLink, Image as ImageIcon } from "lucide-react";
+import { ChevronLeft, Loader2, Save, Building2, Plus, X, Check, BedDouble, MapPin, ExternalLink, Image as ImageIcon, AlertTriangle, RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import AdminDropzone from "@/components/admin/ui/AdminDropzone";
@@ -159,6 +159,7 @@ export default function PropertyFormPage() {
   const [cities, setCities] = useState<City[]>([]);
   const [rooms, setRooms] = useState<RoomItem[]>([]);
   const [loading, setLoading] = useState(!isNew);
+  const [loadError, setLoadError] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [customAmenity, setCustomAmenity] = useState("");
@@ -169,49 +170,61 @@ export default function PropertyFormPage() {
       .then((r) => r.success && setCities(r.data.cities));
   }, []);
 
-  useEffect(() => {
+  const fetchProperty = useCallback(async () => {
     if (isNew) return;
     setLoading(true);
-    fetch(`/api/admin/properties/${id}`)
-      .then((r) => r.json())
-      .then((r) => {
-        if (r.success) {
-          const d = r.data;
-          setForm({
-            name: d.name ?? "",
-            slug: d.slug ?? "",
-            city: d.city?._id ?? d.city ?? "",
-            badge: d.badge ?? "Private room",
-            category: d.category ?? "homestay",
-            tagline: d.tagline ?? "",
-            description: d.description ?? "",
-            images: Array.isArray(d.images) ? d.images : [],
-            address: d.address ?? "",
-            phone: d.phone ?? "",
-            email: d.email ?? "",
-            whatsapp: d.whatsapp ?? "",
-            mapSrc: d.mapSrc ?? "",
-            amenities: Array.isArray(d.amenities) && d.amenities.length > 0 ? d.amenities : ["Free Wifi", "Restaurant"],
-            directions: {
-              railway: d.directions?.railway ?? "",
-              busStand: d.directions?.busStand ?? "",
-              landmark: d.directions?.landmark ?? "",
-              byCar: d.directions?.byCar ?? "",
-              important: d.directions?.important ?? "",
-              helpText: d.directions?.helpText ?? "",
-            },
-            hotelCode: d.hotelCode ?? "",
-            bookingEngineUrl: d.bookingEngineUrl ?? "",
-            featured: Boolean(d.featured),
-            status: d.status ?? "active",
-          });
-          if (Array.isArray(d.rooms)) {
-            setRooms(d.rooms);
-          }
-        }
-      })
-      .finally(() => setLoading(false));
+    setLoadError(false);
+    try {
+      const response = await fetch(`/api/admin/properties/${id}`);
+      const r = await response.json().catch(() => null);
+      if (!response.ok || !r?.success) {
+        // Never fall through to a blank, editable form on a failed load —
+        // that form could be saved and silently overwrite the real property.
+        setLoadError(true);
+        return;
+      }
+      const d = r.data;
+      setForm({
+        name: d.name ?? "",
+        slug: d.slug ?? "",
+        city: d.city?._id ?? d.city ?? "",
+        badge: d.badge ?? "Private room",
+        category: d.category ?? "homestay",
+        tagline: d.tagline ?? "",
+        description: d.description ?? "",
+        images: Array.isArray(d.images) ? d.images : [],
+        address: d.address ?? "",
+        phone: d.phone ?? "",
+        email: d.email ?? "",
+        whatsapp: d.whatsapp ?? "",
+        mapSrc: d.mapSrc ?? "",
+        amenities: Array.isArray(d.amenities) && d.amenities.length > 0 ? d.amenities : ["Free Wifi", "Restaurant"],
+        directions: {
+          railway: d.directions?.railway ?? "",
+          busStand: d.directions?.busStand ?? "",
+          landmark: d.directions?.landmark ?? "",
+          byCar: d.directions?.byCar ?? "",
+          important: d.directions?.important ?? "",
+          helpText: d.directions?.helpText ?? "",
+        },
+        hotelCode: d.hotelCode ?? "",
+        bookingEngineUrl: d.bookingEngineUrl ?? "",
+        featured: Boolean(d.featured),
+        status: d.status ?? "active",
+      });
+      if (Array.isArray(d.rooms)) {
+        setRooms(d.rooms);
+      }
+    } catch {
+      setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
   }, [id, isNew]);
+
+  useEffect(() => {
+    fetchProperty();
+  }, [fetchProperty]);
 
   const toggleAmenity = (amenity: string) => {
     setForm((prev) => {
@@ -323,6 +336,37 @@ export default function PropertyFormPage() {
     return (
       <div className="flex items-center justify-center min-h-75">
         <Loader2 className="h-8 w-8 animate-spin text-[hsl(var(--adm-muted-foreground))]" />
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="max-w-4xl mx-auto py-2 px-1">
+        <button
+          onClick={() => router.push("/admin/properties")}
+          className="flex items-center gap-1.5 text-sm text-[hsl(var(--adm-muted-foreground))] hover:text-[hsl(var(--adm-foreground))] transition-colors mb-5 group"
+        >
+          <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+          Back to Properties
+        </button>
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-[hsl(var(--adm-destructive)/0.3)] bg-[hsl(var(--adm-destructive)/0.06)] px-6 py-16 text-center">
+          <AlertTriangle className="h-8 w-8 text-[hsl(var(--adm-destructive))]" />
+          <div>
+            <p className="text-sm font-semibold text-[hsl(var(--adm-foreground))]">Failed to load this property</p>
+            <p className="mt-1 text-xs text-[hsl(var(--adm-muted-foreground))]">
+              Something went wrong while fetching the property data. Please try again.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => fetchProperty()}
+            className="mt-2 flex h-10 items-center gap-2 rounded-lg px-5 text-sm font-semibold text-white transition-all"
+            style={{ background: "hsl(var(--adm-primary))" }}
+          >
+            <RefreshCw className="h-4 w-4" /> Retry
+          </button>
+        </div>
       </div>
     );
   }

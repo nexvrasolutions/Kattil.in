@@ -17,6 +17,8 @@ import {
   Copy,
   Loader2,
   HelpCircle,
+  AlertTriangle,
+  RefreshCw,
 } from "lucide-react";
 import { toast } from "sonner";
 import PageHeader from "@/components/admin/ui/PageHeader";
@@ -66,6 +68,7 @@ interface RoomItem {
 
 export default function BookingApiAdminPage() {
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [savingGlobal, setSavingGlobal] = useState(false);
   const [savingPropertyId, setSavingPropertyId] = useState<string | null>(null);
   const [savingRoomId, setSavingRoomId] = useState<string | null>(null);
@@ -88,17 +91,25 @@ export default function BookingApiAdminPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
+      setLoadError(false);
       const res = await fetch("/api/admin/booking-api");
-      const json = await res.json();
-      if (json.success && json.data) {
-        if (json.data.bookingEngine) {
-          setSettings((prev) => ({ ...prev, ...json.data.bookingEngine }));
-        }
-        setProperties(json.data.properties || []);
-        setRooms(json.data.rooms || []);
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json?.success || !json?.data) {
+        // Don't leave the default/empty settings and empty property/room
+        // lists on screen looking like a real (zero) result — show an
+        // explicit error state instead.
+        setLoadError(true);
+        toast.error("Failed to load booking API configuration");
+        return;
       }
+      if (json.data.bookingEngine) {
+        setSettings((prev) => ({ ...prev, ...json.data.bookingEngine }));
+      }
+      setProperties(json.data.properties || []);
+      setRooms(json.data.rooms || []);
     } catch (err) {
       console.error(err);
+      setLoadError(true);
       toast.error("Failed to load booking API configuration");
     } finally {
       setLoading(false);
@@ -204,6 +215,30 @@ export default function BookingApiAdminPage() {
     return (
       <div className="flex h-64 items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-[hsl(var(--adm-primary))]" />
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="max-w-7xl mx-auto pb-16">
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-[hsl(var(--adm-destructive)/0.3)] bg-[hsl(var(--adm-destructive)/0.06)] px-6 py-16 text-center">
+          <AlertTriangle className="h-8 w-8 text-[hsl(var(--adm-destructive))]" />
+          <div>
+            <p className="text-sm font-semibold text-[hsl(var(--adm-foreground))]">Failed to load booking API configuration</p>
+            <p className="mt-1 text-xs text-[hsl(var(--adm-muted-foreground))]">
+              Something went wrong while fetching this data. Please try again.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => fetchData()}
+            className="mt-2 flex h-10 items-center gap-2 rounded-lg px-5 text-sm font-semibold text-white transition-all"
+            style={{ background: "hsl(var(--adm-primary))" }}
+          >
+            <RefreshCw className="h-4 w-4" /> Retry
+          </button>
+        </div>
       </div>
     );
   }

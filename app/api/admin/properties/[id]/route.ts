@@ -15,10 +15,15 @@ export async function GET(_request: NextRequest, { params }: Params) {
   try {
     await connectDB();
     const { id } = await params;
-    const property = await Property.findById(id).populate("city", "name slug");
-    if (!property) return apiError("Property not found", 404);
 
-    const rooms = await Room.find({ property: id }).sort({ order: 1, createdAt: -1 }).lean();
+    // These two queries are independent (rooms are looked up by the route's
+    // id param, not by anything on the property document), so run them in
+    // parallel instead of waiting on one before starting the other.
+    const [property, rooms] = await Promise.all([
+      Property.findById(id).populate("city", "name slug"),
+      Room.find({ property: id }).sort({ order: 1, createdAt: -1 }).lean(),
+    ]);
+    if (!property) return apiError("Property not found", 404);
 
     return apiSuccess({ ...property.toObject(), rooms });
   } catch (error) {
