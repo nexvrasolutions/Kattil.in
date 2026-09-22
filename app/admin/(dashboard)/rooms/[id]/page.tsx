@@ -20,8 +20,6 @@ interface RoomForm {
   property: string;
   badge: string;
   category: "deluxe" | "suite" | "standard" | "premium" | "dormitory";
-  price: string;
-  occupancy: string;
   amenities: string[];
   images: string[];
   description: string;
@@ -35,8 +33,6 @@ const EMPTY: RoomForm = {
   property: "",
   badge: "Private room",
   category: "deluxe",
-  price: "1800",
-  occupancy: "2 Guests",
   amenities: ["Free Wifi", "Restaurant", "Air Conditioning"],
   images: [],
   description: "",
@@ -152,10 +148,6 @@ function RoomFormContent() {
             property: d.property?._id ?? d.property ?? "",
             badge: d.badge ?? "Private room",
             category: d.category ?? "deluxe",
-            // Preserve the sign (and full numeric value) exactly as stored — do not
-            // strip a leading "-" and silently turn a negative price positive.
-            price: d.pricing?.[0]?.value?.replace(/[^0-9.-]/g, "") ?? "",
-            occupancy: d.occupancy ?? "2 Guests",
             amenities: Array.isArray(d.amenities) && d.amenities.length > 0 ? d.amenities : ["Free Wifi", "Restaurant"],
             images: Array.isArray(d.images) ? d.images : [],
             description: d.description ?? "",
@@ -231,8 +223,6 @@ function RoomFormContent() {
         propertyId: form.property,
         badge: form.badge.trim() || "Private room",
         category: form.category,
-        price: form.price ? Number(form.price) : undefined,
-        occupancy: form.occupancy.trim() || undefined,
         amenities: form.amenities,
         images: form.images,
         description: form.description.trim() || undefined,
@@ -339,29 +329,6 @@ function RoomFormContent() {
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                   placeholder="e.g. AC Double Room"
                   className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-colors"
-                />
-              </FormField>
-            </div>
-
-            {/* Price & Occupancy */}
-            <div className="grid md:grid-cols-2 gap-5 mt-5">
-              <FormField label="Price per Night (₹)" hint="e.g. 1800, 682.50">
-                <input
-                  type="text"
-                  value={form.price}
-                  onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
-                  placeholder="1800"
-                  className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
-                />
-              </FormField>
-
-              <FormField label="Capacity / Occupancy" hint="e.g. '2 Guests', '6 Beds', '3 Guests'">
-                <input
-                  type="text"
-                  value={form.occupancy}
-                  onChange={(e) => setForm((f) => ({ ...f, occupancy: e.target.value }))}
-                  placeholder="2 Guests"
-                  className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                 />
               </FormField>
             </div>
