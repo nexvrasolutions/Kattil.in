@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { unstable_cache } from "next/cache";
 import Footer, { type FooterProps } from "@/components/layout/Footer";
 import SocialSidebar, { type SidebarIconData } from "@/components/ui/SocialSidebar";
 import PageTransition from "@/components/PageTransition";
@@ -208,21 +209,34 @@ async function SiteChrome() {
   );
 }
 
+// This check must run on every request (see the `dynamic` note above), but a
+// fresh Mongo round-trip per request stacks a full sequential DB hit in front
+// of the homepage's own (already-parallel) queries, since `PublicLayout` has
+// to resolve before `{children}` renders. A short-lived cache keeps it off
+// the hot path while still picking up an admin's toggle within ~10s.
+const getCachedMaintenanceState = unstable_cache(
+  async (): Promise<{ enabled: boolean; message?: string }> => {
+    try {
+      await connectDB();
+      const settings = await Settings.findOne().select("maintenance").lean<{
+        maintenance?: { enabled?: boolean; message?: string };
+      }>();
+      return {
+        enabled: !!settings?.maintenance?.enabled,
+        message: settings?.maintenance?.message,
+      };
+    } catch {
+      // Fail open — a DB hiccup on this check must not take the public site
+      // down; that's the opposite of what maintenance mode is for.
+      return { enabled: false };
+    }
+  },
+  ["maintenance-state"],
+  { revalidate: 10, tags: ["maintenance"] }
+);
+
 async function getMaintenanceState(): Promise<{ enabled: boolean; message?: string }> {
-  try {
-    await connectDB();
-    const settings = await Settings.findOne().select("maintenance").lean<{
-      maintenance?: { enabled?: boolean; message?: string };
-    }>();
-    return {
-      enabled: !!settings?.maintenance?.enabled,
-      message: settings?.maintenance?.message,
-    };
-  } catch {
-    // Fail open — a DB hiccup on this check must not take the public site
-    // down; that's the opposite of what maintenance mode is for.
-    return { enabled: false };
-  }
+  return getCachedMaintenanceState();
 }
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
