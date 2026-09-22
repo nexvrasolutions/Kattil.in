@@ -150,7 +150,15 @@ function RoomsContent() {
     if (filterCity) params.set("city", filterCity);
     if (filterStatus) params.set("status", filterStatus);
     try {
-      const res = await fetch(`/api/admin/rooms?${params}`).then((r) => r.json());
+      const response = await fetch(`/api/admin/rooms?${params}`);
+      if (response.status === 401) {
+        // Session ended server-side (e.g. logged out in another tab, or a
+        // stale client restored after logout). Don't leave whatever room
+        // data is already in state on screen — send back to login.
+        window.location.href = "/admin/login";
+        return;
+      }
+      const res = await response.json();
       if (res.success) {
         setRooms(res.data.rooms);
         setTotalPages(res.data.pagination.pages);

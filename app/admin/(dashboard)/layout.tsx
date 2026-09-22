@@ -3,6 +3,12 @@ import { ThemeProvider } from "@/components/admin/providers/AdminThemeProvider";
 import AdminProviders from "@/components/admin/providers/AdminProviders";
 import AdminSidebar from "@/components/admin/layout/AdminSidebar";
 import AdminHeader from "@/components/admin/layout/AdminHeader";
+import AdminBfcacheGuard from "@/components/admin/layout/AdminBfcacheGuard";
+
+// Protected admin content must never be statically cached/prerendered —
+// see proxy.ts, which also sets Cache-Control: no-store on every response
+// for this route tree.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Kattil Admin",
@@ -14,6 +20,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
       <AdminProviders>
+        <AdminBfcacheGuard />
         <div className="admin-root flex h-screen overflow-hidden">
           <AdminSidebar />
           <div className="flex flex-1 flex-col overflow-hidden">

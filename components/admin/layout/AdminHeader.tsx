@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useTheme } from "@/components/admin/providers/AdminThemeProvider";
 import {
   Moon, Sun, Globe, ChevronRight,
@@ -25,7 +25,6 @@ function buildBreadcrumbs(pathname: string): { label: string; href: string }[] {
 
 export default function AdminHeader() {
   const pathname = usePathname();
-  const router = useRouter();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -60,10 +59,12 @@ export default function AdminHeader() {
     setLoggingOut(true);
     try {
       await fetch("/api/admin/auth", { method: "DELETE" });
-      router.replace("/admin/login");
     } finally {
-      setLoggingOut(false);
-      setProfileOpen(false);
+      // Hard navigation (not router.replace) fully tears down the SPA
+      // session, taking Next's client Router Cache with it — so Back
+      // afterwards always re-hits the server and proxy.ts instead of
+      // instantly restoring the previously-cached admin page.
+      window.location.href = "/admin/login";
     }
   };
 
