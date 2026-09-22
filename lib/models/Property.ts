@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
+import { isValidEmail } from "@/lib/utils/email";
 
 export interface IPropertyDirections {
   railway?: string;
@@ -62,7 +63,16 @@ const propertySchema = new Schema<IProperty>(
     images: { type: [String], default: [] },
     address: { type: String, default: "" },
     phone: { type: String },
-    email: { type: String },
+    // Defense-in-depth: matches the API's Zod check so an invalid email can't
+    // reach persistence via any path that bypasses the API layer.
+    email: {
+      type: String,
+      trim: true,
+      validate: {
+        validator: (v: string) => !v || isValidEmail(v),
+        message: "Please enter a valid email address",
+      },
+    },
     whatsapp: { type: String },
     mapSrc: { type: String },
     amenities: { type: [String], default: [] },

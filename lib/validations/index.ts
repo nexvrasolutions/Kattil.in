@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isValidEmail } from "@/lib/utils/email";
 
 // ---------------------------------------------------------------------------
 // Shared sub-schemas
@@ -66,7 +67,13 @@ export const propertySchema = z.object({
   images: z.array(z.string()).default([]),
   address: z.string().optional(),
   phone: z.string().optional(),
-  email: z.string().optional(),
+  email: z
+    .string()
+    .trim()
+    .optional()
+    .refine((val) => !val || isValidEmail(val), {
+      message: "Please enter a valid email address",
+    }),
   whatsapp: z.string().optional(),
   mapSrc: z.string().optional(),
   amenities: z.array(z.string()).default([]),

@@ -6,6 +6,7 @@ import { ChevronLeft, Loader2, Save, Building2, Plus, X, Check, BedDouble, MapPi
 import { motion } from "framer-motion";
 import Link from "next/link";
 import AdminDropzone from "@/components/admin/ui/AdminDropzone";
+import { isValidEmail } from "@/lib/utils/email";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -264,6 +265,10 @@ export default function PropertyFormPage() {
     }
     if (!form.city) {
       setError("Please select a destination / city.");
+      return;
+    }
+    if (form.email.trim() && !isValidEmail(form.email.trim())) {
+      setError("Please enter a valid email address.");
       return;
     }
 
