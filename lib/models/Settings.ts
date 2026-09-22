@@ -19,6 +19,10 @@ export interface ISettings extends Document {
     defaultHotelCode?: string;
     globalBookingUrl?: string;
   };
+  maintenance?: {
+    enabled: boolean;
+    message?: string;
+  };
   updatedAt: Date;
 }
 
@@ -53,6 +57,10 @@ const settingsSchema = new Schema<ISettings>(
       apiSecret: { type: String, default: "" },
       defaultHotelCode: { type: String, default: "kattil" },
       globalBookingUrl: { type: String, default: "https://live.ipms247.com/booking/book-rooms-kattil" },
+    },
+    maintenance: {
+      enabled: { type: Boolean, default: false },
+      message: { type: String, default: "We'll be back shortly. Thank you for your patience." },
     },
   },
   { timestamps: true }

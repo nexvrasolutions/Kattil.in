@@ -2,9 +2,17 @@ import { Suspense } from "react";
 import Footer, { type FooterProps } from "@/components/layout/Footer";
 import SocialSidebar, { type SidebarIconData } from "@/components/ui/SocialSidebar";
 import PageTransition from "@/components/PageTransition";
+import MaintenancePage from "@/components/section/MaintenancePage";
 import { connectDB } from "@/lib/db/mongodb";
 import FooterModel from "@/lib/models/Footer";
+import Settings from "@/lib/models/Settings";
 import { locations as staticLocations } from "@/lib/data";
+
+// The maintenance check below must run on every request, not just once at
+// build time — otherwise toggling it in admin wouldn't take effect on any
+// page that doesn't already force its own dynamic rendering (e.g. the
+// static marketing pages) until the next deploy.
+export const dynamic = "force-dynamic";
 
 // Map lib/data locations to FooterLocation shape — used as fallback when DB has none
 const LOCATIONS_FALLBACK: FooterProps["locations"] = staticLocations.map((l) => ({
@@ -183,7 +191,30 @@ async function SiteChrome() {
   );
 }
 
-export default function PublicLayout({ children }: { children: React.ReactNode }) {
+async function getMaintenanceState(): Promise<{ enabled: boolean; message?: string }> {
+  try {
+    await connectDB();
+    const settings = await Settings.findOne().select("maintenance").lean<{
+      maintenance?: { enabled?: boolean; message?: string };
+    }>();
+    return {
+      enabled: !!settings?.maintenance?.enabled,
+      message: settings?.maintenance?.message,
+    };
+  } catch {
+    // Fail open — a DB hiccup on this check must not take the public site
+    // down; that's the opposite of what maintenance mode is for.
+    return { enabled: false };
+  }
+}
+
+export default async function PublicLayout({ children }: { children: React.ReactNode }) {
+  const maintenance = await getMaintenanceState();
+
+  if (maintenance.enabled) {
+    return <MaintenancePage message={maintenance.message} />;
+  }
+
   return (
     <>
       <main className="flex-1 flex flex-col">{children}</main>

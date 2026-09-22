@@ -9,7 +9,9 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { toast } from "sonner";
 import { safeFetchJson } from "@/lib/utils/safeFetch";
+import ConfirmDialog from "@/components/admin/ui/ConfirmDialog";
 
 function buildBreadcrumbs(pathname: string): { label: string; href: string }[] {
   const segments = pathname.split("/").filter(Boolean);
@@ -30,7 +32,9 @@ export default function AdminHeader() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [maintenanceOn, setMaintenanceOn] = useState(false);
+  const [maintenanceMessage, setMaintenanceMessage] = useState<string | undefined>(undefined);
   const [maintenanceLoading, setMaintenanceLoading] = useState(false);
+  const [maintenanceConfirmOpen, setMaintenanceConfirmOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { setMounted(true); }, []);
@@ -46,14 +50,19 @@ export default function AdminHeader() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  // Load maintenance state
+  // Load maintenance state — re-checked on every admin navigation (not on an
+  // interval) so a change made from the full Settings page is reflected here
+  // without needing a shared store or polling.
   useEffect(() => {
-    safeFetchJson<{ success: boolean; data?: { maintenance?: { enabled?: boolean } } }>("/api/admin/settings")
+    safeFetchJson<{ success: boolean; data?: { maintenance?: { enabled?: boolean; message?: string } } }>("/api/admin/settings")
       .then((r) => {
-        if (r?.success) setMaintenanceOn(!!r.data?.maintenance?.enabled);
+        if (r?.success) {
+          setMaintenanceOn(!!r.data?.maintenance?.enabled);
+          setMaintenanceMessage(r.data?.maintenance?.message);
+        }
       })
       .catch(() => {});
-  }, []);
+  }, [pathname]);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -68,18 +77,41 @@ export default function AdminHeader() {
     }
   };
 
-  const toggleMaintenance = async () => {
+  const applyMaintenanceChange = async (newVal: boolean) => {
     setMaintenanceLoading(true);
     try {
-      const newVal = !maintenanceOn;
-      await fetch("/api/admin/settings", {
+      const res = await fetch("/api/admin/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ maintenance: { enabled: newVal } }),
+        // The API replaces the whole `maintenance` object on write (no
+        // partial/deep merge), so the current message must be resent here —
+        // otherwise toggling from the header would silently blank out a
+        // custom message set from the full Settings page.
+        body: JSON.stringify({ maintenance: { enabled: newVal, message: maintenanceMessage } }),
       });
-      setMaintenanceOn(newVal);
+      const json = await res.json().catch(() => null);
+      // Only reflect the change locally once the server has confirmed it —
+      // otherwise the header can show "ON" while the public site never
+      // actually went into maintenance mode.
+      if (res.ok && json?.success) {
+        setMaintenanceOn(newVal);
+      } else {
+        toast.error(json?.error || "Failed to update maintenance mode. Please try again.");
+      }
+    } catch {
+      toast.error("Failed to update maintenance mode. Please try again.");
     } finally {
       setMaintenanceLoading(false);
+    }
+  };
+
+  const handleMaintenanceToggleClick = () => {
+    if (maintenanceOn) {
+      // Disabling is low-risk and doesn't need confirmation.
+      applyMaintenanceChange(false);
+    } else {
+      // Enabling takes the public site offline — confirm before applying.
+      setMaintenanceConfirmOpen(true);
     }
   };
 
@@ -119,7 +151,7 @@ export default function AdminHeader() {
       <div className="flex flex-shrink-0 items-center gap-1 sm:gap-2">
         {/* Maintenance mode quick toggle */}
         <button
-          onClick={toggleMaintenance}
+          onClick={handleMaintenanceToggleClick}
           disabled={maintenanceLoading}
           title={maintenanceOn ? "Maintenance mode is ON — click to disable" : "Click to enable maintenance mode"}
           className={[
@@ -227,6 +259,16 @@ export default function AdminHeader() {
           </AnimatePresence>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={maintenanceConfirmOpen}
+        onClose={() => setMaintenanceConfirmOpen(false)}
+        onConfirm={() => applyMaintenanceChange(true)}
+        title="Enable maintenance mode?"
+        message="The public website will show a maintenance page to all visitors until you disable this."
+        confirmLabel="Enable maintenance mode"
+        variant="destructive"
+      />
     </div>
   );
 }
