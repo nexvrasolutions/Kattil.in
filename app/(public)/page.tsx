@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { unstable_cache } from "next/cache";
 import { SITE_URL, DEFAULT_DESCRIPTION } from "@/lib/seo";
 import HeroNavbar from "@/components/layout/hero-navbar";
 import DestinationsSection, {
@@ -23,18 +24,23 @@ export const metadata: Metadata = {
   },
 };
 
-async function getHomeContent() {
-  try {
-    await connectDB();
-    let home = await Home.findOne().lean();
-    if (!home) home = await Home.create({});
-    return home as Awaited<ReturnType<typeof Home.findOne>>;
-  } catch {
-    return null;
-  }
-}
+const getHomeContent = unstable_cache(
+  async () => {
+    try {
+      await connectDB();
+      let home = await Home.findOne().lean();
+      if (!home) home = await Home.create({});
+      return home as Awaited<ReturnType<typeof Home.findOne>>;
+    } catch {
+      return null;
+    }
+  },
+  ["home-content"],
+  { revalidate: 60 }
+);
 
-async function getHomeDestinations(): Promise<DestinationItem[]> {
+const getHomeDestinations = unstable_cache(
+  async (): Promise<DestinationItem[]> => {
   try {
     await connectDB();
 
@@ -194,7 +200,10 @@ async function getHomeDestinations(): Promise<DestinationItem[]> {
   } catch {
     return [];
   }
-}
+  },
+  ["home-destinations"],
+  { revalidate: 60 }
+);
 
 export default async function Home_Page() {
   const [home, initialDestinations] = await Promise.all([
