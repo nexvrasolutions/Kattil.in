@@ -75,7 +75,7 @@ const FOOTER_FALLBACK: FooterProps = {
 const SIDEBAR_FALLBACK: SidebarIconData[] = [
   { label: "WhatsApp", tooltip: "Chat on WhatsApp", iconName: "whatsapp", iconUrl: "", url: "https://wa.me/917358127921", bgColor: "#25D366", iconColor: "#ffffff", type: "link", pulse: true, order: 0, visible: true, locations: [] },
   { label: "Instagram", tooltip: "Follow on Instagram", iconName: "instagram", iconUrl: "", url: "https://www.instagram.com/kattilthehome", bgColor: "linear-gradient(45deg,#833ab4,#fd1d1d,#fcb045)", iconColor: "#ffffff", type: "link", pulse: false, order: 1, visible: true, locations: [] },
-  { label: "Google Maps", tooltip: "Find us on Maps", iconName: "googlemaps", iconUrl: "", url: "", bgColor: "#ffffff", iconColor: "#4285F4", type: "multi", pulse: false, order: 2, visible: true, locations: [{ label: "Chennai", url: "https://maps.app.goo.gl/qNiPXnskwA6fQv8a8" }, { label: "Kaniyakumari", url: "https://maps.google.com/maps?q=Kaniyakumari%2C+Tamil+Nadu+629702" }, { label: "Coimbatore", url: "https://maps.app.goo.gl/RaceCourseCoimbatore" }, { label: "Madurai", url: "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8" }] },
+  { label: "Google Maps", tooltip: "Find us on Maps", iconName: "googlemaps", iconUrl: "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8", url: "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8", bgColor: "#ffffff", iconColor: "#4285F4", type: "link", pulse: false, order: 2, visible: true, locations: [] },
 ];
 
 async function getFooterData(): Promise<{ footer: FooterProps; sidebar: SidebarIconData[] }> {
@@ -146,7 +146,7 @@ async function getFooterData(): Promise<{ footer: FooterProps; sidebar: SidebarI
     let sidebar: SidebarIconData[] =
       (parsed.sidebarIcons as SidebarIconData[] | undefined) ?? SIDEBAR_FALLBACK;
 
-    // Normalize WhatsApp icon to single link
+    // Normalize WhatsApp and Google Maps icons to single links (Head Office location for Maps)
     let sidebarUpdated = false;
     sidebar = sidebar.map((ic) => {
       if (ic.iconName?.toLowerCase() === "whatsapp" || ic.label?.toLowerCase() === "whatsapp") {
@@ -156,6 +156,23 @@ async function getFooterData(): Promise<{ footer: FooterProps; sidebar: SidebarI
             ...ic,
             type: "link" as const,
             url: "https://wa.me/917358127921",
+            locations: [],
+          };
+        }
+      }
+      if (
+        ic.iconName?.toLowerCase() === "googlemaps" ||
+        ic.label?.toLowerCase() === "google maps" ||
+        ic.label?.toLowerCase() === "maps" ||
+        ic.label?.toLowerCase() === "map"
+      ) {
+        const headOfficeMapUrl = "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8";
+        if (ic.type !== "link" || ic.url !== headOfficeMapUrl || (ic.locations && ic.locations.length > 0)) {
+          sidebarUpdated = true;
+          return {
+            ...ic,
+            type: "link" as const,
+            url: headOfficeMapUrl,
             locations: [],
           };
         }

@@ -82,19 +82,6 @@ export default function Navbar() {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [navRowHeight, setNavRowHeight] = useState(84);
 
-  const handleBookNowClick = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
-      e.preventDefault();
-      setMobileOpen(false);
-      setDestinationsOpen(false);
-      document.body.style.overflow = "";
-      if (pathname === "/") {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-    },
-    [pathname]
-  );
-
   const handleDestinationsMouseEnter = useCallback(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -340,21 +327,10 @@ export default function Navbar() {
             <div className="hidden lg:flex items-center justify-end gap-6 flex-1">
               <Link
                 href="/contact-us"
-                data-text="Contact Us"
-                className={`nav-link-bold-safe group relative text-[14px] leading-[12px] tracking-normal transition-colors duration-200 ease-out font-sans ${pathname === "/contact-us"
-                  ? "font-bold !text-[#D2E6BC]"
-                  : "font-medium hover:font-bold text-[#DDDDDD] hover:!text-[#D2E6BC]"
-                  }`}
+                className="w-[122px] h-[40px] rounded-[8px] border border-white px-6 text-white text-[14px] leading-none font-medium inline-flex items-center justify-center transition-all duration-300 hover:border-white hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-95 font-sans"
               >
                 Contact Us
               </Link>
-              <button
-                type="button"
-                onClick={handleBookNowClick}
-                className="w-[122px] h-[40px] rounded-[8px] border border-white px-6 text-white text-[14px] leading-none font-medium inline-flex items-center justify-center transition-all duration-300 hover:border-white hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-95 font-sans cursor-pointer"
-              >
-                Book Now
-              </button>
             </div>
 
             {/* Mobile menu toggle */}
@@ -490,16 +466,13 @@ export default function Navbar() {
 
                 {/* CTAs */}
                 <motion.div variants={MENU_ITEM_VARIANTS} className="pt-4">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      setMobileOpen(false);
-                      handleBookNowClick(e);
-                    }}
-                    className="flex items-center justify-center w-full border border-white hover:border-white text-white rounded-[8px] py-3.5 text-[15px] font-semibold tracking-wide transition-all duration-300 font-sans hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-[0.99] cursor-pointer"
+                  <Link
+                    href="/contact-us"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center justify-center w-full border border-white hover:border-white text-white rounded-[8px] py-3.5 text-[15px] font-semibold tracking-wide transition-all duration-300 font-sans hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-[0.99]"
                   >
-                    Book Now
-                  </button>
+                    Contact Us
+                  </Link>
                 </motion.div>
               </motion.div>
             )}

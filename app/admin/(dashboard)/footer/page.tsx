@@ -137,10 +137,34 @@ export default function FooterPage() {
   const updSocial = (i: number, f: string, v: unknown) => setData((d) => { const s = [...d.socialLinks]; s[i] = { ...s[i], [f]: v }; return { ...d, socialLinks: s }; });
   const delSocial = (i: number) => setData((d) => ({ ...d, socialLinks: d.socialLinks.filter((_, x) => x !== i) }));
 
-  /* ── Sidebar helpers ──────────────────────────────────────────────────── */
   const addSidebar = (name = "custom") => {
     const def = ICON_DEFAULTS[name] ?? ICON_DEFAULTS.custom;
-    setData((d) => ({ ...d, sidebarIcons: [...d.sidebarIcons, { label: ICON_LABELS[name] ?? "New Icon", tooltip: ICON_LABELS[name] ?? "", iconName: name, iconUrl: "", url: "", bgColor: def.bg, iconColor: def.color, type: "link", pulse: false, order: d.sidebarIcons.length, visible: true, locations: [] }] }));
+    const defaultUrl =
+      name === "whatsapp"
+        ? "https://wa.me/917358127921"
+        : name === "googlemaps"
+        ? "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8"
+        : "";
+    setData((d) => ({
+      ...d,
+      sidebarIcons: [
+        ...d.sidebarIcons,
+        {
+          label: ICON_LABELS[name] ?? "New Icon",
+          tooltip: ICON_LABELS[name] ?? "",
+          iconName: name,
+          iconUrl: "",
+          url: defaultUrl,
+          bgColor: def.bg,
+          iconColor: def.color,
+          type: "link",
+          pulse: false,
+          order: d.sidebarIcons.length,
+          visible: true,
+          locations: [],
+        },
+      ],
+    }));
   };
   const updSidebar = (i: number, f: string, v: unknown) => setData((d) => { const s = [...d.sidebarIcons]; s[i] = { ...s[i], [f]: v }; return { ...d, sidebarIcons: s }; });
   const delSidebar = (i: number) => setData((d) => ({ ...d, sidebarIcons: d.sidebarIcons.filter((_, x) => x !== i) }));

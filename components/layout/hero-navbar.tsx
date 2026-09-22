@@ -1115,9 +1115,12 @@ export default function HeroNavbar({
 
               <Link
                 href="/"
-                onClick={(e) => {
+                onClick={() => {
                   setMobileOpen(false);
-                  handleBookNowClick(e);
+                  if (pathname === "/") {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    setHeroVisible(true);
+                  }
                 }}
                 className={`flex items-center justify-center transition-all duration-300 ${mobileOpen
                   ? "absolute left-5 sm:left-6 md:left-8 top-1/2 -translate-y-1/2"

@@ -182,7 +182,7 @@ export default function DestinationsDropdown({
                         {dest.name}
                       </h4>
                       <p className="text-[13px] text-[#707070] font-sans mt-0.5 font-normal tracking-normal truncate">
-                        {dest.hotelCount || "1 hotels"}
+                        {dest.hotelCount || "1 hotel"}
                       </p>
                     </div>
                   </Link>
@@ -306,7 +306,7 @@ export function MobileDestinationsList({
                   {dest.name}
                 </p>
                 <p className="text-[12.5px] text-gray-500 font-sans mt-1 truncate font-normal">
-                  {dest.hotelCount || "1 hotels"}
+                  {dest.hotelCount || "1 hotel"}
                 </p>
               </div>
             </Link>

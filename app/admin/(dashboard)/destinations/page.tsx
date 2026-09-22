@@ -42,7 +42,7 @@ const EMPTY_FORM: Omit<Destination, "_id"> = {
   description: "",
   banner: "",
   image: "",
-  hotelCount: "1 hotels",
+  hotelCount: "",
   link: "",
   address: "",
   phone: "",
@@ -353,7 +353,7 @@ export default function DestinationsPage() {
                   label="Hotel Count / Subtitle"
                   value={form.hotelCount ?? ""}
                   onChange={(e) => setForm((f) => ({ ...f, hotelCount: e.target.value }))}
-                  placeholder="e.g. 2 hotels, 1 hotels"
+                  placeholder="e.g. 2 hotels, 1 hotel (or leave blank for auto count)"
                   hint="Shown in the navbar hover dropdown beneath the destination name"
                 />
                 <AdminInput
@@ -446,7 +446,7 @@ export default function DestinationsPage() {
                       {form.name || "Destination Name"}
                     </p>
                     <p className="text-[13px] text-gray-500 font-sans mt-0.5">
-                      {form.hotelCount || "1 hotels"}
+                      {form.hotelCount || "1 hotel"}
                     </p>
                   </div>
                 </div>

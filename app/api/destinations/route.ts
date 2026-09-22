@@ -103,9 +103,12 @@ export async function GET(_request: NextRequest) {
       }
 
       // Hotel count subtitle
-      const customHotelCount = c.hotelCount?.trim();
+      const rawCustom = c.hotelCount?.trim();
+      const customHotelCount =
+        rawCustom === "1 hotels" ? "" : rawCustom;
       const hotelCount =
-        customHotelCount || (count > 0 ? `${count} ${count === 1 ? "hotel" : "hotels"}` : "");
+        customHotelCount ||
+        (count > 0 ? `${count} ${count === 1 ? "hotel" : "hotels"}` : "1 hotel");
 
       return {
         _id: idStr,

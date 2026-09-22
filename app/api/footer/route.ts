@@ -72,13 +72,9 @@ const STATIC_FALLBACK = {
     },
     {
       label: "Google Maps", tooltip: "Find us on Maps", iconName: "googlemaps", iconUrl: "",
-      url: "", bgColor: "#ffffff", iconColor: "#4285F4",
-      type: "multi", pulse: false, order: 2, visible: true,
-      locations: [
-        { label: "Madurai", url: "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8" },
-        { label: "Chennai", url: "https://maps.app.goo.gl/qNiPXnskwA6fQv8a8" },
-        { label: "Coimbatore", url: "https://maps.app.goo.gl/RaceCourseCoimbatore" },
-      ],
+      url: "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8", bgColor: "#ffffff", iconColor: "#4285F4",
+      type: "link", pulse: false, order: 2, visible: true,
+      locations: [],
     },
   ],
 };
