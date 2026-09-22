@@ -47,8 +47,36 @@ export function handleApiError(error: unknown): Response {
     return apiError(msg || "Validation failed", 400);
   }
 
-  // MongoDB duplicate key (code 11000)
+  // MongoDB duplicate key (code 11000) — identify the conflicting business
+  // identifier from the index's key pattern so the message is actionable
+  // instead of a generic Mongo error.
   if (err["code"] === 11000) {
+    const keyPattern = (err["keyPattern"] as Record<string, unknown>) || {};
+    const keys = Object.keys(keyPattern);
+    const isScopedToProperty = keys.includes("property");
+
+    if (keys.includes("hotelCode")) {
+      return apiError("A property with this hotel code already exists.", 409);
+    }
+    if (keys.includes("roomCode")) {
+      return apiError("A room with this room code already exists in this property.", 409);
+    }
+    if (keys.includes("name")) {
+      return apiError(
+        isScopedToProperty
+          ? "A room with this name already exists in this property."
+          : "A property with this name already exists.",
+        409
+      );
+    }
+    if (keys.includes("slug")) {
+      return apiError(
+        isScopedToProperty
+          ? "A room with this name already exists in this property."
+          : "A property with this slug already exists.",
+        409
+      );
+    }
     return apiError("A record with this value already exists", 409);
   }
 

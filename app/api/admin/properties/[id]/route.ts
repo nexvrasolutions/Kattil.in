@@ -49,16 +49,9 @@ export async function PUT(request: NextRequest, { params }: Params) {
       const newSlug = rest.slug ? slugify(rest.slug) : slugify(rest.name!);
       updateData.slug = newSlug;
 
-      let effectiveCity: string;
-      if (cityId) {
-        effectiveCity = cityId;
-      } else {
-        const current = (await Property.findById(id).select("city").lean()) as { city: string } | null;
-        if (!current) return apiError("Property not found", 404);
-        effectiveCity = String(current.city);
-      }
-
-      const conflict = await Property.findOne({ slug: newSlug, city: effectiveCity, _id: { $ne: id } });
+      // Slug is a globally unique identifier (see Property model), so the
+      // pre-check must not be scoped to a single city.
+      const conflict = await Property.findOne({ slug: newSlug, _id: { $ne: id } });
       if (conflict) {
         updateData.slug = `${newSlug}-${Date.now().toString().slice(-4)}`;
       }

@@ -100,7 +100,23 @@ const propertySchema = new Schema<IProperty>(
   { timestamps: true }
 );
 
-propertySchema.index({ slug: 1, city: 1 }, { unique: true });
+// `name` and `slug` are property-level business identifiers looked up
+// globally (e.g. the public /properties/[slug] route resolves by slug alone,
+// with no city scoping), so both must be unique across all properties.
+// Collation strength 2 makes the `name` comparison case-insensitive without
+// altering the stored casing.
+propertySchema.index(
+  { name: 1 },
+  { unique: true, collation: { locale: "en", strength: 2 } }
+);
+propertySchema.index({ slug: 1 }, { unique: true });
+// `hotelCode` identifies a property's PMS/eZee hotel account and must be
+// globally unique; the partial filter excludes properties that haven't set
+// one yet instead of colliding on missing/blank values.
+propertySchema.index(
+  { hotelCode: 1 },
+  { unique: true, partialFilterExpression: { hotelCode: { $type: "string", $gt: "" } } }
+);
 propertySchema.index({ city: 1 });
 propertySchema.index({ status: 1 });
 propertySchema.index({ featured: 1 });

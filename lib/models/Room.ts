@@ -105,11 +105,40 @@ const roomSchema = new Schema<IRoom>(
   { timestamps: true }
 );
 
-roomSchema.index({ slug: 1, property: 1 });
+// Room `name`/`slug` only need to be unique within the same property (the
+// same room name across two different properties is not a conflict — see
+// BUG-004). Scoped to rooms that actually have a property assigned; an
+// unassigned room has no scope to disambiguate within.
+roomSchema.index(
+  { property: 1, name: 1 },
+  {
+    unique: true,
+    collation: { locale: "en", strength: 2 },
+    partialFilterExpression: { property: { $type: "objectId" } },
+  }
+);
+roomSchema.index(
+  { property: 1, slug: 1 },
+  { unique: true, partialFilterExpression: { property: { $type: "objectId" } } }
+);
+// `roomCode` (eZee roomtypeunkid) is scoped to its property's hotel account —
+// the same numeric code is legitimately reused across different properties'
+// PMS accounts, so uniqueness must not be global.
+roomSchema.index(
+  { property: 1, roomCode: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      property: { $type: "objectId" },
+      roomCode: { $type: "string", $gt: "" },
+    },
+  }
+);
 roomSchema.index({ property: 1 });
 roomSchema.index({ city: 1 });
 roomSchema.index({ status: 1 });
 roomSchema.index({ featured: 1 });
+roomSchema.index({ category: 1 });
 
 const Room: Model<IRoom> =
   (mongoose.models.Room as Model<IRoom>) ||

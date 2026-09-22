@@ -74,9 +74,13 @@ export async function POST(request: NextRequest) {
       Object.entries({ ...rest, city: cityId }).filter(([, v]) => v !== undefined)
     );
 
+    // Slug is a globally unique identifier (see Property model), so the
+    // pre-check must not be scoped to a single city — otherwise two
+    // differently-named properties in different cities could collide on
+    // slug and only be caught by the DB's unique index as a raw 409.
     let slug = rest.slug ? slugify(rest.slug) : slugify(rest.name);
-    const existing = await Property.findOne({ slug, city: cityId });
-    if (existing) {
+    const existingSlug = await Property.findOne({ slug });
+    if (existingSlug) {
       slug = `${slug}-${Date.now().toString().slice(-4)}`;
     }
 
