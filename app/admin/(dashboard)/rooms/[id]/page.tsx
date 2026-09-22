@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, Loader2, Save, BedDouble, Plus, X, Check, Building2 } from "lucide-react";
+import { ChevronLeft, Loader2, Save, BedDouble, Plus, X, Check, Building2, AlertTriangle, RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
 import AdminDropzone from "@/components/admin/ui/AdminDropzone";
 
@@ -117,23 +117,36 @@ function RoomFormContent() {
     property: propertyFromQuery,
   });
   const [properties, setProperties] = useState<PropertySummary[]>([]);
+  const [propertiesError, setPropertiesError] = useState(false);
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [customAmenity, setCustomAmenity] = useState("");
 
-  useEffect(() => {
-    fetch("/api/admin/properties?limit=100")
-      .then((r) => r.json())
-      .then((r) => {
-        if (r.success) {
-          setProperties(r.data.properties);
-          if (isNew && propertyFromQuery && !form.property) {
-            setForm((f) => ({ ...f, property: propertyFromQuery }));
-          }
-        }
-      });
+  // Loads the Property dropdown's options. Deliberately independent of the
+  // page-level `loading` state (which only guards the existing-room fetch)
+  // so a slow/failed properties request never blocks the form itself from
+  // rendering — it only affects this one field, with its own inline error.
+  const fetchProperties = useCallback(async () => {
+    setPropertiesError(false);
+    try {
+      const response = await fetch("/api/admin/properties?limit=100");
+      const r = await response.json().catch(() => null);
+      if (!response.ok || !r?.success) {
+        // Don't silently leave the dropdown empty with no explanation.
+        setPropertiesError(true);
+        return;
+      }
+      setProperties(r.data.properties);
+      setForm((f) => (isNew && propertyFromQuery && !f.property ? { ...f, property: propertyFromQuery } : f));
+    } catch {
+      setPropertiesError(true);
+    }
   }, [isNew, propertyFromQuery]);
+
+  useEffect(() => {
+    fetchProperties();
+  }, [fetchProperties]);
 
   useEffect(() => {
     if (isNew) return;
@@ -302,7 +315,7 @@ function RoomFormContent() {
               <FormField
                 label="Select Property"
                 required
-                hint="Which property does this room belong to?"
+                hint={propertiesError ? undefined : "Which property does this room belong to?"}
               >
                 <select
                   value={form.property}
@@ -316,6 +329,19 @@ function RoomFormContent() {
                     </option>
                   ))}
                 </select>
+                {propertiesError && (
+                  <div className="mt-2 flex items-center gap-2 rounded-lg border border-[hsl(var(--adm-destructive)/0.3)] bg-[hsl(var(--adm-destructive)/0.06)] px-3 py-2">
+                    <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0 text-[hsl(var(--adm-destructive))]" />
+                    <p className="flex-1 text-xs text-[hsl(var(--adm-destructive))]">Failed to load properties.</p>
+                    <button
+                      type="button"
+                      onClick={() => fetchProperties()}
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-[hsl(var(--adm-primary))] hover:underline"
+                    >
+                      <RefreshCw className="h-3 w-3" /> Retry
+                    </button>
+                  </div>
+                )}
               </FormField>
 
               <FormField
