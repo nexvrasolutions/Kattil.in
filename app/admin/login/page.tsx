@@ -14,9 +14,6 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => { setMounted(true); }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,8 +40,6 @@ function LoginForm() {
       setLoading(false);
     }
   };
-
-  if (!mounted) return null;
 
   return (
     <div className="dark admin-root min-h-screen flex items-center justify-center bg-[hsl(var(--adm-background))] px-4">

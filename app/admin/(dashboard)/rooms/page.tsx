@@ -133,6 +133,7 @@ function RoomsContent() {
   const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
+  const [stats, setStats] = useState({ total: 0, active: 0, featured: 0, inactive: 0 });
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
 
   const [search, setSearch] = useState("");
@@ -163,6 +164,7 @@ function RoomsContent() {
         setRooms(res.data.rooms);
         setTotalPages(res.data.pagination.pages);
         setTotal(res.data.pagination.total);
+        if (res.data.stats) setStats(res.data.stats);
       }
     } finally {
       setLoading(false);
@@ -189,9 +191,6 @@ function RoomsContent() {
     fetchRooms();
   };
 
-  const activeCount = rooms.filter((r) => r.status === "active").length;
-  const featuredCount = rooms.filter((r) => r.featured).length;
-
   return (
     <div>
       <PageHeader
@@ -213,10 +212,10 @@ function RoomsContent() {
         className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4"
       >
         {[
-          { label: "Total Rooms", value: total, icon: BedDouble, color: "hsl(var(--adm-primary))" },
-          { label: "Active", value: activeCount, icon: Check, color: "hsl(var(--adm-success))" },
-          { label: "Featured", value: featuredCount, icon: Star, color: "hsl(var(--adm-warning))" },
-          { label: "Inactive", value: total - activeCount, icon: StarOff, color: "hsl(var(--adm-destructive))" },
+          { label: "Total Rooms", value: stats.total, icon: BedDouble, color: "hsl(var(--adm-primary))" },
+          { label: "Active", value: stats.active, icon: Check, color: "hsl(var(--adm-success))" },
+          { label: "Featured", value: stats.featured, icon: Star, color: "hsl(var(--adm-warning))" },
+          { label: "Inactive", value: stats.inactive, icon: StarOff, color: "hsl(var(--adm-destructive))" },
         ].map(({ label, value, icon: Icon, color }) => (
           <AdminCard key={label} className="rounded-2xl!">
             <div className="flex items-center justify-between p-4">

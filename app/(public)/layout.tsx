@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Footer, { type FooterProps } from "@/components/layout/Footer";
 import SocialSidebar, { type SidebarIconData } from "@/components/ui/SocialSidebar";
 import PageTransition from "@/components/PageTransition";
@@ -167,14 +168,28 @@ async function getFooterData(): Promise<{ footer: FooterProps; sidebar: SidebarI
   }
 }
 
-export default async function PublicLayout({ children }: { children: React.ReactNode }) {
+// Fixed-position sidebar + footer both come from the same footer document, and
+// neither blocks the page's own content: they're rendered behind their own
+// Suspense boundary so `<main>{children}</main>` can stream immediately instead
+// of waiting on this fetch on every navigation.
+async function SiteChrome() {
   const { footer, sidebar } = await getFooterData();
 
   return (
     <>
       <SocialSidebar icons={sidebar} />
-      <main className="flex-1 flex flex-col">{children}</main>
       <Footer {...footer} />
+    </>
+  );
+}
+
+export default function PublicLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <main className="flex-1 flex flex-col">{children}</main>
+      <Suspense fallback={null}>
+        <SiteChrome />
+      </Suspense>
     </>
   );
 }

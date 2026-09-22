@@ -1,6 +1,5 @@
 import PageTransition from "@/components/PageTransition";
 
-export default function Template({ children }: { children: React.ReactNode }) {
+export default function PublicTemplate({ children }: { children: React.ReactNode }) {
   return <PageTransition>{children}</PageTransition>;
 }
-

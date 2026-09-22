@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { getDestinationStaysData } from "@/lib/db/destinations";
 import DestinationStaysView from "@/components/section/destination/DestinationStaysView";
+import DestinationStaysSkeleton from "@/components/section/destination/DestinationStaysSkeleton";
 import { SITE_URL } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -30,9 +32,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function DynamicDestinationPage({ params }: PageProps) {
-  const { slug } = await params;
-  const formattedName = slug.charAt(0).toUpperCase() + slug.slice(1);
+async function DestinationSlugStays({ slug, formattedName }: { slug: string; formattedName: string }) {
   const data = await getDestinationStaysData(slug, formattedName);
 
   if (!data.citySlugFound) {
@@ -66,5 +66,16 @@ export default async function DynamicDestinationPage({ params }: PageProps) {
         properties={data.properties}
       />
     </>
+  );
+}
+
+export default async function DynamicDestinationPage({ params }: PageProps) {
+  const { slug } = await params;
+  const formattedName = slug.charAt(0).toUpperCase() + slug.slice(1);
+
+  return (
+    <Suspense fallback={<DestinationStaysSkeleton cityName={formattedName} />}>
+      <DestinationSlugStays slug={slug} formattedName={formattedName} />
+    </Suspense>
   );
 }

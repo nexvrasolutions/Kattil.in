@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { SITE_URL } from "@/lib/seo";
 import { getDestinationStaysData } from "@/lib/db/destinations";
 import DestinationStaysView from "@/components/section/destination/DestinationStaysView";
+import DestinationStaysSkeleton from "@/components/section/destination/DestinationStaysSkeleton";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -50,20 +52,28 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function KaniyakumariPage() {
+async function KaniyakumariStays() {
   const data = await getDestinationStaysData("kaniyakumari", "Kaniyakumari");
 
+  return (
+    <DestinationStaysView
+      cityName={data.cityName}
+      citySlug={data.citySlug}
+      properties={data.properties}
+    />
+  );
+}
+
+export default function KaniyakumariPage() {
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
       />
-      <DestinationStaysView
-        cityName={data.cityName}
-        citySlug={data.citySlug}
-        properties={data.properties}
-      />
+      <Suspense fallback={<DestinationStaysSkeleton cityName="Kaniyakumari" />}>
+        <KaniyakumariStays />
+      </Suspense>
     </>
   );
 }
