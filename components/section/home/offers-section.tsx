@@ -83,7 +83,7 @@ export default function OffersSection() {
                   mt-5
                 "
               >
-                Discover thoughtfully curated offers designed to
+                Find thoughtfully curated offers designed to
                 <br className="hidden sm:inline" /> make your stay more rewarding, from special rates
                 <br className="hidden sm:inline" /> to exclusive experiences.
               </p>
