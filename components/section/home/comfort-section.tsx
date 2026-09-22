@@ -17,7 +17,7 @@ const FEATURES: ComfortFeature[] = [
   },
   {
     title: "Prime Locations",
-    description: "Our properties are located where it matters most.",
+    description: "Our hotels are located where it matters most.",
   },
   {
     title: "Hassle-free Booking",
