@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     if (featured === "false") filter.featured = false;
 
     // Summary counts span all rooms, independent of filters and pagination.
-    const [rooms, total, totalRooms, activeRooms, featuredRooms] = await Promise.all([
+    const [rooms, total, totalRooms, activeRooms, featuredRooms, inactiveRooms] = await Promise.all([
       Room.find(filter)
         .sort({ order: 1, createdAt: -1 })
         .skip(skip)
@@ -42,6 +42,10 @@ export async function GET(request: NextRequest) {
       Room.countDocuments({}),
       Room.countDocuments({ status: "active" }),
       Room.countDocuments({ featured: true }),
+      // Room.status also has a "maintenance" value, so this must be counted
+      // directly rather than derived as (total - active), which would fold
+      // maintenance rooms into the inactive count.
+      Room.countDocuments({ status: "inactive" }),
     ]);
 
     return apiSuccess({
@@ -51,7 +55,7 @@ export async function GET(request: NextRequest) {
         total: totalRooms,
         active: activeRooms,
         featured: featuredRooms,
-        inactive: totalRooms - activeRooms,
+        inactive: inactiveRooms,
       },
     });
   } catch (error) {
