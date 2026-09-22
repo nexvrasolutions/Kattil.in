@@ -1142,35 +1142,10 @@ export default function HeroNavbar({
               {/* RIGHT CTAs */}
 
               <div className="hidden lg:flex items-center justify-end gap-6 flex-1">
-                <Link
-                  href="/contact-us"
-                  data-text="Contact Us"
-                  className={`
-                    nav-link-bold-safe
-                    group
-                    relative
-                    text-[14px]
-                    leading-[12px]
-                    tracking-normal
-                    transition-colors
-                    duration-200
-                    ease-out
-                    font-sans
-                    ${pathname === "/contact-us"
-                      ? "font-bold !text-[#D2E6BC]"
-                      : "font-medium hover:font-bold text-[#DDDDDD] hover:!text-[#D2E6BC]"
-                    }
-                  `}
-                  style={{
-                    textDecoration: "none",
-                  }}
-                >
-                  Contact Us
-                </Link>
+
 
                 <Link
-                  href="/"
-                  onClick={handleBookNowClick}
+                  href="/contact-us"
                   className="
                     w-[122px]
                     h-[40px]
@@ -1195,7 +1170,7 @@ export default function HeroNavbar({
                     font-sans
                   "
                 >
-                  Book Now
+                  Contact Us
                 </Link>
               </div>
 
@@ -1397,14 +1372,11 @@ export default function HeroNavbar({
                   {/* CTAs */}
                   <motion.div variants={MENU_ITEM_VARIANTS} className="pt-4">
                     <Link
-                      href="/"
-                      onClick={(e) => {
-                        setMobileOpen(false);
-                        handleBookNowClick(e);
-                      }}
+                      href="/contact-us"
+                      onClick={() => setMobileOpen(false)}
                       className="flex items-center justify-center w-full border border-white hover:border-white text-white rounded-[8px] py-3.5 text-[15px] font-semibold tracking-wide transition-all duration-300 font-sans hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-[0.99]"
                     >
-                      Book Now
+                      Contact Us
                     </Link>
                   </motion.div>
                 </motion.div>
