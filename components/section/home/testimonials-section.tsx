@@ -359,9 +359,9 @@ export default function TestimonialsSection() {
                         {item.title}
                       </p>
                     ) : (
-                      <h3 className="text-[17px] sm:text-[18px] text-[#0d1b2e] mt-3.5 leading-snug">
+                      <p className="text-[17px] sm:text-[18px] text-[#0d1b2e] mt-3.5 leading-snug">
                         {item.title}
-                      </h3>
+                      </p>
                     )}
 
                     {/* Review Text */}
@@ -448,9 +448,9 @@ export default function TestimonialsSection() {
                               {item.title}
                             </p>
                           ) : (
-                            <h3 className="text-[20px] text-[#0d1b2e] mt-4 leading-snug">
+                            <p className="text-[20px] text-[#0d1b2e] mt-4 leading-snug">
                               {item.title}
-                            </h3>
+                            </p>
                           )}
 
                           {/* Review Text */}
