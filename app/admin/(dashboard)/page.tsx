@@ -191,7 +191,7 @@ export default function AdminDashboard() {
               </div>
               <div className="flex flex-col gap-3">
                 <StatRow label="Gallery Items" value={d.galleryCount.toString()} helper="Uploaded images" />
-                <StatRow label="Media Files"   value={d.mediaCount.toString()}   helper="Total library"  />
+                <StatRow label="Media Files"   value={d.mediaCount.toString()}   helper="Media Library (separate from Gallery)"  />
               </div>
             </AdminCardContent>
           </AdminCard>
