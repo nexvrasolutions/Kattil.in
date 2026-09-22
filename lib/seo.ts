@@ -1,4 +1,4 @@
-export const SITE_URL = "https://kattil.in";
+export const SITE_URL = "https://www.kattil.in";
 export const SITE_NAME = "Kattil — The Homely Hotel";
 
 export const DEFAULT_DESCRIPTION =
