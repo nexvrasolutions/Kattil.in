@@ -15,6 +15,7 @@ import PageHeader from "@/components/admin/ui/PageHeader";
 import ConfirmDialog from "@/components/admin/ui/ConfirmDialog";
 import { SkeletonTable } from "@/components/admin/ui/SkeletonLoader";
 import AdminPagination from "@/components/admin/ui/AdminPagination";
+import { toast } from "sonner";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const CATEGORIES = ["Reservations", "Amenities", "Dining", "Policies"] as const;
@@ -32,13 +33,20 @@ function StatusToggle({ faq, onChanged }: { faq: Faq; onChanged: () => void }) {
   const [saving, setSaving] = useState(false);
   const toggle = async () => {
     setSaving(true);
-    await fetch(`/api/admin/faqs/${faq._id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: faq.status === "active" ? "inactive" : "active" }),
-    });
-    setSaving(false);
-    onChanged();
+    try {
+      const res = await fetch(`/api/admin/faqs/${faq._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: faq.status === "active" ? "inactive" : "active" }),
+      }).then((r) => r.json());
+      if (res.success) {
+        onChanged();
+      } else {
+        toast.error(res.error || "Failed to update status.");
+      }
+    } finally {
+      setSaving(false);
+    }
   };
   return (
     <button

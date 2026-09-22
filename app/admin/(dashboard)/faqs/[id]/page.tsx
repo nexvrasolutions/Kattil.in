@@ -13,9 +13,12 @@ interface FaqForm {
   answer:       string;
   category:     string;
   displayOrder: number;
+  status:       "active" | "inactive";
 }
 
-const EMPTY: FaqForm = { question: "", answer: "", category: "", displayOrder: 0 };
+// New FAQs start as a draft (inactive) — they only go live once explicitly
+// published, so nothing typed here is publicly visible by accident.
+const EMPTY: FaqForm = { question: "", answer: "", category: "", displayOrder: 0, status: "inactive" };
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
@@ -71,13 +74,14 @@ export default function FaqFormPage() {
             answer:       d.answer       ?? "",
             category:     d.category     ?? "",
             displayOrder: d.displayOrder ?? 0,
+            status:       d.status       ?? "inactive",
           });
         }
       })
       .finally(() => setLoading(false));
   }, [id, isNew]);
 
-  const handleSave = async () => {
+  const handleSave = async (statusOverride?: "active" | "inactive") => {
     setError("");
     if (!form.question.trim()) { setError("Question is required."); return; }
     if (!form.answer.trim())   { setError("Answer is required.");   return; }
@@ -85,7 +89,7 @@ export default function FaqFormPage() {
 
     setSaving(true);
     try {
-      const body = { ...form, status: "active" }; // always active
+      const body = { ...form, status: statusOverride ?? form.status };
       const url    = isNew ? "/api/admin/faqs" : `/api/admin/faqs/${id}`;
       const method = isNew ? "POST" : "PUT";
       const res = await fetch(url, {
@@ -201,10 +205,14 @@ export default function FaqFormPage() {
               className="h-10 rounded-lg border border-[hsl(var(--adm-border))] bg-transparent px-5 text-sm font-medium text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors">
               Cancel
             </button>
-            <button type="button" onClick={handleSave} disabled={saving}
+            <button type="button" onClick={() => handleSave("inactive")} disabled={saving}
+              className="h-10 rounded-lg border border-[hsl(var(--adm-border))] bg-transparent px-5 text-sm font-medium text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors disabled:opacity-60">
+              Save as Draft
+            </button>
+            <button type="button" onClick={() => handleSave(isNew ? "active" : undefined)} disabled={saving}
               className="flex h-10 items-center gap-2 rounded-lg px-6 text-sm font-semibold text-white transition-all disabled:opacity-60"
               style={{ background: "hsl(var(--adm-primary))" }}>
-              {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : <><Save className="h-4 w-4" /> {isNew ? "Create FAQ" : "Save Changes"}</>}
+              {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : <><Save className="h-4 w-4" /> {isNew ? "Publish FAQ" : "Save Changes"}</>}
             </button>
           </div>
         </div>

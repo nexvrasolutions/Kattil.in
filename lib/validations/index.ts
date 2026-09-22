@@ -288,11 +288,38 @@ export const faqSchema = z.object({
   question: z.string().min(1, "Question is required"),
   answer: z.string().min(1, "Answer is required"),
   category: z.enum(["Reservations", "Amenities", "Dining", "Policies"]),
-  status: z.enum(["active", "inactive"]).default("active"),
+  // Defaults to inactive (draft) — a new FAQ must not go live until an
+  // admin explicitly publishes it.
+  status: z.enum(["active", "inactive"]).default("inactive"),
   displayOrder: z.number().default(0),
 });
 
 export const updateFaqSchema = faqSchema.partial();
+
+// Obvious placeholder/test content that must never be publicly published.
+// Deliberately exact-match (on the whole trimmed field), not a substring
+// check, so real content that happens to contain one of these words (e.g.
+// "Please answer within 24 hours") is never falsely blocked.
+const FAQ_PLACEHOLDER_EXACT_MATCHES = new Set([
+  "test", "tests", "testing",
+  "answer", "answers",
+  "question",
+  "placeholder",
+  "n/a", "na",
+  "todo", "tbd",
+  "asdf", "asdfasdf",
+  "xxx", "xxxx",
+  "sample", "example",
+]);
+
+export function isPlaceholderFaqText(text: string): boolean {
+  const normalized = text.trim().toLowerCase();
+  if (!normalized) return false;
+  if (FAQ_PLACEHOLDER_EXACT_MATCHES.has(normalized)) return true;
+  // Classic Lorem Ipsum placeholder paragraphs always start with this phrase.
+  if (normalized.startsWith("lorem ipsum")) return true;
+  return false;
+}
 
 // ---------------------------------------------------------------------------
 // Blog

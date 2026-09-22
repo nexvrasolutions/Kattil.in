@@ -19,7 +19,9 @@ const faqSchema = new Schema<IFaq>(
       enum: ["Reservations", "Amenities", "Dining", "Policies"],
       required: true,
     },
-    status: { type: String, enum: ["active", "inactive"], default: "active" },
+    // Defaults to inactive (draft) so a new FAQ is never publicly visible
+    // until an admin explicitly publishes it.
+    status: { type: String, enum: ["active", "inactive"], default: "inactive" },
     displayOrder: { type: Number, default: 0 },
   },
   { timestamps: true }

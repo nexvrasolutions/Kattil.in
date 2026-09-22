@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db/mongodb";
 import Faq from "@/lib/models/Faq";
 import { apiSuccess, apiError, handleApiError, getPaginationParams } from "@/lib/utils/api";
-import { faqSchema } from "@/lib/validations";
+import { faqSchema, isPlaceholderFaqText } from "@/lib/validations";
 
 export async function GET(request: NextRequest) {
   try {
@@ -37,6 +37,17 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const parsed = faqSchema.safeParse(body);
     if (!parsed.success) return apiError(parsed.error.issues[0].message, 400);
+
+    // Server-side publish gate: placeholder/test content must never go live,
+    // regardless of what the admin UI sends.
+    if (parsed.data.status === "active") {
+      if (isPlaceholderFaqText(parsed.data.question) || isPlaceholderFaqText(parsed.data.answer)) {
+        return apiError(
+          "This FAQ looks like placeholder/test content and cannot be published. Please provide real question and answer text.",
+          400
+        );
+      }
+    }
 
     const faq = await Faq.create(parsed.data);
     return apiSuccess(faq, 201);
