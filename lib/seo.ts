@@ -2,7 +2,7 @@ export const SITE_URL = "https://new-kattil.vercel.app";
 export const SITE_NAME = "Kattil — The Homely Hotel";
 
 export const DEFAULT_DESCRIPTION =
-  "Experience warm hospitality at Kattil — a homely hotel with properties in Chennai and Madurai, Tamil Nadu. Premium rooms, co-working spaces, and curated stays.";
+  "Experience warm hospitality at KATTIL hotels in Chennai and Madurai, Tamil Nadu. Enjoy comfortable rooms, co-working spaces, and curated stays.";
 
 export const DEFAULT_KEYWORDS = [
   "hotel in Chennai",
