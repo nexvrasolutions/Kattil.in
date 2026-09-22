@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import AdminDropzone from "@/components/admin/ui/AdminDropzone";
 import { isValidEmail } from "@/lib/utils/email";
+import { isValidHttpsUrl } from "@/lib/utils/url";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -269,6 +270,10 @@ export default function PropertyFormPage() {
     }
     if (form.email.trim() && !isValidEmail(form.email.trim())) {
       setError("Please enter a valid email address.");
+      return;
+    }
+    if (form.bookingEngineUrl.trim() && !isValidHttpsUrl(form.bookingEngineUrl.trim())) {
+      setError("Please enter a valid HTTPS booking URL.");
       return;
     }
 

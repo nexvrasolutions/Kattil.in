@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { isValidEmail } from "@/lib/utils/email";
+import { isValidHttpsUrl } from "@/lib/utils/url";
 
 // ---------------------------------------------------------------------------
 // Shared sub-schemas
@@ -79,7 +80,13 @@ export const propertySchema = z.object({
   amenities: z.array(z.string()).default([]),
   directions: directionsSubSchema.optional(),
   hotelCode: z.string().optional(),
-  bookingEngineUrl: z.string().optional(),
+  bookingEngineUrl: z
+    .string()
+    .trim()
+    .optional()
+    .refine((val) => !val || isValidHttpsUrl(val), {
+      message: "Please enter a valid HTTPS booking URL",
+    }),
   featured: z.boolean().default(false),
   status: z.enum(["active", "inactive", "maintenance"]).default("active"),
   order: z.number().default(0),

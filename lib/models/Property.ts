@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 import { isValidEmail } from "@/lib/utils/email";
+import { isValidHttpsUrl } from "@/lib/utils/url";
 
 export interface IPropertyDirections {
   railway?: string;
@@ -78,7 +79,16 @@ const propertySchema = new Schema<IProperty>(
     amenities: { type: [String], default: [] },
     directions: { type: directionsSubdoc },
     hotelCode: { type: String, trim: true },
-    bookingEngineUrl: { type: String, trim: true },
+    // Defense-in-depth: matches the API's Zod check so a malformed booking URL
+    // can't reach persistence via any path that bypasses the API layer.
+    bookingEngineUrl: {
+      type: String,
+      trim: true,
+      validate: {
+        validator: (v: string) => !v || isValidHttpsUrl(v),
+        message: "Please enter a valid HTTPS booking URL",
+      },
+    },
     featured: { type: Boolean, default: false },
     status: {
       type: String,
