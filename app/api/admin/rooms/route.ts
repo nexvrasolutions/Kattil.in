@@ -30,17 +30,8 @@ export async function GET(request: NextRequest) {
     if (featured === "true") filter.featured = true;
     if (featured === "false") filter.featured = false;
 
-    // Synchronize rooms of inactive properties to inactive
-    const inactiveProperties = await Property.find({ status: "inactive" }).select("_id").lean();
-    const inactivePropIds = inactiveProperties.map((p) => p._id);
-    if (inactivePropIds.length > 0) {
-      await Room.updateMany(
-        { property: { $in: inactivePropIds }, status: "active" },
-        { $set: { status: "inactive" } }
-      );
-    }
-
-    const [rooms, total] = await Promise.all([
+    // Summary counts span all rooms, independent of filters and pagination.
+    const [rooms, total, totalRooms, activeRooms, featuredRooms] = await Promise.all([
       Room.find(filter)
         .sort({ order: 1, createdAt: -1 })
         .skip(skip)
@@ -48,9 +39,21 @@ export async function GET(request: NextRequest) {
         .populate("property", "name slug badge status")
         .populate("city", "name slug"),
       Room.countDocuments(filter),
+      Room.countDocuments({}),
+      Room.countDocuments({ status: "active" }),
+      Room.countDocuments({ featured: true }),
     ]);
 
-    return apiSuccess({ rooms, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
+    return apiSuccess({
+      rooms,
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+      stats: {
+        total: totalRooms,
+        active: activeRooms,
+        featured: featuredRooms,
+        inactive: totalRooms - activeRooms,
+      },
+    });
   } catch (error) {
     console.error("[GET /api/admin/rooms]", error);
     return apiError("Failed to fetch rooms", 500);
@@ -74,6 +77,14 @@ export async function POST(request: NextRequest) {
     if (propertyId && !resolvedCityId) {
       const prop = await Property.findById(propertyId).select("city").lean();
       if (prop?.city) resolvedCityId = String(prop.city);
+    }
+
+    // New rooms attached to an already-inactive property should start inactive too.
+    if (propertyId) {
+      const targetProperty = await Property.findById(propertyId).select("status").lean();
+      if (targetProperty?.status === "inactive") {
+        rest.status = "inactive";
+      }
     }
 
     const createData: Record<string, unknown> = {
