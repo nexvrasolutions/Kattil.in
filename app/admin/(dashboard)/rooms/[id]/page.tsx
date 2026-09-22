@@ -152,7 +152,9 @@ function RoomFormContent() {
             property: d.property?._id ?? d.property ?? "",
             badge: d.badge ?? "Private room",
             category: d.category ?? "deluxe",
-            price: d.pricing?.[0]?.value?.replace(/[^0-9.]/g, "") ?? "",
+            // Preserve the sign (and full numeric value) exactly as stored — do not
+            // strip a leading "-" and silently turn a negative price positive.
+            price: d.pricing?.[0]?.value?.replace(/[^0-9.-]/g, "") ?? "",
             occupancy: d.occupancy ?? "2 Guests",
             amenities: Array.isArray(d.amenities) && d.amenities.length > 0 ? d.amenities : ["Free Wifi", "Restaurant"],
             images: Array.isArray(d.images) ? d.images : [],

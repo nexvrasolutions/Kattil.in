@@ -51,7 +51,22 @@ const ctaSubdoc = new Schema(
 const pricingSubdoc = new Schema(
   {
     label: { type: String },
-    value: { type: String },
+    // `value` is a formatted display string (e.g. "₹500"), not a numeric field,
+    // but is still validated as a defense-in-depth check against non-positive
+    // prices reaching persistence via any path that bypasses the API's Zod
+    // validation (e.g. a script writing to the model directly).
+    value: {
+      type: String,
+      validate: {
+        validator: function (v: string) {
+          if (!v) return true;
+          const num = parseFloat(String(v).replace(/[^0-9.-]/g, ""));
+          if (Number.isNaN(num)) return true; // non-numeric values (e.g. "On Request") are unaffected
+          return num >= 1;
+        },
+        message: "Price must be at least ₹1",
+      },
+    },
   },
   { _id: false }
 );

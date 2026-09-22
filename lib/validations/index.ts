@@ -84,35 +84,55 @@ export const updatePropertySchema = propertySchema.partial();
 // Room
 // ---------------------------------------------------------------------------
 
-export const roomSchema = z.object({
+// Default-free base: `.partial()` in Zod 4 keeps inner `.default()`s, which would
+// overwrite omitted fields on update. Defaults are added only for create below.
+const roomBaseSchema = z.object({
   name: z.string().min(1, "Name is required"),
   slug: z.string().optional(),
   propertyId: z.string().optional(),
   cityId: z.string().optional(),
-  category: z
-    .enum(["deluxe", "suite", "standard", "premium", "dormitory"])
-    .default("deluxe"),
-  images: z.array(z.string()).default([]),
+  category: z.enum(["deluxe", "suite", "standard", "premium", "dormitory"]),
+  images: z.array(z.string()),
   link: z.string().optional(),
   roomCode: z.string().optional(),
   description: z.string().optional(),
-  features: z.array(z.string()).default([]),
-  amenities: z.array(z.string()).default([]),
+  features: z.array(z.string()),
+  amenities: z.array(z.string()),
   pricing: z
     .array(z.object({ label: z.string(), value: z.string() }))
     .optional(),
-  price: z.union([z.string(), z.number()]).optional(),
+  price: z
+    .union([z.string(), z.number()])
+    .optional()
+    .refine(
+      (val) => {
+        if (val === undefined || val === "") return true;
+        const num = typeof val === "number" ? val : Number(val);
+        return Number.isFinite(num) && num >= 1;
+      },
+      { message: "Price must be at least ₹1" }
+    ),
   occupancy: z.string().optional(),
   cta: ctaSubSchema.optional(),
   seo: seoSubSchema.optional(),
-  featured: z.boolean().default(false),
-  status: z.enum(["active", "inactive", "maintenance"]).default("active"),
+  featured: z.boolean(),
+  status: z.enum(["active", "inactive", "maintenance"]),
   badge: z.string().optional(),
   additionalInfo: z.string().optional(),
-  order: z.number().default(0),
+  order: z.number(),
 });
 
-export const updateRoomSchema = roomSchema.partial();
+export const roomSchema = roomBaseSchema.extend({
+  category: roomBaseSchema.shape.category.default("deluxe"),
+  images: roomBaseSchema.shape.images.default([]),
+  features: roomBaseSchema.shape.features.default([]),
+  amenities: roomBaseSchema.shape.amenities.default([]),
+  featured: roomBaseSchema.shape.featured.default(false),
+  status: roomBaseSchema.shape.status.default("active"),
+  order: roomBaseSchema.shape.order.default(0),
+});
+
+export const updateRoomSchema = roomBaseSchema.partial();
 
 // ---------------------------------------------------------------------------
 // Gallery
