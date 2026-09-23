@@ -79,7 +79,7 @@ const SIDEBAR_FALLBACK: SidebarIconData[] = [
   { label: "Google Maps", tooltip: "Find us on Maps", iconName: "googlemaps", iconUrl: "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8", url: "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8", bgColor: "#ffffff", iconColor: "#4285F4", type: "link", pulse: false, order: 2, visible: true, locations: [] },
 ];
 
-async function getFooterData(): Promise<{ footer: FooterProps; sidebar: SidebarIconData[] }> {
+async function fetchFooterData(): Promise<{ footer: FooterProps; sidebar: SidebarIconData[] }> {
   try {
     await connectDB();
     const raw = await FooterModel.findOne()
@@ -193,6 +193,13 @@ async function getFooterData(): Promise<{ footer: FooterProps; sidebar: SidebarI
     return { footer: FOOTER_FALLBACK, sidebar: SIDEBAR_FALLBACK };
   }
 }
+
+// The footer document rarely changes, so there's no need for a Mongo
+// round-trip on every request. Same 60s window as the homepage's own cached
+// content, so admin edits still show up within a minute.
+const getFooterData = unstable_cache(fetchFooterData, ["footer-data"], {
+  revalidate: 60,
+});
 
 // Fixed-position sidebar + footer both come from the same footer document, and
 // neither blocks the page's own content: they're rendered behind their own
