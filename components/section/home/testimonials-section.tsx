@@ -119,18 +119,45 @@ const TESTIMONIALS_DATA: Testimonial[][] = [
   ],
 ];
 
-// Cloned list for seamless forward slideshow loop on desktop (0, 1, 2, 3, 0)
-const DESKTOP_SLIDES = [...TESTIMONIALS_DATA, TESTIMONIALS_DATA[0]];
-
 const ALL_TESTIMONIALS = TESTIMONIALS_DATA.flat();
-// 3 repeated sets for continuous seamless infinite forward loop on mobile
-const INFINITE_TESTIMONIALS = [
-  ...ALL_TESTIMONIALS,
-  ...ALL_TESTIMONIALS,
-  ...ALL_TESTIMONIALS,
+const CARDS_PER_DESKTOP_SLIDE = TESTIMONIALS_DATA[0].length;
+
+type CarouselMode = "mobile" | "desktop" | null;
+
+interface TrackItem {
+  key: string;
+  item: Testimonial;
+  isClone: boolean;
+}
+
+const ORIGINAL_ITEMS: TrackItem[] = ALL_TESTIMONIALS.map((item, i) => ({
+  key: `orig-${i}`,
+  item,
+  isClone: false,
+}));
+
+// Mobile: 3 sets (clone, original, clone) for continuous seamless infinite loop.
+// Original cards keep their keys so they are not remounted when clones are added.
+const MOBILE_ITEMS: TrackItem[] = [
+  ...ALL_TESTIMONIALS.map((item, i) => ({ key: `pre-${i}`, item, isClone: true })),
+  ...ORIGINAL_ITEMS,
+  ...ALL_TESTIMONIALS.map((item, i) => ({ key: `post-${i}`, item, isClone: true })),
+];
+
+// Desktop: originals + cloned 1st slide for seamless forward slideshow loop (0, 1, 2, 3, 0)
+const DESKTOP_ITEMS: TrackItem[] = [
+  ...ORIGINAL_ITEMS,
+  ...ALL_TESTIMONIALS.slice(0, CARDS_PER_DESKTOP_SLIDE).map((item, i) => ({
+    key: `post-${i}`,
+    item,
+    isClone: true,
+  })),
 ];
 
 export default function TestimonialsSection() {
+  // Responsive mode is only known after mount; server + first client render use originals only
+  const [mode, setMode] = useState<CarouselMode>(null);
+
   // Desktop slideshow state
   const [desktopSlideIndex, setDesktopSlideIndex] = useState(0);
   const [isSlideAnimating, setIsSlideAnimating] = useState(true);
@@ -144,6 +171,23 @@ export default function TestimonialsSection() {
   const mobileResumeTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isAdjustingScrollRef = useRef(false);
 
+  // ── RESPONSIVE MODE (client only) ─────────────────────────────────────────
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const applyMode = () => {
+      setIsSlideAnimating(false);
+      setDesktopSlideIndex(0);
+      setMobileActiveIndex(0);
+      setMode(mq.matches ? "desktop" : "mobile");
+    };
+    applyMode();
+    mq.addEventListener("change", applyMode);
+    return () => mq.removeEventListener("change", applyMode);
+  }, []);
+
+  const trackItems =
+    mode === "mobile" ? MOBILE_ITEMS : mode === "desktop" ? DESKTOP_ITEMS : ORIGINAL_ITEMS;
+
   // ── DESKTOP SEAMLESS SLIDESHOW ADVANCE ────────────────────────────────────
   const nextDesktopSlide = useCallback(() => {
     setIsSlideAnimating(true);
@@ -156,16 +200,14 @@ export default function TestimonialsSection() {
   }, []);
 
   useEffect(() => {
-    if (isDesktopPaused) return;
+    if (mode !== "desktop" || isDesktopPaused) return;
 
     const interval = setInterval(() => {
-      if (typeof window !== "undefined" && window.innerWidth >= 768) {
-        nextDesktopSlide();
-      }
+      nextDesktopSlide();
     }, 3500);
 
     return () => clearInterval(interval);
-  }, [isDesktopPaused, nextDesktopSlide]);
+  }, [mode, isDesktopPaused, nextDesktopSlide]);
 
   const handleDesktopAnimationComplete = () => {
     // When finished sliding into the cloned 1st slide (index 4)
@@ -177,6 +219,7 @@ export default function TestimonialsSection() {
   };
 
   const handleDesktopCardHover = (paused: boolean) => {
+    if (mode !== "desktop") return;
     if (desktopResumeTimerRef.current) clearTimeout(desktopResumeTimerRef.current);
     if (paused) {
       setIsDesktopPaused(true);
@@ -188,6 +231,7 @@ export default function TestimonialsSection() {
   };
 
   const goToDesktopSlide = (targetIndex: number) => {
+    if (mode !== "desktop") return;
     setIsSlideAnimating(true);
     setDesktopSlideIndex(targetIndex);
     handleDesktopCardHover(true);
@@ -204,6 +248,8 @@ export default function TestimonialsSection() {
 
   // ── MOBILE INITIAL SCROLL (Center on middle set) ──────────────────────────
   useEffect(() => {
+    if (mode !== "mobile") return;
+
     const setupInitialPosition = () => {
       const el = mobileScrollRef.current;
       if (!el) return;
@@ -220,10 +266,11 @@ export default function TestimonialsSection() {
 
     const timer = setTimeout(setupInitialPosition, 100);
     return () => clearTimeout(timer);
-  }, [getCardStep]);
+  }, [mode, getCardStep]);
 
   // ── MOBILE SCROLL EVENT (Infinite loop & active dot sync) ─────────────────
   const handleMobileScroll = useCallback(() => {
+    if (mode !== "mobile") return;
     const el = mobileScrollRef.current;
     if (!el || isAdjustingScrollRef.current) return;
 
@@ -251,15 +298,15 @@ export default function TestimonialsSection() {
     const rawIndex = Math.round((el.scrollLeft - singleSetWidth) / step);
     const normalized = ((rawIndex % ALL_TESTIMONIALS.length) + ALL_TESTIMONIALS.length) % ALL_TESTIMONIALS.length;
     setMobileActiveIndex(normalized);
-  }, [getCardStep]);
+  }, [mode, getCardStep]);
 
   // ── MOBILE AUTO-SCROLL (Continuous forward smooth scroll every 3s) ────────
   useEffect(() => {
-    if (isMobilePaused) return;
+    if (mode !== "mobile" || isMobilePaused) return;
 
     const interval = setInterval(() => {
       const el = mobileScrollRef.current;
-      if (!el || typeof window === "undefined" || window.innerWidth >= 768) return;
+      if (!el) return;
       if (el.offsetParent === null) return;
 
       const step = getCardStep();
@@ -270,15 +317,17 @@ export default function TestimonialsSection() {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [isMobilePaused, getCardStep]);
+  }, [mode, isMobilePaused, getCardStep]);
 
   // Mobile user touch/interaction handlers
   const handleMobileInteractionStart = () => {
+    if (mode !== "mobile") return;
     setIsMobilePaused(true);
     if (mobileResumeTimerRef.current) clearTimeout(mobileResumeTimerRef.current);
   };
 
   const handleMobileInteractionEnd = () => {
+    if (mode !== "mobile") return;
     if (mobileResumeTimerRef.current) clearTimeout(mobileResumeTimerRef.current);
     mobileResumeTimerRef.current = setTimeout(() => {
       setIsMobilePaused(false);
@@ -287,6 +336,7 @@ export default function TestimonialsSection() {
 
   // Scroll directly to a card when mobile dot is tapped
   const scrollToMobileCard = (targetIndex: number) => {
+    if (mode !== "mobile") return;
     const el = mobileScrollRef.current;
     if (!el) return;
     const step = getCardStep();
@@ -321,26 +371,41 @@ export default function TestimonialsSection() {
             </h2>
           </motion.div>
 
-          {/* ── Mobile Carousel View (< md) ─────────────────────────────────── */}
-          <div className="block md:hidden">
-            <div
+          {/* ── Responsive Carousel ──────────────────────────────────────────
+              Mobile (< md): native horizontal scroll-snap carousel.
+              Desktop (>= md): Framer Motion slideshow, 3 cards per slide. */}
+          <div
+            onMouseEnter={() => handleDesktopCardHover(true)}
+            onMouseLeave={() => handleDesktopCardHover(false)}
+            className="md:overflow-hidden md:w-full md:py-2"
+          >
+            {/* Track: mobile scroll container / desktop slideshow track */}
+            <motion.div
               ref={mobileScrollRef}
               onScroll={handleMobileScroll}
               onTouchStart={handleMobileInteractionStart}
               onTouchEnd={handleMobileInteractionEnd}
               onTouchCancel={handleMobileInteractionEnd}
-              className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-none px-5 -mx-5 pb-2 scroll-smooth"
+              animate={{ x: `-${desktopSlideIndex * 100}%` }}
+              transition={
+                isSlideAnimating
+                  ? { duration: 0.7, ease: [0.25, 1, 0.5, 1] }
+                  : { duration: 0 }
+              }
+              onAnimationComplete={handleDesktopAnimationComplete}
+              className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-none px-5 -mx-5 pb-2 scroll-smooth md:w-full md:gap-6 md:overflow-visible md:snap-none md:px-1 md:mx-0 md:pb-0 md:scroll-auto"
               style={{
                 scrollbarWidth: "none",
                 msOverflowStyle: "none",
                 WebkitOverflowScrolling: "touch",
               }}
             >
-              {INFINITE_TESTIMONIALS.map((item, index) => (
+              {trackItems.map(({ key, item, isClone }) => (
                 <div
-                  key={`mobile-${index}`}
-                  aria-hidden={index >= ALL_TESTIMONIALS.length ? true : undefined}
-                  className="w-[calc(100vw-64px)] max-w-[340px] shrink-0 snap-start bg-white rounded-[20px] p-5 sm:p-6 flex flex-col justify-between border border-black/[0.04] select-none min-h-[260px]"
+                  key={key}
+                  aria-hidden={isClone ? true : undefined}
+                  // Desktop: every 3rd card ends a slide; -16px margin keeps the original 8px gap between slides
+                  className="w-[calc(100vw-64px)] max-w-[340px] md:w-[calc((100%-48px)/3)] md:max-w-none md:[&:nth-child(3n)]:-mr-4 shrink-0 snap-start bg-white rounded-[20px] p-5 sm:p-6 md:p-8 flex flex-col justify-between border border-black/[0.04] md:border-black/[0.03] select-none md:select-auto md:transition-all md:duration-300 min-h-[260px] md:min-h-[290px]"
                 >
                   <div>
                     {/* 5 Stars */}
@@ -354,142 +419,62 @@ export default function TestimonialsSection() {
                     </div>
 
                     {/* Title */}
-                    {index >= ALL_TESTIMONIALS.length ? (
-                      <p className="text-[17px] sm:text-[18px] text-[#0d1b2e] mt-3.5 leading-snug">
-                        {item.title}
-                      </p>
-                    ) : (
-                      <p className="text-[17px] sm:text-[18px] text-[#0d1b2e] mt-3.5 leading-snug">
-                        {item.title}
-                      </p>
-                    )}
+                    <p className="text-[17px] sm:text-[18px] md:text-[20px] text-[#0d1b2e] mt-3.5 md:mt-4 leading-snug">
+                      {item.title}
+                    </p>
 
                     {/* Review Text */}
-                    <p className="text-gray-600 text-[14px] sm:text-[15px] leading-relaxed mt-2.5 font-light">
+                    <p className="text-gray-600 text-[14px] sm:text-[15px] md:text-[15.5px] leading-relaxed mt-2.5 md:mt-4 font-light">
                       {item.review}
                     </p>
                   </div>
 
                   {/* Author Info */}
-                  <div className="mt-5 pt-3.5 border-t border-gray-100 flex items-center justify-between">
+                  <div className="mt-5 md:mt-6 pt-3.5 md:pt-4 border-t border-gray-100 flex items-center justify-between md:block">
                     <div>
-                      <p className="text-[13.5px] text-[#0d1b2e]">
+                      <p className="text-[13.5px] md:text-[14px] text-[#0d1b2e]">
                         {item.author}
                       </p>
-                      <p className="text-[11.5px] text-gray-400 mt-0.5">
+                      <p className="text-[11.5px] md:text-[12px] text-gray-400 mt-0.5">
                         {item.location}
                       </p>
                     </div>
                   </div>
                 </div>
               ))}
-            </div>
-
-            {/* Pagination Dots (Mobile) */}
-            <div className="flex justify-center items-center gap-1.5 mt-6">
-              {ALL_TESTIMONIALS.map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => scrollToMobileCard(i)}
-                  aria-label={`Go to review ${i + 1}`}
-                  className={`transition-all duration-300 cursor-pointer ${mobileActiveIndex === i
-                    ? "w-6 h-2 bg-[#8EA980] rounded-full"
-                    : "w-2 h-2 bg-[#D1D5DB] hover:bg-gray-400 rounded-full"
-                    }`}
-                />
-              ))}
-            </div>
+            </motion.div>
           </div>
 
-          {/* ── Desktop Slideshow View (>= md) ──────────────────────────────── */}
-          <div className="hidden md:block">
-            <div
-              onMouseEnter={() => handleDesktopCardHover(true)}
-              onMouseLeave={() => handleDesktopCardHover(false)}
-              className="overflow-hidden w-full py-2"
-            >
-              {/* Continuous Forward Horizontal Slideshow Track */}
-              <motion.div
-                className="flex w-full"
-                animate={{ x: `-${desktopSlideIndex * 100}%` }}
-                transition={
-                  isSlideAnimating
-                    ? { duration: 0.7, ease: [0.25, 1, 0.5, 1] }
-                    : { duration: 0 }
-                }
-                onAnimationComplete={handleDesktopAnimationComplete}
-              >
-                {DESKTOP_SLIDES.map((pageReviews, pageIdx) => (
-                  <div
-                    key={pageIdx}
-                    className="w-full shrink-0 grid grid-cols-3 gap-6 px-1"
-                  >
-                    {pageReviews.map((item, index) => (
-                      <div
-                        key={`${pageIdx}-${index}`}
-                        aria-hidden={pageIdx >= TESTIMONIALS_DATA.length ? true : undefined}
-                        className="bg-white rounded-[20px] p-6 sm:p-7 md:p-8 flex flex-col justify-between border border-black/[0.03] transition-all duration-300 min-h-[290px]"
-                      >
-                        <div>
-                          {/* 5 Stars */}
-                          <div className="flex items-center gap-1">
-                            {[...Array(item.rating)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className="w-4 h-4 fill-[#FBBF24] text-[#FBBF24]"
-                              />
-                            ))}
-                          </div>
+          {/* Pagination Dots (Mobile) */}
+          <div className="flex md:hidden justify-center items-center gap-1.5 mt-6">
+            {ALL_TESTIMONIALS.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => scrollToMobileCard(i)}
+                aria-label={`Go to review ${i + 1}`}
+                className={`transition-all duration-300 cursor-pointer ${mobileActiveIndex === i
+                  ? "w-6 h-2 bg-[#8EA980] rounded-full"
+                  : "w-2 h-2 bg-[#D1D5DB] hover:bg-gray-400 rounded-full"
+                  }`}
+              />
+            ))}
+          </div>
 
-                          {/* Title */}
-                          {pageIdx >= TESTIMONIALS_DATA.length ? (
-                            <p className="text-[20px] text-[#0d1b2e] mt-4 leading-snug">
-                              {item.title}
-                            </p>
-                          ) : (
-                            <p className="text-[20px] text-[#0d1b2e] mt-4 leading-snug">
-                              {item.title}
-                            </p>
-                          )}
-
-                          {/* Review Text */}
-                          <p className="text-gray-600 text-[15.5px] leading-relaxed mt-4 font-light">
-                            {item.review}
-                          </p>
-                        </div>
-
-                        {/* Author Info */}
-                        <div className="mt-6 pt-4 border-t border-gray-100">
-                          <p className="text-[14px] text-[#0d1b2e]">
-                            {item.author}
-                          </p>
-                          <p className="text-[12px] text-gray-400 mt-0.5">
-                            {item.location}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </motion.div>
-            </div>
-
-            {/* Pagination Dots (Desktop Slideshow) */}
-            <div className="flex justify-center items-center gap-2 mt-10">
-              {TESTIMONIALS_DATA.map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => goToDesktopSlide(i)}
-                  aria-label={`Go to testimonial slide ${i + 1}`}
-                  className={`transition-all duration-300 cursor-pointer ${currentDesktopActiveDot === i
-                    ? "w-7 h-2.5 bg-[#8EA980] rounded-full scale-105"
-                    : "w-2.5 h-2.5 bg-[#D1D5DB] hover:bg-gray-400 rounded-full"
-                    }`}
-                />
-              ))}
-            </div>
+          {/* Pagination Dots (Desktop Slideshow) */}
+          <div className="hidden md:flex justify-center items-center gap-2 mt-10">
+            {TESTIMONIALS_DATA.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => goToDesktopSlide(i)}
+                aria-label={`Go to testimonial slide ${i + 1}`}
+                className={`transition-all duration-300 cursor-pointer ${currentDesktopActiveDot === i
+                  ? "w-7 h-2.5 bg-[#8EA980] rounded-full scale-105"
+                  : "w-2.5 h-2.5 bg-[#D1D5DB] hover:bg-gray-400 rounded-full"
+                  }`}
+              />
+            ))}
           </div>
         </div>
       </div>
