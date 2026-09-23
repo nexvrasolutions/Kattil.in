@@ -267,6 +267,7 @@ export default function RoomStickyBookingWidget({
   // Initialize Flatpickr range picker
   useEffect(() => {
     let alive = true;
+    let openScrollY = 0;
 
     function repositionCalendar(instance: any) {
       if (!instance?.calendarContainer) return;
@@ -373,6 +374,7 @@ export default function RoomStickyBookingWidget({
             repositionCalendar(instance);
           },
           onOpen(selectedDates: Date[], dateStr: string, instance: any) {
+            openScrollY = window.scrollY;
             if (closeTimerRef.current) {
               clearTimeout(closeTimerRef.current);
             }
@@ -434,7 +436,21 @@ export default function RoomStickyBookingWidget({
         repositionCalendar(fpRef.current);
       }
     };
-    window.addEventListener("scroll", handleScrollOrResize, { passive: true });
+
+    // The calendar is appended to <body> while the date field is sticky (desktop) or
+    // a fixed floating card (mobile); repositioning on every scroll event lags behind
+    // and detaches once the widget unsticks. Close the calendar when the page scrolls
+    // instead. Small jitter (<= 4px) is ignored.
+    const handleScroll = () => {
+      if (!fpRef.current?.isOpen) return;
+      if (Math.abs(window.scrollY - openScrollY) > 4) {
+        if (closeTimerRef.current) {
+          clearTimeout(closeTimerRef.current);
+        }
+        fpRef.current.close();
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("resize", handleScrollOrResize, { passive: true });
 
     return () => {
@@ -442,7 +458,7 @@ export default function RoomStickyBookingWidget({
       if (closeTimerRef.current) {
         clearTimeout(closeTimerRef.current);
       }
-      window.removeEventListener("scroll", handleScrollOrResize);
+      window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleScrollOrResize);
       fpRef.current?.destroy();
     };

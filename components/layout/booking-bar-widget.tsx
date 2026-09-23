@@ -412,6 +412,21 @@ export default function BookingBarWidget({
       }
     };
 
+    // The calendar is appended to <body> (absolute, document coordinates) while the
+    // date field can live inside the fixed, collapsing hero header. Once the page
+    // scrolls the two can no longer stay aligned, so close the calendar instead of
+    // letting it detach from the field. Small jitter (<= 4px) is ignored.
+    let openScrollY = 0;
+    const handleScroll = () => {
+      if (!fpInstance.current?.isOpen) return;
+      if (Math.abs(window.scrollY - openScrollY) > 4) {
+        if (closeTimerRef.current) {
+          clearTimeout(closeTimerRef.current);
+        }
+        fpInstance.current.close();
+      }
+    };
+
     (async () => {
       try {
         injectStyle("https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css");
@@ -441,6 +456,7 @@ export default function BookingBarWidget({
             repositionCalendar(instance);
           },
           onOpen(selectedDates: Date[], dateStr: string, instance: any) {
+            openScrollY = window.scrollY;
             if (closeTimerRef.current) {
               clearTimeout(closeTimerRef.current);
             }
@@ -493,7 +509,7 @@ export default function BookingBarWidget({
           },
         });
 
-        window.addEventListener("scroll", handleScrollOrResize, { passive: true });
+        window.addEventListener("scroll", handleScroll, { passive: true });
         window.addEventListener("resize", handleScrollOrResize, { passive: true });
       } catch (e) {
         console.error("[BookingWidget]", e);
@@ -505,7 +521,7 @@ export default function BookingBarWidget({
       if (closeTimerRef.current) {
         clearTimeout(closeTimerRef.current);
       }
-      window.removeEventListener("scroll", handleScrollOrResize);
+      window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleScrollOrResize);
       fpInstance.current?.destroy();
     };
@@ -608,6 +624,10 @@ export default function BookingBarWidget({
                   )}
                 </div>
 
+                {/*
+                  ORIGINAL IMPLEMENTATION — KEEP FOR EASY RESTORATION
+                  (main field was a button; search lived in a separate input inside the dropdown)
+
                 <button
                   type="button"
                   onClick={() => setDropdownOpen((prev) => !prev)}
@@ -635,6 +655,92 @@ export default function BookingBarWidget({
                   />
                 </button>
 
+                  END ORIGINAL IMPLEMENTATION
+                */}
+
+                {/* UI TEST: main field doubles as the search input */}
+                <div
+                  onClick={() => {
+                    setDropdownOpen(true);
+                    searchInputRef.current?.focus();
+                  }}
+                  className={`w-full h-[58px] sm:h-[60px] md:h-[48px] lg:h-[50px] border-[1px] ${hotelError
+                    ? "border-[#0E2E4E] bg-[#0E2E4E]/[0.03] ring-1 ring-[#0E2E4E]/20"
+                    : "border-[#E5E7EB] bg-[#F9FAFB] hover:bg-gray-50/80"
+                    } rounded-[8px] px-4 sm:px-[16px] py-0 flex items-center justify-between gap-2 transition-all text-left cursor-text`}
+                >
+                  <div className="flex items-center gap-3 overflow-hidden flex-1 min-w-0">
+                    <Search className={`w-5 h-5 ${hotelError ? "text-[#0E2E4E]" : "text-[#0E2E4E]/70"} shrink-0 stroke-[1.6]`} />
+
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      role="combobox"
+                      aria-expanded={dropdownOpen}
+                      aria-autocomplete="list"
+                      autoComplete="off"
+                      value={
+                        dropdownOpen
+                          ? searchQuery
+                          : selectedHotel
+                            ? `${selectedHotel.name} (${selectedHotel.place})`
+                            : ""
+                      }
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        if (!dropdownOpen) setDropdownOpen(true);
+                      }}
+                      onFocus={() => setDropdownOpen(true)}
+                      placeholder={
+                        dropdownOpen && selectedHotel
+                          ? `${selectedHotel.name} (${selectedHotel.place})`
+                          : "Search location or property"
+                      }
+                      className={`w-full min-w-0 bg-transparent outline-none border-none p-0 text-[14.5px] sm:text-[15px] md:text-[14px] lg:text-[14.5px] truncate placeholder-gray-400 font-sans ${selectedHotel && !dropdownOpen ? "text-gray-900 font-medium" : "text-gray-900"
+                        }`}
+                      onKeyDown={(e) => {
+                        e.stopPropagation();
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                        } else if (e.key === "Escape") {
+                          setDropdownOpen(false);
+                          e.currentTarget.blur();
+                        }
+                      }}
+                    />
+                  </div>
+
+                  {dropdownOpen && searchQuery && (
+                    <button
+                      type="button"
+                      aria-label="Clear search"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSearchQuery("");
+                        searchInputRef.current?.focus();
+                      }}
+                      className="text-gray-400 hover:text-gray-600 p-0.5 cursor-pointer shrink-0"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    aria-label={dropdownOpen ? "Close list" : "Open list"}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDropdownOpen((prev) => !prev);
+                    }}
+                    className="shrink-0 cursor-pointer"
+                  >
+                    <ChevronDown
+                      className={`w-4.5 h-4.5 ${hotelError ? "text-[#0E2E4E]" : "text-[#0E2E4E]/70"} shrink-0 stroke-[1.6] transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""
+                        }`}
+                    />
+                  </button>
+                </div>
+
                 {/* ── Dropdown Menu ────────────────────────────────────────────── */}
                 <AnimatePresence>
                   {dropdownOpen && (
@@ -649,6 +755,10 @@ export default function BookingBarWidget({
                       className="absolute left-0 right-0 top-full mt-1 bg-white rounded-[8px] shadow-[0_16px_40px_-8px_rgba(0,0,0,0.22)] border border-gray-100 py-1 z-50 overflow-hidden"
                     >
                       {/* Search Bar */}
+                      {/*
+                        ORIGINAL IMPLEMENTATION — KEEP FOR EASY RESTORATION
+                        (UI TEST: search now happens in the main field above)
+
                       <div className="px-2.5 pb-1.5 pt-1 border-b border-gray-100">
                         <div className="relative flex items-center">
                           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
@@ -682,6 +792,9 @@ export default function BookingBarWidget({
                           )}
                         </div>
                       </div>
+
+                        END ORIGINAL IMPLEMENTATION
+                      */}
 
                       {/* Header Info */}
                       <div className="px-3 py-1 flex items-center justify-between text-[10.5px] sm:text-[11px] font-bold text-gray-500 bg-gray-50/70">
