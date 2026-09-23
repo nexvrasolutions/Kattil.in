@@ -267,7 +267,6 @@ export default function RoomStickyBookingWidget({
   // Initialize Flatpickr range picker
   useEffect(() => {
     let alive = true;
-    let openScrollY = 0;
 
     function repositionCalendar(instance: any) {
       if (!instance?.calendarContainer) return;
@@ -374,7 +373,6 @@ export default function RoomStickyBookingWidget({
             repositionCalendar(instance);
           },
           onOpen(selectedDates: Date[], dateStr: string, instance: any) {
-            openScrollY = window.scrollY;
             if (closeTimerRef.current) {
               clearTimeout(closeTimerRef.current);
             }
@@ -438,19 +436,39 @@ export default function RoomStickyBookingWidget({
     };
 
     // The calendar is appended to <body> while the date field is sticky (desktop) or
-    // a fixed floating card (mobile); repositioning on every scroll event lags behind
-    // and detaches once the widget unsticks. Close the calendar when the page scrolls
-    // instead. Small jitter (<= 4px) is ignored.
-    const handleScroll = () => {
+    // a fixed floating card (mobile); repositioning on scroll lags behind and detaches
+    // once the widget unsticks. Close the calendar immediately on scroll input
+    // (wheel / touch drag) instead. Listeners use capture so React stopPropagation
+    // can't block them.
+    const closeCalendar = () => {
       if (!fpRef.current?.isOpen) return;
-      if (Math.abs(window.scrollY - openScrollY) > 4) {
-        if (closeTimerRef.current) {
-          clearTimeout(closeTimerRef.current);
-        }
-        fpRef.current.close();
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
       }
+      fpRef.current.close();
     };
-    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    };
+    // Ignore finger jitter while tapping a date; a real drag closes the calendar.
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!fpRef.current?.isOpen || e.touches.length !== 1) return;
+      const dx = e.touches[0].clientX - touchStartX;
+      const dy = e.touches[0].clientY - touchStartY;
+      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) closeCalendar();
+    };
+    const listenerOptions: AddEventListenerOptions = { passive: true, capture: true };
+
+    window.addEventListener("wheel", closeCalendar, listenerOptions);
+    window.addEventListener("touchstart", handleTouchStart, listenerOptions);
+    window.addEventListener("touchmove", handleTouchMove, listenerOptions);
+    // Fallback for keyboard / scrollbar page scrolling (non-capture: ignores inner scrollers)
+    window.addEventListener("scroll", closeCalendar, { passive: true });
     window.addEventListener("resize", handleScrollOrResize, { passive: true });
 
     return () => {
@@ -458,7 +476,10 @@ export default function RoomStickyBookingWidget({
       if (closeTimerRef.current) {
         clearTimeout(closeTimerRef.current);
       }
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("wheel", closeCalendar, listenerOptions);
+      window.removeEventListener("touchstart", handleTouchStart, listenerOptions);
+      window.removeEventListener("touchmove", handleTouchMove, listenerOptions);
+      window.removeEventListener("scroll", closeCalendar);
       window.removeEventListener("resize", handleScrollOrResize);
       fpRef.current?.destroy();
     };

@@ -414,18 +414,32 @@ export default function BookingBarWidget({
 
     // The calendar is appended to <body> (absolute, document coordinates) while the
     // date field can live inside the fixed, collapsing hero header. Once the page
-    // scrolls the two can no longer stay aligned, so close the calendar instead of
-    // letting it detach from the field. Small jitter (<= 4px) is ignored.
-    let openScrollY = 0;
-    const handleScroll = () => {
+    // or hero starts moving the two can no longer stay aligned, so close the calendar
+    // immediately on scroll input (wheel / touch drag) instead of waiting for the
+    // resulting scroll. Listeners use capture so React stopPropagation can't block them.
+    const closeCalendar = () => {
       if (!fpInstance.current?.isOpen) return;
-      if (Math.abs(window.scrollY - openScrollY) > 4) {
-        if (closeTimerRef.current) {
-          clearTimeout(closeTimerRef.current);
-        }
-        fpInstance.current.close();
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
       }
+      fpInstance.current.close();
     };
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    };
+    // Ignore finger jitter while tapping a date; a real drag closes the calendar.
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!fpInstance.current?.isOpen || e.touches.length !== 1) return;
+      const dx = e.touches[0].clientX - touchStartX;
+      const dy = e.touches[0].clientY - touchStartY;
+      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) closeCalendar();
+    };
+    const listenerOptions: AddEventListenerOptions = { passive: true, capture: true };
 
     (async () => {
       try {
@@ -456,7 +470,6 @@ export default function BookingBarWidget({
             repositionCalendar(instance);
           },
           onOpen(selectedDates: Date[], dateStr: string, instance: any) {
-            openScrollY = window.scrollY;
             if (closeTimerRef.current) {
               clearTimeout(closeTimerRef.current);
             }
@@ -509,7 +522,11 @@ export default function BookingBarWidget({
           },
         });
 
-        window.addEventListener("scroll", handleScroll, { passive: true });
+        window.addEventListener("wheel", closeCalendar, listenerOptions);
+        window.addEventListener("touchstart", handleTouchStart, listenerOptions);
+        window.addEventListener("touchmove", handleTouchMove, listenerOptions);
+        // Fallback for keyboard / scrollbar page scrolling (non-capture: ignores inner scrollers)
+        window.addEventListener("scroll", closeCalendar, { passive: true });
         window.addEventListener("resize", handleScrollOrResize, { passive: true });
       } catch (e) {
         console.error("[BookingWidget]", e);
@@ -521,7 +538,10 @@ export default function BookingBarWidget({
       if (closeTimerRef.current) {
         clearTimeout(closeTimerRef.current);
       }
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("wheel", closeCalendar, listenerOptions);
+      window.removeEventListener("touchstart", handleTouchStart, listenerOptions);
+      window.removeEventListener("touchmove", handleTouchMove, listenerOptions);
+      window.removeEventListener("scroll", closeCalendar);
       window.removeEventListener("resize", handleScrollOrResize);
       fpInstance.current?.destroy();
     };
