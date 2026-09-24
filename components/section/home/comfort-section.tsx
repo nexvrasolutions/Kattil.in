@@ -108,7 +108,7 @@ export default function ComfortSection() {
                   </div>
 
                   {feature.href ? (
-                    <Link href={feature.href} className="contents">
+                    <Link href={feature.href} className="block">
                       <h3 className="text-[18px] sm:text-[20px] text-[#0d1b2e] leading-snug">
                         {feature.title}
                       </h3>
