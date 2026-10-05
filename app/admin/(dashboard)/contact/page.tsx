@@ -98,7 +98,7 @@ export default function ContactPage() {
     return (
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-16 rounded-2xl adm-skeleton" />
+          <div key={i} className="h-16 rounded-[8px] adm-skeleton" />
         ))}
       </div>
     );
@@ -114,7 +114,7 @@ export default function ContactPage() {
       </PageHeader>
 
       {/* Info banner */}
-      <div className="mb-6 flex items-start gap-3 rounded-2xl border border-[hsl(var(--adm-border)/0.5)] bg-[hsl(var(--adm-accent)/0.15)] p-4">
+      <div className="mb-6 flex items-start gap-3 rounded-[8px] border border-[hsl(var(--adm-border)/0.5)] bg-[hsl(var(--adm-accent)/0.15)] p-4">
         <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-[hsl(var(--adm-primary))]" />
         <div className="flex-1">
           <p className="text-sm font-semibold text-[hsl(var(--adm-foreground))]">How the Contact page works</p>
@@ -128,7 +128,7 @@ export default function ContactPage() {
       </div>
 
       {locations.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-[hsl(var(--adm-border))] py-24">
+        <div className="flex flex-col items-center justify-center rounded-[8px] border border-dashed border-[hsl(var(--adm-border))] py-24">
           <MapPin className="h-12 w-12 text-[hsl(var(--adm-muted-foreground)/0.3)] mb-3" />
           <p className="text-sm text-[hsl(var(--adm-muted-foreground))] mb-1">No cities found</p>
           <p className="text-xs text-[hsl(var(--adm-muted-foreground))]">
@@ -143,9 +143,9 @@ export default function ContactPage() {
         <div className="flex gap-6">
           {/* Location tabs sidebar */}
           <div className="w-44 shrink-0">
-            <AdminCard className="rounded-2xl! overflow-hidden">
+            <AdminCard className="rounded-[8px]! overflow-hidden">
               <div className="p-3 space-y-1">
-                <p className="px-2 mb-2 text-xs font-bold uppercase tracking-wider text-[hsl(var(--adm-muted-foreground))]">
+                <p className="px-2 mb-2 text-xs font-bold uppercase text-[hsl(var(--adm-muted-foreground))]">
                   Locations
                 </p>
                 {locations.map((loc) => (
@@ -153,7 +153,7 @@ export default function ContactPage() {
                     key={loc.id}
                     onClick={() => setActiveLocId(loc.id)}
                     className={[
-                      "w-full flex items-center gap-2 rounded-xl px-2.5 py-2 text-sm text-left transition-colors",
+                      "w-full flex items-center gap-2 rounded-[8px] px-2.5 py-2 text-sm text-left transition-colors",
                       activeLocId === loc.id
                         ? "bg-[hsl(var(--adm-primary)/0.1)] text-[hsl(var(--adm-primary))] font-semibold border-l-2 border-[hsl(var(--adm-primary))]"
                         : "text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))]",
@@ -264,7 +264,7 @@ export default function ContactPage() {
                           />
                           <FieldHint>
                             Google Maps → Share → Embed a map → copy the{" "}
-                            <code className="rounded bg-[hsl(var(--adm-accent))] px-1 py-0.5 text-[10px]">src</code> URL.
+                            <code className="rounded-[8px] bg-[hsl(var(--adm-accent))] px-1 py-0.5 text-[10px]">src</code> URL.
                           </FieldHint>
 
                           <AnimatePresence>
@@ -276,7 +276,7 @@ export default function ContactPage() {
                                 transition={{ duration: 0.25 }}
                                 className="mt-3 overflow-hidden"
                               >
-                                <div className="relative overflow-hidden rounded-2xl border border-[hsl(var(--adm-border))]" style={{ height: 280 }}>
+                                <div className="relative overflow-hidden rounded-[8px] border border-[hsl(var(--adm-border))]" style={{ height: 280 }}>
                                   <iframe
                                     src={getGoogleMapsEmbedUrl(activeLoc.mapSrc, activeLoc.address || `${activeLoc.label}, Tamil Nadu, India`)}
                                     width="100%"
@@ -305,7 +305,7 @@ export default function ContactPage() {
                     if (!activeLoc.mapSrc) missing.push("Map embed URL");
                     if (missing.length === 0) return null;
                     return (
-                      <div className="flex items-start gap-3 rounded-2xl border border-[hsl(var(--adm-warning)/0.3)] bg-[hsl(var(--adm-warning)/0.08)] p-4">
+                      <div className="flex items-start gap-3 rounded-[8px] border border-[hsl(var(--adm-warning)/0.3)] bg-[hsl(var(--adm-warning)/0.08)] p-4">
                         <AlertCircle className="h-4 w-4 mt-0.5 shrink-0 text-[hsl(var(--adm-warning)/0.8)]" />
                         <div>
                           <p className="text-sm font-semibold text-[hsl(var(--adm-warning)/0.8)]">Incomplete location</p>

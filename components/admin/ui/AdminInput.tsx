@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 // ── Shared base class ─────────────────────────────────────────────────────────
 
 const inputBase =
-  "flex w-full rounded-xl border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3.5 py-2.5 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground)/0.7)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] focus-visible:ring-offset-0 focus-visible:border-[hsl(var(--adm-ring)/0.6)] hover:border-[hsl(var(--adm-border)/0.8)] disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-150";
+  "flex w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3.5 py-2.5 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground)/0.7)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] focus-visible:ring-offset-0 focus-visible:border-[hsl(var(--adm-ring)/0.6)] hover:border-[hsl(var(--adm-border)/0.8)] disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-150";
 
 const labelClass =
   "mb-2 block text-sm font-semibold text-[hsl(var(--adm-foreground))]";

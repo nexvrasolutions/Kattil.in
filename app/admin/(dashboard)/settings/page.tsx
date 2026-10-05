@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import {
   Save, Hotel, Globe, Shield, ToggleRight,
   Link as LinkIcon,
-  Sun, Moon, Monitor,
 } from "lucide-react";
 import {
   AdminCard, AdminCardHeader, AdminCardContent,
@@ -78,12 +77,6 @@ const SOCIAL_ICONS: Record<string, React.ElementType> = {
   Instagram: LinkIcon, Facebook: LinkIcon, Twitter: LinkIcon, Youtube: LinkIcon,
 };
 
-const THEME_OPTIONS = [
-  { value: "light", label: "Light", icon: Sun },
-  { value: "dark", label: "Dark", icon: Moon },
-  { value: "system", label: "System", icon: Monitor },
-] as const;
-
 const FEATURE_LABELS: Record<string, string> = {
   gallery: "Photo Gallery",
   amenities: "Amenities Section",
@@ -98,9 +91,9 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
     <button
       type="button"
       onClick={() => onChange(!checked)}
-      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${checked ? "bg-[hsl(var(--adm-primary))]" : "bg-[hsl(var(--adm-muted))]"}`}
+      className={`relative inline-flex h-6 w-11 items-center rounded-[8px] transition-colors ${checked ? "bg-[hsl(var(--adm-brand))]" : "bg-[hsl(var(--adm-muted))]"}`}
     >
-      <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${checked ? "translate-x-6" : "translate-x-1"}`} />
+      <span className={`inline-block h-4 w-4 rounded-[8px] bg-white transition-transform ${checked ? "translate-x-6" : "translate-x-1"}`} />
     </button>
   );
 }
@@ -158,7 +151,7 @@ export default function SettingsPage() {
 
   if (loading) return (
     <div className="space-y-4">
-      {[...Array(4)].map((_, i) => <div key={i} className="h-16 rounded-2xl adm-skeleton" />)}
+      {[...Array(4)].map((_, i) => <div key={i} className="h-16 rounded-[8px] adm-skeleton" />)}
     </div>
   );
 
@@ -172,10 +165,10 @@ export default function SettingsPage() {
       </PageHeader>
 
       {/* Tab bar */}
-      <div className="mb-6 flex gap-1 rounded-xl border border-[hsl(var(--adm-border))] p-1 overflow-x-auto">
+      <div className="mb-6 flex gap-1 rounded-[8px] border border-[hsl(var(--adm-border))] p-1 overflow-x-auto">
         {tabs.map(({ key, label }) => (
           <button key={key} type="button" onClick={() => setActiveTab(key)}
-            className={`flex-1 whitespace-nowrap rounded-lg py-2 text-xs font-semibold transition-colors min-w-[80px] ${activeTab === key ? "bg-[hsl(var(--adm-primary))] text-white" : "text-[hsl(var(--adm-muted-foreground))] hover:text-[hsl(var(--adm-foreground))]"}`}>
+            className={`flex-1 whitespace-nowrap rounded-[8px] py-2 text-xs font-semibold transition-colors min-w-[80px] ${activeTab === key ? "bg-[hsl(var(--adm-brand))] text-[hsl(var(--adm-brand-foreground))]" : "text-[hsl(var(--adm-muted-foreground))] hover:text-[hsl(var(--adm-foreground))]"}`}>
             {label}
           </button>
         ))}
@@ -209,7 +202,7 @@ export default function SettingsPage() {
                         placeholder="https://..."
                       />
                       {data.logo && (
-                        <img src={data.logo} alt="Logo" className="mt-2 h-12 rounded-lg border border-[hsl(var(--adm-border))] object-contain p-1 bg-white" />
+                        <img src={data.logo} alt="Logo" className="mt-2 h-12 rounded-[8px] border border-[hsl(var(--adm-border))] object-contain p-1 bg-white" />
                       )}
                     </div>
                     <div>
@@ -220,34 +213,10 @@ export default function SettingsPage() {
                         placeholder="https://..."
                       />
                       {data.favicon && (
-                        <img src={data.favicon} alt="Favicon" className="mt-2 h-8 w-8 rounded border border-[hsl(var(--adm-border))] object-contain p-0.5 bg-white" />
+                        <img src={data.favicon} alt="Favicon" className="mt-2 h-8 w-8 rounded-[8px] border border-[hsl(var(--adm-border))] object-contain p-0.5 bg-white" />
                       )}
                     </div>
                   </div>
-                </div>
-              </AdminCardContent>
-            </AdminCard>
-
-            <AdminCard>
-              <AdminCardHeader>
-                <AdminCardDescription>Appearance</AdminCardDescription>
-                <AdminCardTitle className="mt-2">Default Theme</AdminCardTitle>
-              </AdminCardHeader>
-              <AdminCardContent>
-                <div className="grid grid-cols-3 gap-3">
-                  {THEME_OPTIONS.map(({ value, label, icon: Icon }) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => setData((d) => ({ ...d, theme: value }))}
-                      className={`flex flex-col items-center gap-2 rounded-2xl border-2 p-4 transition-all ${data.theme === value
-                        ? "border-[hsl(var(--adm-primary))] bg-[hsl(var(--adm-primary)/0.08)]"
-                        : "border-[hsl(var(--adm-border))] hover:border-[hsl(var(--adm-primary)/0.4)]"}`}
-                    >
-                      <Icon className={`h-6 w-6 ${data.theme === value ? "text-[hsl(var(--adm-primary))]" : "text-[hsl(var(--adm-muted-foreground))]"}`} />
-                      <span className={`text-sm font-semibold ${data.theme === value ? "text-[hsl(var(--adm-primary))]" : "text-[hsl(var(--adm-foreground))]"}`}>{label}</span>
-                    </button>
-                  ))}
                 </div>
               </AdminCardContent>
             </AdminCard>
@@ -279,7 +248,7 @@ export default function SettingsPage() {
             <AdminCardContent>
               <div className="space-y-3">
                 {Object.entries(data.features ?? {}).map(([key, enabled]) => (
-                  <div key={key} className="flex items-center justify-between rounded-2xl border border-[hsl(var(--adm-border)/0.5)] p-4">
+                  <div key={key} className="flex items-center justify-between rounded-[8px] border border-[hsl(var(--adm-border)/0.5)] p-4">
                     <div>
                       <p className="text-sm font-semibold text-[hsl(var(--adm-foreground))]">
                         {FEATURE_LABELS[key] ?? key}
@@ -311,8 +280,8 @@ export default function SettingsPage() {
                 {(data.socialLinks ?? []).map((social, i) => {
                   const Icon = SOCIAL_ICONS[social.platform] ?? LinkIcon;
                   return (
-                    <div key={i} className="flex items-center gap-3 rounded-2xl border border-[hsl(var(--adm-border)/0.5)] p-4">
-                      <div className="rounded-xl bg-[hsl(var(--adm-accent)/0.3)] p-2.5 shrink-0">
+                    <div key={i} className="flex items-center gap-3 rounded-[8px] border border-[hsl(var(--adm-border)/0.5)] p-4">
+                      <div className="rounded-[8px] bg-[hsl(var(--adm-accent)/0.3)] p-2.5 shrink-0">
                         <Icon className="h-5 w-5 text-[hsl(var(--adm-primary))]" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -361,7 +330,7 @@ export default function SettingsPage() {
                     value={data.seo?.defaultDescription ?? ""}
                     onChange={(e) => setData((d) => ({ ...d, seo: { ...d.seo, defaultDescription: e.target.value } }))}
                     placeholder="Fallback description used when no page-specific meta description is set (max 160 chars)"
-                    className="flex min-h-[80px] w-full rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 py-2 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] resize-none"
+                    className="flex min-h-[80px] w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 py-2 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] resize-none"
                   />
                   <p className="mt-1 text-xs text-[hsl(var(--adm-muted-foreground))]">
                     {(data.seo?.defaultDescription?.length ?? 0)}/160 characters
@@ -374,7 +343,7 @@ export default function SettingsPage() {
                   placeholder="https://..."
                 />
                 {data.seo?.defaultOgImage && (
-                  <img src={data.seo.defaultOgImage} alt="OG Preview" className="h-40 w-full rounded-xl object-cover border border-[hsl(var(--adm-border))]" />
+                  <img src={data.seo.defaultOgImage} alt="OG Preview" className="h-40 w-full rounded-[8px] object-cover border border-[hsl(var(--adm-border))]" />
                 )}
               </div>
             </AdminCardContent>
@@ -391,7 +360,7 @@ export default function SettingsPage() {
               </AdminCardHeader>
               <AdminCardContent>
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between rounded-2xl border border-[hsl(var(--adm-border)/0.5)] p-4">
+                  <div className="flex items-center justify-between rounded-[8px] border border-[hsl(var(--adm-border)/0.5)] p-4">
                     <div>
                       <p className="text-sm font-semibold text-[hsl(var(--adm-foreground))]">Maintenance Mode</p>
                       <p className="text-xs text-[hsl(var(--adm-muted-foreground))]">
@@ -404,7 +373,7 @@ export default function SettingsPage() {
                     />
                   </div>
                   {data.maintenance?.enabled && (
-                    <div className="rounded-2xl border border-[hsl(var(--adm-warning)/0.3)] bg-[hsl(var(--adm-warning)/0.08)] p-4">
+                    <div className="rounded-[8px] border border-[hsl(var(--adm-warning)/0.3)] bg-[hsl(var(--adm-warning)/0.08)] p-4">
                       <p className="text-sm font-semibold text-[hsl(var(--adm-warning)/0.8)] mb-3">Site is currently in maintenance mode</p>
                       <AdminInput
                         label="Maintenance Message"
@@ -432,8 +401,8 @@ export default function SettingsPage() {
                     { label: "Styling", value: "Tailwind CSS v4 + Framer Motion" },
                     { label: "Hotel", value: data.hotelName ?? "Kattil Hotels" },
                   ].map(({ label, value }) => (
-                    <div key={label} className="flex items-center justify-between rounded-lg border border-[hsl(var(--adm-border)/0.6)] bg-[hsl(var(--adm-accent)/0.12)] px-3 py-3">
-                      <span className="text-xs font-bold uppercase tracking-wide text-[hsl(var(--adm-muted-foreground))]">{label}</span>
+                    <div key={label} className="flex items-center justify-between rounded-[8px] border border-[hsl(var(--adm-border)/0.6)] bg-[hsl(var(--adm-accent)/0.12)] px-3 py-3">
+                      <span className="text-xs font-bold uppercase text-[hsl(var(--adm-muted-foreground))]">{label}</span>
                       <span className="text-sm font-semibold text-[hsl(var(--adm-foreground))]">{value}</span>
                     </div>
                   ))}

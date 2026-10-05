@@ -151,7 +151,7 @@ export function DataTable<T extends Record<string, unknown>>({
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 placeholder={searchPlaceholder}
-                className="flex h-9 w-full rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] pl-8 pr-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-colors"
+                className="flex h-9 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] pl-8 pr-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-colors"
               />
             </div>
           )}
@@ -177,7 +177,7 @@ export function DataTable<T extends Record<string, unknown>>({
       )}
 
       {/* Table */}
-      <div className="w-full overflow-auto rounded-xl border border-[hsl(var(--adm-border))]">
+      <div className="w-full overflow-auto rounded-[8px] border border-[hsl(var(--adm-border))]">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-muted)/0.5)]">
@@ -188,7 +188,7 @@ export function DataTable<T extends Record<string, unknown>>({
                     checked={allSelected}
                     ref={(el) => { if (el) el.indeterminate = someSelected; }}
                     onChange={toggleAll}
-                    className="h-4 w-4 rounded border-[hsl(var(--adm-border))] accent-[hsl(var(--adm-primary))]"
+                    className="h-4 w-4 rounded-[8px] border-[hsl(var(--adm-border))] accent-[hsl(var(--adm-primary))]"
                     aria-label="Select all rows"
                   />
                 </th>
@@ -197,7 +197,7 @@ export function DataTable<T extends Record<string, unknown>>({
                 <th
                   key={String(col.key)}
                   className={[
-                    "h-11 px-4 text-left font-semibold text-[hsl(var(--adm-muted-foreground))] text-xs uppercase tracking-wide select-none",
+                    "h-11 px-4 text-left font-semibold text-[hsl(var(--adm-muted-foreground))] text-xs uppercase select-none",
                     col.sortable ? "cursor-pointer hover:text-[hsl(var(--adm-foreground))]" : "",
                     col.className ?? "",
                   ].join(" ")}
@@ -215,13 +215,13 @@ export function DataTable<T extends Record<string, unknown>>({
                 <tr key={i} className="border-b border-[hsl(var(--adm-border)/0.5)]">
                   {bulkActions && (
                     <td className="px-4 py-3">
-                      <div className="adm-skeleton h-4 w-4 rounded" />
+                      <div className="adm-skeleton h-4 w-4 rounded-[8px]" />
                     </td>
                   )}
                   {columns.map((col) => (
                     <td key={String(col.key)} className="px-4 py-3">
                       <div
-                        className="adm-skeleton h-4 rounded"
+                        className="adm-skeleton h-4 rounded-[8px]"
                         style={{ width: `${60 + Math.random() * 30}%` }}
                       />
                     </td>
@@ -258,7 +258,7 @@ export function DataTable<T extends Record<string, unknown>>({
                           type="checkbox"
                           checked={selected}
                           onChange={() => toggleRow(key)}
-                          className="h-4 w-4 rounded border-[hsl(var(--adm-border))] accent-[hsl(var(--adm-primary))]"
+                          className="h-4 w-4 rounded-[8px] border-[hsl(var(--adm-border))] accent-[hsl(var(--adm-primary))]"
                           aria-label={`Select row ${String(key)}`}
                         />
                       </td>

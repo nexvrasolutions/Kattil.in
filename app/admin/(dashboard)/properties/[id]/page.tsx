@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ChevronLeft, Loader2, Save, Building2, Plus, X, Check, BedDouble, MapPin, ExternalLink, Image as ImageIcon, AlertTriangle, RefreshCw } from "lucide-react";
+import { ChevronLeft, Loader2, Save, Building2, Plus, X, BedDouble, MapPin, ExternalLink, Image as ImageIcon, AlertTriangle, RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import AdminDropzone from "@/components/admin/ui/AdminDropzone";
+import AmenityPicker from "@/components/admin/ui/AmenityPicker";
 import { isValidEmail } from "@/lib/utils/email";
 import { isValidHttpsUrl } from "@/lib/utils/url";
 
@@ -52,6 +53,7 @@ interface PropertyForm {
   };
   hotelCode: string;
   bookingEngineUrl: string;
+  offerPercentage: string;
   featured: boolean;
   status: "active" | "inactive" | "maintenance";
 }
@@ -70,7 +72,7 @@ const EMPTY: PropertyForm = {
   email: "",
   whatsapp: "",
   mapSrc: "",
-  amenities: ["Free Wifi", "Restaurant", "Air Conditioning", "24/7 Butler"],
+  amenities: [],
   directions: {
     railway: "",
     busStand: "",
@@ -81,6 +83,7 @@ const EMPTY: PropertyForm = {
   },
   hotelCode: "",
   bookingEngineUrl: "",
+  offerPercentage: "",
   featured: false,
   status: "active",
 };
@@ -96,24 +99,10 @@ const BADGE_PRESETS = [
   "Hostel & Co-living",
 ];
 
-const POPULAR_AMENITIES = [
-  "Free Wifi",
-  "Restaurant",
-  "Air Conditioning",
-  "Swimming Pool",
-  "Wellness Spa",
-  "24/7 Butler",
-  "Room Service",
-  "Free Parking",
-  "Meeting Lounge",
-  "Locker",
-  "Gym",
-  "Breakfast Included",
-];
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="text-sm font-bold uppercase tracking-wider text-[hsl(var(--adm-muted-foreground))] border-b border-[hsl(var(--adm-border)/0.5)] pb-3 mb-5">
+    <h2 className="text-sm font-bold uppercase text-[hsl(var(--adm-muted-foreground))] border-b border-[hsl(var(--adm-border)/0.5)] pb-3 mb-5">
       {children}
     </h2>
   );
@@ -162,12 +151,12 @@ export default function PropertyFormPage() {
   const [loadError, setLoadError] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [customAmenity, setCustomAmenity] = useState("");
 
   useEffect(() => {
     fetch("/api/admin/cities?limit=100")
       .then((r) => r.json())
-      .then((r) => r.success && setCities(r.data.cities));
+      .then((r) => r.success && setCities(r.data.cities))
+      .catch(() => {});
   }, []);
 
   const fetchProperty = useCallback(async () => {
@@ -198,7 +187,7 @@ export default function PropertyFormPage() {
         email: d.email ?? "",
         whatsapp: d.whatsapp ?? "",
         mapSrc: d.mapSrc ?? "",
-        amenities: Array.isArray(d.amenities) && d.amenities.length > 0 ? d.amenities : ["Free Wifi", "Restaurant"],
+        amenities: Array.isArray(d.amenities) ? d.amenities : [],
         directions: {
           railway: d.directions?.railway ?? "",
           busStand: d.directions?.busStand ?? "",
@@ -209,6 +198,7 @@ export default function PropertyFormPage() {
         },
         hotelCode: d.hotelCode ?? "",
         bookingEngineUrl: d.bookingEngineUrl ?? "",
+        offerPercentage: d.offerPercentage ? String(d.offerPercentage) : "",
         featured: Boolean(d.featured),
         status: d.status ?? "active",
       });
@@ -225,36 +215,6 @@ export default function PropertyFormPage() {
   useEffect(() => {
     fetchProperty();
   }, [fetchProperty]);
-
-  const toggleAmenity = (amenity: string) => {
-    setForm((prev) => {
-      const exists = prev.amenities.includes(amenity);
-      return {
-        ...prev,
-        amenities: exists
-          ? prev.amenities.filter((a) => a !== amenity)
-          : [...prev.amenities, amenity],
-      };
-    });
-  };
-
-  const addCustomAmenity = () => {
-    const trimmed = customAmenity.trim();
-    if (trimmed && !form.amenities.includes(trimmed)) {
-      setForm((prev) => ({
-        ...prev,
-        amenities: [...prev.amenities, trimmed],
-      }));
-      setCustomAmenity("");
-    }
-  };
-
-  const removeAmenity = (amenity: string) => {
-    setForm((prev) => ({
-      ...prev,
-      amenities: prev.amenities.filter((a) => a !== amenity),
-    }));
-  };
 
   const addGalleryImage = (url: string) => {
     if (!url) return;
@@ -289,6 +249,11 @@ export default function PropertyFormPage() {
       setError("Please enter a valid HTTPS booking URL.");
       return;
     }
+    const offerPercentage = form.offerPercentage.trim() === "" ? 0 : Number(form.offerPercentage);
+    if (!Number.isFinite(offerPercentage) || offerPercentage < 0 || offerPercentage > 100) {
+      setError("Offer percentage must be between 0 and 100.");
+      return;
+    }
 
     setSaving(true);
     try {
@@ -310,6 +275,7 @@ export default function PropertyFormPage() {
         directions: form.directions,
         hotelCode: form.hotelCode.trim() || undefined,
         bookingEngineUrl: form.bookingEngineUrl.trim() || undefined,
+        offerPercentage,
         featured: form.featured,
         status: form.status,
       };
@@ -350,7 +316,7 @@ export default function PropertyFormPage() {
           <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
           Back to Properties
         </button>
-        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-[hsl(var(--adm-destructive)/0.3)] bg-[hsl(var(--adm-destructive)/0.06)] px-6 py-16 text-center">
+        <div className="flex flex-col items-center justify-center gap-3 rounded-[8px] border border-[hsl(var(--adm-destructive)/0.3)] bg-[hsl(var(--adm-destructive)/0.06)] px-6 py-16 text-center">
           <AlertTriangle className="h-8 w-8 text-[hsl(var(--adm-destructive))]" />
           <div>
             <p className="text-sm font-semibold text-[hsl(var(--adm-foreground))]">Failed to load this property</p>
@@ -361,8 +327,8 @@ export default function PropertyFormPage() {
           <button
             type="button"
             onClick={() => fetchProperty()}
-            className="mt-2 flex h-10 items-center gap-2 rounded-lg px-5 text-sm font-semibold text-white transition-all"
-            style={{ background: "hsl(var(--adm-primary))" }}
+            className="mt-2 flex h-10 items-center gap-2 rounded-[8px] px-5 text-sm font-semibold text-[hsl(var(--adm-brand-foreground))] transition-all"
+            style={{ background: "hsl(var(--adm-brand))" }}
           >
             <RefreshCw className="h-4 w-4" /> Retry
           </button>
@@ -387,12 +353,12 @@ export default function PropertyFormPage() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: EASE }}
-        className="rounded-2xl border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] shadow-sm overflow-hidden"
+        className="rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] overflow-hidden"
       >
         {/* Header */}
         <div className="px-6 py-5 border-b border-[hsl(var(--adm-border)/0.5)]">
           <div className="flex items-center gap-3">
-            <div className="rounded-xl p-2.5 bg-[hsl(var(--adm-primary)/0.1)]">
+            <div className="rounded-[8px] p-2.5 bg-[hsl(var(--adm-primary)/0.1)]">
               <Building2 className="h-5 w-5 text-[hsl(var(--adm-primary))]" />
             </div>
             <div>
@@ -424,7 +390,7 @@ export default function PropertyFormPage() {
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                   placeholder="e.g. Kattil Executive Stay"
-                  className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                  className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                 />
               </FormField>
 
@@ -436,7 +402,7 @@ export default function PropertyFormPage() {
                 <select
                   value={form.city}
                   onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
-                  className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                  className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                 >
                   <option value="">Select a destination…</option>
                   {cities.map((c) => (
@@ -459,8 +425,8 @@ export default function PropertyFormPage() {
                     key={badge}
                     type="button"
                     onClick={() => setForm((f) => ({ ...f, badge }))}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${form.badge === badge
-                        ? "bg-[hsl(var(--adm-primary))] text-white border-[hsl(var(--adm-primary))]"
+                    className={`px-3 py-1.5 rounded-[8px] text-xs font-medium border transition-colors ${form.badge === badge
+                        ? "bg-[hsl(var(--adm-brand))] text-[hsl(var(--adm-brand-foreground))] border-[hsl(var(--adm-brand))]"
                         : "bg-[hsl(var(--adm-background))] border-[hsl(var(--adm-border))] text-[hsl(var(--adm-foreground))] hover:border-[hsl(var(--adm-primary)/0.5)]"
                       }`}
                   >
@@ -473,7 +439,7 @@ export default function PropertyFormPage() {
                 value={form.badge}
                 onChange={(e) => setForm((f) => ({ ...f, badge: e.target.value }))}
                 placeholder="Or type custom badge, e.g. Boutique Stay, Homestay"
-                className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
               />
               <FieldHint>
                 Displayed above the property name on destination cards (e.g. <em>Homestay</em>, <em>Executive Stay</em>).
@@ -488,7 +454,21 @@ export default function PropertyFormPage() {
                   value={form.tagline}
                   onChange={(e) => setForm((f) => ({ ...f, tagline: e.target.value }))}
                   placeholder="e.g. Your Peaceful Sanctuary in Chennai"
-                  className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                  className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                />
+              </FormField>
+
+              <FormField label="Offer Percentage (%)" hint="Optional. Shown as a badge (e.g. '20% OFF') on the destination stay card. Leave empty or 0 for no offer.">
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  step={1}
+                  inputMode="numeric"
+                  value={form.offerPercentage}
+                  onChange={(e) => setForm((f) => ({ ...f, offerPercentage: e.target.value }))}
+                  placeholder="e.g. 20"
+                  className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                 />
               </FormField>
 
@@ -498,7 +478,7 @@ export default function PropertyFormPage() {
                   value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                   placeholder="Describe the property, atmosphere, and standout features…"
-                  className="flex w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] p-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                  className="flex w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] p-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                 />
               </FormField>
             </div>
@@ -514,7 +494,7 @@ export default function PropertyFormPage() {
                   value={form.address}
                   onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
                   placeholder="Property street address, area, city, pin code"
-                  className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                  className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                 />
               </FormField>
 
@@ -525,7 +505,7 @@ export default function PropertyFormPage() {
                     value={form.phone}
                     onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
                     placeholder="+91 63851 97921"
-                    className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                    className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                   />
                 </FormField>
                 <FormField label="Email">
@@ -534,7 +514,7 @@ export default function PropertyFormPage() {
                     value={form.email}
                     onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
                     placeholder="contact@kattil.in"
-                    className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                    className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                   />
                 </FormField>
                 <FormField label="WhatsApp Number">
@@ -543,7 +523,7 @@ export default function PropertyFormPage() {
                     value={form.whatsapp}
                     onChange={(e) => setForm((f) => ({ ...f, whatsapp: e.target.value }))}
                     placeholder="+916385197921"
-                    className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                    className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                   />
                 </FormField>
               </div>
@@ -554,7 +534,7 @@ export default function PropertyFormPage() {
                   value={form.mapSrc}
                   onChange={(e) => setForm((f) => ({ ...f, mapSrc: e.target.value }))}
                   placeholder="https://maps.google.com/maps?q=..."
-                  className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                  className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                 />
               </FormField>
             </div>
@@ -584,16 +564,16 @@ export default function PropertyFormPage() {
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
                   {form.images.map((img, idx) => (
-                    <div key={idx} className="relative group rounded-xl overflow-hidden border border-[hsl(var(--adm-border))] h-24 bg-[hsl(var(--adm-muted))]">
+                    <div key={idx} className="relative group rounded-[8px] overflow-hidden border border-[hsl(var(--adm-border))] h-24 bg-[hsl(var(--adm-muted))]">
                       <img src={img} alt={`Photo ${idx + 1}`} className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                         {idx === 0 && (
-                          <span className="text-[10px] bg-white text-black px-1.5 py-0.5 rounded font-bold">Cover</span>
+                          <span className="text-[10px] bg-white text-black px-1.5 py-0.5 rounded-[8px] font-bold">Cover</span>
                         )}
                         <button
                           type="button"
                           onClick={() => removeImage(idx)}
-                          className="p-1 rounded bg-[hsl(var(--adm-destructive))] text-white hover:opacity-90"
+                          className="p-1 rounded-[8px] bg-[hsl(var(--adm-destructive))] text-white hover:opacity-90"
                           title="Remove photo"
                         >
                           <X className="w-3.5 h-3.5" />
@@ -617,70 +597,10 @@ export default function PropertyFormPage() {
           {/* Section 4: Amenities */}
           <section>
             <SectionTitle>Amenities & Facilities</SectionTitle>
-            <div className="space-y-3">
-              <div className="flex flex-wrap gap-2">
-                {POPULAR_AMENITIES.map((amenity) => {
-                  const selected = form.amenities.includes(amenity);
-                  return (
-                    <button
-                      key={amenity}
-                      type="button"
-                      onClick={() => toggleAmenity(amenity)}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${selected
-                          ? "bg-[hsl(var(--adm-primary)/0.15)] text-[hsl(var(--adm-primary))] border-[hsl(var(--adm-primary)/0.4)]"
-                          : "bg-[hsl(var(--adm-background))] border-[hsl(var(--adm-border))] text-[hsl(var(--adm-muted-foreground))] hover:border-[hsl(var(--adm-primary)/0.4)]"
-                        }`}
-                    >
-                      {selected && <Check className="w-3.5 h-3.5" />}
-                      {amenity}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="flex gap-2 pt-2">
-                <input
-                  type="text"
-                  value={customAmenity}
-                  onChange={(e) => setCustomAmenity(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addCustomAmenity();
-                    }
-                  }}
-                  placeholder="Add custom amenity (press Enter)..."
-                  className="flex h-9 flex-1 rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-xs text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
-                />
-                <button
-                  type="button"
-                  onClick={addCustomAmenity}
-                  className="px-3.5 py-1.5 rounded-lg bg-[hsl(var(--adm-primary))] text-white text-xs font-semibold hover:opacity-90 transition-opacity flex items-center gap-1"
-                >
-                  <Plus className="w-3.5 h-3.5" /> Add
-                </button>
-              </div>
-
-              {form.amenities.length > 0 && (
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {form.amenities.map((amenity) => (
-                    <span
-                      key={amenity}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[hsl(var(--adm-accent))] text-xs font-medium text-[hsl(var(--adm-foreground))]"
-                    >
-                      {amenity}
-                      <button
-                        type="button"
-                        onClick={() => removeAmenity(amenity)}
-                        className="hover:text-[hsl(var(--adm-destructive))] transition-colors"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
+            <AmenityPicker
+              value={form.amenities}
+              onChange={(amenities) => setForm((prev) => ({ ...prev, amenities }))}
+            />
           </section>
 
           {/* Section 5: Directions / How to Reach */}
@@ -693,7 +613,7 @@ export default function PropertyFormPage() {
                   value={form.directions.railway}
                   onChange={(e) => setForm((f) => ({ ...f, directions: { ...f.directions, railway: e.target.value } }))}
                   placeholder="e.g. Central Station — 18 km"
-                  className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                  className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                 />
               </FormField>
 
@@ -703,7 +623,7 @@ export default function PropertyFormPage() {
                   value={form.directions.busStand}
                   onChange={(e) => setForm((f) => ({ ...f, directions: { ...f.directions, busStand: e.target.value } }))}
                   placeholder="e.g. Thoraipakkam Stop — 500 meters"
-                  className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                  className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                 />
               </FormField>
 
@@ -713,7 +633,7 @@ export default function PropertyFormPage() {
                   value={form.directions.landmark}
                   onChange={(e) => setForm((f) => ({ ...f, directions: { ...f.directions, landmark: e.target.value } }))}
                   placeholder="e.g. Opposite Secretariat Park"
-                  className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                  className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                 />
               </FormField>
 
@@ -723,7 +643,7 @@ export default function PropertyFormPage() {
                   value={form.directions.byCar}
                   onChange={(e) => setForm((f) => ({ ...f, directions: { ...f.directions, byCar: e.target.value } }))}
                   placeholder="e.g. Direct access via OMR"
-                  className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                  className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                 />
               </FormField>
             </div>
@@ -742,7 +662,7 @@ export default function PropertyFormPage() {
                   value={form.hotelCode}
                   onChange={(e) => setForm((f) => ({ ...f, hotelCode: e.target.value }))}
                   placeholder={form.slug ? `e.g. kattil${form.slug.replace(/^kattil-?/, "").replace(/-/g, "")}` : "e.g. kattilchennai, hostelgandhi"}
-                  className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                  className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                 />
               </FormField>
 
@@ -755,7 +675,7 @@ export default function PropertyFormPage() {
                   value={form.bookingEngineUrl}
                   onChange={(e) => setForm((f) => ({ ...f, bookingEngineUrl: e.target.value }))}
                   placeholder={form.slug ? `https://live.ipms247.com/booking/book-rooms-kattil${form.slug.replace(/^kattil-?/, "").replace(/-/g, "")}` : "https://live.ipms247.com/booking/book-rooms-..."}
-                  className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                  className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                 />
               </FormField>
             </div>
@@ -765,7 +685,7 @@ export default function PropertyFormPage() {
           {!isNew && (
             <section>
               <div className="flex items-center justify-between pb-3 mb-4 border-b border-[hsl(var(--adm-border)/0.5)]">
-                <h2 className="text-sm font-bold uppercase tracking-wider text-[hsl(var(--adm-muted-foreground))]">
+                <h2 className="text-sm font-bold uppercase text-[hsl(var(--adm-muted-foreground))]">
                   Rooms in this Property ({rooms.length})
                 </h2>
                 <Link
@@ -777,7 +697,7 @@ export default function PropertyFormPage() {
               </div>
 
               {rooms.length === 0 ? (
-                <div className="p-6 text-center rounded-xl bg-[hsl(var(--adm-muted)/0.5)] border border-[hsl(var(--adm-border)/0.5)]">
+                <div className="p-6 text-center rounded-[8px] bg-[hsl(var(--adm-muted)/0.5)] border border-[hsl(var(--adm-border)/0.5)]">
                   <BedDouble className="mx-auto h-8 w-8 text-[hsl(var(--adm-muted-foreground))] mb-2 opacity-50" />
                   <p className="text-sm font-medium text-[hsl(var(--adm-foreground))]">No rooms assigned yet</p>
                   <p className="text-xs text-[hsl(var(--adm-muted-foreground))] mt-0.5">
@@ -785,7 +705,7 @@ export default function PropertyFormPage() {
                   </p>
                   <Link
                     href={`/admin/rooms/new?property=${id}`}
-                    className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[hsl(var(--adm-primary))] text-white text-xs font-semibold"
+                    className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] bg-[#D2E6BC] text-[#0E2E4E] text-xs font-semibold"
                   >
                     <Plus className="w-3.5 h-3.5" /> Add Room
                   </Link>
@@ -795,9 +715,9 @@ export default function PropertyFormPage() {
                   {rooms.map((room) => (
                     <div
                       key={room._id}
-                      className="flex items-center gap-3 p-3 rounded-xl border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-background))] hover:border-[hsl(var(--adm-primary)/0.5)] transition-colors"
+                      className="flex items-center gap-3 p-3 rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-background))] hover:border-[hsl(var(--adm-primary)/0.5)] transition-colors"
                     >
-                      <div className="w-12 h-12 rounded-lg bg-[hsl(var(--adm-muted))] overflow-hidden shrink-0">
+                      <div className="w-12 h-12 rounded-[8px] bg-[hsl(var(--adm-muted))] overflow-hidden shrink-0">
                         {room.images[0] ? (
                           <img src={room.images[0]} alt={room.name} className="w-full h-full object-cover" />
                         ) : (
@@ -832,11 +752,11 @@ export default function PropertyFormPage() {
                     status: f.status === "active" ? "inactive" : "active",
                   }))
                 }
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.status === "active" ? "bg-[hsl(var(--adm-primary))]" : "bg-[hsl(var(--adm-muted))]"
+                className={`relative inline-flex h-6 w-11 items-center rounded-[8px] transition-colors ${form.status === "active" ? "bg-[hsl(var(--adm-brand))]" : "bg-[hsl(var(--adm-muted))]"
                   }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${form.status === "active" ? "translate-x-6" : "translate-x-1"
+                  className={`inline-block h-4 w-4 rounded-[8px] bg-white transition-transform ${form.status === "active" ? "translate-x-6" : "translate-x-1"
                     }`}
                 />
               </button>
@@ -850,7 +770,7 @@ export default function PropertyFormPage() {
 
           {/* Error Message */}
           {error && (
-            <div className="rounded-xl border border-[hsl(var(--adm-destructive)/0.3)] bg-[hsl(var(--adm-destructive)/0.08)] px-4 py-3">
+            <div className="rounded-[8px] border border-[hsl(var(--adm-destructive)/0.3)] bg-[hsl(var(--adm-destructive)/0.08)] px-4 py-3">
               <p className="text-sm text-[hsl(var(--adm-destructive))]">{error}</p>
             </div>
           )}
@@ -860,7 +780,7 @@ export default function PropertyFormPage() {
             <button
               type="button"
               onClick={() => router.push("/admin/properties")}
-              className="h-10 rounded-lg border border-[hsl(var(--adm-border))] bg-transparent px-5 text-sm font-medium text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors"
+              className="h-10 rounded-[8px] border border-[hsl(var(--adm-border))] bg-transparent px-5 text-sm font-medium text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors"
             >
               Cancel
             </button>
@@ -868,8 +788,8 @@ export default function PropertyFormPage() {
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="flex h-10 items-center gap-2 rounded-lg px-6 text-sm font-semibold text-white transition-all disabled:opacity-60"
-              style={{ background: "hsl(var(--adm-primary))" }}
+              className="flex h-10 items-center gap-2 rounded-[8px] px-6 text-sm font-semibold text-[hsl(var(--adm-brand-foreground))] transition-all disabled:opacity-60"
+              style={{ background: "hsl(var(--adm-brand))" }}
             >
               {saving ? (
                 <>

@@ -43,10 +43,10 @@ function FieldHint({ children }: { children: React.ReactNode }) {
 function SectionLabel({ icon: Icon, children }: { icon: React.ElementType; children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-2 mb-5">
-      <div className="rounded-lg p-1.5 bg-[hsl(var(--adm-primary)/0.1)]">
+      <div className="rounded-[8px] p-1.5 bg-[hsl(var(--adm-primary)/0.1)]">
         <Icon className="h-4 w-4 text-[hsl(var(--adm-primary))]" />
       </div>
-      <span className="text-xs font-bold uppercase tracking-wider text-[hsl(var(--adm-muted-foreground))]">{children}</span>
+      <span className="text-xs font-bold uppercase text-[hsl(var(--adm-muted-foreground))]">{children}</span>
     </div>
   );
 }
@@ -82,7 +82,7 @@ export default function AboutPage() {
 
   if (loading) return (
     <div className="space-y-4">
-      {[...Array(3)].map((_, i) => <div key={i} className="h-40 rounded-2xl adm-skeleton" />)}
+      {[...Array(3)].map((_, i) => <div key={i} className="h-40 rounded-[8px] adm-skeleton" />)}
     </div>
   );
 
@@ -183,7 +183,7 @@ export default function AboutPage() {
                     aspectRatio="aspect-[3/1]"
                   />
                   <div className="mt-2 flex items-center gap-2">
-                    <span className="inline-flex items-center rounded-md bg-[hsl(var(--adm-accent)/0.6)] px-2 py-0.5 text-[10px] font-semibold text-[hsl(var(--adm-foreground))]">
+                    <span className="inline-flex items-center rounded-[8px] bg-[hsl(var(--adm-accent)/0.6)] px-2 py-0.5 text-[10px] font-semibold text-[hsl(var(--adm-foreground))]">
                       Recommended: 900 × 600 px
                     </span>
                     <span className="text-xs text-[hsl(var(--adm-muted-foreground))]">Landscape · 3:2 ratio</span>
@@ -201,7 +201,7 @@ export default function AboutPage() {
                     aspectRatio="aspect-[1/1]"
                   />
                   <div className="mt-2 flex items-center gap-2">
-                    <span className="inline-flex items-center rounded-md bg-[hsl(var(--adm-accent)/0.6)] px-2 py-0.5 text-[10px] font-semibold text-[hsl(var(--adm-foreground))]">
+                    <span className="inline-flex items-center rounded-[8px] bg-[hsl(var(--adm-accent)/0.6)] px-2 py-0.5 text-[10px] font-semibold text-[hsl(var(--adm-foreground))]">
                       Recommended: 400 × 400 px
                     </span>
                     <span className="text-xs text-[hsl(var(--adm-muted-foreground))]">Square · 1:1 ratio</span>
@@ -218,7 +218,7 @@ export default function AboutPage() {
           <AdminCard>
             <AdminCardHeader>
               <div className="flex items-center gap-3">
-                <div className="rounded-lg p-1.5 bg-[hsl(var(--adm-primary)/0.1)]">
+                <div className="rounded-[8px] p-1.5 bg-[hsl(var(--adm-primary)/0.1)]">
                   <Search className="h-4 w-4 text-[hsl(var(--adm-primary))]" />
                 </div>
                 <div>
@@ -228,7 +228,7 @@ export default function AboutPage() {
               </div>
             </AdminCardHeader>
             <AdminCardContent>
-              <div className="rounded-xl bg-[hsl(var(--adm-accent)/0.35)] px-4 py-3 mb-5">
+              <div className="rounded-[8px] bg-[hsl(var(--adm-accent)/0.35)] px-4 py-3 mb-5">
                 <p className="text-xs text-[hsl(var(--adm-muted-foreground))] leading-relaxed">
                   Controls how the About Us page appears in Google results and social media previews. Leave blank to inherit site-wide defaults from <strong>Settings → Default SEO</strong>.
                 </p>
@@ -282,7 +282,7 @@ export default function AboutPage() {
                   <img
                     src={data.seo.ogImage}
                     alt="OG preview"
-                    className="mt-1 h-24 w-full rounded-xl object-cover border border-[hsl(var(--adm-border))]"
+                    className="mt-1 h-24 w-full rounded-[8px] object-cover border border-[hsl(var(--adm-border))]"
                   />
                 )}
               </div>

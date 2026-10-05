@@ -4,7 +4,9 @@ import Room from "@/lib/models/Room";
 import Property from "@/lib/models/Property";
 import City from "@/lib/models/City";
 import Gallery from "@/lib/models/Gallery";
-import { PropertyDetailsData, PropertyRoomOption } from "@/components/section/rooms/PropertyDetailsView";
+import Amenity from "@/lib/models/Amenity";
+import { exactNameRegex } from "@/lib/amenities";
+import { PropertyAmenity, PropertyDetailsData, PropertyRoomOption } from "@/components/section/rooms/PropertyDetailsView";
 import { locationRooms } from "@/lib/data";
 
 interface CityConfig {
@@ -148,6 +150,22 @@ function getFallbackRoomOptions(citySlug: string): PropertyRoomOption[] {
   ];
 }
 
+// Resolves the amenity names saved on a Property (`amenities: string[]`) to
+// display items, taking each icon from the Amenity catalog. Names with no
+// catalog entry are still returned (without an icon) rather than dropped.
+async function resolvePropertyAmenities(names: unknown): Promise<PropertyAmenity[]> {
+  const list = Array.isArray(names)
+    ? names.filter((n): n is string => typeof n === "string" && n.trim() !== "").map((n) => n.trim())
+    : [];
+  if (list.length === 0) return [];
+
+  const catalog = await Amenity.find({ name: { $in: list.map(exactNameRegex) } })
+    .select("name icon")
+    .lean();
+  const iconByName = new Map(catalog.map((a) => [a.name.trim().toLowerCase(), a.icon]));
+  return list.map((name) => ({ name, icon: iconByName.get(name.toLowerCase()) }));
+}
+
 // In-memory cache with 60-second TTL
 const propertyDetailsCache = new Map<string, { data: PropertyDetailsData; timestamp: number }>();
 const roomsPageCache = new Map<string, { data: RoomsPageData; timestamp: number }>();
@@ -258,6 +276,7 @@ export const getPropertyDetailsData = cache(async function getPropertyDetailsDat
         email: property.email || city?.email || cityConfig.email,
         whatsapp: property.whatsapp,
         directions: property.directions,
+        amenities: await resolvePropertyAmenities(property.amenities),
         rooms: [],
         entityFound: true,
       };
@@ -501,6 +520,7 @@ export const getPropertyDetailsData = cache(async function getPropertyDetailsDat
       hotelCode: property?.hotelCode,
       bookingEngineUrl: property?.bookingEngineUrl,
       directions: property?.directions,
+      amenities: await resolvePropertyAmenities(property?.amenities),
       rooms: roomOptions,
       entityFound: matchedEntity,
     };

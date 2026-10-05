@@ -57,7 +57,7 @@ const FALLBACK_BLOGS: BlogPost[] = [
     title: "Wellness, Reimagined",
     category: "Wellness",
     excerpt: "Holistic self-care routines, mindful rituals, and rejuvenating spaces crafted for modern travellers.",
-    image: "/assets/gallery.png",
+    image: "/assets/gallery.webp",
     readTime: "7 min read",
     date: "August 12",
     featured: false,

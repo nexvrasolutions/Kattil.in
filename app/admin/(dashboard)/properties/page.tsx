@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import AdminPagination from "@/components/admin/ui/AdminPagination";
 import { AdminCard } from "@/components/admin/ui/AdminCard";
-import AdminBadge from "@/components/admin/ui/AdminBadge";
+// import AdminBadge from "@/components/admin/ui/AdminBadge";
 import AdminButton from "@/components/admin/ui/AdminButton";
 import PageHeader from "@/components/admin/ui/PageHeader";
 import ConfirmDialog from "@/components/admin/ui/ConfirmDialog";
@@ -66,37 +66,36 @@ function StatusChanger({ property, onChanged }: { property: PropertyItem; onChan
       <button
         onClick={() => setOpen((v) => !v)}
         disabled={saving}
-        className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold transition-colors hover:opacity-80"
+        className="inline-flex items-center gap-1.5 rounded-[8px] px-2.5 py-1 text-xs font-semibold transition-colors hover:opacity-80"
         style={{
           background:
             property.status === "active"
               ? "hsl(142 76% 36% / 0.12)"
               : property.status === "maintenance"
-              ? "hsl(38 92% 50% / 0.12)"
-              : "hsl(var(--adm-muted))",
+                ? "hsl(38 92% 50% / 0.12)"
+                : "hsl(var(--adm-muted))",
           color:
             property.status === "active"
               ? "hsl(142 76% 30%)"
               : property.status === "maintenance"
-              ? "hsl(38 80% 35%)"
-              : "hsl(var(--adm-muted-foreground))",
+                ? "hsl(38 80% 35%)"
+                : "hsl(var(--adm-muted-foreground))",
         }}
       >
-        <span className="h-1.5 w-1.5 rounded-full" style={{ background: "currentColor" }} />
+        <span className="h-1.5 w-1.5 rounded-[8px]" style={{ background: "currentColor" }} />
         {statusLabel[property.status] || "Active"}
         <span className="opacity-50">▾</span>
       </button>
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 top-full mt-1 z-50 w-40 rounded-xl border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] py-1 shadow-xl">
+          <div className="absolute left-0 top-full mt-1 z-50 w-40 rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] py-1">
             {(["active", "inactive", "maintenance"] as const).map((s) => (
               <button
                 key={s}
                 onClick={() => change(s)}
-                className={`flex w-full items-center gap-2 px-3 py-2 text-xs font-medium transition-colors hover:bg-[hsl(var(--adm-accent)/0.5)] ${
-                  property.status === s ? "text-[hsl(var(--adm-primary))]" : "text-[hsl(var(--adm-foreground))]"
-                }`}
+                className={`flex w-full items-center gap-2 px-3 py-2 text-xs font-medium transition-colors hover:bg-[hsl(var(--adm-accent)/0.5)] ${property.status === s ? "text-[hsl(var(--adm-primary))]" : "text-[hsl(var(--adm-foreground))]"
+                  }`}
               >
                 {property.status === s && <Check className="h-3 w-3" />}
                 {property.status !== s && <span className="h-3 w-3" />}
@@ -182,24 +181,21 @@ export default function PropertiesPage() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: EASE }}
-        className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4"
+        className="mb-6 grid grid-cols-2 gap-16 sm:grid-cols-4"
       >
         {[
-          { label: "Total Properties", value: total, icon: Building2, color: "hsl(var(--adm-primary))" },
-          { label: "Active", value: activeCount, icon: Check, color: "hsl(var(--adm-success))" },
-          { label: "Featured", value: featuredCount, icon: Star, color: "hsl(var(--adm-warning))" },
-          { label: "Inactive", value: total - activeCount, icon: StarOff, color: "hsl(var(--adm-destructive))" },
-        ].map(({ label, value, icon: Icon, color }) => (
-          <AdminCard key={label} className="rounded-2xl!">
-            <div className="flex items-center justify-between p-4">
+          { label: "Total Properties", value: total, color: "hsl(var(--adm-primary))" },
+          { label: "Active", value: activeCount, color: "hsl(var(--adm-success))" },
+          { label: "Featured", value: featuredCount, color: "hsl(var(--adm-warning))" },
+          { label: "Inactive", value: total - activeCount, color: "hsl(var(--adm-destructive))" },
+        ].map(({ label, value, color }) => (
+          <AdminCard key={label} className="rounded-[8px]!">
+            <div className="flex items-center justify-between p-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-[hsl(var(--adm-muted-foreground))]">
+                <p className="text-xs font-semibold uppercase text-[hsl(var(--adm-muted-foreground))]">
                   {label}
                 </p>
                 <p className="mt-1 text-2xl font-bold text-[hsl(var(--adm-card-foreground))]">{value}</p>
-              </div>
-              <div className="rounded-xl p-2.5" style={{ background: `${color}20` }}>
-                <Icon className="h-5 w-5" style={{ color }} />
               </div>
             </div>
           </AdminCard>
@@ -218,7 +214,7 @@ export default function PropertiesPage() {
                 setPage(1);
               }}
               placeholder="Search properties by name…"
-              className="flex h-10 w-full rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] pl-9 pr-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+              className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] pl-9 pr-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] !outline-none !ring-0 focus:!outline-none focus:!ring-0 focus:!border-[hsl(var(--adm-input))]"
             />
           </div>
           <select
@@ -227,7 +223,7 @@ export default function PropertiesPage() {
               setFilterCity(e.target.value);
               setPage(1);
             }}
-            className="h-10 rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+            className="h-10 shrink-0 sm:w-[188px] rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] !outline-none !ring-0 focus:!outline-none focus:!ring-0 focus:!border-[hsl(var(--adm-input))]"
           >
             <option value="">All Destinations</option>
             {cities.map((c) => (
@@ -242,8 +238,7 @@ export default function PropertiesPage() {
               setFilterStatus(e.target.value);
               setPage(1);
             }}
-            className="h-10 rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
-          >
+            className="h-10 shrink-0 sm:w-[188px] rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus:!border-[hsl(var(--adm-input))] focus:!outline-none focus:!ring-0 focus:!shadow-none"          >
             <option value="">All Statuses</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
@@ -264,25 +259,23 @@ export default function PropertiesPage() {
           )}
 
           {/* View toggle */}
-          <div className="flex items-center gap-1 ml-auto rounded-lg border border-[hsl(var(--adm-border))] p-0.5">
+          <div className="flex items-center gap-1 ml-auto rounded-[8px] border border-[hsl(var(--adm-border))] p-0.5">
             <button
               onClick={() => setViewMode("list")}
-              className={`flex h-8 w-8 items-center justify-center rounded-md transition-colors ${
-                viewMode === "list"
-                  ? "bg-[hsl(var(--adm-primary))] text-white"
-                  : "text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))]"
-              }`}
+              className={`flex h-8 w-8 items-center justify-center rounded-[8px] transition-colors ${viewMode === "list"
+                ? "bg-[hsl(var(--adm-brand))] text-[hsl(var(--adm-brand-foreground))]"
+                : "text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))]"
+                }`}
               title="List view"
             >
               <List className="h-4 w-4" />
             </button>
             <button
               onClick={() => setViewMode("grid")}
-              className={`flex h-8 w-8 items-center justify-center rounded-md transition-colors ${
-                viewMode === "grid"
-                  ? "bg-[hsl(var(--adm-primary))] text-white"
-                  : "text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))]"
-              }`}
+              className={`flex h-8 w-8 items-center justify-center rounded-[8px] transition-colors ${viewMode === "grid"
+                ? "bg-[hsl(var(--adm-brand))] text-[hsl(var(--adm-brand-foreground))]"
+                : "text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))]"
+                }`}
               title="Grid view"
             >
               <LayoutGrid className="h-4 w-4" />
@@ -297,7 +290,7 @@ export default function PropertiesPage() {
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-48 rounded-2xl adm-skeleton" />
+                <div key={i} className="h-48 rounded-[8px] adm-skeleton" />
               ))}
             </div>
           ) : properties.length === 0 ? (
@@ -338,7 +331,7 @@ export default function PropertiesPage() {
                     </div>
                     {property.city && (
                       <div className="absolute bottom-2.5 left-2.5">
-                        <span className="rounded-lg bg-black/60 backdrop-blur-sm px-2.5 py-1 text-xs font-semibold text-white">
+                        <span className="rounded-[8px] bg-black/60 backdrop-blur-sm px-2.5 py-1 text-xs font-semibold text-white">
                           {property.city.name}
                         </span>
                       </div>
@@ -347,7 +340,7 @@ export default function PropertiesPage() {
                   <div className="p-4 flex-1 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[11px] font-semibold uppercase tracking-wider text-[hsl(var(--adm-primary))]">
+                        <span className="text-[11px] font-semibold uppercase text-[hsl(var(--adm-primary))]">
                           {property.badge || "Property"}
                         </span>
                       </div>
@@ -371,20 +364,20 @@ export default function PropertiesPage() {
                         <Link
                           href={`/properties/${property.slug}`}
                           target="_blank"
-                          className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-foreground))]"
+                          className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-foreground))]"
                           title="View on site"
                         >
                           <ExternalLink className="h-4 w-4" />
                         </Link>
                         <Link
                           href={`/admin/properties/${property._id}`}
-                          className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-foreground))]"
+                          className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-foreground))]"
                         >
                           <Pencil className="h-4 w-4" />
                         </Link>
                         <button
                           onClick={() => setDeleteId(property._id)}
-                          className="rounded-lg p-1.5 text-[hsl(var(--adm-destructive))] hover:bg-[hsl(var(--adm-destructive)/0.1)]"
+                          className="rounded-[8px] p-1.5 text-[hsl(var(--adm-destructive))] hover:bg-[hsl(var(--adm-destructive)/0.1)]"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -438,7 +431,7 @@ export default function PropertiesPage() {
                     <tr key={property._id} className="hover:bg-[hsl(var(--adm-accent)/0.3)] transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-[hsl(var(--adm-muted))]">
+                          <div className="h-12 w-16 shrink-0 overflow-hidden rounded-[8px] bg-[hsl(var(--adm-muted))]">
                             {property.images[0] ? (
                               <img src={property.images[0]} alt={property.name} className="h-full w-full object-cover" />
                             ) : (
@@ -455,7 +448,7 @@ export default function PropertiesPage() {
                       </td>
                       <td className="px-4 py-3">
                         {property.city ? (
-                          <AdminBadge variant="outline">{property.city.name}</AdminBadge>
+                          <span className="text-xs font-semibold text-[#000000]">{property.city.name}</span>
                         ) : (
                           <span className="text-xs text-[hsl(var(--adm-muted-foreground))]">—</span>
                         )}
@@ -468,7 +461,7 @@ export default function PropertiesPage() {
                           href={`/admin/rooms?property=${property._id}`}
                           className="inline-flex items-center gap-1 text-xs font-semibold text-[hsl(var(--adm-primary))] hover:underline"
                         >
-                          <BedDouble className="h-3.5 w-3.5" />
+
                           {property.roomCount ?? 0} {property.roomCount === 1 ? "room" : "rooms"}
                         </Link>
                       </td>
@@ -480,20 +473,20 @@ export default function PropertiesPage() {
                           <Link
                             href={`/properties/${property.slug}`}
                             target="_blank"
-                            className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-foreground))]"
+                            className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-foreground))]"
                             title="View on site"
                           >
                             <ExternalLink className="h-4 w-4" />
                           </Link>
                           <Link
                             href={`/admin/properties/${property._id}`}
-                            className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-foreground))]"
+                            className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-foreground))]"
                           >
                             <Pencil className="h-4 w-4" />
                           </Link>
                           <button
                             onClick={() => setDeleteId(property._id)}
-                            className="rounded-lg p-1.5 text-[hsl(var(--adm-destructive))] hover:bg-[hsl(var(--adm-destructive)/0.1)]"
+                            className="rounded-[8px] p-1.5 text-[hsl(var(--adm-destructive))] hover:bg-[hsl(var(--adm-destructive)/0.1)]"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>

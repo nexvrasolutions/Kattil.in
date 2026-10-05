@@ -29,6 +29,7 @@ export interface IProperty extends Document {
   directions?: IPropertyDirections;
   hotelCode?: string; // Booking API Hotel/PMS Code (e.g. "kattilchennai", "kattil")
   bookingEngineUrl?: string; // Custom Let's Book / Booking Engine URL
+  offerPercentage?: number; // Discount shown on stay cards; 0 = no offer
   featured: boolean;
   order: number;
   status: "active" | "inactive" | "maintenance";
@@ -88,6 +89,12 @@ const propertySchema = new Schema<IProperty>(
         validator: (v: string) => !v || isValidHttpsUrl(v),
         message: "Please enter a valid HTTPS booking URL",
       },
+    },
+    offerPercentage: {
+      type: Number,
+      default: 0,
+      min: [0, "Offer percentage cannot be below 0"],
+      max: [100, "Offer percentage cannot exceed 100"],
     },
     featured: { type: Boolean, default: false },
     status: {

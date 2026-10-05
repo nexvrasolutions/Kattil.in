@@ -222,7 +222,7 @@ export default function BookingApiAdminPage() {
   if (loadError) {
     return (
       <div className="max-w-7xl mx-auto pb-16">
-        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-[hsl(var(--adm-destructive)/0.3)] bg-[hsl(var(--adm-destructive)/0.06)] px-6 py-16 text-center">
+        <div className="flex flex-col items-center justify-center gap-3 rounded-[8px] border border-[hsl(var(--adm-destructive)/0.3)] bg-[hsl(var(--adm-destructive)/0.06)] px-6 py-16 text-center">
           <AlertTriangle className="h-8 w-8 text-[hsl(var(--adm-destructive))]" />
           <div>
             <p className="text-sm font-semibold text-[hsl(var(--adm-foreground))]">Failed to load booking API configuration</p>
@@ -233,8 +233,8 @@ export default function BookingApiAdminPage() {
           <button
             type="button"
             onClick={() => fetchData()}
-            className="mt-2 flex h-10 items-center gap-2 rounded-lg px-5 text-sm font-semibold text-white transition-all"
-            style={{ background: "hsl(var(--adm-primary))" }}
+            className="mt-2 flex h-10 items-center gap-2 rounded-[8px] px-5 text-sm font-semibold text-[hsl(var(--adm-brand-foreground))] transition-all"
+            style={{ background: "hsl(var(--adm-brand))" }}
           >
             <RefreshCw className="h-4 w-4" /> Retry
           </button>
@@ -255,9 +255,9 @@ export default function BookingApiAdminPage() {
       <div className="flex items-center gap-2 border-b border-[hsl(var(--adm-border)/0.6)] pb-2 overflow-x-auto">
         <button
           onClick={() => setActiveTab("global")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-[8px] text-sm font-semibold transition-all cursor-pointer ${
             activeTab === "global"
-              ? "bg-[hsl(var(--adm-primary))] text-white shadow-xs"
+              ? "bg-[hsl(var(--adm-brand))] text-[hsl(var(--adm-brand-foreground))]"
               : "text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-muted)/0.5)]"
           }`}
         >
@@ -266,9 +266,9 @@ export default function BookingApiAdminPage() {
         </button>
         <button
           onClick={() => setActiveTab("properties")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-[8px] text-sm font-semibold transition-all cursor-pointer ${
             activeTab === "properties"
-              ? "bg-[hsl(var(--adm-primary))] text-white shadow-xs"
+              ? "bg-[hsl(var(--adm-brand))] text-[hsl(var(--adm-brand-foreground))]"
               : "text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-muted)/0.5)]"
           }`}
         >
@@ -277,9 +277,9 @@ export default function BookingApiAdminPage() {
         </button>
         <button
           onClick={() => setActiveTab("rooms")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-[8px] text-sm font-semibold transition-all cursor-pointer ${
             activeTab === "rooms"
-              ? "bg-[hsl(var(--adm-primary))] text-white shadow-xs"
+              ? "bg-[hsl(var(--adm-brand))] text-[hsl(var(--adm-brand-foreground))]"
               : "text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-muted)/0.5)]"
           }`}
         >
@@ -288,9 +288,9 @@ export default function BookingApiAdminPage() {
         </button>
         <button
           onClick={() => setActiveTab("docs")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-[8px] text-sm font-semibold transition-all cursor-pointer ${
             activeTab === "docs"
-              ? "bg-[hsl(var(--adm-primary))] text-white shadow-xs"
+              ? "bg-[hsl(var(--adm-brand))] text-[hsl(var(--adm-brand-foreground))]"
               : "text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-muted)/0.5)]"
           }`}
         >
@@ -310,11 +310,11 @@ export default function BookingApiAdminPage() {
           <form onSubmit={handleSaveGlobal} className="space-y-6">
             <AdminCard>
               <AdminCardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[hsl(var(--adm-primary)/0.1)] flex items-center justify-center text-[hsl(var(--adm-primary))]">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 rounded-[8px] bg-[hsl(var(--adm-primary)/0.1)] flex items-center justify-center text-[hsl(var(--adm-primary))]">
                     <Globe className="w-5 h-5" />
                   </div>
-                  <div>
+                  <div className="flex flex-col gap-1">
                     <AdminCardTitle>Booking Engine Provider Configuration</AdminCardTitle>
                     <AdminCardDescription>
                       Default booking engine provider and base URL for all dynamic booking bars.
@@ -331,7 +331,7 @@ export default function BookingApiAdminPage() {
                     <select
                       value={settings.provider}
                       onChange={(e) => setSettings({ ...settings, provider: e.target.value })}
-                      className="w-full h-10 px-3 rounded-lg border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] text-sm font-medium text-[hsl(var(--adm-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--adm-primary))]"
+                      className="w-full h-11 px-3 rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] text-sm font-medium text-[hsl(var(--adm-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--adm-primary))]"
                     >
                       <option value="eZee / IPMS247">eZee / IPMS247</option>
                       <option value="LetsBook">LetsBook</option>
@@ -362,8 +362,8 @@ export default function BookingApiAdminPage() {
                     onChange={(e) => setSettings({ ...settings, baseUrl: e.target.value })}
                     placeholder="https://live.ipms247.com/booking/book-rooms-"
                   />
-                  <p className="text-[11.5px] text-[hsl(var(--adm-muted-foreground))] mt-1">
-                    The property hotel code is appended to this URL when a guest clicks "Check Availability" (e.g. <code className="bg-[hsl(var(--adm-muted)/0.5)] px-1 py-0.5 rounded">https://live.ipms247.com/booking/book-rooms-kattilchennai</code>).
+                  <p className="text-[11.5px] text-[hsl(var(--adm-muted-foreground))] mt-1.5">
+                    The property hotel code is appended to this URL when a guest clicks "Check Availability" (e.g. <code className="bg-[hsl(var(--adm-muted)/0.5)] px-1 py-0.5 rounded-[8px]">https://live.ipms247.com/booking/book-rooms-kattilchennai</code>).
                   </p>
                 </div>
 
@@ -382,7 +382,7 @@ export default function BookingApiAdminPage() {
                         href={settings.globalBookingUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-3.5 h-10 rounded-lg border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-muted)/0.5)] hover:bg-[hsl(var(--adm-muted))] flex items-center justify-center text-[hsl(var(--adm-foreground))] transition-colors shrink-0"
+                        className="px-3.5 h-11 rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-muted)/0.5)] hover:bg-[hsl(var(--adm-muted))] flex items-center justify-center text-[hsl(var(--adm-foreground))] transition-colors shrink-0"
                         title="Test global link"
                       >
                         <ExternalLink className="w-4 h-4" />
@@ -395,11 +395,11 @@ export default function BookingApiAdminPage() {
 
             <AdminCard>
               <AdminCardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[hsl(var(--adm-primary)/0.1)] flex items-center justify-center text-[hsl(var(--adm-primary))]">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 rounded-[8px] bg-[hsl(var(--adm-primary)/0.1)] flex items-center justify-center text-[hsl(var(--adm-primary))]">
                     <Shield className="w-5 h-5" />
                   </div>
-                  <div>
+                  <div className="flex flex-col gap-1">
                     <AdminCardTitle>Booking API Credentials (Optional)</AdminCardTitle>
                     <AdminCardDescription>
                       For automated availability queries, channel manager sync, or custom webhook integrations.
@@ -407,7 +407,7 @@ export default function BookingApiAdminPage() {
                   </div>
                 </div>
               </AdminCardHeader>
-              <AdminCardContent className="space-y-4">
+              <AdminCardContent className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-xs font-semibold text-[hsl(var(--adm-foreground))] mb-1.5">
@@ -478,7 +478,7 @@ export default function BookingApiAdminPage() {
                       {/* Property Info */}
                       <div className="min-w-[220px]">
                         <div className="flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-full bg-[hsl(var(--adm-primary)/0.1)] text-[hsl(var(--adm-primary))] text-xs font-bold flex items-center justify-center">
+                          <span className="w-6 h-6 rounded-[8px] bg-[hsl(var(--adm-primary)/0.1)] text-[hsl(var(--adm-primary))] text-xs font-bold flex items-center justify-center">
                             {idx + 1}
                           </span>
                           <h4 className="text-[15px] font-bold text-[hsl(var(--adm-foreground))]">
@@ -533,7 +533,7 @@ export default function BookingApiAdminPage() {
                           href={effectiveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="h-10 px-3.5 rounded-lg border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] hover:bg-[hsl(var(--adm-muted)/0.5)] flex items-center gap-1.5 text-xs font-semibold text-[hsl(var(--adm-foreground))] transition-colors"
+                          className="h-10 px-3.5 rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] hover:bg-[hsl(var(--adm-muted)/0.5)] flex items-center gap-1.5 text-xs font-semibold text-[hsl(var(--adm-foreground))] transition-colors"
                           title="Open and test booking engine link"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
@@ -643,7 +643,7 @@ export default function BookingApiAdminPage() {
                             href={room.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="h-9 px-3 rounded-lg border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] hover:bg-[hsl(var(--adm-muted)/0.5)] flex items-center gap-1.5 text-xs font-semibold text-[hsl(var(--adm-foreground))] transition-colors"
+                            className="h-9 px-3 rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] hover:bg-[hsl(var(--adm-muted)/0.5)] flex items-center gap-1.5 text-xs font-semibold text-[hsl(var(--adm-foreground))] transition-colors"
                             title="Test room booking link"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
@@ -684,19 +684,19 @@ export default function BookingApiAdminPage() {
         >
           <AdminCard>
             <AdminCardHeader>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[hsl(var(--adm-primary)/0.1)] flex items-center justify-center text-[hsl(var(--adm-primary))]">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 shrink-0 rounded-[8px] bg-[hsl(var(--adm-primary)/0.1)] flex items-center justify-center text-[hsl(var(--adm-primary))]">
                   <Code className="w-5 h-5" />
                 </div>
-                <div>
-                  <AdminCardTitle>Public REST API Endpoints</AdminCardTitle>
+                <div className="min-w-0 space-y-1">
+                  <AdminCardTitle className="leading-tight">Public REST API Endpoints</AdminCardTitle>
                   <AdminCardDescription>
                     These public endpoints provide live destinations, properties, rooms, and booking links for mobile apps or external integrations.
                   </AdminCardDescription>
                 </div>
               </div>
             </AdminCardHeader>
-            <AdminCardContent className="space-y-4">
+            <AdminCardContent className="space-y-3">
               {[
                 {
                   method: "GET",
@@ -721,16 +721,16 @@ export default function BookingApiAdminPage() {
               ].map((api, i) => (
                 <div
                   key={i}
-                  className="p-3.5 rounded-xl border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] flex items-center justify-between gap-4"
+                  className="p-3.5 rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] flex items-center justify-between gap-4"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="px-2 py-0.5 text-[11px] font-bold rounded-md bg-[hsl(var(--adm-primary)/0.12)] text-[hsl(var(--adm-primary))]">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="shrink-0 px-2 py-0.5 text-[11px] leading-4 font-bold rounded-[8px] bg-[hsl(var(--adm-primary)/0.12)] text-[hsl(var(--adm-primary))]">
                       {api.method}
                     </span>
-                    <code className="text-xs font-mono font-bold text-[hsl(var(--adm-foreground))]">
+                    <code className="shrink-0 text-xs leading-4 font-bold text-[hsl(var(--adm-foreground))]">
                       {api.path}
                     </code>
-                    <span className="text-xs text-[hsl(var(--adm-muted-foreground))] hidden sm:inline">
+                    <span className="text-xs leading-4 text-[hsl(var(--adm-muted-foreground))] hidden sm:inline">
                       — {api.desc}
                     </span>
                   </div>
@@ -738,7 +738,7 @@ export default function BookingApiAdminPage() {
                   <button
                     type="button"
                     onClick={() => copyToClipboard(api.path, api.path)}
-                    className="h-8 px-2.5 rounded-lg border border-[hsl(var(--adm-border))] text-xs font-semibold text-[hsl(var(--adm-muted-foreground))] hover:text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-muted)/0.5)] flex items-center gap-1 transition-colors cursor-pointer"
+                    className="shrink-0 h-8 px-2.5 rounded-[8px] border border-[hsl(var(--adm-border))] text-xs font-semibold text-[hsl(var(--adm-muted-foreground))] hover:text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-muted)/0.5)] flex items-center gap-1 transition-colors cursor-pointer"
                   >
                     {copiedEndpoint === api.path ? (
                       <>

@@ -57,13 +57,6 @@ function slugify(s: string) {
   return s.toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/[\s_-]+/g, "-").replace(/^-+|-+$/g, "");
 }
 
-const GRADIENT_PAIRS = [
-  "from-[#0d1b2e] to-[#3a5535]",       // deep navy → dark sage
-  "from-[#526442] to-[#9CAF88]",        // dark sage → sage green
-  "from-[#162840] to-[#526442]",        // medium navy → sage
-  "from-[#3d6080] to-[#9CAF88]",        // mid navy → sage green
-];
-
 export default function DestinationsPage() {
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [loading, setLoading] = useState(true);
@@ -157,7 +150,7 @@ export default function DestinationsPage() {
       {loading ? (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-64 rounded-3xl adm-skeleton" />
+            <div key={i} className="h-64 rounded-[8px] adm-skeleton" />
           ))}
         </div>
       ) : destinations.length === 0 ? (
@@ -165,7 +158,7 @@ export default function DestinationsPage() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: EASE }}
-          className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-[hsl(var(--adm-border))] py-24"
+          className="flex flex-col items-center justify-center rounded-[8px] border border-dashed border-[hsl(var(--adm-border))] py-24"
         >
           <Building className="h-16 w-16 text-[hsl(var(--adm-muted-foreground)/0.3)] mb-4" />
           <p className="text-lg font-semibold text-[hsl(var(--adm-foreground))]">No destinations yet</p>
@@ -183,7 +176,7 @@ export default function DestinationsPage() {
           variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
           className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3"
         >
-          {destinations.map((dest, i) => (
+          {destinations.map((dest) => (
             <motion.div
               key={dest._id}
               variants={{
@@ -196,19 +189,10 @@ export default function DestinationsPage() {
               <AdminCard className="overflow-hidden h-full flex flex-col justify-between">
                 <div>
                   {/* Banner / Cover */}
-                  <div className={`relative h-36 bg-gradient-to-br ${GRADIENT_PAIRS[i % GRADIENT_PAIRS.length]}`}>
-                    {dest.banner && (
-                      <img
-                        src={dest.banner}
-                        alt={dest.name}
-                        className="absolute inset-0 h-full w-full object-cover opacity-60"
-                      />
-                    )}
-                    <div className="absolute inset-0 bg-black/25" />
-
+                  <div className="relative h-36 bg-[#0E2E4E]">
                     {/* Thumbnail floating preview */}
                     <div className="absolute bottom-3 left-4 flex items-center gap-3">
-                      <div className="h-14 w-14 rounded-xl border-2 border-white/40 overflow-hidden bg-white/20 shadow-md backdrop-blur-sm shrink-0">
+                      <div className="h-14 w-14 rounded-[8px] border-2 border-white/40 overflow-hidden bg-white/20 backdrop-blur-sm shrink-0">
                         {dest.image || dest.banner ? (
                           <img
                             src={dest.image || dest.banner}
@@ -222,11 +206,11 @@ export default function DestinationsPage() {
                         )}
                       </div>
                       <div>
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-white/90 drop-shadow-sm">
+                        <span className="text-[11px] font-bold uppercase text-white/90">
                           /{dest.slug}
                         </span>
                         {dest.link && (
-                          <p className="text-[10.5px] text-white/70 flex items-center gap-1 font-mono">
+                          <p className="text-[10.5px] text-white/70 flex items-center gap-1">
                             <ExternalLink className="h-2.5 w-2.5" />
                             {dest.link}
                           </p>
@@ -238,14 +222,14 @@ export default function DestinationsPage() {
                     <div className="absolute right-3 top-3 flex items-center gap-1.5 opacity-0 transition-opacity group-hover:opacity-100">
                       <button
                         onClick={() => openEdit(dest)}
-                        className="rounded-lg bg-white/90 p-1.5 text-[hsl(var(--adm-foreground))] shadow-sm hover:bg-white transition-colors"
+                        className="rounded-[8px] bg-white/90 p-1.5 text-[hsl(var(--adm-foreground))] hover:bg-white transition-colors"
                         title="Edit"
                       >
                         <Pencil className="h-3.5 w-3.5" />
                       </button>
                       <button
                         onClick={() => setDeleteId(dest._id)}
-                        className="rounded-lg bg-white/90 p-1.5 text-[hsl(var(--adm-destructive))] shadow-sm hover:bg-white transition-colors"
+                        className="rounded-[8px] bg-white/90 p-1.5 text-[hsl(var(--adm-destructive))] hover:bg-white transition-colors"
                         title="Delete"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -257,7 +241,7 @@ export default function DestinationsPage() {
                   <div className="p-5">
                     <div className="flex items-start justify-between gap-3 mb-1.5">
                       <div>
-                        <h3 className="text-xl font-bold text-[hsl(var(--adm-card-foreground))] font-serif">
+                        <h3 className="text-xl font-bold text-[hsl(var(--adm-card-foreground))]">
                           {dest.name}
                         </h3>
                         <p className="text-xs font-medium text-[hsl(var(--adm-primary))] mt-0.5">
@@ -298,15 +282,15 @@ export default function DestinationsPage() {
         title={editingDestination ? `Edit Destination: ${editingDestination.name}` : "Add Destination"}
         size="lg"
       >
-        <div className="mb-6 flex gap-1 rounded-xl border border-[hsl(var(--adm-border))] p-1">
+        <div className="mb-6 flex gap-1 rounded-[8px] border border-[hsl(var(--adm-border))] p-1">
           {(["basic", "media", "contact", "seo"] as const).map((t) => (
             <button
               key={t}
               type="button"
               onClick={() => setActiveTab(t)}
-              className={`flex-1 rounded-lg py-2 text-xs font-semibold capitalize transition-colors ${
+              className={`flex-1 rounded-[8px] py-2 text-xs font-semibold capitalize transition-colors ${
                 activeTab === t
-                  ? "bg-[hsl(var(--adm-primary))] text-white"
+                  ? "bg-[hsl(var(--adm-brand))] text-[hsl(var(--adm-brand-foreground))]"
                   : "text-[hsl(var(--adm-muted-foreground))] hover:text-[hsl(var(--adm-foreground))]"
               }`}
             >
@@ -383,12 +367,12 @@ export default function DestinationsPage() {
                   <button
                     type="button"
                     onClick={() => setForm((f) => ({ ...f, active: !f.active }))}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      form.active ? "bg-[hsl(var(--adm-primary))]" : "bg-[hsl(var(--adm-muted))]"
+                    className={`relative inline-flex h-6 w-11 items-center rounded-[8px] transition-colors ${
+                      form.active ? "bg-[hsl(var(--adm-brand))]" : "bg-[hsl(var(--adm-muted))]"
                     }`}
                   >
                     <span
-                      className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
+                      className={`inline-block h-4 w-4 rounded-[8px] bg-white transition-transform ${
                         form.active ? "translate-x-6" : "translate-x-1"
                       }`}
                     />
@@ -423,12 +407,12 @@ export default function DestinationsPage() {
               />
 
               {/* Live Card Preview */}
-              <div className="rounded-2xl border border-[hsl(var(--adm-border))] p-4 bg-[hsl(var(--adm-accent)/0.15)]">
-                <p className="text-xs font-bold uppercase tracking-wider text-[hsl(var(--adm-muted-foreground))] mb-3">
+              <div className="rounded-[8px] border border-[hsl(var(--adm-border))] p-4 bg-[hsl(var(--adm-accent)/0.15)]">
+                <p className="text-xs font-bold uppercase text-[hsl(var(--adm-muted-foreground))] mb-3">
                   Navbar Dropdown Item Preview
                 </p>
-                <div className="inline-flex items-center gap-3.5 p-3 rounded-xl bg-white shadow-sm border border-gray-100">
-                  <div className="w-14 h-14 rounded-[12px] overflow-hidden bg-gray-100 shrink-0 border border-gray-100">
+                <div className="inline-flex items-center gap-3.5 p-3 rounded-[8px] bg-white border border-gray-100">
+                  <div className="w-14 h-14 rounded-[8px] overflow-hidden bg-gray-100 shrink-0 border border-gray-100">
                     {form.image || form.banner ? (
                       <img
                         src={form.image || form.banner}
@@ -442,7 +426,7 @@ export default function DestinationsPage() {
                     )}
                   </div>
                   <div>
-                    <p className="font-serif text-[17px] font-medium text-[#0d1b2e] leading-tight">
+                    <p className="text-[17px] font-medium text-[#0d1b2e] leading-tight">
                       {form.name || "Destination Name"}
                     </p>
                     <p className="text-[13px] text-gray-500 font-sans mt-0.5">

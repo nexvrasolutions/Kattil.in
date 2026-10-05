@@ -4,6 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
+// Offers page is temporarily hidden — set to true to restore the "Explore Offers" link.
+const SHOW_EXPLORE_OFFERS_LINK = false;
+
 export default function OffersSection() {
   return (
     <section className="w-full bg-transparent pt-4 sm:pt-6 md:pt-8 lg:pt-0 pb-0 px-3 md:px-5">
@@ -87,9 +90,10 @@ export default function OffersSection() {
                 <br className="hidden sm:inline" /> make your stay more rewarding, from special rates
                 <br className="hidden sm:inline" /> to exclusive experiences.
               </p>
-              {/* <div className="mt-6 sm:mt-8 md:mt-10 lg:mt-[80px]">
+              {SHOW_EXPLORE_OFFERS_LINK && (
+              <div className="mt-6 sm:mt-8 md:mt-10 lg:mt-[80px]">
                 <Link
-                  href=""
+                  href="/offers"
                   className="
       inline-block  
       text-[#D2E6BC]  
@@ -104,7 +108,8 @@ export default function OffersSection() {
                 >
                   Explore Offers
                 </Link>
-              </div> */}
+              </div>
+              )}
             </motion.div>
 
             {/* ================= RIGHT VISUAL ================= */}

@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "4mb",
     },
   },
+  allowedDevOrigins: ["192.168.1.6", "localhost", "127.0.0.1"],
   // Protected admin HTML must never be cached/reused by the browser or any
   // intermediary. proxy.ts also sets this, but Next's own Cache-Control
   // computed for dynamically-rendered pages otherwise wins for the document

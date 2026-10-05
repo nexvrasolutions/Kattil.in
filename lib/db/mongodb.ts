@@ -79,15 +79,20 @@ export async function connectDB(): Promise<typeof mongoose> {
     global._mongooseCache = undefined;
   }
 
+  // If already connected, return immediately
+  if (mongoose.connection.readyState === 1) {
+    return mongoose;
+  }
+
   if (!global._mongooseCache) {
     global._mongooseCache = { uri: rawUri, conn: null, promise: null };
   }
 
   const cached = global._mongooseCache;
 
-  if (cached.conn && mongoose.connection.readyState === 1) return cached.conn;
+  if (cached.conn) return cached.conn;
 
-  if (!cached.promise || mongoose.connection.readyState === 0) {
+  if (!cached.promise) {
     cached.promise = (async () => {
       const targetUri = await resolveMongoUri(rawUri);
 

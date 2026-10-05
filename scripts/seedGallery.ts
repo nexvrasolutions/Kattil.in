@@ -148,9 +148,3 @@ export async function seedGallery() {
   await Gallery.insertMany(images);
   console.log(`Gallery: ${images.length} images created (9 Madurai, 4 Chennai, 12 Kaniyakumari)`);
 }
-    },
-  ];
-
-await Gallery.insertMany(images);
-console.log(`Gallery: ${images.length} images created (9 Madurai, 4 Chennai, 4 Coimbatore, 12 Kaniyakumari)`);
-}

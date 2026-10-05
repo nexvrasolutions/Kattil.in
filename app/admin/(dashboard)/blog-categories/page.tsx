@@ -73,7 +73,7 @@ export default function BlogCategoriesPage() {
       </PageHeader>
 
       {/* Add new category */}
-      <AdminCard className="rounded-2xl! mb-6">
+      <AdminCard className="rounded-[8px]! mb-6">
         <div className="p-4 flex items-center gap-3">
           <Tag className="h-4 w-4 shrink-0 text-[hsl(var(--adm-primary))]" />
           <input
@@ -81,7 +81,7 @@ export default function BlogCategoriesPage() {
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAdd()}
             placeholder="New category name… (e.g. Travel Guide, Wellness, Dining)"
-            className="flex-1 h-10 rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+            className="flex-1 h-10 rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
           />
           <AdminButton onClick={handleAdd} loading={adding} disabled={!newName.trim()}>
             <Plus className="h-4 w-4" /> Add
@@ -92,7 +92,7 @@ export default function BlogCategoriesPage() {
       {/* Category list */}
       {loading ? (
         <div className="space-y-2">
-          {[...Array(4)].map((_, i) => <div key={i} className="h-14 rounded-2xl adm-skeleton" />)}
+          {[...Array(4)].map((_, i) => <div key={i} className="h-14 rounded-[8px] adm-skeleton" />)}
         </div>
       ) : categories.length === 0 ? (
         <AdminCard>
@@ -103,7 +103,7 @@ export default function BlogCategoriesPage() {
           </div>
         </AdminCard>
       ) : (
-        <AdminCard className="rounded-2xl! overflow-hidden">
+        <AdminCard className="rounded-[8px]! overflow-hidden">
           <div className="divide-y divide-[hsl(var(--adm-border)/0.4)]">
             {categories.map((cat, i) => (
               <motion.div
@@ -113,7 +113,7 @@ export default function BlogCategoriesPage() {
                 transition={{ delay: i * 0.04, ease: EASE }}
                 className="flex items-center gap-3 px-4 py-3 hover:bg-[hsl(var(--adm-accent)/0.3)] transition-colors"
               >
-                <div className="rounded-lg p-1.5 bg-[hsl(var(--adm-primary)/0.1)]">
+                <div className="rounded-[8px] p-1.5 bg-[hsl(var(--adm-primary)/0.1)]">
                   <Tag className="h-3.5 w-3.5 text-[hsl(var(--adm-primary))]" />
                 </div>
 
@@ -123,7 +123,7 @@ export default function BlogCategoriesPage() {
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
                     onKeyDown={(e) => { if (e.key === "Enter") handleEdit(cat._id); if (e.key === "Escape") setEditId(null); }}
-                    className="flex-1 h-8 rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                    className="flex-1 h-8 rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                   />
                 ) : (
                   <div className="flex-1 min-w-0">
@@ -136,22 +136,22 @@ export default function BlogCategoriesPage() {
                   {editId === cat._id ? (
                     <>
                       <button onClick={() => handleEdit(cat._id)} disabled={saving}
-                        className="rounded-lg p-1.5 text-[hsl(var(--adm-success))] hover:bg-[hsl(var(--adm-success)/0.1)] transition-colors">
+                        className="rounded-[8px] p-1.5 text-[hsl(var(--adm-success))] hover:bg-[hsl(var(--adm-success)/0.1)] transition-colors">
                         <Check className="h-3.5 w-3.5" />
                       </button>
                       <button onClick={() => setEditId(null)}
-                        className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] transition-colors">
+                        className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] transition-colors">
                         <X className="h-3.5 w-3.5" />
                       </button>
                     </>
                   ) : (
                     <>
                       <button onClick={() => { setEditId(cat._id); setEditName(cat.name); }}
-                        className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-primary))] transition-colors">
+                        className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-primary))] transition-colors">
                         <Pencil className="h-3.5 w-3.5" />
                       </button>
                       <button onClick={() => setDeleteId(cat._id)}
-                        className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors">
+                        className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors">
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     </>

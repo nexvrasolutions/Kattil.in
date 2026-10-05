@@ -5,8 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Building2,
   Calendar,
-  ChevronDown,
-  Search,
   X,
   MapPin,
 } from "lucide-react";
@@ -162,6 +160,10 @@ export default function BookingBarWidget({
   const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const hotelInputBoxRef = useRef<HTMLDivElement>(null);
+  const dropdownPanelRef = useRef<HTMLDivElement>(null);
+  // Mobile only: bottom offset (px, relative to the field wrapper) when the dropdown opens upward
+  const [dropUpBottom, setDropUpBottom] = useState<number | null>(null);
 
   // Focus search input when dropdown opens
   useEffect(() => {
@@ -347,6 +349,62 @@ export default function BookingBarWidget({
       );
     });
   }, [hotelsList, searchQuery, lockedDestination, initialDestination, selectedHotel]);
+
+  // Mobile: open the dropdown upward when the visible viewport (e.g. with the on-screen
+  // keyboard open) leaves too little room below the input. Desktop always opens downward.
+  useEffect(() => {
+    if (!dropdownOpen) {
+      setDropUpBottom(null);
+      return;
+    }
+
+    const mobileQuery = window.matchMedia("(max-width: 767px)");
+    const vv = window.visualViewport;
+    let frame = 0;
+
+    function updatePlacement() {
+      const wrapper = dropdownRef.current;
+      const box = hotelInputBoxRef.current;
+      if (!wrapper || !box || !mobileQuery.matches) {
+        setDropUpBottom(null);
+        return;
+      }
+
+      const rect = box.getBoundingClientRect();
+      const visibleTop = vv ? vv.offsetTop : 0;
+      const visibleBottom = vv ? vv.offsetTop + vv.height : window.innerHeight;
+      const spaceBelow = visibleBottom - rect.bottom;
+      const spaceAbove = rect.top - visibleTop;
+      const gap = 4;
+      const panelHeight = (dropdownPanelRef.current?.offsetHeight || 180) + gap;
+
+      if (spaceBelow < panelHeight && spaceAbove > spaceBelow) {
+        // Anchor the panel's bottom edge just above the input's top edge
+        setDropUpBottom(wrapper.offsetHeight - box.offsetTop + gap);
+      } else {
+        setDropUpBottom(null);
+      }
+    }
+
+    function schedule() {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(updatePlacement);
+    }
+
+    schedule();
+    vv?.addEventListener("resize", schedule);
+    vv?.addEventListener("scroll", schedule);
+    window.addEventListener("resize", schedule);
+    mobileQuery.addEventListener("change", schedule);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      vv?.removeEventListener("resize", schedule);
+      vv?.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      mobileQuery.removeEventListener("change", schedule);
+    };
+  }, [dropdownOpen, filteredHotels.length]);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -680,6 +738,7 @@ export default function BookingBarWidget({
 
                 {/* UI TEST: main field doubles as the search input */}
                 <div
+                  ref={hotelInputBoxRef}
                   onClick={() => {
                     setDropdownOpen(true);
                     searchInputRef.current?.focus();
@@ -690,7 +749,7 @@ export default function BookingBarWidget({
                     } rounded-[8px] px-4 sm:px-[16px] py-0 flex items-center justify-between gap-2 transition-all text-left cursor-text`}
                 >
                   <div className="flex items-center gap-3 overflow-hidden flex-1 min-w-0">
-                    <Search className={`w-5 h-5 ${hotelError ? "text-[#0E2E4E]" : "text-[#0E2E4E]/70"} shrink-0 stroke-[1.6]`} />
+                    <MapPin className={`w-5 h-5 ${hotelError ? "text-[#0E2E4E]" : "text-[#0E2E4E]/70"} shrink-0 stroke-[1.6]`} />
 
                     <input
                       ref={searchInputRef}
@@ -744,27 +803,14 @@ export default function BookingBarWidget({
                       <X className="w-3.5 h-3.5" />
                     </button>
                   )}
-
-                  <button
-                    type="button"
-                    aria-label={dropdownOpen ? "Close list" : "Open list"}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDropdownOpen((prev) => !prev);
-                    }}
-                    className="shrink-0 cursor-pointer"
-                  >
-                    <ChevronDown
-                      className={`w-4.5 h-4.5 ${hotelError ? "text-[#0E2E4E]" : "text-[#0E2E4E]/70"} shrink-0 stroke-[1.6] transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""
-                        }`}
-                    />
-                  </button>
                 </div>
 
-                {/* ── Dropdown Menu ────────────────────────────────────────────── */}
+                {/* ── Suggestions Dropdown ─────────────────────────────────────── */}
                 <AnimatePresence>
                   {dropdownOpen && (
                     <motion.div
+                      ref={dropdownPanelRef}
+                      style={dropUpBottom !== null ? { top: "auto", bottom: dropUpBottom, marginTop: 0 } : undefined}
                       data-prevent-hero-scroll="true"
                       initial={{ opacity: 0, y: 4, scale: 0.98 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}

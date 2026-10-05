@@ -56,20 +56,20 @@ function StatusChanger({ blog, onChanged }: { blog: Blog; onChanged: () => void 
       <button
         onClick={() => setOpen((v) => !v)}
         disabled={saving}
-        className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold transition-colors hover:opacity-80"
+        className="inline-flex items-center gap-1.5 rounded-[8px] px-2.5 py-1 text-xs font-semibold transition-colors hover:opacity-80"
         style={{
           background: isPublished ? "hsl(142 76% 36% / 0.12)" : "hsl(var(--adm-muted))",
           color: isPublished ? "hsl(142 76% 30%)" : "hsl(var(--adm-muted-foreground))",
         }}
       >
-        <span className="h-1.5 w-1.5 rounded-full" style={{ background: "currentColor" }} />
+        <span className="h-1.5 w-1.5 rounded-[8px]" style={{ background: "currentColor" }} />
         {isPublished ? "Published" : "Draft"}
         <span className="opacity-50">▾</span>
       </button>
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 top-full mt-1 z-50 w-36 rounded-xl border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] py-1 shadow-xl">
+          <div className="absolute left-0 top-full mt-1 z-50 w-36 rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] py-1">
             {(["published", "draft"] as const).map((s) => (
               <button
                 key={s}
@@ -162,13 +162,13 @@ export default function BlogsPage() {
           { label: "Featured", value: featuredCount, icon: Star, color: "hsl(var(--adm-warning))" },
           { label: "Drafts", value: total - publishedCount, icon: Eye, color: "hsl(var(--adm-muted-foreground))" },
         ].map(({ label, value, icon: Icon, color }) => (
-          <AdminCard key={label} className="rounded-2xl!">
+          <AdminCard key={label} className="rounded-[8px]!">
             <div className="flex items-center justify-between p-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-[hsl(var(--adm-muted-foreground))]">{label}</p>
+                <p className="text-xs font-semibold uppercase text-[hsl(var(--adm-muted-foreground))]">{label}</p>
                 <p className="mt-1 text-2xl font-bold text-[hsl(var(--adm-card-foreground))]">{value}</p>
               </div>
-              <div className="rounded-xl p-2.5" style={{ background: `${color}20` }}>
+              <div className="rounded-[8px] p-2.5" style={{ background: `${color}20` }}>
                 <Icon className="h-5 w-5" style={{ color }} />
               </div>
             </div>
@@ -185,13 +185,13 @@ export default function BlogsPage() {
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               placeholder="Search posts…"
-              className="flex h-10 w-full rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] pl-9 pr-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+              className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] pl-9 pr-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
             />
           </div>
           <select
             value={filterCategory}
             onChange={(e) => { setFilterCategory(e.target.value); setPage(1); }}
-            className="h-10 rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+            className="h-10 shrink-0 sm:w-[188px] rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
           >
             <option value="">All Categories</option>
             {categories.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -199,7 +199,7 @@ export default function BlogsPage() {
           <select
             value={filterStatus}
             onChange={(e) => { setFilterStatus(e.target.value); setPage(1); }}
-            className="h-10 rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+            className="h-10 shrink-0 sm:w-[188px] rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
           >
             <option value="">All Statuses</option>
             <option value="published">Published</option>
@@ -210,17 +210,17 @@ export default function BlogsPage() {
               <X className="h-4 w-4" /> Clear
             </AdminButton>
           )}
-          <div className="flex items-center gap-1 ml-auto rounded-lg border border-[hsl(var(--adm-border))] p-0.5">
+          <div className="flex items-center gap-1 ml-auto rounded-[8px] border border-[hsl(var(--adm-border))] p-0.5">
             <button
               onClick={() => setViewMode("list")}
-              className={`flex h-8 w-8 items-center justify-center rounded-md transition-colors ${viewMode === "list" ? "bg-[hsl(var(--adm-primary))] text-white" : "text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))]"}`}
+              className={`flex h-8 w-8 items-center justify-center rounded-[8px] transition-colors ${viewMode === "list" ? "bg-[hsl(var(--adm-brand))] text-[hsl(var(--adm-brand-foreground))]" : "text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))]"}`}
               title="List view"
             >
               <List className="h-4 w-4" />
             </button>
             <button
               onClick={() => setViewMode("grid")}
-              className={`flex h-8 w-8 items-center justify-center rounded-md transition-colors ${viewMode === "grid" ? "bg-[hsl(var(--adm-primary))] text-white" : "text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))]"}`}
+              className={`flex h-8 w-8 items-center justify-center rounded-[8px] transition-colors ${viewMode === "grid" ? "bg-[hsl(var(--adm-brand))] text-[hsl(var(--adm-brand-foreground))]" : "text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))]"}`}
               title="Grid view"
             >
               <LayoutGrid className="h-4 w-4" />
@@ -234,7 +234,7 @@ export default function BlogsPage() {
         <div>
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[...Array(6)].map((_, i) => <div key={i} className="h-72 rounded-2xl adm-skeleton" />)}
+              {[...Array(6)].map((_, i) => <div key={i} className="h-72 rounded-[8px] adm-skeleton" />)}
             </div>
           ) : blogs.length === 0 ? (
             <AdminCard>
@@ -255,7 +255,7 @@ export default function BlogsPage() {
                 <motion.div
                   key={blog._id}
                   initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                  className="group relative rounded-2xl border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                  className="group relative rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] overflow-hidden"
                 >
                   {/* Image */}
                   <div className="relative aspect-[16/9] bg-[hsl(var(--adm-muted))]">
@@ -268,24 +268,24 @@ export default function BlogsPage() {
                     )}
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
                       <Link href={`/admin/blogs/${blog._id}`}>
-                        <button className="flex items-center gap-1.5 rounded-lg bg-white/90 px-3 py-2 text-xs font-semibold text-gray-800 hover:bg-white transition-colors">
+                        <button className="flex items-center gap-1.5 rounded-[8px] bg-white/90 px-3 py-2 text-xs font-semibold text-gray-800 hover:bg-white transition-colors">
                           <Pencil className="h-3.5 w-3.5" /> Edit
                         </button>
                       </Link>
                       <button
                         onClick={() => setDeleteId(blog._id)}
-                        className="flex items-center gap-1.5 rounded-lg bg-red-500/90 px-3 py-2 text-xs font-semibold text-white hover:bg-red-500 transition-colors"
+                        className="flex items-center gap-1.5 rounded-[8px] bg-red-500/90 px-3 py-2 text-xs font-semibold text-white hover:bg-red-500 transition-colors"
                       >
                         <Trash2 className="h-3.5 w-3.5" /> Delete
                       </button>
                     </div>
                     {blog.featured && (
                       <div className="absolute top-2 right-2">
-                        <Star className="h-4 w-4 fill-[hsl(var(--adm-warning))] text-[hsl(var(--adm-warning))] drop-shadow" />
+                        <Star className="h-4 w-4 fill-[hsl(var(--adm-warning))] text-[hsl(var(--adm-warning))]" />
                       </div>
                     )}
                     <div className="absolute top-2 left-2">
-                      <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white"
+                      <span className="rounded-[8px] px-2 py-0.5 text-[10px] font-bold uppercase text-white"
                         style={{ background: blog.status === "published" ? "hsl(142 76% 36% / 0.85)" : "hsl(var(--adm-muted-foreground)/0.5)" }}>
                         {blog.status}
                       </span>
@@ -293,20 +293,20 @@ export default function BlogsPage() {
                   </div>
                   {/* Info */}
                   <div className="p-4">
-                    <p className="text-[10px] font-bold uppercase tracking-wide text-[hsl(var(--adm-primary))] mb-1.5">{blog.category}</p>
+                    <p className="text-[10px] font-bold uppercase text-[hsl(var(--adm-primary))] mb-1.5">{blog.category}</p>
                     <p className="font-semibold text-sm text-[hsl(var(--adm-foreground))] leading-snug line-clamp-2 mb-2">{blog.title}</p>
                     <p className="text-xs text-[hsl(var(--adm-muted-foreground))] line-clamp-2 mb-3">{blog.excerpt}</p>
                     <div className="flex items-center justify-between">
                       <StatusChanger blog={blog} onChanged={fetchBlogs} />
                       <div className="flex items-center gap-1">
                         <Link href={`/admin/blogs/${blog._id}`}>
-                          <button className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-primary))] transition-colors">
+                          <button className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-primary))] transition-colors">
                             <Pencil className="h-3.5 w-3.5" />
                           </button>
                         </Link>
                         <button
                           onClick={() => setDeleteId(blog._id)}
-                          className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors"
+                          className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -329,7 +329,7 @@ export default function BlogsPage() {
                 <thead>
                   <tr className="border-b border-[hsl(var(--adm-border)/0.5)] bg-[hsl(var(--adm-muted)/0.4)]">
                     {["Post", "Category", "Author", "Date", "Status", "Actions"].map((h) => (
-                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-[hsl(var(--adm-muted-foreground))]">{h}</th>
+                      <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase text-[hsl(var(--adm-muted-foreground))]">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -347,9 +347,9 @@ export default function BlogsPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           {blog.image ? (
-                            <img src={blog.image} alt={blog.title} className="h-10 w-16 rounded-lg object-cover shrink-0" />
+                            <img src={blog.image} alt={blog.title} className="h-10 w-16 rounded-[8px] object-cover shrink-0" />
                           ) : (
-                            <div className="h-10 w-16 rounded-lg bg-[hsl(var(--adm-muted))] flex items-center justify-center shrink-0">
+                            <div className="h-10 w-16 rounded-[8px] bg-[hsl(var(--adm-muted))] flex items-center justify-center shrink-0">
                               <FileText className="h-4 w-4 text-[hsl(var(--adm-muted-foreground)/0.5)]" />
                             </div>
                           )}
@@ -369,13 +369,13 @@ export default function BlogsPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
                           <Link href={`/admin/blogs/${blog._id}`}>
-                            <button className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-primary))] transition-colors">
+                            <button className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-primary))] transition-colors">
                               <Pencil className="h-3.5 w-3.5" />
                             </button>
                           </Link>
                           <button
                             onClick={() => setDeleteId(blog._id)}
-                            className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors"
+                            className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>

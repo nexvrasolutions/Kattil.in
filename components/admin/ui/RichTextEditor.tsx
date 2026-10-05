@@ -28,7 +28,7 @@ interface RichTextEditorProps {
   minHeight?: string;
 }
 
-const inputCls = "flex h-9 rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-colors";
+const inputCls = "flex h-9 rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-colors";
 
 function ToolbarBtn({
   active,
@@ -49,9 +49,9 @@ function ToolbarBtn({
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className={`flex h-8 w-8 items-center justify-center rounded-md text-[hsl(var(--adm-foreground))] transition-colors disabled:opacity-40 ${
+      className={`flex h-8 w-8 items-center justify-center rounded-[8px] text-[hsl(var(--adm-foreground))] transition-colors disabled:opacity-40 ${
         active
-          ? "bg-[hsl(var(--adm-primary))] text-white"
+          ? "bg-[hsl(var(--adm-brand))] text-[hsl(var(--adm-brand-foreground))]"
           : "hover:bg-[hsl(var(--adm-accent))]"
       }`}
     >
@@ -157,7 +157,7 @@ export default function RichTextEditor({
   if (!editor) return null;
 
   return (
-    <div className="rounded-xl border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] overflow-hidden">
+    <div className="rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] overflow-hidden">
       {/* ── Toolbar ─────────────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center gap-0.5 border-b border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-muted)/0.3)] px-2 py-1.5">
 
@@ -290,12 +290,12 @@ export default function RichTextEditor({
               className={`${inputCls} flex-1`}
             />
             <button type="button" onClick={applyLink}
-              className="h-9 rounded-md px-3 text-sm font-semibold text-white transition-colors"
-              style={{ background: "hsl(var(--adm-primary))" }}>
+              className="h-9 rounded-[8px] px-3 text-sm font-semibold text-[hsl(var(--adm-brand-foreground))] transition-colors"
+              style={{ background: "hsl(var(--adm-brand))" }}>
               Apply
             </button>
             <button type="button" onClick={() => setLinkModal(false)}
-              className="h-9 rounded-md px-3 text-sm text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] transition-colors">
+              className="h-9 rounded-[8px] px-3 text-sm text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] transition-colors">
               Cancel
             </button>
           </div>
@@ -307,7 +307,7 @@ export default function RichTextEditor({
         {/* Bubble menu — appears on text selection */}
         <BubbleMenu
           editor={editor}
-          className="flex items-center gap-0.5 rounded-xl border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] px-1.5 py-1 shadow-xl"
+          className="flex items-center gap-0.5 rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] px-1.5 py-1"
         >
           <ToolbarBtn title="Bold" active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}>
             <Bold className="h-3 w-3" />
@@ -328,8 +328,8 @@ export default function RichTextEditor({
 
       {/* ── Editor styles ─────────────────────────────────────────────────── */}
       <style>{`
-        .rte-body h1 { font-family: var(--font-serif, serif); font-size: 1.75rem; font-weight: 700; line-height: 1.3; margin: 1.2rem 0 0.6rem; color: hsl(var(--adm-foreground)); }
-        .rte-body h2 { font-family: var(--font-serif, serif); font-size: 1.35rem; font-weight: 600; line-height: 1.35; margin: 1rem 0 0.5rem; color: hsl(var(--adm-foreground)); }
+        .rte-body h1 { font-family: var(--font-public-sans), "Public Sans", sans-serif; font-size: 1.75rem; font-weight: 700; line-height: 1.3; margin: 1.2rem 0 0.6rem; color: hsl(var(--adm-foreground)); }
+        .rte-body h2 { font-family: var(--font-public-sans), "Public Sans", sans-serif; font-size: 1.35rem; font-weight: 600; line-height: 1.35; margin: 1rem 0 0.5rem; color: hsl(var(--adm-foreground)); }
         .rte-body h3 { font-size: 1.1rem; font-weight: 600; margin: 0.8rem 0 0.4rem; color: hsl(var(--adm-foreground)); }
         .rte-body p  { margin: 0.5rem 0; line-height: 1.75; color: hsl(var(--adm-foreground)); font-size: 0.9rem; }
         .rte-body ul, .rte-body ol { padding-left: 1.4rem; margin: 0.5rem 0; }
@@ -337,13 +337,13 @@ export default function RichTextEditor({
         .rte-body ul li { list-style-type: disc; }
         .rte-body ol li { list-style-type: decimal; }
         .rte-body blockquote { border-left: 3px solid hsl(var(--adm-primary)); padding-left: 1rem; margin: 0.8rem 0; color: hsl(var(--adm-muted-foreground)); font-style: italic; }
-        .rte-body code { background: hsl(var(--adm-muted)); padding: 0.15rem 0.35rem; border-radius: 0.3rem; font-size: 0.82em; font-family: monospace; }
-        .rte-body pre  { background: hsl(var(--adm-muted)); padding: 0.8rem 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 0.8rem 0; }
+        .rte-body code { background: hsl(var(--adm-muted)); padding: 0.15rem 0.35rem; border-radius: 8px; font-size: 0.82em; font-family: var(--font-public-sans), "Public Sans", sans-serif; }
+        .rte-body pre  { background: hsl(var(--adm-muted)); padding: 0.8rem 1rem; border-radius: 8px; overflow-x: auto; margin: 0.8rem 0; }
         .rte-body pre code { background: transparent; padding: 0; }
         .rte-body hr   { border: none; border-top: 1px solid hsl(var(--adm-border)); margin: 1.2rem 0; }
         .rte-body a.rte-link { color: hsl(var(--adm-primary)); text-decoration: underline; cursor: pointer; }
-        .rte-body img.rte-image { max-width: 100%; border-radius: 0.5rem; margin: 0.8rem 0; display: block; }
-        .rte-body .ProseMirror-selectednode { outline: 2px solid hsl(var(--adm-primary)); border-radius: 0.5rem; }
+        .rte-body img.rte-image { max-width: 100%; border-radius: 8px; margin: 0.8rem 0; display: block; }
+        .rte-body .ProseMirror-selectednode { outline: 2px solid hsl(var(--adm-primary)); border-radius: 8px; }
         .rte-body p.is-editor-empty:first-child::before {
           content: attr(data-placeholder);
           color: hsl(var(--adm-muted-foreground));

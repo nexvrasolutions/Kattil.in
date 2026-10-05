@@ -12,10 +12,10 @@ export function AdminCard({ className = "", children, style }: AdminCardProps) {
   return (
     <div
       className={[
-        "rounded-3xl border border-[hsl(var(--adm-border)/0.6)] bg-[hsl(var(--adm-card))] text-[hsl(var(--adm-card-foreground))]",
+        "rounded-[8px] border border-[hsl(var(--adm-border)/0.6)] bg-[hsl(var(--adm-card))] text-[hsl(var(--adm-card-foreground))]",
         className,
       ].join(" ")}
-      style={{ boxShadow: "var(--adm-shadow-sm)", ...style }}
+      style={style}
     >
       {children}
     </div>
@@ -83,7 +83,7 @@ export function AdminCardDescription({ className = "", children }: AdminCardDesc
   return (
     <p
       className={[
-        "text-xs font-semibold uppercase tracking-[0.18em] text-[hsl(var(--adm-muted-foreground))]",
+        "text-xs font-semibold uppercase text-[hsl(var(--adm-muted-foreground))]",
         className,
       ].join(" ")}
     >
@@ -105,12 +105,12 @@ export function StatRow({ label, value, helper, className = "" }: StatRowProps) 
   return (
     <div
       className={[
-        "flex items-start justify-between rounded-lg border border-[hsl(var(--adm-border)/0.6)] bg-[hsl(var(--adm-accent)/0.12)] px-3 py-3",
+        "flex items-start justify-between rounded-[8px] border border-[hsl(var(--adm-border)/0.6)] bg-[hsl(var(--adm-accent)/0.12)] px-3 py-3",
         className,
       ].join(" ")}
     >
       <div className="flex flex-col gap-0.5">
-        <span className="text-[11px] font-bold uppercase tracking-wide text-[hsl(var(--adm-muted-foreground))]">
+        <span className="text-[11px] font-bold uppercase text-[hsl(var(--adm-muted-foreground))]">
           {label}
         </span>
         {helper && (
@@ -137,23 +137,11 @@ export function GradientCard({ className = "", children }: GradientCardProps) {
   return (
     <div
       className={[
-        "relative overflow-hidden rounded-3xl border-none shadow-xl",
+        "relative overflow-hidden rounded-[8px] border-none",
         className,
       ].join(" ")}
-      style={{
-        // Deep navy → mid navy → dark sage — matches project primary (#0d1b2e) → secondary-dark (#526442)
-        background:
-          "linear-gradient(135deg, #0d1b2e 0%, #162840 55%, #3a5535 100%)",
-      }}
+      style={{ background: "#0E2E4E" }}
     >
-      {/* Radial shimmer overlay with sage tint */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse at 15% 15%, rgba(156,175,136,0.22) 0%, transparent 55%), radial-gradient(ellipse at 85% 85%, rgba(13,27,46,0.6) 0%, transparent 55%)",
-        }}
-      />
       <div className="relative z-10">{children}</div>
     </div>
   );

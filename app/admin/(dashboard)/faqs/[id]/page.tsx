@@ -22,7 +22,7 @@ const EMPTY: FaqForm = { question: "", answer: "", category: "", displayOrder: 0
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="text-sm font-bold uppercase tracking-wider text-[hsl(var(--adm-muted-foreground))] border-b border-[hsl(var(--adm-border)/0.5)] pb-3 mb-5">
+    <h2 className="text-sm font-bold uppercase text-[hsl(var(--adm-muted-foreground))] border-b border-[hsl(var(--adm-border)/0.5)] pb-3 mb-5">
       {children}
     </h2>
   );
@@ -42,7 +42,7 @@ function FormField({ label, required, hint, children }: {
   );
 }
 
-const inputCls = "flex w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-colors";
+const inputCls = "flex w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-colors";
 
 export default function FaqFormPage() {
   const router = useRouter();
@@ -58,7 +58,8 @@ export default function FaqFormPage() {
   useEffect(() => {
     fetch("/api/admin/faq-categories")
       .then((r) => r.json())
-      .then((r) => { if (r.success) setCategories(r.data.categories); });
+      .then((r) => { if (r.success) setCategories(r.data.categories); })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -78,6 +79,7 @@ export default function FaqFormPage() {
           });
         }
       })
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, [id, isNew]);
 
@@ -126,12 +128,12 @@ export default function FaqFormPage() {
 
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: EASE }}
-        className="rounded-2xl border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] shadow-sm overflow-hidden">
+        className="rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] overflow-hidden">
 
         {/* Header */}
         <div className="px-6 py-5 border-b border-[hsl(var(--adm-border)/0.5)]">
           <div className="flex items-center gap-3">
-            <div className="rounded-xl p-2.5 bg-[hsl(var(--adm-primary)/0.1)]">
+            <div className="rounded-[8px] p-2.5 bg-[hsl(var(--adm-primary)/0.1)]">
               <HelpCircle className="h-5 w-5 text-[hsl(var(--adm-primary))]" />
             </div>
             <div>
@@ -180,7 +182,7 @@ export default function FaqFormPage() {
                     {categories.map((c) => <option key={c._id} value={c.name}>{c.name}</option>)}
                   </select>
                   <a href="/admin/faq-categories" target="_blank" rel="noopener noreferrer"
-                    className="h-10 flex items-center gap-1 rounded-lg border border-[hsl(var(--adm-border))] px-3 text-xs font-medium text-[hsl(var(--adm-primary))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors whitespace-nowrap">
+                    className="h-10 flex items-center gap-1 rounded-[8px] border border-[hsl(var(--adm-border))] px-3 text-xs font-medium text-[hsl(var(--adm-primary))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors whitespace-nowrap">
                     <Plus className="h-3 w-3" /> Manage
                   </a>
                 </div>
@@ -194,7 +196,7 @@ export default function FaqFormPage() {
           </section>
 
           {error && (
-            <div className="rounded-xl border border-[hsl(var(--adm-destructive)/0.3)] bg-[hsl(var(--adm-destructive)/0.08)] px-4 py-3">
+            <div className="rounded-[8px] border border-[hsl(var(--adm-destructive)/0.3)] bg-[hsl(var(--adm-destructive)/0.08)] px-4 py-3">
               <p className="text-sm text-[hsl(var(--adm-destructive))]">{error}</p>
             </div>
           )}
@@ -202,16 +204,16 @@ export default function FaqFormPage() {
           {/* Actions */}
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-[hsl(var(--adm-border)/0.4)]">
             <button type="button" onClick={() => router.push("/admin/faqs")}
-              className="h-10 rounded-lg border border-[hsl(var(--adm-border))] bg-transparent px-5 text-sm font-medium text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors">
+              className="h-10 rounded-[8px] border border-[hsl(var(--adm-border))] bg-transparent px-5 text-sm font-medium text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors">
               Cancel
             </button>
             <button type="button" onClick={() => handleSave("inactive")} disabled={saving}
-              className="h-10 rounded-lg border border-[hsl(var(--adm-border))] bg-transparent px-5 text-sm font-medium text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors disabled:opacity-60">
+              className="h-10 rounded-[8px] border border-[hsl(var(--adm-border))] bg-transparent px-5 text-sm font-medium text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors disabled:opacity-60">
               Save as Draft
             </button>
             <button type="button" onClick={() => handleSave(isNew ? "active" : undefined)} disabled={saving}
-              className="flex h-10 items-center gap-2 rounded-lg px-6 text-sm font-semibold text-white transition-all disabled:opacity-60"
-              style={{ background: "hsl(var(--adm-primary))" }}>
+              className="flex h-10 items-center gap-2 rounded-[8px] px-6 text-sm font-semibold text-[hsl(var(--adm-brand-foreground))] transition-all disabled:opacity-60"
+              style={{ background: "hsl(var(--adm-brand))" }}>
               {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : <><Save className="h-4 w-4" /> {isNew ? "Publish FAQ" : "Save Changes"}</>}
             </button>
           </div>

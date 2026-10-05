@@ -28,7 +28,7 @@ function FieldHint({ children }: { children: React.ReactNode }) {
 
 function SectionIcon({ icon: Icon, color }: { icon: React.ElementType; color: string }) {
   return (
-    <div className="rounded-xl p-2.5 shrink-0" style={{ background: `${color}18` }}>
+    <div className="rounded-[8px] p-2.5 shrink-0" style={{ background: `${color}18` }}>
       <Icon className="h-5 w-5" style={{ color }} />
     </div>
   );
@@ -69,7 +69,7 @@ export default function AdminHomePage() {
 
   if (loading) return (
     <div className="space-y-4">
-      {[...Array(3)].map((_, i) => <div key={i} className="h-48 rounded-2xl adm-skeleton" />)}
+      {[...Array(3)].map((_, i) => <div key={i} className="h-48 rounded-[8px] adm-skeleton" />)}
     </div>
   );
 
@@ -97,7 +97,7 @@ export default function AdminHomePage() {
               </div>
             </AdminCardHeader>
             <AdminCardContent>
-              <p className="text-xs text-[hsl(var(--adm-muted-foreground))] mb-5 leading-relaxed rounded-xl bg-[hsl(var(--adm-accent)/0.4)] px-4 py-3">
+              <p className="text-xs text-[hsl(var(--adm-muted-foreground))] mb-5 leading-relaxed rounded-[8px] bg-[hsl(var(--adm-accent)/0.4)] px-4 py-3">
                 This is the full-screen hero section guests see when they first open the website. It contains the big animated headline and the booking widget.
               </p>
               <div className="space-y-5">
@@ -146,7 +146,7 @@ export default function AdminHomePage() {
               </div>
             </AdminCardHeader>
             <AdminCardContent>
-              <p className="text-xs text-[hsl(var(--adm-muted-foreground))] mb-5 leading-relaxed rounded-xl bg-[hsl(var(--adm-accent)/0.4)] px-4 py-3">
+              <p className="text-xs text-[hsl(var(--adm-muted-foreground))] mb-5 leading-relaxed rounded-[8px] bg-[hsl(var(--adm-accent)/0.4)] px-4 py-3">
                 Appears below the hero — shows the amenity icons grid. To add or remove amenity icons, go to <strong>Content → Amenities</strong>.
               </p>
               <div className="grid md:grid-cols-2 gap-5">
@@ -186,7 +186,7 @@ export default function AdminHomePage() {
               </div>
             </AdminCardHeader>
             <AdminCardContent>
-              <p className="text-xs text-[hsl(var(--adm-muted-foreground))] mb-5 leading-relaxed rounded-xl bg-[hsl(var(--adm-accent)/0.4)] px-4 py-3">
+              <p className="text-xs text-[hsl(var(--adm-muted-foreground))] mb-5 leading-relaxed rounded-[8px] bg-[hsl(var(--adm-accent)/0.4)] px-4 py-3">
                 Appears at the bottom of the home page — shows a preview of gallery images with a "View All" link. To manage the actual images, go to <strong>Content → Gallery</strong>.
               </p>
               <div className="grid md:grid-cols-3 gap-5">

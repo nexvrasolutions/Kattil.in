@@ -75,9 +75,9 @@ export default function AdminSidebar() {
             style={{ filter: "var(--adm-logo-filter, none)" }}
           />
           <span
-            className="text-[11px] font-bold tracking-widest uppercase"
+            className="text-[11px] font-bold uppercase"
             style={{
-              background: "linear-gradient(90deg, hsl(var(--adm-primary)), hsl(260 80% 65%))",
+              background: "linear-gradient(90deg, hsl(var(--adm-sidebar-primary)), hsl(var(--adm-sidebar-foreground)))",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
@@ -88,7 +88,7 @@ export default function AdminSidebar() {
         </Link>
         <button
           onClick={() => setMobileOpen(false)}
-          className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-[hsl(var(--adm-accent))] text-[hsl(var(--adm-muted-foreground))] lg:hidden transition-colors"
+          className="flex h-7 w-7 items-center justify-center rounded-[8px] hover:bg-[hsl(var(--adm-sidebar-accent))] text-[hsl(var(--adm-sidebar-foreground))] lg:hidden transition-colors"
         >
           <X className="h-4 w-4" />
         </button>
@@ -98,7 +98,7 @@ export default function AdminSidebar() {
       <nav className="flex-1 overflow-y-auto px-3 py-5 space-y-6">
         {navSections.map((section) => (
           <div key={section.title}>
-            <p className="mb-2 px-2.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[hsl(var(--adm-muted-foreground)/0.6)]">
+            <p className="mb-2 px-2.5 text-[10px] font-bold uppercase text-[hsl(var(--adm-sidebar-foreground)/0.6)]">
               {section.title}
             </p>
             <ul className="space-y-0.5">
@@ -111,27 +111,21 @@ export default function AdminSidebar() {
                       href={item.href}
                       onClick={() => setMobileOpen(false)}
                       className={[
-                        "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150",
+                        "group flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-colors duration-150",
                         active
-                          ? "bg-[hsl(var(--adm-primary)/0.12)] text-[hsl(var(--adm-primary))]"
-                          : "text-[hsl(var(--adm-sidebar-foreground)/0.65)] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-foreground))]",
+                          ? "text-[#D2E6BC]"
+                          : "text-[hsl(var(--adm-sidebar-foreground)/0.85)] hover:text-[#D2E6BC]",
                       ].join(" ")}
                     >
                       <Icon
                         className={[
                           "h-4.25 w-4.25 shrink-0 transition-colors",
                           active
-                            ? "text-[hsl(var(--adm-primary))]"
-                            : "text-[hsl(var(--adm-muted-foreground)/0.7)]",
+                            ? "text-[#D2E6BC]"
+                            : "text-[hsl(var(--adm-sidebar-foreground)/0.7)] group-hover:text-[#D2E6BC]",
                         ].join(" ")}
                       />
                       <span className="truncate">{item.label}</span>
-                      {active && (
-                        <span
-                          className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-[hsl(var(--adm-primary))]"
-                          aria-hidden="true"
-                        />
-                      )}
                     </Link>
                   </li>
                 );
@@ -147,24 +141,24 @@ export default function AdminSidebar() {
           href="/admin/settings"
           onClick={() => setMobileOpen(false)}
           className={[
-            "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-150",
+            "flex items-center gap-3 rounded-[8px] px-3 py-2.5 text-sm font-medium transition-all duration-150",
             isActive("/admin/settings")
-              ? "bg-[hsl(var(--adm-primary)/0.12)] text-[hsl(var(--adm-primary))]"
-              : "text-[hsl(var(--adm-sidebar-foreground)/0.65)] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-foreground))]",
+              ? "bg-[hsl(var(--adm-sidebar-primary))] text-[hsl(var(--adm-sidebar-primary-foreground))]"
+              : "text-[hsl(var(--adm-sidebar-foreground)/0.85)] hover:bg-[hsl(var(--adm-sidebar-accent))] hover:text-[hsl(var(--adm-sidebar-accent-foreground))]",
           ].join(" ")}
         >
           <Settings
             className={[
               "h-4.25 w-4.25 shrink-0",
               isActive("/admin/settings")
-                ? "text-[hsl(var(--adm-primary))]"
-                : "text-[hsl(var(--adm-muted-foreground)/0.7)]",
+                ? "text-[hsl(var(--adm-sidebar-primary-foreground))]"
+                : "text-[hsl(var(--adm-sidebar-foreground)/0.7)]",
             ].join(" ")}
           />
           <span>Settings</span>
           {isActive("/admin/settings") && (
             <span
-              className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-[hsl(var(--adm-primary))]"
+              className="ml-auto h-1.5 w-1.5 shrink-0 rounded-[8px] bg-[hsl(var(--adm-sidebar-primary-foreground))]"
               aria-hidden="true"
             />
           )}
@@ -178,7 +172,7 @@ export default function AdminSidebar() {
       {/* Mobile hamburger */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="fixed left-4 top-4 z-40 flex h-8 w-8 items-center justify-center rounded-xl bg-[hsl(var(--adm-card))] shadow-md hover:shadow-lg transition-shadow lg:hidden"
+        className="fixed left-4 top-4 z-40 flex h-8 w-8 items-center justify-center rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] lg:hidden"
       >
         <Menu className="h-4 w-4 text-[hsl(var(--adm-foreground))]" />
       </button>

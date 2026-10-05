@@ -16,7 +16,7 @@ import Room from "@/lib/models/Room";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "Kattil — The Homely Hotel | Chennai & Madurai",
+    absolute: "Kattil — The Homely Hotel",
   },
   description: DEFAULT_DESCRIPTION,
   alternates: {
@@ -41,82 +41,82 @@ const getHomeContent = unstable_cache(
 
 const getHomeDestinations = unstable_cache(
   async (): Promise<DestinationItem[]> => {
-  try {
-    await connectDB();
+    try {
+      await connectDB();
 
-    const cities = await City.find({ active: { $ne: false } })
-      .sort({ order: 1, name: 1 })
-      .lean();
+      const cities = await City.find({ active: { $ne: false } })
+        .sort({ order: 1, name: 1 })
+        .lean();
 
-    if (!cities || cities.length === 0) return [];
+      if (!cities || cities.length === 0) return [];
 
-    // None of these three depend on each other's results, so run them concurrently.
-    const [propertyCounts, allPropertyCounts, activeProps] = await Promise.all([
-      Property.aggregate([
-        { $match: { status: { $ne: "inactive" } } },
-        { $group: { _id: "$city", count: { $sum: 1 } } },
-      ]),
-      Property.aggregate([{ $group: { _id: "$city", count: { $sum: 1 } } }]),
-      Property.find({ status: { $ne: "inactive" } }).select("_id").lean(),
-    ]);
+      // None of these three depend on each other's results, so run them concurrently.
+      const [propertyCounts, allPropertyCounts, activeProps] = await Promise.all([
+        Property.aggregate([
+          { $match: { status: { $ne: "inactive" } } },
+          { $group: { _id: "$city", count: { $sum: 1 } } },
+        ]),
+        Property.aggregate([{ $group: { _id: "$city", count: { $sum: 1 } } }]),
+        Property.find({ status: { $ne: "inactive" } }).select("_id").lean(),
+      ]);
 
-    const propertyCountMap = new Map<string, number>();
-    for (const p of propertyCounts) {
-      if (p._id) propertyCountMap.set(String(p._id), p.count);
-    }
+      const propertyCountMap = new Map<string, number>();
+      for (const p of propertyCounts) {
+        if (p._id) propertyCountMap.set(String(p._id), p.count);
+      }
 
-    const allPropertyCountMap = new Map<string, number>();
-    for (const p of allPropertyCounts) {
-      if (p._id) allPropertyCountMap.set(String(p._id), p.count);
-    }
+      const allPropertyCountMap = new Map<string, number>();
+      for (const p of allPropertyCounts) {
+        if (p._id) allPropertyCountMap.set(String(p._id), p.count);
+      }
 
-    const activePropIds = activeProps.map((p) => p._id);
+      const activePropIds = activeProps.map((p) => p._id);
 
-    const roomCounts = await Room.aggregate([
-      {
-        $match: {
-          status: { $ne: "inactive" },
-          $or: [
-            { property: { $in: activePropIds } },
-            { property: { $exists: false } },
-            { property: null },
-          ],
+      const roomCounts = await Room.aggregate([
+        {
+          $match: {
+            status: { $ne: "inactive" },
+            $or: [
+              { property: { $in: activePropIds } },
+              { property: { $exists: false } },
+              { property: null },
+            ],
+          },
         },
-      },
-      { $group: { _id: "$city", count: { $sum: 1 } } },
-    ]);
-    const roomCountMap = new Map<string, number>();
-    for (const r of roomCounts) {
-      if (r._id) roomCountMap.set(String(r._id), r.count);
-    }
+        { $group: { _id: "$city", count: { $sum: 1 } } },
+      ]);
+      const roomCountMap = new Map<string, number>();
+      for (const r of roomCounts) {
+        if (r._id) roomCountMap.set(String(r._id), r.count);
+      }
 
-    const priorityOrder: Record<string, number> = {
-      chennai: 1,
-      kaniyakumari: 2,
-      kanniyakumari: 2,
-      kanyakumari: 2,
-      coimbatore: 3,
-      madurai: 4,
-      colachel: 5,
-    };
+      const priorityOrder: Record<string, number> = {
+        chennai: 1,
+        kaniyakumari: 2,
+        kanniyakumari: 2,
+        kanyakumari: 2,
+        coimbatore: 3,
+        madurai: 4,
+        colachel: 5,
+      };
 
-    const activeList = cities
-      .map((c) => {
-        const idStr = String(c._id);
-        const hasProps = (allPropertyCountMap.get(idStr) ?? 0) > 0;
-        const count = hasProps
-          ? propertyCountMap.get(idStr) ?? 0
-          : roomCountMap.get(idStr) ?? 0;
+      const activeList = cities
+        .map((c) => {
+          const idStr = String(c._id);
+          const hasProps = (allPropertyCountMap.get(idStr) ?? 0) > 0;
+          const count = hasProps
+            ? propertyCountMap.get(idStr) ?? 0
+            : roomCountMap.get(idStr) ?? 0;
 
-        const isKanya =
-          c.slug === "kaniyakumari" ||
-          c.slug === "kanyakumari" ||
-          c.slug === "kanniyakumari" ||
-          /kany|kaniy/i.test(c.name);
+          const isKanya =
+            c.slug === "kaniyakumari" ||
+            c.slug === "kanyakumari" ||
+            c.slug === "kanniyakumari" ||
+            /kany|kaniy/i.test(c.name);
 
-        let destinationLink = isKanya
-          ? "/kaniyakumari"
-          : c.link?.trim() ||
+          let destinationLink = isKanya
+            ? "/kaniyakumari"
+            : c.link?.trim() ||
             (c.slug === "chennai"
               ? "/chennai"
               : c.slug === "coimbatore"
@@ -127,79 +127,79 @@ const getHomeDestinations = unstable_cache(
                     ? "/colachel"
                     : `/destinations/${c.slug}`);
 
-        let destinationImage = c.image?.trim() || c.banner?.trim();
-        if (
-          !destinationImage ||
-          (c.slug === "chennai" && destinationImage.includes("kanyakumari"))
-        ) {
-          if (c.slug === "chennai")
-            destinationImage = "/images/destinations/chennai.png";
-          else if (isKanya)
-            destinationImage = "/images/destinations/kanyakumari.png";
-          else if (c.slug === "coimbatore")
-            destinationImage = "/images/destinations/coimbatore.png";
-          else if (c.slug === "madurai")
-            destinationImage = "/images/destinations/madurai.png";
-          else if (c.slug === "colachel")
-            destinationImage = "/images/destinations/kanyakumari.png";
-          else destinationImage = "/images/destinations/chennai.png";
-        }
+          let destinationImage = c.image?.trim() || c.banner?.trim();
+          if (
+            !destinationImage ||
+            (c.slug === "chennai" && destinationImage.includes("kanyakumari"))
+          ) {
+            if (c.slug === "chennai")
+              destinationImage = "/images/destinations/chennai.png";
+            else if (isKanya)
+              destinationImage = "/images/destinations/kanyakumari.png";
+            else if (c.slug === "coimbatore")
+              destinationImage = "/images/destinations/coimbatore.png";
+            else if (c.slug === "madurai")
+              destinationImage = "/images/destinations/madurai.png";
+            else if (c.slug === "colachel")
+              destinationImage = "/images/destinations/kanyakumari.png";
+            else destinationImage = "/images/destinations/chennai.png";
+          }
 
-        const displayName =
-          c.name ||
-          (c.slug === "chennai"
-            ? "Chennai"
-            : c.slug === "madurai"
-              ? "Madurai"
-              : c.slug === "coimbatore"
-                ? "Coimbatore"
-                : isKanya
-                  ? "Kaniyakumari"
-                  : c.slug === "colachel"
-                    ? "Colachel"
-                    : c.slug);
+          const displayName =
+            c.name ||
+            (c.slug === "chennai"
+              ? "Chennai"
+              : c.slug === "madurai"
+                ? "Madurai"
+                : c.slug === "coimbatore"
+                  ? "Coimbatore"
+                  : isKanya
+                    ? "Kaniyakumari"
+                    : c.slug === "colachel"
+                      ? "Colachel"
+                      : c.slug);
 
-        return {
-          id: idStr,
-          name: displayName,
-          pillLabel: displayName,
-          image: destinationImage,
-          href: destinationLink,
-          slug: c.slug,
-          count,
-        };
-      })
-      .filter((d) => d.count > 0)
-      .sort((a, b) => {
-        const pA = priorityOrder[a.slug ?? ""] ?? 99;
-        const pB = priorityOrder[b.slug ?? ""] ?? 99;
-        return pA - pB;
-      });
+          return {
+            id: idStr,
+            name: displayName,
+            pillLabel: displayName,
+            image: destinationImage,
+            href: destinationLink,
+            slug: c.slug,
+            count,
+          };
+        })
+        .filter((d) => d.count > 0)
+        .sort((a, b) => {
+          const pA = priorityOrder[a.slug ?? ""] ?? 99;
+          const pB = priorityOrder[b.slug ?? ""] ?? 99;
+          return pA - pB;
+        });
 
-    if (activeList.length === 0) return [];
+      if (activeList.length === 0) return [];
 
-    const baseItems: DestinationItem[] = activeList.slice(0, 3).map((item) => ({
-      id: item.id,
-      name: item.name,
-      pillLabel: item.pillLabel,
-      image: item.image,
-      href: item.href,
-    }));
+      const baseItems: DestinationItem[] = activeList.slice(0, 3).map((item) => ({
+        id: item.id,
+        name: item.name,
+        pillLabel: item.pillLabel,
+        image: item.image,
+        href: item.href,
+      }));
 
-    return [
-      ...baseItems,
-      {
-        id: "view-all",
-        name: "View all our Destination",
-        pillLabel: "",
-        image: "/images/destinations/destination-card-bg.png",
-        href: "/destinations",
-        isViewAll: true,
-      },
-    ];
-  } catch {
-    return [];
-  }
+      return [
+        ...baseItems,
+        {
+          id: "view-all",
+          name: "View all our Destination",
+          pillLabel: "",
+          image: "/images/destinations/destination-card-bg.png",
+          href: "/destinations",
+          isViewAll: true,
+        },
+      ];
+    } catch {
+      return [];
+    }
   },
   ["home-destinations"],
   { revalidate: 60 }

@@ -135,13 +135,13 @@ export default function AdminDropzone({
                 onChange={(e) => { setUrlInput(e.target.value); setError(""); }}
                 onKeyDown={(e) => e.key === "Enter" && applyUrl()}
                 placeholder="https://example.com/image.jpg"
-                className="flex h-10 flex-1 rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                className="flex h-10 flex-1 rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
               />
               <button
                 type="button"
                 onClick={applyUrl}
-                className="h-10 rounded-md px-4 text-sm font-semibold text-[hsl(var(--adm-primary-foreground))] transition-colors"
-                style={{ background: "hsl(var(--adm-primary))" }}
+                className="h-10 rounded-[8px] px-4 text-sm font-semibold text-[hsl(var(--adm-brand-foreground))] transition-colors"
+                style={{ background: "hsl(var(--adm-brand))" }}
               >
                 Set
               </button>
@@ -159,7 +159,7 @@ export default function AdminDropzone({
           onPaste={handlePaste}
           onClick={() => !value && !uploading && inputRef.current?.click()}
           className={[
-            `relative ${aspectRatio} w-full rounded-xl border-2 transition-all overflow-hidden max-h-48`,
+            `relative ${aspectRatio} w-full rounded-[8px] border-2 transition-all overflow-hidden max-h-48`,
             dragging
               ? "border-[hsl(var(--adm-primary))] bg-[hsl(var(--adm-primary)/0.05)] scale-[1.01]"
               : value
@@ -191,7 +191,7 @@ export default function AdminDropzone({
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); inputRef.current?.click(); }}
-                  className="flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-xs font-semibold text-gray-800 hover:bg-white transition-colors"
+                  className="flex items-center gap-2 rounded-[8px] bg-white/90 px-4 py-2 text-xs font-semibold text-gray-800 hover:bg-white transition-colors"
                 >
                   <Upload className="h-3.5 w-3.5" />
                   Change Image
@@ -199,7 +199,7 @@ export default function AdminDropzone({
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); onChange(""); }}
-                  className="flex items-center gap-2 rounded-full bg-red-500/90 px-4 py-2 text-xs font-semibold text-white hover:bg-red-500 transition-colors"
+                  className="flex items-center gap-2 rounded-[8px] bg-red-500/90 px-4 py-2 text-xs font-semibold text-white hover:bg-red-500 transition-colors"
                 >
                   <X className="h-3.5 w-3.5" />
                   Remove
@@ -209,7 +209,7 @@ export default function AdminDropzone({
           ) : (
             /* Placeholder */
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6">
-              <div className={`rounded-2xl p-4 transition-colors ${dragging ? "bg-[hsl(var(--adm-primary)/0.15)]" : "bg-[hsl(var(--adm-accent)/0.5)]"}`}>
+              <div className={`rounded-[8px] p-4 transition-colors ${dragging ? "bg-[hsl(var(--adm-primary)/0.15)]" : "bg-[hsl(var(--adm-accent)/0.5)]"}`}>
                 <ImageIcon className={`h-7 w-7 transition-colors ${dragging ? "text-[hsl(var(--adm-primary))]" : "text-[hsl(var(--adm-muted-foreground))]"}`} />
               </div>
               <div className="text-center">
@@ -227,12 +227,12 @@ export default function AdminDropzone({
 
       {/* URL preview */}
       {urlMode && value && (
-        <div className={`relative ${aspectRatio} w-full overflow-hidden rounded-xl border border-[hsl(var(--adm-border))] max-h-48`}>
+        <div className={`relative ${aspectRatio} w-full overflow-hidden rounded-[8px] border border-[hsl(var(--adm-border))] max-h-48`}>
           <img src={value} alt={label} className="h-full w-full object-cover" />
           <button
             type="button"
             onClick={() => onChange("")}
-            className="absolute right-2 top-2 rounded-full bg-black/60 p-1 text-white hover:bg-black/80 transition-colors"
+            className="absolute right-2 top-2 rounded-[8px] bg-black/60 p-1 text-white hover:bg-black/80 transition-colors"
           >
             <X className="h-3.5 w-3.5" />
           </button>

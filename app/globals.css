@@ -33,37 +33,39 @@ body {
 /* ═══════════════════════════════════════════════════════════════════════════
    ADMIN THEME — Xura Hotel CMS Edition
    Scoped under .admin-root to avoid polluting public site styles.
-   Dark mode toggled via .dark ancestor (next-themes class strategy).
+   Light mode only.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .admin-root {
-  --adm-background: 44 22% 96%;
-  --adm-foreground: 215 54% 13%;
-  --adm-card: 44 30% 99%;
-  --adm-card-foreground: 215 54% 13%;
-  --adm-popover: 44 30% 99%;
-  --adm-popover-foreground: 215 54% 13%;
+  --adm-background: 40 27.3% 95.7%;      /* #F7F5F1 — kattil-cream */
+  --adm-foreground: 216.4 45.2% 12.2%;    /* #111C2D — kattil-navy */
+  --adm-card: 0 0% 100%;
+  --adm-card-foreground: 216.4 45.2% 12.2%;
+  --adm-popover: 0 0% 100%;
+  --adm-popover-foreground: 216.4 45.2% 12.2%;
 
-  --adm-primary: 95 20% 34%;
-  --adm-primary-foreground: 44 30% 99%;
-  --adm-secondary: 100 22% 90%;
-  --adm-secondary-foreground: 95 20% 34%;
+  --adm-primary: 90.8 18.5% 58.6%;       /* #95A982 — kattil-sage */
+  --adm-primary-foreground: 0 0% 100%;
+  --adm-brand: 88.6 45.7% 82%;            /* #D2E6BC — admin accent fill */
+  --adm-brand-foreground: 210 69.6% 18%;  /* #0E2E4E — text/icons on accent fill */
+  --adm-secondary: 86.7 25% 85.9%;       /* #DCE4D2 — kattil-sage-light */
+  --adm-secondary-foreground: 91.8 15.2% 43.9%; /* #6F815F — kattil-sage-dark */
 
-  --adm-muted: 100 18% 93%;
-  --adm-muted-foreground: 215 18% 44%;
-  --adm-accent: 100 22% 91%;
-  --adm-accent-foreground: 215 54% 13%;
+  --adm-muted: 90 22.2% 92.9%;           /* #EDF1E9 — kattil-hover */
+  --adm-muted-foreground: 98.6 7.2% 38%;  /* #5F685A — kattil-muted */
+  --adm-accent: 90 22.2% 92.9%;          /* #EDF1E9 — kattil-hover */
+  --adm-accent-foreground: 216.4 45.2% 12.2%;
 
-  --adm-destructive: 4 68% 52%;
+  --adm-destructive: 0 72% 51%;         /* #dc2626 — site red-600 */
   --adm-destructive-foreground: 0 0% 100%;
   --adm-success: 95 35% 36%;
   --adm-success-foreground: 0 0% 100%;
   --adm-warning: 38 88% 48%;
   --adm-warning-foreground: 0 0% 100%;
 
-  --adm-border: 100 14% 84%;
-  --adm-input: 100 14% 84%;
-  --adm-ring: 95 20% 34%;
+  --adm-border: 87.3 14.3% 84.9%;        /* #D9DED3 — kattil-border */
+  --adm-input: 87.3 14.3% 84.9%;
+  --adm-ring: 91.8 15.2% 43.9%;
 
   --adm-chart-1: 95 20% 34%;
   --adm-chart-2: 89 19% 55%;
@@ -71,24 +73,24 @@ body {
   --adm-chart-4: 215 40% 32%;
   --adm-chart-5: 44 22% 65%;
 
-  --adm-sidebar: 44 16% 92%;
-  --adm-sidebar-foreground: 215 54% 13%;
-  --adm-sidebar-primary: 95 20% 34%;
-  --adm-sidebar-primary-foreground: 44 30% 99%;
-  --adm-sidebar-accent: 100 22% 87%;
-  --adm-sidebar-accent-foreground: 215 54% 13%;
-  --adm-sidebar-border: 100 14% 82%;
+  --adm-sidebar: 210 69.6% 18%;          /* #0E2E4E */
+  --adm-sidebar-foreground: 0 0% 100%;
+  --adm-sidebar-primary: 88.6 45.7% 82%;  /* #D2E6BC — active nav */
+  --adm-sidebar-primary-foreground: 210 69.6% 18%; /* #0E2E4E */
+  --adm-sidebar-accent: 210 50% 26%;      /* #214263 — hover, lighter shade of sidebar */
+  --adm-sidebar-accent-foreground: 0 0% 100%;
+  --adm-sidebar-border: 87.3 14.3% 84.9%;
 
-  --adm-shadow-xs: 0 1px 3px 0 hsl(100 20% 20% / 0.06), 0 1px 2px -1px hsl(100 20% 20% / 0.04);
-  --adm-shadow-sm: 0 2px 6px 0 hsl(100 20% 20% / 0.08), 0 1px 3px -1px hsl(100 20% 20% / 0.06);
-  --adm-shadow-md: 0 4px 14px 0 hsl(100 20% 20% / 0.10), 0 2px 5px -1px hsl(100 20% 20% / 0.07);
-  --adm-shadow-lg: 0 8px 24px 0 hsl(100 20% 20% / 0.11), 0 4px 8px -2px hsl(100 20% 20% / 0.08);
-  --adm-shadow-xl: 0 16px 40px 0 hsl(100 20% 20% / 0.14), 0 6px 12px -3px hsl(100 20% 20% / 0.09);
+  --adm-shadow-xs: none;
+  --adm-shadow-sm: none;
+  --adm-shadow-md: none;
+  --adm-shadow-lg: none;
+  --adm-shadow-xl: none;
 
-  --adm-radius: 0.625rem;
+  --adm-radius: 8px;
   --adm-header-height: 4rem;
   --adm-sidebar-width: 16rem;
-  --adm-font-sans: Inter, system-ui, sans-serif;
+  --adm-font-sans: var(--font-public-sans), "Public Sans", system-ui, sans-serif;
   --adm-font-mono: "JetBrains Mono", monospace;
   --adm-logo-filter: none;
 
@@ -97,62 +99,6 @@ body {
   font-family: var(--adm-font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-.dark .admin-root,
-.dark.admin-root {
-  --adm-background: 215 55% 8%;
-  --adm-foreground: 44 22% 93%;
-  --adm-card: 215 48% 11%;
-  --adm-card-foreground: 44 22% 93%;
-  --adm-popover: 215 48% 11%;
-  --adm-popover-foreground: 44 22% 93%;
-
-  --adm-primary: 89 19% 60%;
-  --adm-primary-foreground: 215 55% 8%;
-  --adm-secondary: 215 40% 17%;
-  --adm-secondary-foreground: 100 20% 72%;
-
-  --adm-muted: 215 44% 14%;
-  --adm-muted-foreground: 44 12% 57%;
-  --adm-accent: 215 42% 17%;
-  --adm-accent-foreground: 44 22% 93%;
-
-  --adm-destructive: 4 68% 58%;
-  --adm-destructive-foreground: 0 0% 100%;
-  --adm-success: 89 40% 46%;
-  --adm-success-foreground: 0 0% 100%;
-  --adm-warning: 38 88% 54%;
-  --adm-warning-foreground: 215 55% 8%;
-
-  --adm-border: 215 38% 21%;
-  --adm-input: 215 38% 21%;
-  --adm-ring: 89 19% 60%;
-
-  --adm-chart-1: 89 19% 60%;
-  --adm-chart-2: 100 20% 72%;
-  --adm-chart-3: 44 22% 78%;
-  --adm-chart-4: 215 35% 36%;
-  --adm-chart-5: 89 19% 46%;
-
-  --adm-sidebar: 215 56% 7%;
-  --adm-sidebar-foreground: 44 22% 93%;
-  --adm-sidebar-primary: 89 19% 60%;
-  --adm-sidebar-primary-foreground: 215 55% 8%;
-  --adm-sidebar-accent: 215 44% 14%;
-  --adm-sidebar-accent-foreground: 44 22% 93%;
-  --adm-sidebar-border: 215 40% 18%;
-
-  --adm-shadow-xs: 0 1px 3px 0 hsl(215 55% 4% / 0.35), 0 1px 2px -1px hsl(215 55% 4% / 0.25);
-  --adm-shadow-sm: 0 2px 6px 0 hsl(215 55% 4% / 0.45), 0 1px 3px -1px hsl(215 55% 4% / 0.35);
-  --adm-shadow-md: 0 4px 14px 0 hsl(215 55% 4% / 0.50), 0 2px 5px -1px hsl(215 55% 4% / 0.40);
-  --adm-shadow-lg: 0 8px 24px 0 hsl(215 55% 4% / 0.55), 0 4px 8px -2px hsl(215 55% 4% / 0.45);
-  --adm-shadow-xl: 0 16px 40px 0 hsl(215 55% 4% / 0.65), 0 6px 12px -3px hsl(215 55% 4% / 0.55);
-
-  --adm-logo-filter: brightness(0) invert(1);
-
-  background-color: hsl(var(--adm-background));
-  color: hsl(var(--adm-foreground));
 }
 
 .admin-root ::-webkit-scrollbar {
@@ -166,7 +112,7 @@ body {
 
 .admin-root ::-webkit-scrollbar-thumb {
   background: hsl(var(--adm-border));
-  border-radius: 999px;
+  border-radius: 8px;
 }
 
 .admin-root ::-webkit-scrollbar-thumb:hover {
@@ -190,7 +136,7 @@ body {
       hsl(var(--adm-muted)) 63%);
   background-size: 400% 100%;
   animation: adm-shimmer 2.5s infinite linear;
-  border-radius: calc(var(--adm-radius) - 2px);
+  border-radius: var(--adm-radius);
 }
 
 .admin-root * {
@@ -200,6 +146,24 @@ body {
 .admin-root :focus-visible {
   outline: 2px solid hsl(var(--adm-ring));
   outline-offset: 2px;
+}
+
+/* Admin form controls: white background. Unlayered, so it overrides the
+   per-field Tailwind bg-* utilities. Transparent inputs nested in styled
+   wrappers are left alone. */
+.admin-root :is(
+  input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"], [type="button"], [type="submit"], [type="reset"], [type="image"], [type="hidden"]),
+  textarea,
+  select
+):not(.bg-transparent) {
+  background-color: #FFFFFF;
+}
+
+/* Admin typography: Public Sans everywhere, no custom letter spacing */
+.admin-root,
+.admin-root * {
+  font-family: var(--adm-font-sans);
+  letter-spacing: normal;
 }
 
 * {

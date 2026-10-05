@@ -11,7 +11,7 @@ import AdminDropzone from "@/components/admin/ui/AdminDropzone";
 const RichTextEditor = dynamic(() => import("@/components/admin/ui/RichTextEditor"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-64 items-center justify-center rounded-xl border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-muted)/0.3)]">
+    <div className="flex h-64 items-center justify-center rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-muted)/0.3)]">
       <Loader2 className="h-6 w-6 animate-spin text-[hsl(var(--adm-muted-foreground))]" />
     </div>
   ),
@@ -47,7 +47,7 @@ function slugify(text: string) {
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="text-sm font-bold uppercase tracking-wider text-[hsl(var(--adm-muted-foreground))] border-b border-[hsl(var(--adm-border)/0.5)] pb-3 mb-5">
+    <h2 className="text-sm font-bold uppercase text-[hsl(var(--adm-muted-foreground))] border-b border-[hsl(var(--adm-border)/0.5)] pb-3 mb-5">
       {children}
     </h2>
   );
@@ -67,7 +67,7 @@ function FormField({ label, required, hint, children }: {
   );
 }
 
-const inputCls = "flex w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-colors";
+const inputCls = "flex w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-colors";
 
 export default function BlogFormPage() {
   const router  = useRouter();
@@ -85,7 +85,8 @@ export default function BlogFormPage() {
   useEffect(() => {
     fetch("/api/admin/blog-categories")
       .then((r) => r.json())
-      .then((r) => { if (r.success) setCategories(r.data.categories); });
+      .then((r) => { if (r.success) setCategories(r.data.categories); })
+      .catch(() => {});
   }, []);
 
   // Load existing blog for edit
@@ -113,6 +114,7 @@ export default function BlogFormPage() {
           });
         }
       })
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, [id, isNew]);
 
@@ -176,12 +178,12 @@ export default function BlogFormPage() {
 
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: EASE }}
-        className="rounded-2xl border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] shadow-sm overflow-hidden">
+        className="rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] overflow-hidden">
 
         {/* Header */}
         <div className="px-6 py-5 border-b border-[hsl(var(--adm-border)/0.5)]">
           <div className="flex items-center gap-3">
-            <div className="rounded-xl p-2.5 bg-[hsl(var(--adm-primary)/0.1)]">
+            <div className="rounded-[8px] p-2.5 bg-[hsl(var(--adm-primary)/0.1)]">
               <FileText className="h-5 w-5 text-[hsl(var(--adm-primary))]" />
             </div>
             <div>
@@ -208,7 +210,7 @@ export default function BlogFormPage() {
                   className={`${inputCls} h-10`} />
                 {form.title && (
                   <p className="text-[10px] text-[hsl(var(--adm-muted-foreground))] mt-1">
-                    URL: <span className="font-mono">/blog/{slugify(form.title)}</span>
+                    URL: <span>/blog/{slugify(form.title)}</span>
                   </p>
                 )}
               </FormField>
@@ -223,7 +225,7 @@ export default function BlogFormPage() {
                       {categories.map((c) => <option key={c._id} value={c.name}>{c.name}</option>)}
                     </select>
                     <a href="/admin/blog-categories" target="_blank" rel="noopener noreferrer"
-                      className="h-10 flex items-center gap-1 rounded-lg border border-[hsl(var(--adm-border))] px-3 text-xs font-medium text-[hsl(var(--adm-primary))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors whitespace-nowrap">
+                      className="h-10 flex items-center gap-1 rounded-[8px] border border-[hsl(var(--adm-border))] px-3 text-xs font-medium text-[hsl(var(--adm-primary))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors whitespace-nowrap">
                       <Plus className="h-3 w-3" /> Manage
                     </a>
                   </div>
@@ -290,10 +292,10 @@ export default function BlogFormPage() {
             </p>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-3">
               {form.additionalImages.map((img, i) => (
-                <div key={i} className="relative aspect-square overflow-hidden rounded-xl border border-[hsl(var(--adm-border))]">
+                <div key={i} className="relative aspect-square overflow-hidden rounded-[8px] border border-[hsl(var(--adm-border))]">
                   <img src={img} alt={`Additional ${i + 1}`} className="h-full w-full object-cover" />
                   <button type="button" onClick={() => removeAdditionalImage(i)}
-                    className="absolute top-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white hover:bg-red-500/90 transition-colors">
+                    className="absolute top-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded-[8px] bg-black/60 text-white hover:bg-red-500/90 transition-colors">
                     <X className="h-3 w-3" />
                   </button>
                 </div>
@@ -324,7 +326,7 @@ export default function BlogFormPage() {
                   placeholder="Add a tag…"
                   className={`${inputCls} h-10 flex-1`} />
                 <button type="button" onClick={addTag}
-                  className="h-10 rounded-lg border border-[hsl(var(--adm-border))] px-4 text-sm font-medium text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors">
+                  className="h-10 rounded-[8px] border border-[hsl(var(--adm-border))] px-4 text-sm font-medium text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors">
                   <Tag className="h-3.5 w-3.5" />
                 </button>
               </div>
@@ -332,7 +334,7 @@ export default function BlogFormPage() {
             {form.tags.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">
                 {form.tags.map((tag) => (
-                  <span key={tag} className="inline-flex items-center gap-1.5 rounded-full border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-muted)/0.6)] px-3 py-1 text-xs font-medium text-[hsl(var(--adm-foreground))]">
+                  <span key={tag} className="inline-flex items-center gap-1.5 rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-muted)/0.6)] px-3 py-1 text-xs font-medium text-[hsl(var(--adm-foreground))]">
                     {tag}
                     <button type="button" onClick={() => setForm((f) => ({ ...f, tags: f.tags.filter((t) => t !== tag) }))}
                       className="text-[hsl(var(--adm-muted-foreground))] hover:text-[hsl(var(--adm-destructive))] transition-colors">
@@ -355,7 +357,7 @@ export default function BlogFormPage() {
                   className={`${inputCls} h-10`} />
               </FormField>
               <FormField label="Options">
-                <label className="flex h-10 cursor-pointer items-center gap-3 rounded-lg border border-[hsl(var(--adm-border))] px-3 hover:bg-[hsl(var(--adm-accent)/0.3)] transition-colors">
+                <label className="flex h-10 cursor-pointer items-center gap-3 rounded-[8px] border border-[hsl(var(--adm-border))] px-3 hover:bg-[hsl(var(--adm-accent)/0.3)] transition-colors">
                   <input type="checkbox" checked={form.featured}
                     onChange={(e) => setForm((f) => ({ ...f, featured: e.target.checked }))}
                     className="h-4 w-4 accent-[hsl(var(--adm-primary))]" />
@@ -368,7 +370,7 @@ export default function BlogFormPage() {
               </FormField>
             </div>
 
-            <div className="mt-4 rounded-xl bg-[hsl(var(--adm-accent)/0.2)] border border-[hsl(var(--adm-border)/0.5)] p-3 text-xs text-[hsl(var(--adm-muted-foreground))]">
+            <div className="mt-4 rounded-[8px] bg-[hsl(var(--adm-accent)/0.2)] border border-[hsl(var(--adm-border)/0.5)] p-3 text-xs text-[hsl(var(--adm-muted-foreground))]">
               <strong className="text-[hsl(var(--adm-foreground))]">SEO is generated automatically</strong> from your title, description, category, and tags.
               No manual SEO configuration needed.
             </div>
@@ -376,7 +378,7 @@ export default function BlogFormPage() {
 
           {/* Error */}
           {error && (
-            <div className="rounded-xl border border-[hsl(var(--adm-destructive)/0.3)] bg-[hsl(var(--adm-destructive)/0.08)] px-4 py-3">
+            <div className="rounded-[8px] border border-[hsl(var(--adm-destructive)/0.3)] bg-[hsl(var(--adm-destructive)/0.08)] px-4 py-3">
               <p className="text-sm text-[hsl(var(--adm-destructive))]">{error}</p>
             </div>
           )}
@@ -384,16 +386,16 @@ export default function BlogFormPage() {
           {/* Actions */}
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-[hsl(var(--adm-border)/0.4)]">
             <button type="button" onClick={() => router.push("/admin/blogs")}
-              className="h-10 rounded-lg border border-[hsl(var(--adm-border))] bg-transparent px-5 text-sm font-medium text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors">
+              className="h-10 rounded-[8px] border border-[hsl(var(--adm-border))] bg-transparent px-5 text-sm font-medium text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors">
               Cancel
             </button>
             <button type="button" onClick={() => handleSave("draft")} disabled={saving}
-              className="h-10 rounded-lg border border-[hsl(var(--adm-border))] bg-transparent px-5 text-sm font-medium text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors disabled:opacity-60">
+              className="h-10 rounded-[8px] border border-[hsl(var(--adm-border))] bg-transparent px-5 text-sm font-medium text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors disabled:opacity-60">
               Save as Draft
             </button>
             <button type="button" onClick={() => handleSave()} disabled={saving}
-              className="flex h-10 items-center gap-2 rounded-lg px-6 text-sm font-semibold text-white transition-all disabled:opacity-60"
-              style={{ background: "hsl(var(--adm-primary))" }}>
+              className="flex h-10 items-center gap-2 rounded-[8px] px-6 text-sm font-semibold text-[hsl(var(--adm-brand-foreground))] transition-all disabled:opacity-60"
+              style={{ background: "hsl(var(--adm-brand))" }}>
               {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : <><Save className="h-4 w-4" /> {isNew ? "Publish Post" : "Save Changes"}</>}
             </button>
           </div>

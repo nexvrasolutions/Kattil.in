@@ -61,7 +61,7 @@ const ICON_DEFAULTS: Record<string, { bg: string; color: string }> = {
   custom:     { bg: "#374151",  color: "#ffffff" },
 };
 
-const ic = "flex w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-colors h-10";
+const ic = "flex w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-colors h-10";
 
 const TABS = [
   { id: "branding",  label: "Branding",      icon: ImageIcon    },
@@ -172,7 +172,7 @@ export default function FooterPage() {
   const updLoc     = (si: number, li: number, f: string, v: string) => setData((d) => { const s = [...d.sidebarIcons]; s[si].locations = s[si].locations.map((l, x) => x === li ? { ...l, [f]: v } : l); return { ...d, sidebarIcons: s }; });
   const delLoc     = (si: number, li: number) => setData((d) => { const s = [...d.sidebarIcons]; s[si].locations = s[si].locations.filter((_, x) => x !== li); return { ...d, sidebarIcons: s }; });
 
-  if (loading) return <div className="space-y-4">{[...Array(3)].map((_, i) => <div key={i} className="h-32 rounded-2xl adm-skeleton" />)}</div>;
+  if (loading) return <div className="space-y-4">{[...Array(3)].map((_, i) => <div key={i} className="h-32 rounded-[8px] adm-skeleton" />)}</div>;
 
   return (
     <div>
@@ -186,7 +186,7 @@ export default function FooterPage() {
       <div className="flex gap-1 mb-6 overflow-x-auto pb-1">
         {TABS.map((t) => { const Icon = t.icon; return (
           <button key={t.id} onClick={() => setTab(t.id)}
-            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition-colors ${tab === t.id ? "bg-[hsl(var(--adm-primary))] text-white" : "text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))]"}`}>
+            className={`flex items-center gap-2 rounded-[8px] px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition-colors ${tab === t.id ? "bg-[hsl(var(--adm-brand))] text-[hsl(var(--adm-brand-foreground))]" : "text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))]"}`}>
             <Icon className="h-4 w-4" />{t.label}
           </button>
         ); })}
@@ -203,7 +203,7 @@ export default function FooterPage() {
                 <label className="text-sm font-medium text-[hsl(var(--adm-foreground))]">Footer Logo</label>
                 <p className="text-xs text-[hsl(var(--adm-muted-foreground))]">PNG with transparent background recommended.</p>
                 <div className="flex items-center gap-4">
-                  <div className="h-12 w-32 shrink-0 rounded-lg border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-muted)/0.4)] overflow-hidden flex items-center justify-center">
+                  <div className="h-12 w-32 shrink-0 rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-muted)/0.4)] overflow-hidden flex items-center justify-center">
                     {data.logo
                       ? <img src={data.logo} alt="Logo" className="h-full w-full object-contain p-1.5" />
                       : <ImageIcon className="h-5 w-5 text-[hsl(var(--adm-muted-foreground)/0.4)]" />
@@ -212,13 +212,13 @@ export default function FooterPage() {
                   <div className="flex items-center gap-2">
                     <input ref={logoInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
                     <button type="button" onClick={() => logoInputRef.current?.click()} disabled={logoUploading}
-                      className="flex items-center gap-1.5 h-9 rounded-lg border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-background))] px-3 text-sm font-medium text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent))] transition-colors disabled:opacity-50">
+                      className="flex items-center gap-1.5 h-9 rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-background))] px-3 text-sm font-medium text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent))] transition-colors disabled:opacity-50">
                       {logoUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
                       {logoUploading ? "Uploading…" : "Change Logo"}
                     </button>
                     {data.logo && (
                       <button type="button" onClick={() => setData((d) => ({ ...d, logo: "" }))}
-                        className="h-9 rounded-lg border border-[hsl(var(--adm-border))] px-3 text-sm text-[hsl(var(--adm-muted-foreground))] hover:text-[hsl(var(--adm-destructive))] hover:bg-[hsl(var(--adm-destructive)/0.06)] transition-colors">
+                        className="h-9 rounded-[8px] border border-[hsl(var(--adm-border))] px-3 text-sm text-[hsl(var(--adm-muted-foreground))] hover:text-[hsl(var(--adm-destructive))] hover:bg-[hsl(var(--adm-destructive)/0.06)] transition-colors">
                         Remove
                       </button>
                     )}
@@ -249,7 +249,7 @@ export default function FooterPage() {
           {data.footerLinks.length === 0 && (
             <AdminCard><div className="flex flex-col items-center py-12 gap-3"><Globe className="h-10 w-10 text-[hsl(var(--adm-muted-foreground)/0.3)]" /><p className="text-sm text-[hsl(var(--adm-muted-foreground))]">No link sections yet</p><AdminButton variant="outline" size="sm" onClick={addSection}><Plus className="h-3.5 w-3.5" />Add First Section</AdminButton></div></AdminCard>
           )}
-          <AdminCard className="rounded-2xl! overflow-hidden">
+          <AdminCard className="rounded-[8px]! overflow-hidden">
             {data.footerLinks.map((section, si) => {
               const isOpen = openSections.has(si);
               return (
@@ -257,14 +257,14 @@ export default function FooterPage() {
                   {/* ── Section header row ── */}
                   <div className="flex items-center gap-2 px-4 py-3">
                     <button onClick={() => toggleSection(si)}
-                      className="rounded p-0.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] transition-colors">
+                      className="rounded-[8px] p-0.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] transition-colors">
                       {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                     </button>
                     <input value={section.section} onChange={(e) => updSection(si, "section", e.target.value)}
                       className={`${ic.replace("h-10","h-8")} max-w-40 font-semibold`} placeholder="Section name" />
                     <span className="ml-auto text-xs text-[hsl(var(--adm-muted-foreground))]">{section.links.length} link{section.links.length !== 1 ? "s" : ""}</span>
                     <button onClick={() => delSection(si)}
-                      className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors">
+                      className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors">
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
@@ -285,7 +285,7 @@ export default function FooterPage() {
                             <ExternalLink className="h-3 w-3 text-[hsl(var(--adm-muted-foreground))]" />
                           </label>
                           <button onClick={() => delLink(si, li)}
-                            className="rounded p-1 text-[hsl(var(--adm-muted-foreground))] hover:text-[hsl(var(--adm-destructive))] transition-colors">
+                            className="rounded-[8px] p-1 text-[hsl(var(--adm-muted-foreground))] hover:text-[hsl(var(--adm-destructive))] transition-colors">
                             <Trash2 className="h-3 w-3" />
                           </button>
                         </div>
@@ -311,7 +311,7 @@ export default function FooterPage() {
               <p className="text-sm font-medium text-[hsl(var(--adm-foreground))] mb-3">Quick Add</p>
               <div className="flex flex-wrap gap-2">
                 {BUILT_IN_ICONS.map((name) => (
-                  <button key={name} onClick={() => addSocial(name)} className="rounded-full border border-[hsl(var(--adm-border))] px-3 py-1.5 text-xs font-semibold text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent))] transition-colors">
+                  <button key={name} onClick={() => addSocial(name)} className="rounded-[8px] border border-[hsl(var(--adm-border))] px-3 py-1.5 text-xs font-semibold text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent))] transition-colors">
                     + {ICON_LABELS[name]}
                   </button>
                 ))}
@@ -322,11 +322,11 @@ export default function FooterPage() {
             <AdminCard><div className="flex flex-col items-center py-10 gap-3"><Share2 className="h-8 w-8 text-[hsl(var(--adm-muted-foreground)/0.3)]" /><p className="text-sm text-[hsl(var(--adm-muted-foreground))]">No social links yet — use Quick Add above</p></div></AdminCard>
           )}
           {data.socialLinks.length > 0 && (
-            <AdminCard className="rounded-2xl! overflow-hidden">
+            <AdminCard className="rounded-[8px]! overflow-hidden">
               {data.socialLinks.map((social, i) => (
                 <div key={i} className="flex items-center gap-2 px-4 py-2.5 border-b border-[hsl(var(--adm-border)/0.4)] last:border-0 hover:bg-[hsl(var(--adm-accent)/0.2)] transition-colors">
                   {/* Colour swatch / custom icon preview */}
-                  <div className="h-7 w-7 rounded-full shrink-0 flex items-center justify-center text-[9px] font-black text-white overflow-hidden border border-white/10"
+                  <div className="h-7 w-7 rounded-[8px] shrink-0 flex items-center justify-center text-[9px] font-black text-white overflow-hidden border border-white/10"
                     style={{ background: social.bgColor }}>
                     {social.iconImageUrl
                       ? <img src={social.iconImageUrl} alt="" className="h-4 w-4 object-contain" />
@@ -339,11 +339,11 @@ export default function FooterPage() {
                   <input value={social.bgColor} onChange={(e) => updSocial(i, "bgColor", e.target.value)}
                     placeholder="bg-color" className={`${ic.replace("h-10","h-8")} w-44 text-xs hidden md:flex`} />
                   <button onClick={() => updSocial(i, "visible", !social.visible)}
-                    className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] transition-colors shrink-0">
+                    className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] transition-colors shrink-0">
                     {social.visible ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
                   </button>
                   <button onClick={() => delSocial(i)}
-                    className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors shrink-0">
+                    className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors shrink-0">
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </div>
@@ -363,7 +363,7 @@ export default function FooterPage() {
             </div>
             <div className="flex flex-wrap gap-2 shrink-0">
               {BUILT_IN_ICONS.slice(0, 7).map((name) => (
-                <button key={name} onClick={() => addSidebar(name)} className="rounded-full border border-[hsl(var(--adm-border))] px-3 py-1.5 text-xs font-semibold text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent))] transition-colors whitespace-nowrap">
+                <button key={name} onClick={() => addSidebar(name)} className="rounded-[8px] border border-[hsl(var(--adm-border))] px-3 py-1.5 text-xs font-semibold text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent))] transition-colors whitespace-nowrap">
                   + {ICON_LABELS[name]}
                 </button>
               ))}
@@ -373,13 +373,13 @@ export default function FooterPage() {
             <AdminCard><div className="flex flex-col items-center py-10 gap-3"><LayoutTemplate className="h-8 w-8 text-[hsl(var(--adm-muted-foreground)/0.3)]" /><p className="text-sm text-[hsl(var(--adm-muted-foreground))]">No sidebar icons yet — use Quick Add above</p></div></AdminCard>
           )}
           {data.sidebarIcons.length > 0 && (
-            <AdminCard className="rounded-2xl! overflow-hidden">
+            <AdminCard className="rounded-[8px]! overflow-hidden">
               {data.sidebarIcons.map((icon, i) => (
                 <div key={i} className="border-b border-[hsl(var(--adm-border)/0.4)] last:border-0">
                   {/* ── Compact main row ── */}
                   <div className="flex items-center gap-2 px-4 py-2.5 hover:bg-[hsl(var(--adm-accent)/0.2)] transition-colors">
                     {/* Icon preview */}
-                    <div className="h-7 w-7 rounded-full shrink-0 flex items-center justify-center text-[9px] font-black overflow-hidden border border-white/10"
+                    <div className="h-7 w-7 rounded-[8px] shrink-0 flex items-center justify-center text-[9px] font-black overflow-hidden border border-white/10"
                       style={{ background: icon.bgColor, color: icon.iconColor }}>
                       {icon.iconUrl
                         ? <img src={icon.iconUrl} alt="" className="h-4 w-4 object-contain" />
@@ -415,11 +415,11 @@ export default function FooterPage() {
                     </label>
 
                     <button onClick={() => updSidebar(i, "visible", !icon.visible)}
-                      className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] transition-colors shrink-0">
+                      className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] transition-colors shrink-0">
                       {icon.visible ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
                     </button>
                     <button onClick={() => delSidebar(i)}
-                      className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors shrink-0">
+                      className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors shrink-0">
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
@@ -427,7 +427,7 @@ export default function FooterPage() {
                   {/* ── Multi-location sub-rows ── */}
                   {icon.type === "multi" && (
                     <div className="px-4 pb-3 pt-1 bg-[hsl(var(--adm-muted)/0.2)] space-y-1.5">
-                      <p className="text-[10px] font-semibold uppercase tracking-wide text-[hsl(var(--adm-muted-foreground))] mb-1">Sub-menu locations</p>
+                      <p className="text-[10px] font-semibold uppercase text-[hsl(var(--adm-muted-foreground))] mb-1">Sub-menu locations</p>
                       {icon.locations.map((loc, li) => (
                         <div key={li} className="flex items-center gap-2">
                           <input value={loc.label} onChange={(e) => updLoc(i, li, "label", e.target.value)}
@@ -435,7 +435,7 @@ export default function FooterPage() {
                           <input value={loc.url} onChange={(e) => updLoc(i, li, "url", e.target.value)}
                             placeholder="https://wa.me/91..." className={`${ic.replace("h-10","h-7")} flex-1 text-xs`} />
                           <button onClick={() => delLoc(i, li)}
-                            className="rounded p-1 text-[hsl(var(--adm-muted-foreground))] hover:text-[hsl(var(--adm-destructive))] transition-colors">
+                            className="rounded-[8px] p-1 text-[hsl(var(--adm-muted-foreground))] hover:text-[hsl(var(--adm-destructive))] transition-colors">
                             <Trash2 className="h-3 w-3" />
                           </button>
                         </div>

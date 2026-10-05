@@ -13,7 +13,7 @@ interface AdminButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<ButtonVariant, string> = {
   default:
-    "bg-[hsl(var(--adm-primary))] text-[hsl(var(--adm-primary-foreground))] hover:bg-[hsl(var(--adm-primary)/0.88)] active:scale-[0.98]",
+    "border-none bg-[#D2E6BC] text-[#202020] hover:bg-[#D2E6BC] active:bg-[#D2E6BC] focus:bg-[#D2E6BC]",
   secondary:
     "bg-[hsl(var(--adm-secondary))] text-[hsl(var(--adm-secondary-foreground))] hover:bg-[hsl(var(--adm-secondary)/0.75)] active:scale-[0.98]",
   destructive:
@@ -26,10 +26,10 @@ const variantClasses: Record<ButtonVariant, string> = {
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm:      "h-8 px-3.5 text-xs rounded-lg gap-1.5",
-  default: "h-10 px-5 text-sm rounded-xl gap-2",
-  lg:      "h-11 px-7 text-sm rounded-xl gap-2",
-  icon:    "h-10 w-10 rounded-xl",
+  sm: "h-8 px-3.5 text-xs rounded-[8px] gap-1.5",
+  default: "h-10 px-5 text-sm rounded-[8px] gap-2",
+  lg: "h-11 px-7 text-sm rounded-[8px] gap-2",
+  icon: "h-10 w-10 rounded-[8px]",
 };
 
 export function AdminButton({
@@ -57,7 +57,7 @@ export function AdminButton({
       {loading ? (
         <>
           <span
-            className="h-3.5 w-3.5 rounded-full border-2 border-current border-t-transparent animate-spin"
+            className="h-3.5 w-3.5 rounded-[8px] border-2 border-current border-t-transparent animate-spin"
             aria-hidden="true"
           />
           <span>Loading…</span>

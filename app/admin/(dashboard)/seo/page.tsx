@@ -103,7 +103,7 @@ export default function SeoPage() {
 
       {/* Missing pages alert */}
       {missingPages.length > 0 && (
-        <div className="mb-6 rounded-2xl border border-[hsl(var(--adm-warning)/0.3)] bg-[hsl(var(--adm-warning)/0.08)] p-4">
+        <div className="mb-6 rounded-[8px] border border-[hsl(var(--adm-warning)/0.3)] bg-[hsl(var(--adm-warning)/0.08)] p-4">
           <div className="flex items-center gap-2 mb-2">
             <AlertCircle className="h-4 w-4 text-[hsl(var(--adm-warning)/0.8)]" />
             <p className="text-sm font-semibold text-[hsl(var(--adm-warning)/0.8)]">{missingPages.length} pages missing SEO configuration</p>
@@ -111,7 +111,7 @@ export default function SeoPage() {
           <div className="flex flex-wrap gap-2">
             {missingPages.map((p) => (
               <button key={p} onClick={() => { setForm({ ...EMPTY_FORM, page: p }); setEditingPage(null); setIsModalOpen(true); }}
-                className="rounded-full border border-[hsl(38_62%_40%/0.4)] px-3 py-1 text-xs font-medium text-[hsl(var(--adm-warning)/0.8)] hover:bg-[hsl(var(--adm-warning)/0.1)] transition-colors capitalize">
+                className="rounded-[8px] border border-[hsl(38_62%_40%/0.4)] px-3 py-1 text-xs font-medium text-[hsl(var(--adm-warning)/0.8)] hover:bg-[hsl(var(--adm-warning)/0.1)] transition-colors capitalize">
                 {p} →
               </button>
             ))}
@@ -120,16 +120,16 @@ export default function SeoPage() {
       )}
 
       {loading ? (
-        <div className="space-y-3">{[...Array(5)].map((_, i) => <div key={i} className="h-20 rounded-2xl adm-skeleton" />)}</div>
+        <div className="space-y-3">{[...Array(5)].map((_, i) => <div key={i} className="h-20 rounded-[8px] adm-skeleton" />)}</div>
       ) : (
         <motion.div initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.06 } } }} className="space-y-3">
           {entries.map((entry) => (
             <motion.div key={entry._id ?? entry.page}
               variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.3, ease: EASE } } }}>
               <div className="cursor-pointer" onClick={() => openEdit(entry)}>
-              <AdminCard className="!rounded-2xl hover:border-[hsl(var(--adm-primary)/0.3)] transition-colors">
+              <AdminCard className="!rounded-[8px] hover:border-[hsl(var(--adm-primary)/0.3)] transition-colors">
                 <div className="flex items-center gap-4 p-4">
-                  <div className="rounded-xl bg-[hsl(var(--adm-accent)/0.3)] p-2.5 shrink-0">
+                  <div className="rounded-[8px] bg-[hsl(var(--adm-accent)/0.3)] p-2.5 shrink-0">
                     <Globe className="h-5 w-5 text-[hsl(var(--adm-primary))]" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -145,7 +145,7 @@ export default function SeoPage() {
                   <div className="flex items-center gap-3 shrink-0">
                     <SeoScore title={entry.title} description={entry.description} />
                     <button onClick={(e) => { e.stopPropagation(); setDeleteId(entry.page); }}
-                      className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors">
+                      className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors">
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
@@ -155,7 +155,7 @@ export default function SeoPage() {
             </motion.div>
           ))}
           {entries.length === 0 && (
-            <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-[hsl(var(--adm-border))] py-24">
+            <div className="flex flex-col items-center justify-center rounded-[8px] border border-dashed border-[hsl(var(--adm-border))] py-24">
               <Search className="h-16 w-16 text-[hsl(var(--adm-muted-foreground)/0.3)] mb-4" />
               <p className="text-lg font-semibold">No SEO entries yet</p>
               <AdminButton onClick={openAdd} className="mt-4"><Plus className="h-4 w-4" /> Add First Page</AdminButton>
@@ -167,10 +167,10 @@ export default function SeoPage() {
       {/* Modal */}
       <AdminModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}
         title={editingPage ? `SEO: ${editingPage}` : "Add Page SEO"} size="lg">
-        <div className="mb-6 flex gap-1 rounded-xl border border-[hsl(var(--adm-border))] p-1">
+        <div className="mb-6 flex gap-1 rounded-[8px] border border-[hsl(var(--adm-border))] p-1">
           {(["basic", "advanced"] as const).map((t) => (
             <button key={t} type="button" onClick={() => setActiveTab(t)}
-              className={`flex-1 rounded-lg py-2 text-xs font-semibold transition-colors ${activeTab === t ? "bg-[hsl(var(--adm-primary))] text-white" : "text-[hsl(var(--adm-muted-foreground))] hover:text-[hsl(var(--adm-foreground))]"}`}>
+              className={`flex-1 rounded-[8px] py-2 text-xs font-semibold transition-colors ${activeTab === t ? "bg-[hsl(var(--adm-brand))] text-[hsl(var(--adm-brand-foreground))]" : "text-[hsl(var(--adm-muted-foreground))] hover:text-[hsl(var(--adm-foreground))]"}`}>
               {t === "basic" ? "Basic SEO" : "Advanced"}
             </button>
           ))}
@@ -181,12 +181,12 @@ export default function SeoPage() {
               <div>
                 <label className="text-sm font-medium text-[hsl(var(--adm-foreground))] mb-1.5 block">Page Identifier *</label>
                 {editingPage ? (
-                  <div className="flex h-10 items-center rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-muted)/0.3)] px-3 text-sm text-[hsl(var(--adm-muted-foreground))]">
+                  <div className="flex h-10 items-center rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-muted)/0.3)] px-3 text-sm text-[hsl(var(--adm-muted-foreground))]">
                     /{editingPage}
                   </div>
                 ) : (
                   <select value={form.page} onChange={(e) => setForm((f) => ({ ...f, page: e.target.value }))}
-                    className="flex h-10 w-full rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]">
+                    className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]">
                     <option value="">Select a page</option>
                     {missingPages.map((p) => <option key={p} value={p}>{p}</option>)}
                     <option value="">— Custom —</option>
@@ -214,7 +214,7 @@ export default function SeoPage() {
               <div>
                 <label className="text-sm font-medium text-[hsl(var(--adm-foreground))] mb-1.5 block">Robots</label>
                 <select value={form.robots ?? "index, follow"} onChange={(e) => setForm((f) => ({ ...f, robots: e.target.value }))}
-                  className="flex h-10 w-full rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]">
+                  className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]">
                   <option value="index, follow">index, follow (default)</option>
                   <option value="noindex, nofollow">noindex, nofollow</option>
                   <option value="noindex, follow">noindex, follow</option>

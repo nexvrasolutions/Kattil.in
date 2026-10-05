@@ -47,7 +47,7 @@ export function ConfirmDialog({
         <div className="flex items-start gap-3">
           <div
             className={[
-              "flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full",
+              "flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-[8px]",
               variant === "destructive"
                 ? "bg-[hsl(var(--adm-destructive)/0.12)] text-[hsl(var(--adm-destructive))]"
                 : "bg-[hsl(var(--adm-primary)/0.12)] text-[hsl(var(--adm-primary))]",

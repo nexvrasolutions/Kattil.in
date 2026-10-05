@@ -105,6 +105,9 @@ export const getDestinationStaysData = cache(async function getDestinationStaysD
           amenities: Array.isArray(p.amenities) && p.amenities.length > 0 ? p.amenities : ["Free Wifi", "Restaurant"],
           link: `/properties/${p.slug}`,
           description: p.description,
+          offerPercentage: p.offerPercentage,
+          city: (typeof p.city === "object" && p.city && "name" in p.city ? (p.city as any).name : "") || city?.name || "",
+          address: p.address || "",
         }));
       } else {
         properties = [];
@@ -137,6 +140,8 @@ export const getDestinationStaysData = cache(async function getDestinationStaysD
           link: r.link?.trim() || `/properties/${r.slug || r._id}`,
           description: r.description,
           occupancy: r.occupancy,
+          city: city?.name || "",
+          address: r.address || "",
         }));
       } else if (legacyRooms.length > 0) {
         properties = [];

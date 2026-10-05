@@ -14,13 +14,6 @@ import {
   Phone,
   Mail,
   MessageCircle,
-  Wifi,
-  Utensils,
-  Dumbbell,
-  Shield,
-  Sparkles,
-  Lock,
-  BellRing,
   ArrowRight,
   Check,
   X,
@@ -28,6 +21,7 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import RoomStickyBookingWidget from "./RoomStickyBookingWidget";
+import { AmenityIcon } from "@/components/admin/ui/AmenityIcon";
 import { locationRooms } from "@/lib/data";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
@@ -42,6 +36,13 @@ export interface PropertyRoomOption {
   amenities: string[];
   bookingLink?: string;
   price?: string;
+}
+
+// A property amenity as selected in the Admin Panel, with the icon from the
+// Amenity catalog (absent when the name has no catalog entry).
+export interface PropertyAmenity {
+  name: string;
+  icon?: string;
 }
 
 export interface PropertyDetailsData {
@@ -61,6 +62,7 @@ export interface PropertyDetailsData {
   whatsapp?: string;
   hotelCode?: string;
   bookingEngineUrl?: string;
+  amenities?: PropertyAmenity[];
   rooms: PropertyRoomOption[];
   entityFound: boolean;
   directions?: {
@@ -78,17 +80,6 @@ const DEFAULT_GALLERY_IMAGES = [
   "/images/gallery/sunny-balcony-guest.jpg",
   "/images/gallery/bikers-adventure.jpg",
   "/assets/about-us-1.webp",
-];
-
-const AMENITY_ICONS = [
-  { label: "Locker", icon: Lock },
-  { label: "Holistic SPA", icon: Sparkles },
-  { label: "Modern Gym", icon: Dumbbell },
-  { label: "High Speed Wi-Fi", icon: Wifi },
-  { label: "Locker", icon: Shield },
-  { label: "Fine Dining", icon: Utensils },
-  { label: "High Speed Wi-Fi", icon: Wifi },
-  { label: "24/7 Butler", icon: BellRing },
 ];
 
 export default function PropertyDetailsView({ data }: { data: PropertyDetailsData }) {
@@ -414,14 +405,14 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
 
 
                 {/* Premium Amenities */}
+                {data.amenities && data.amenities.length > 0 && (
                 <div className="mt-12">
                   <h2 className="font-sans text-2xl md:text-[28px] font-semibold text-[#111827] mb-10">
                     Premium Amenities
                   </h2>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-8 gap-x-4">
-                    {AMENITY_ICONS.map((item, aIdx) => {
-                      const Icon = item.icon;
+                    {data.amenities.map((item, aIdx) => {
                       return (
                         <motion.div
                           key={aIdx}
@@ -433,16 +424,17 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
                           className="flex flex-col items-center text-center cursor-default group"
                         >
                           <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#D2E6BC] flex items-center justify-center text-[#3a5535] shadow-xs group-hover:bg-[#c3dab0] transition-colors">
-                            <Icon className="w-6 h-6 md:w-7 md:h-7 stroke-[1.75]" />
+                            <AmenityIcon name={item.icon} className="w-6 h-6 md:w-7 md:h-7 stroke-[1.75]" />
                           </div>
                           <span className="font-sans text-[12.5px] md:text-[13px] font-medium text-[#374151] mt-3">
-                            {item.label}
+                            {item.name}
                           </span>
                         </motion.div>
                       );
                     })}
                   </div>
                 </div>
+                )}
               </motion.div>
 
               {/* ── B. Select Room ── */}

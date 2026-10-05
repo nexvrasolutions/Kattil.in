@@ -87,6 +87,13 @@ export const propertySchema = z.object({
     .refine((val) => !val || isValidHttpsUrl(val), {
       message: "Please enter a valid HTTPS booking URL",
     }),
+  // No default: `.partial()` keeps defaults, which would reset this on updates
+  // that omit it. The model supplies the 0 default on create.
+  offerPercentage: z
+    .number()
+    .min(0, "Offer percentage must be between 0 and 100")
+    .max(100, "Offer percentage must be between 0 and 100")
+    .optional(),
   featured: z.boolean().default(false),
   status: z.enum(["active", "inactive", "maintenance"]).default("active"),
   order: z.number().default(0),
@@ -172,7 +179,7 @@ export const updateGallerySchema = gallerySchema.partial();
 // ---------------------------------------------------------------------------
 
 export const amenitySchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  name: z.string().trim().min(1, "Name is required"),
   icon: z.string().min(1, "Icon is required"),
   description: z.string().optional(),
   visible: z.boolean().default(true),

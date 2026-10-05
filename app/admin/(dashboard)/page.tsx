@@ -57,7 +57,7 @@ const PIE_COLORS = [
 const TOOLTIP_STYLE = {
   background: "white",
   border: "1px solid hsl(100 14% 84%)",   // sage-tinted border
-  borderRadius: "0.75rem",
+  borderRadius: "8px",
   fontSize: 12,
 };
 
@@ -67,12 +67,12 @@ const shortDate = (iso: string) => {
 };
 
 const quickActions = [
-  { icon: Hotel,    label: "Add Property", href: "/admin/properties/new", color: "#9CAF88" },   // sage
-  { icon: Upload,   label: "Upload Media", href: "/admin/media",          color: "#7a9e6a" },   // sage mid
-  { icon: Images,   label: "Gallery",      href: "/admin/gallery",        color: "#b8c9a6" },   // sage light
-  { icon: FileText, label: "Edit About",   href: "/admin/about",          color: "#526442" },   // sage dark
-  { icon: MapPin,   label: "Destinations", href: "/admin/destinations",   color: "#3d6080" },   // mid navy
-  { icon: Settings, label: "Settings",     href: "/admin/settings",       color: "#5a7a6a" },   // sage-navy mix
+  { icon: Hotel, label: "Add Property", href: "/admin/properties/new", color: "#9CAF88" },   // sage
+  { icon: Upload, label: "Upload Media", href: "/admin/media", color: "#7a9e6a" },   // sage mid
+  { icon: Images, label: "Gallery", href: "/admin/gallery", color: "#b8c9a6" },   // sage light
+  { icon: FileText, label: "Edit About", href: "/admin/about", color: "#526442" },   // sage dark
+  { icon: MapPin, label: "Destinations", href: "/admin/destinations", color: "#3d6080" },   // mid navy
+  { icon: Settings, label: "Settings", href: "/admin/settings", color: "#5a7a6a" },   // sage-navy mix
 ];
 
 const statusBadge = (s: string): "success" | "warning" | "destructive" =>
@@ -114,13 +114,13 @@ export default function AdminDashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <SkeletonDashboard />;
+  if (loading) return <div className="adm-dashboard"><SkeletonDashboard /></div>;
 
   const d = cms || DEFAULT_CMS_DATA;
   const a = analytics;
   const activePct = d.totalProperties > 0 ? Math.round((d.activeProperties / d.totalProperties) * 100) : 100;
   const weeklyClicks = a?.bookNowByDay.reduce((s, x) => s + x.clicks, 0) ?? 0;
-  const weeklyViews  = a?.visitsByDay.reduce((s, x) => s + x.views, 0) ?? 0;
+  const weeklyViews = a?.visitsByDay.reduce((s, x) => s + x.views, 0) ?? 0;
 
   // Combine clicks + views into one combined trend for the area chart
   const combinedTrend = (a?.bookNowByDay ?? []).map((c, i) => ({
@@ -130,8 +130,10 @@ export default function AdminDashboard() {
   }));
 
   return (
-    <div>
-      <PageHeader title="Dashboard" subtitle="Welcome back. Here's what's happening at Kattil Hotels." />
+    <div className="adm-dashboard">
+      <div className="adm-dashboard-header">
+        <PageHeader title="Dashboard" subtitle="Welcome back. Here's what's happening at Kattil Hotels." />
+      </div>
 
       <motion.div variants={container} initial="hidden" animate="show"
         className="grid grid-cols-1 gap-6 xl:grid-cols-12">
@@ -140,10 +142,10 @@ export default function AdminDashboard() {
         <motion.div variants={item} className="xl:col-span-6">
           <GradientCard className="h-full">
             <div className="p-6">
-              <p className="text-xs font-black uppercase tracking-[0.25em] text-white/70">Kattil Hotels</p>
+              <p className="text-xs font-black uppercase text-white/70">Kattil Hotels</p>
               <h2 className="mt-3 text-5xl font-bold text-white">{d.activeProperties}</h2>
               <p className="mt-1 text-sm text-white/70">Active properties across all locations</p>
-              <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1">
+              <div className="mt-4 inline-flex items-center gap-2 rounded-[8px] bg-white/15 px-3 py-1">
                 <TrendingUp className="h-4 w-4 text-white" />
                 <span className="text-xs font-semibold text-white">Active since 2024</span>
               </div>
@@ -151,14 +153,14 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-3 gap-3 px-6 pb-6">
               {[
                 { label: "Active Properties", value: d.activeProperties },
-                { label: "Cities",            value: d.totalCities },
-                { label: "Amenities",         value: d.amenitiesCount },
-                { label: "Blog Posts",        value: d.blogsCount },
-                { label: "Published",         value: d.publishedBlogsCount },
-                { label: "FAQs",              value: d.faqsCount },
+                { label: "Cities", value: d.totalCities },
+                { label: "Amenities", value: d.amenitiesCount },
+                { label: "Blog Posts", value: d.blogsCount },
+                { label: "Published", value: d.publishedBlogsCount },
+                { label: "FAQs", value: d.faqsCount },
               ].map(({ label, value }) => (
-                <div key={label} className="rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur-sm">
-                  <p className="text-xs font-bold uppercase tracking-wide text-white/70">{label}</p>
+                <div key={label} className="rounded-[8px] border border-white/20 bg-white/10 p-4 backdrop-blur-sm">
+                  <p className="text-xs font-bold uppercase text-white/70">{label}</p>
                   <p className="mt-2 text-2xl font-bold text-white">{value}</p>
                 </div>
               ))}
@@ -175,9 +177,7 @@ export default function AdminDashboard() {
                   <AdminCardTitle className="mt-2">{d.activeProperties}/{d.totalProperties} Active</AdminCardTitle>
                   <p className="mt-1 text-xs text-[hsl(var(--adm-muted-foreground))]">Currently active</p>
                 </div>
-                <span className="rounded-full bg-[hsl(var(--adm-accent)/0.24)] p-2 text-[hsl(var(--adm-primary))]">
-                  <Hotel className="h-5 w-5" />
-                </span>
+
               </div>
               <AdminBadge variant="default">
                 <TrendingUp className="h-3.5 w-3.5" />
@@ -185,13 +185,13 @@ export default function AdminDashboard() {
               </AdminBadge>
             </AdminCardHeader>
             <AdminCardContent>
-              <div className="mb-4 h-2 w-full overflow-hidden rounded-full bg-[hsl(var(--adm-muted))]">
-                <div className="h-full rounded-full bg-[hsl(var(--adm-primary))] transition-all duration-700"
+              <div className="mb-4 h-2 w-full overflow-hidden rounded-[8px] bg-[hsl(var(--adm-muted))]">
+                <div className="h-full rounded-[8px] bg-[hsl(var(--adm-brand))] transition-all duration-700"
                   style={{ width: `${activePct}%` }} />
               </div>
               <div className="flex flex-col gap-3">
                 <StatRow label="Gallery Items" value={d.galleryCount.toString()} helper="Uploaded images" />
-                <StatRow label="Media Files"   value={d.mediaCount.toString()}   helper="Media Library (separate from Gallery)"  />
+                <StatRow label="Media Files" value={d.mediaCount.toString()} helper="Media Library (separate from Gallery)" />
               </div>
             </AdminCardContent>
           </AdminCard>
@@ -206,9 +206,6 @@ export default function AdminDashboard() {
                   <AdminCardTitle className="mt-2">All Systems</AdminCardTitle>
                   <p className="mt-1 text-xs text-[hsl(var(--adm-muted-foreground))]">Running normally</p>
                 </div>
-                <span className="rounded-full bg-[hsl(var(--adm-success)/0.15)] p-2 text-[hsl(var(--adm-success))]">
-                  <CheckCircle2 className="h-5 w-5" />
-                </span>
               </div>
               <AdminBadge variant="success">
                 <CheckCircle2 className="h-3.5 w-3.5" />
@@ -218,14 +215,14 @@ export default function AdminDashboard() {
             <AdminCardContent>
               <div className="flex flex-col gap-3">
                 {[
-                  { label: "Database",  status: "Online" },
+                  { label: "Database", status: "Online" },
                   { label: "Media CDN", status: "Online" },
-                  { label: "API Routes",status: "Online" },
+                  { label: "API Routes", status: "Online" },
                 ].map(({ label, status }) => (
                   <div key={label} className="flex items-center justify-between">
                     <span className="text-xs text-[hsl(var(--adm-muted-foreground))]">{label}</span>
                     <div className="flex items-center gap-1.5">
-                      <span className="h-2 w-2 rounded-full bg-[hsl(var(--adm-success))]" />
+                      <span className="h-2 w-2 rounded-[8px] bg-[hsl(var(--adm-success))]" />
                       <span className="text-xs font-medium text-[hsl(var(--adm-success))]">{status}</span>
                     </div>
                   </div>
@@ -238,7 +235,7 @@ export default function AdminDashboard() {
         {/* ── Row 2: Book Now + Views trend (replaces fake Occupancy Trends) + Analytics stats ── */}
         <motion.div variants={item} className="xl:col-span-8">
           <AdminCard className="h-full">
-            <div className="flex flex-col gap-4 rounded-t-3xl border-b border-[hsl(var(--adm-border)/0.6)] bg-[hsl(var(--adm-card)/0.8)] px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-4 rounded-t-[8px] border-b border-[hsl(var(--adm-border)/0.6)] bg-[hsl(var(--adm-card)/0.8)] px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <AdminCardDescription>Live Analytics</AdminCardDescription>
                 <AdminCardTitle>Book Now Clicks &amp; Page Views</AdminCardTitle>
@@ -246,14 +243,13 @@ export default function AdminDashboard() {
                   Real visitor data from your public website
                 </p>
               </div>
-              <div className="flex items-center gap-1.5 rounded-xl border border-[hsl(var(--adm-border))] p-1">
+              <div className="flex items-center gap-1.5 rounded-[8px] border border-[hsl(var(--adm-border))] p-1">
                 {(["7D", "30D"] as const).map((t) => (
                   <button key={t} type="button" onClick={() => setTimeRange(t)}
-                    className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
-                      timeRange === t
-                        ? "bg-[hsl(var(--adm-primary))] text-white"
-                        : "text-[hsl(var(--adm-muted-foreground))] hover:text-[hsl(var(--adm-foreground))]"
-                    }`}>{t}</button>
+                    className={`rounded-[8px] px-3 py-1.5 text-xs font-medium transition-colors ${timeRange === t
+                      ? "bg-[hsl(var(--adm-brand))] text-[hsl(var(--adm-brand-foreground))]"
+                      : "text-[hsl(var(--adm-muted-foreground))] hover:text-[hsl(var(--adm-foreground))]"
+                      }`}>{t}</button>
                 ))}
               </div>
             </div>
@@ -271,11 +267,11 @@ export default function AdminDashboard() {
                   <AreaChart data={combinedTrend}>
                     <defs>
                       <linearGradient id="fillClicks" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#9CAF88" stopOpacity={0.75} />
+                        <stop offset="5%" stopColor="#9CAF88" stopOpacity={0.75} />
                         <stop offset="95%" stopColor="#9CAF88" stopOpacity={0.05} />
                       </linearGradient>
                       <linearGradient id="fillViews" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#526442" stopOpacity={0.5} />
+                        <stop offset="5%" stopColor="#526442" stopOpacity={0.5} />
                         <stop offset="95%" stopColor="#526442" stopOpacity={0.03} />
                       </linearGradient>
                     </defs>
@@ -287,7 +283,7 @@ export default function AdminDashboard() {
                       labelFormatter={(l) => shortDate(String(l))} />
                     <Area dataKey="clicks" type="natural" fill="url(#fillClicks)"
                       stroke="#9CAF88" strokeWidth={2} name="Book Now Clicks" />
-                    <Area dataKey="views"  type="natural" fill="url(#fillViews)"
+                    <Area dataKey="views" type="natural" fill="url(#fillViews)"
                       stroke="#526442" strokeWidth={2} name="Page Views" />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -304,24 +300,22 @@ export default function AdminDashboard() {
                   <AdminCardDescription>Visitor Analytics</AdminCardDescription>
                   <AdminCardTitle className="mt-2">Branch &amp; Traffic</AdminCardTitle>
                 </div>
-                <span className="rounded-full bg-[hsl(var(--adm-accent)/0.24)] p-2 text-[hsl(var(--adm-primary))]">
-                  <Eye className="h-5 w-5" />
-                </span>
+
               </div>
             </AdminCardHeader>
             <AdminCardContent>
               {/* Analytics KPIs */}
               <div className="grid grid-cols-2 gap-3 mb-5">
                 {[
-                  { label: "Total Clicks",     value: a?.totalBookNow ?? 0,   icon: MousePointerClick, color: "#9CAF88" },
-                  { label: "Page Views",       value: a?.totalPageViews ?? 0, icon: Eye,               color: "#526442" },
-                  { label: "This Week Clicks", value: weeklyClicks,           icon: TrendingUp,        color: "#b8c9a6" },
-                  { label: "This Week Views",  value: weeklyViews,            icon: Globe,             color: "#3d6080" },
-                ].map(({ label, value, icon: Icon, color }) => (
-                  <div key={label} className="rounded-xl border border-[hsl(var(--adm-border)/0.5)] p-3">
+                  { label: "Total Clicks", value: a?.totalBookNow ?? 0, color: "#9CAF88" },
+                  { label: "Page Views", value: a?.totalPageViews ?? 0, color: "#526442" },
+                  { label: "This Week Clicks", value: weeklyClicks, color: "#b8c9a6" },
+                  { label: "This Week Views", value: weeklyViews, color: "#3d6080" },
+                ].map(({ label, value, color }) => (
+                  <div key={label} className="rounded-[8px] border border-[hsl(var(--adm-border)/0.5)] p-3">
                     <div className="flex items-center gap-1.5 mb-1">
-                      <Icon className="h-3.5 w-3.5" style={{ color }} />
-                      <span className="text-[10px] font-semibold uppercase tracking-wide text-[hsl(var(--adm-muted-foreground))]">{label}</span>
+
+                      <span className="text-[10px] font-semibold uppercase text-[hsl(var(--adm-muted-foreground))]">{label}</span>
                     </div>
                     <p className="text-xl font-bold text-[hsl(var(--adm-foreground))]">{value.toLocaleString()}</p>
                   </div>
@@ -330,20 +324,20 @@ export default function AdminDashboard() {
               {/* Branch breakdown */}
               {a?.branchData.length ? (
                 <div className="flex flex-col gap-2.5">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[hsl(var(--adm-muted-foreground))]">
+                  <p className="text-xs font-semibold uppercase text-[hsl(var(--adm-muted-foreground))]">
                     Book Now by Branch
                   </p>
                   {a.branchData.map(({ branch, clicks }, i) => {
                     const total = a.branchData.reduce((s, x) => s + x.clicks, 0);
-                    const pct   = total > 0 ? Math.round((clicks / total) * 100) : 0;
+                    const pct = total > 0 ? Math.round((clicks / total) * 100) : 0;
                     return (
                       <div key={branch} className="space-y-1">
                         <div className="flex items-center justify-between">
                           <span className="text-xs font-medium text-[hsl(var(--adm-foreground))]">{branch}</span>
                           <span className="text-xs font-bold text-[hsl(var(--adm-foreground))]">{clicks} <span className="font-normal text-[hsl(var(--adm-muted-foreground))]">({pct}%)</span></span>
                         </div>
-                        <div className="h-1.5 rounded-full bg-[hsl(var(--adm-muted))]">
-                          <div className="h-full rounded-full transition-all duration-500"
+                        <div className="h-1.5 rounded-[8px] bg-[hsl(var(--adm-muted))]">
+                          <div className="h-full rounded-[8px] transition-all duration-500"
                             style={{ width: `${pct}%`, background: PIE_COLORS[i % PIE_COLORS.length] }} />
                         </div>
                       </div>
@@ -382,7 +376,7 @@ export default function AdminDashboard() {
                   <div className="mt-2 grid grid-cols-2 gap-2">
                     {d.propertyCategories.map(({ name, value }: { name: string; value: number }, i: number) => (
                       <div key={name} className="flex items-center gap-2">
-                        <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
+                        <span className="h-2 w-2 shrink-0 rounded-[8px]" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
                         <span className="text-xs text-[hsl(var(--adm-muted-foreground))]">{name}</span>
                         <span className="ml-auto text-xs font-bold text-[hsl(var(--adm-foreground))]">{value}</span>
                       </div>
@@ -413,7 +407,7 @@ export default function AdminDashboard() {
                   <thead>
                     <tr className="border-b border-[hsl(var(--adm-border)/0.5)]">
                       {["Property Name", "City", "Category", "Status"].map((h) => (
-                        <th key={h} className="pb-3 text-left text-xs font-semibold uppercase tracking-wide text-[hsl(var(--adm-muted-foreground))]">{h}</th>
+                        <th key={h} className="pb-3 text-left text-xs font-semibold uppercase text-[hsl(var(--adm-muted-foreground))]">{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -459,7 +453,7 @@ export default function AdminDashboard() {
                     const Icon = [Images, BookOpen, HelpCircle, MapPin, Sparkles, Eye][i % 6];
                     return (
                       <div key={page} className="relative flex items-start gap-4 pb-5 last:pb-0">
-                        <div className="relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
+                        <div className="relative z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-[8px]"
                           style={{ background: `${iconColor}20` }}>
                           <Icon className="h-3 w-3" style={{ color: iconColor }} />
                         </div>
@@ -492,8 +486,8 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-2 gap-2.5">
                 {quickActions.map(({ icon: Icon, label, href, color }) => (
                   <Link key={label} href={href}
-                    className="group flex flex-col items-center gap-2 rounded-2xl border border-[hsl(var(--adm-border)/0.6)] p-3 text-center transition-all hover:border-[hsl(var(--adm-primary)/0.3)] hover:bg-[hsl(var(--adm-primary)/0.05)]">
-                    <div className="rounded-xl p-2" style={{ background: `${color}15` }}>
+                    className="group flex flex-col items-center gap-2 rounded-[8px] border border-[hsl(var(--adm-border)/0.6)] p-3 text-center transition-all hover:border-[hsl(var(--adm-primary)/0.3)] hover:bg-[hsl(var(--adm-primary)/0.05)]">
+                    <div className="rounded-[8px] p-2" style={{ background: `${color}15` }}>
                       <Icon className="h-4 w-4" style={{ color }} />
                     </div>
                     <span className="text-xs font-medium text-[hsl(var(--adm-foreground))] group-hover:text-[hsl(var(--adm-primary))] transition-colors">

@@ -48,7 +48,7 @@ export default function AdminPagination({
   }
 
   const btn =
-    "flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-xs font-semibold transition-all select-none cursor-pointer";
+    "flex h-8 min-w-8 items-center justify-center rounded-[8px] px-2 text-xs font-semibold transition-all select-none cursor-pointer";
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-3 mt-3 border-t border-[hsl(var(--adm-border)/0.4)]">
@@ -63,7 +63,7 @@ export default function AdminPagination({
                 handleLimit(Number(e.target.value));
                 handlePage(1);
               }}
-              className="h-8 rounded-lg border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-background))] px-2 text-xs font-semibold text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] cursor-pointer"
+              className="h-8 rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-background))] px-2 text-xs font-semibold text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] cursor-pointer"
             >
               {LIMIT_OPTIONS.map((n) => (
                 <option key={n} value={n}>
@@ -107,7 +107,7 @@ export default function AdminPagination({
                 onClick={() => handlePage(p as number)}
                 className={`${btn} ${
                   p === page
-                    ? "bg-[hsl(var(--adm-primary))] text-white shadow-sm"
+                    ? "bg-[hsl(var(--adm-brand))] text-[hsl(var(--adm-brand-foreground))]"
                     : "border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:border-[hsl(var(--adm-primary)/0.3)]"
                 }`}
               >

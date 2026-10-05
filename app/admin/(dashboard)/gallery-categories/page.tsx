@@ -117,7 +117,7 @@ export default function GalleryCategoriesPage() {
               onChange={(e) => { setNewName(e.target.value); setError(null); }}
               onKeyDown={(e) => e.key === "Enter" && handleAdd()}
               placeholder="e.g. Rooftop, Dining, Rooms, Events…"
-              className="flex-1 h-11 rounded-xl border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3.5 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground)/0.7)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-all"
+              className="flex-1 h-11 rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3.5 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground)/0.7)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-all"
             />
             <AdminButton onClick={handleAdd} loading={adding} disabled={!newName.trim()}>
               <Plus className="h-4 w-4" /> Add
@@ -136,13 +136,13 @@ export default function GalleryCategoriesPage() {
       {loading ? (
         <div className="space-y-2">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-14 rounded-2xl adm-skeleton" />
+            <div key={i} className="h-14 rounded-[8px] adm-skeleton" />
           ))}
         </div>
       ) : categories.length === 0 ? (
         <AdminCard>
           <div className="flex flex-col items-center py-20 gap-3">
-            <div className="rounded-full bg-[hsl(var(--adm-accent)/0.5)] p-4">
+            <div className="rounded-[8px] bg-[hsl(var(--adm-accent)/0.5)] p-4">
               <Tag className="h-8 w-8 text-[hsl(var(--adm-muted-foreground)/0.5)]" />
             </div>
             <p className="text-sm font-semibold text-[hsl(var(--adm-foreground))]">No categories yet</p>
@@ -163,7 +163,7 @@ export default function GalleryCategoriesPage() {
                 className="flex items-center gap-3 px-5 py-3.5 hover:bg-[hsl(var(--adm-accent)/0.3)] transition-colors group"
               >
                 {/* Icon */}
-                <div className="rounded-lg p-1.5 bg-[hsl(var(--adm-primary)/0.1)] shrink-0">
+                <div className="rounded-[8px] p-1.5 bg-[hsl(var(--adm-primary)/0.1)] shrink-0">
                   <Tag className="h-3.5 w-3.5 text-[hsl(var(--adm-primary))]" />
                 </div>
 
@@ -177,12 +177,12 @@ export default function GalleryCategoriesPage() {
                       if (e.key === "Enter") handleEdit(cat._id);
                       if (e.key === "Escape") setEditId(null);
                     }}
-                    className="flex-1 h-9 rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-2.5 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                    className="flex-1 h-9 rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-2.5 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                   />
                 ) : (
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-sm text-[hsl(var(--adm-foreground))]">{cat.name}</p>
-                    <p className="text-[10px] text-[hsl(var(--adm-muted-foreground)/0.6)] font-mono">/{cat.slug}</p>
+                    <p className="text-[10px] text-[hsl(var(--adm-muted-foreground)/0.6)]">/{cat.slug}</p>
                   </div>
                 )}
 
@@ -194,14 +194,14 @@ export default function GalleryCategoriesPage() {
                         onClick={() => handleEdit(cat._id)}
                         disabled={saving}
                         title="Save"
-                        className="rounded-lg p-1.5 text-[hsl(var(--adm-success))] hover:bg-[hsl(var(--adm-success)/0.1)] transition-colors"
+                        className="rounded-[8px] p-1.5 text-[hsl(var(--adm-success))] hover:bg-[hsl(var(--adm-success)/0.1)] transition-colors"
                       >
                         <Check className="h-3.5 w-3.5" />
                       </button>
                       <button
                         onClick={() => setEditId(null)}
                         title="Cancel"
-                        className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] transition-colors"
+                        className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] transition-colors"
                       >
                         <X className="h-3.5 w-3.5" />
                       </button>
@@ -211,14 +211,14 @@ export default function GalleryCategoriesPage() {
                       <button
                         onClick={() => { setEditId(cat._id); setEditName(cat.name); }}
                         title="Rename"
-                        className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-primary))] transition-colors opacity-0 group-hover:opacity-100"
+                        className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-primary))] transition-colors opacity-0 group-hover:opacity-100"
                       >
                         <Pencil className="h-3.5 w-3.5" />
                       </button>
                       <button
                         onClick={() => setDeleteId(cat._id)}
                         title="Delete"
-                        className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors opacity-0 group-hover:opacity-100"
+                        className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors opacity-0 group-hover:opacity-100"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>

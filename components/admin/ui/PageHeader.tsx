@@ -11,12 +11,12 @@ export function PageHeader({ title, subtitle, children }: PageHeaderProps) {
     <div className="flex items-start justify-between gap-4 mb-7">
       <div className="flex items-start gap-3.5">
         <div
-          className="mt-1 h-7 w-1 rounded-full shrink-0"
-          style={{ background: "hsl(var(--adm-primary))" }}
+          className="mt-1 h-7 w-1 rounded-[8px] shrink-0"
+          style={{ background: "hsl(var(--adm-brand))" }}
           aria-hidden="true"
         />
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[hsl(var(--adm-foreground))]">
+          <h1 className="text-2xl font-medium text-[hsl(var(--adm-foreground))]">
             {title}
           </h1>
           {subtitle && (

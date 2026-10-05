@@ -10,6 +10,9 @@ import { safeFetchJson } from "@/lib/utils/safeFetch";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
+// Offer badge on stay cards is hidden for now — set to true to show it again.
+const SHOW_OFFER_BADGE = false;
+
 export interface PropertyStay {
   _id: string;
   name: string;
@@ -20,6 +23,9 @@ export interface PropertyStay {
   amenities?: string[];
   link?: string;
   description?: string;
+  offerPercentage?: number;
+  city?: string;
+  address?: string;
 }
 
 interface DestinationStaysViewProps {
@@ -65,6 +71,9 @@ export default function DestinationStaysView({
               amenities: Array.isArray(p.amenities) && p.amenities.length > 0 ? p.amenities : ["Free Wifi", "Restaurant"],
               link: `/properties/${p.slug || p._id}`,
               description: p.description,
+              offerPercentage: p.offerPercentage,
+              city: (typeof p.city === "object" ? p.city?.name : p.city) || cityName,
+              address: p.address,
             })
           );
           setStays(mapped);
@@ -429,21 +438,6 @@ export default function DestinationStaysView({
                     "/assets/ac-double-room.webp";
 
                   /* ---------------------------------------------
-                     BADGE
-                  --------------------------------------------- */
-                  const stayBadge =
-                    stay.badge?.trim() ||
-                    (
-                      stay.category === "deluxe"
-                        ? "Private room"
-                        : stay.category === "suite"
-                          ? "Luxury Suite"
-                          : idx % 2 === 0
-                            ? "Private room"
-                            : "Home stay"
-                    );
-
-                  /* ---------------------------------------------
                      PROPERTY LINK
                   --------------------------------------------- */
                   const targetLink =
@@ -460,6 +454,11 @@ export default function DestinationStaysView({
                   /* ---------------------------------------------
                      AMENITIES
                   --------------------------------------------- */
+                  /* ---------------------------------------------
+                     OFFER (admin-managed; 0/empty = no badge)
+                  --------------------------------------------- */
+                  const offerPercentage = Number(stay.offerPercentage) || 0;
+
                   const stayAmenities =
                     stay.amenities &&
                       stay.amenities.length > 0
@@ -546,33 +545,36 @@ export default function DestinationStaysView({
                         --------------------------------------------- */}
                         <div>
 
-                          {/* Badge */}
-                          <p
-                            className="
-                              font-sans
-                              text-[13px]
-                              leading-[18px]
-                              font-normal
-                              text-[#526442]
-                              mb-[4px]
-                            "
-                          >
-                            {stayBadge}
-                          </p>
+                          {/* Location & Offer (Before Property Name) */}
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <div className="flex items-center gap-1.5 text-[13px] font-medium text-[#526442] min-w-0">
+                              <MapPin className="w-3.5 h-3.5 shrink-0 text-[#526442]" />
+                              <span className="truncate">
+                                {stay.city && !/^[0-9a-fA-F]{24}$/.test(stay.city) ? stay.city : cityName}
+                              </span>
+                            </div>
+
+                            {SHOW_OFFER_BADGE && offerPercentage > 0 && (
+                              <span className="inline-flex shrink-0 items-center px-2.5 py-[2px] rounded-full bg-[#F5F3EB] border border-[#526442]/20 text-[11.5px] leading-[16px] font-semibold text-[#526442] whitespace-nowrap">
+                                {offerPercentage}% OFF
+                              </span>
+                            )}
+                          </div>
 
                           {/* Property Name */}
                           <Link
                             href={targetLink}
                             prefetch={true}
-                            className="block"
+                            className="block min-w-0"
                           >
                             <h2
                               className="
                                 font-sans
-                                text-[24px]
+                                text-[22px]
+                                sm:text-[24px]
                                 font-medium
                                 text-[#292929]
-                                leading-[1.1]
+                                leading-[1.15]
                                 tracking-[-0.4px]
                                 group-hover:text-[#526442]
                                 transition-colors

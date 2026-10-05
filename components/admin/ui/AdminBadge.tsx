@@ -31,7 +31,7 @@ export function AdminBadge({
   return (
     <span
       className={[
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors",
+        "inline-flex items-center gap-1.5 rounded-[8px] px-2.5 py-0.5 text-xs font-semibold transition-colors",
         variantClasses[variant],
         className,
       ].join(" ")}

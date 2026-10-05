@@ -248,7 +248,8 @@ export default function Navbar() {
                 { label: "Home", href: "/" },
                 { label: "Destinations", href: "/rooms" },
                 { label: "Partners", href: "/partners" },
-                // { label: "Offering", href: "" },
+                // Offers temporarily hidden — restore to re-enable.
+                // { label: "Offering", href: "/offers" },
               ].map((link) => {
                 const isDestinations = link.label === "Destinations";
                 const isActive = isDestinations
@@ -438,16 +439,17 @@ export default function Navbar() {
                     </Link>
                   </motion.div>
 
-                  {/* 4. Offering */}
-                  {/* <motion.div variants={MENU_ITEM_VARIANTS}>
+                  {/* 4. Offering — temporarily hidden; restore to re-enable.
+                  <motion.div variants={MENU_ITEM_VARIANTS}>
                     <Link
-                      href="#"
+                      href="/offers"
                       onClick={() => setMobileOpen(false)}
                       className="py-1 text-[17px] sm:text-[18px] font-sans font-medium text-white/90 hover:text-[#D2E6BC] transition-colors"
                     >
                       Offering
                     </Link>
-                  </motion.div> */}
+                  </motion.div>
+                  */}
 
                   {/* 5. Contact Us */}
                   <motion.div variants={MENU_ITEM_VARIANTS}>

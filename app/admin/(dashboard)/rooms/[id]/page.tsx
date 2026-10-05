@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useCallback, Suspense } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, Loader2, Save, BedDouble, Plus, X, Check, Building2, AlertTriangle, RefreshCw } from "lucide-react";
+import { ChevronLeft, Loader2, Save, BedDouble, X, Building2, AlertTriangle, RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
 import AdminDropzone from "@/components/admin/ui/AdminDropzone";
+import AmenityPicker from "@/components/admin/ui/AmenityPicker";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -33,7 +34,7 @@ const EMPTY: RoomForm = {
   property: "",
   badge: "Private room",
   category: "deluxe",
-  amenities: ["Free Wifi", "Restaurant", "Air Conditioning"],
+  amenities: [],
   images: [],
   description: "",
   status: "active",
@@ -51,24 +52,10 @@ const BADGE_PRESETS = [
   "Executive Room",
 ];
 
-const POPULAR_AMENITIES = [
-  "Free Wifi",
-  "Restaurant",
-  "Air Conditioning",
-  "Private Bathroom",
-  "Lockers",
-  "Study Desk",
-  "Room Service",
-  "Swimming Pool",
-  "Balcony",
-  "Smart TV",
-  "Individual Pod Cooling",
-  "Ceiling Fan",
-];
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="text-sm font-bold uppercase tracking-wider text-[hsl(var(--adm-muted-foreground))] border-b border-[hsl(var(--adm-border)/0.5)] pb-3 mb-5">
+    <h2 className="text-sm font-bold uppercase text-[hsl(var(--adm-muted-foreground))] border-b border-[hsl(var(--adm-border)/0.5)] pb-3 mb-5">
       {children}
     </h2>
   );
@@ -121,7 +108,6 @@ function RoomFormContent() {
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [customAmenity, setCustomAmenity] = useState("");
 
   // Loads the Property dropdown's options. Deliberately independent of the
   // page-level `loading` state (which only guards the existing-room fetch)
@@ -161,7 +147,7 @@ function RoomFormContent() {
             property: d.property?._id ?? d.property ?? "",
             badge: d.badge ?? "Private room",
             category: d.category ?? "deluxe",
-            amenities: Array.isArray(d.amenities) && d.amenities.length > 0 ? d.amenities : ["Free Wifi", "Restaurant"],
+            amenities: Array.isArray(d.amenities) ? d.amenities : [],
             images: Array.isArray(d.images) ? d.images : [],
             description: d.description ?? "",
             status: d.status ?? "active",
@@ -172,36 +158,6 @@ function RoomFormContent() {
       })
       .finally(() => setLoading(false));
   }, [id, isNew]);
-
-  const toggleAmenity = (amenity: string) => {
-    setForm((prev) => {
-      const exists = prev.amenities.includes(amenity);
-      return {
-        ...prev,
-        amenities: exists
-          ? prev.amenities.filter((a) => a !== amenity)
-          : [...prev.amenities, amenity],
-      };
-    });
-  };
-
-  const addCustomAmenity = () => {
-    const trimmed = customAmenity.trim();
-    if (trimmed && !form.amenities.includes(trimmed)) {
-      setForm((prev) => ({
-        ...prev,
-        amenities: [...prev.amenities, trimmed],
-      }));
-      setCustomAmenity("");
-    }
-  };
-
-  const removeAmenity = (amenity: string) => {
-    setForm((prev) => ({
-      ...prev,
-      amenities: prev.amenities.filter((a) => a !== amenity),
-    }));
-  };
 
   const addGalleryImage = (url: string) => {
     if (!url) return;
@@ -285,12 +241,12 @@ function RoomFormContent() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, ease: EASE }}
-        className="rounded-2xl border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] shadow-sm overflow-hidden"
+        className="rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] overflow-hidden"
       >
         {/* Header */}
         <div className="px-6 py-5 border-b border-[hsl(var(--adm-border)/0.5)]">
           <div className="flex items-center gap-3">
-            <div className="rounded-xl p-2.5 bg-[hsl(var(--adm-primary)/0.1)]">
+            <div className="rounded-[8px] p-2.5 bg-[hsl(var(--adm-primary)/0.1)]">
               <BedDouble className="h-5 w-5 text-[hsl(var(--adm-primary))]" />
             </div>
             <div>
@@ -320,7 +276,7 @@ function RoomFormContent() {
                 <select
                   value={form.property}
                   onChange={(e) => setForm((f) => ({ ...f, property: e.target.value }))}
-                  className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-colors"
+                  className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-colors"
                 >
                   <option value="">Select a property…</option>
                   {properties.map((p) => (
@@ -330,7 +286,7 @@ function RoomFormContent() {
                   ))}
                 </select>
                 {propertiesError && (
-                  <div className="mt-2 flex items-center gap-2 rounded-lg border border-[hsl(var(--adm-destructive)/0.3)] bg-[hsl(var(--adm-destructive)/0.06)] px-3 py-2">
+                  <div className="mt-2 flex items-center gap-2 rounded-[8px] border border-[hsl(var(--adm-destructive)/0.3)] bg-[hsl(var(--adm-destructive)/0.06)] px-3 py-2">
                     <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0 text-[hsl(var(--adm-destructive))]" />
                     <p className="flex-1 text-xs text-[hsl(var(--adm-destructive))]">Failed to load properties.</p>
                     <button
@@ -354,7 +310,7 @@ function RoomFormContent() {
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
                   placeholder="e.g. AC Double Room"
-                  className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-colors"
+                  className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-colors"
                 />
               </FormField>
             </div>
@@ -370,9 +326,9 @@ function RoomFormContent() {
                     key={badge}
                     type="button"
                     onClick={() => setForm((f) => ({ ...f, badge }))}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+                    className={`px-3 py-1.5 rounded-[8px] text-xs font-medium border transition-colors ${
                       form.badge === badge
-                        ? "bg-[hsl(var(--adm-primary))] text-white border-[hsl(var(--adm-primary))]"
+                        ? "bg-[hsl(var(--adm-brand))] text-[hsl(var(--adm-brand-foreground))] border-[hsl(var(--adm-brand))]"
                         : "bg-[hsl(var(--adm-background))] border-[hsl(var(--adm-border))] text-[hsl(var(--adm-foreground))] hover:border-[hsl(var(--adm-primary)/0.5)]"
                     }`}
                   >
@@ -385,7 +341,7 @@ function RoomFormContent() {
                 value={form.badge}
                 onChange={(e) => setForm((f) => ({ ...f, badge: e.target.value }))}
                 placeholder="Or type custom, e.g. Private room, Dormitory"
-                className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
               />
             </div>
 
@@ -397,7 +353,7 @@ function RoomFormContent() {
                   value={form.description}
                   onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                   placeholder="Spacious room with modern amenities, pod cooling, and quiet atmosphere…"
-                  className="flex w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] p-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                  className="flex w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] p-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
                 />
               </FormField>
             </div>
@@ -406,71 +362,10 @@ function RoomFormContent() {
           {/* Section 2: Amenities */}
           <section>
             <SectionTitle>Room Amenities</SectionTitle>
-            <div className="space-y-3">
-              <div className="flex flex-wrap gap-2">
-                {POPULAR_AMENITIES.map((amenity) => {
-                  const selected = form.amenities.includes(amenity);
-                  return (
-                    <button
-                      key={amenity}
-                      type="button"
-                      onClick={() => toggleAmenity(amenity)}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                        selected
-                          ? "bg-[hsl(var(--adm-primary)/0.15)] text-[hsl(var(--adm-primary))] border-[hsl(var(--adm-primary)/0.4)]"
-                          : "bg-[hsl(var(--adm-background))] border-[hsl(var(--adm-border))] text-[hsl(var(--adm-muted-foreground))] hover:border-[hsl(var(--adm-primary)/0.4)]"
-                      }`}
-                    >
-                      {selected && <Check className="w-3.5 h-3.5" />}
-                      {amenity}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="flex gap-2 pt-2">
-                <input
-                  type="text"
-                  value={customAmenity}
-                  onChange={(e) => setCustomAmenity(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addCustomAmenity();
-                    }
-                  }}
-                  placeholder="Add custom amenity (press Enter)..."
-                  className="flex h-9 flex-1 rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-xs text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
-                />
-                <button
-                  type="button"
-                  onClick={addCustomAmenity}
-                  className="px-3.5 py-1.5 rounded-lg bg-[hsl(var(--adm-primary))] text-white text-xs font-semibold hover:opacity-90 transition-opacity flex items-center gap-1"
-                >
-                  <Plus className="w-3.5 h-3.5" /> Add
-                </button>
-              </div>
-
-              {form.amenities.length > 0 && (
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {form.amenities.map((amenity) => (
-                    <span
-                      key={amenity}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[hsl(var(--adm-accent))] text-xs font-medium text-[hsl(var(--adm-foreground))]"
-                    >
-                      {amenity}
-                      <button
-                        type="button"
-                        onClick={() => removeAmenity(amenity)}
-                        className="hover:text-[hsl(var(--adm-destructive))] transition-colors"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
+            <AmenityPicker
+              value={form.amenities}
+              onChange={(amenities) => setForm((prev) => ({ ...prev, amenities }))}
+            />
           </section>
 
           {/* Section 3: Room Photos */}
@@ -493,12 +388,12 @@ function RoomFormContent() {
               {form.images.length > 1 && (
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
                   {form.images.map((img, idx) => (
-                    <div key={idx} className="relative group rounded-xl overflow-hidden border border-[hsl(var(--adm-border))] h-20 bg-[hsl(var(--adm-muted))]">
+                    <div key={idx} className="relative group rounded-[8px] overflow-hidden border border-[hsl(var(--adm-border))] h-20 bg-[hsl(var(--adm-muted))]">
                       <img src={img} alt={`Room ${idx + 1}`} className="w-full h-full object-cover" />
                       <button
                         type="button"
                         onClick={() => removeImage(idx)}
-                        className="absolute top-1 right-1 p-1 rounded bg-[hsl(var(--adm-destructive))] text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-1 right-1 p-1 rounded-[8px] bg-[hsl(var(--adm-destructive))] text-white opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -530,7 +425,7 @@ function RoomFormContent() {
                 value={form.link}
                 onChange={(e) => setForm((f) => ({ ...f, link: e.target.value }))}
                 placeholder="https://live.ipms247.com/booking/book-rooms-kattilchennai?roomtypeunkid=..."
-                className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-colors"
+                className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-colors"
               />
             </FormField>
 
@@ -543,7 +438,7 @@ function RoomFormContent() {
                 value={form.roomCode}
                 onChange={(e) => setForm((f) => ({ ...f, roomCode: e.target.value }))}
                 placeholder="e.g. 3921829 or DELUXE_ROOM"
-                className="flex h-10 w-full rounded-lg border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-colors"
+                className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] transition-colors"
               />
             </FormField>
           </section>
@@ -559,14 +454,14 @@ function RoomFormContent() {
                     status: f.status === "active" ? "inactive" : "active",
                   }))
                 }
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                className={`relative inline-flex h-6 w-11 items-center rounded-[8px] transition-colors ${
                   form.status === "active"
-                    ? "bg-[hsl(var(--adm-primary))]"
+                    ? "bg-[hsl(var(--adm-brand))]"
                     : "bg-[hsl(var(--adm-muted))]"
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
+                  className={`inline-block h-4 w-4 rounded-[8px] bg-white transition-transform ${
                     form.status === "active" ? "translate-x-6" : "translate-x-1"
                   }`}
                 />
@@ -581,7 +476,7 @@ function RoomFormContent() {
 
           {/* Error message */}
           {error && (
-            <div className="rounded-xl border border-[hsl(var(--adm-destructive)/0.3)] bg-[hsl(var(--adm-destructive)/0.08)] px-4 py-3">
+            <div className="rounded-[8px] border border-[hsl(var(--adm-destructive)/0.3)] bg-[hsl(var(--adm-destructive)/0.08)] px-4 py-3">
               <p className="text-sm text-[hsl(var(--adm-destructive))]">{error}</p>
             </div>
           )}
@@ -591,7 +486,7 @@ function RoomFormContent() {
             <button
               type="button"
               onClick={() => router.push("/admin/rooms")}
-              className="h-10 rounded-lg border border-[hsl(var(--adm-border))] bg-transparent px-5 text-sm font-medium text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors"
+              className="h-10 rounded-[8px] border border-[hsl(var(--adm-border))] bg-transparent px-5 text-sm font-medium text-[hsl(var(--adm-foreground))] hover:bg-[hsl(var(--adm-accent)/0.4)] transition-colors"
             >
               Cancel
             </button>
@@ -599,8 +494,8 @@ function RoomFormContent() {
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="flex h-10 items-center gap-2 rounded-lg px-6 text-sm font-semibold text-white transition-all disabled:opacity-60"
-              style={{ background: "hsl(var(--adm-primary))" }}
+              className="flex h-10 items-center gap-2 rounded-[8px] px-6 text-sm font-semibold text-[hsl(var(--adm-brand-foreground))] transition-all disabled:opacity-60"
+              style={{ background: "hsl(var(--adm-brand))" }}
             >
               {saving ? (
                 <>

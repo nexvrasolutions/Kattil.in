@@ -42,9 +42,9 @@ function TagInput({ value, onChange, placeholder }: { value: string[]; onChange:
   const [input, setInput] = useState("");
   const add = () => { const t = input.trim(); if (t && !value.includes(t)) { onChange([...value, t]); setInput(""); } };
   return (
-    <div className="flex flex-wrap gap-1.5 rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 py-2 min-h-[40px]">
+    <div className="flex flex-wrap gap-1.5 rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 py-2 min-h-[40px]">
       {value.map((tag) => (
-        <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-[hsl(var(--adm-primary)/0.1)] px-2.5 py-0.5 text-xs font-medium text-[hsl(var(--adm-primary))]">
+        <span key={tag} className="inline-flex items-center gap-1 rounded-[8px] bg-[hsl(var(--adm-primary)/0.1)] px-2.5 py-0.5 text-xs font-medium text-[hsl(var(--adm-primary))]">
           {tag}
           <button type="button" onClick={() => onChange(value.filter((t) => t !== tag))}><X className="h-3 w-3" /></button>
         </span>
@@ -114,7 +114,7 @@ function CategoryManager({
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAdd()}
             placeholder="e.g. Rooftop, Dining, Events…"
-            className="flex h-10 flex-1 rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+            className="flex h-10 flex-1 rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
           />
           <AdminButton onClick={handleAdd} loading={adding} disabled={!newName.trim()}>
             <Plus className="h-4 w-4" /> Add
@@ -132,7 +132,7 @@ function CategoryManager({
         ) : (
           categories.map((cat) => (
             <div key={cat._id}
-              className="flex items-center gap-3 rounded-xl border border-[hsl(var(--adm-border)/0.5)] bg-[hsl(var(--adm-accent)/0.1)] px-3 py-2.5">
+              className="flex items-center gap-3 rounded-[8px] border border-[hsl(var(--adm-border)/0.5)] bg-[hsl(var(--adm-accent)/0.1)] px-3 py-2.5">
               <Tag className="h-3.5 w-3.5 shrink-0 text-[hsl(var(--adm-primary))]" />
               {editId === cat._id ? (
                 <input
@@ -145,20 +145,20 @@ function CategoryManager({
               ) : (
                 <span className="flex-1 text-sm text-[hsl(var(--adm-foreground))]">{cat.name}</span>
               )}
-              <span className="text-[10px] text-[hsl(var(--adm-muted-foreground)/0.5)] font-mono">{cat.slug}</span>
+              <span className="text-[10px] text-[hsl(var(--adm-muted-foreground)/0.5)]">{cat.slug}</span>
               {editId === cat._id ? (
                 <button onClick={() => handleRename(cat._id)}
-                  className="rounded-lg p-1.5 text-[hsl(var(--adm-primary))] hover:bg-[hsl(var(--adm-primary)/0.1)] transition-colors">
+                  className="rounded-[8px] p-1.5 text-[hsl(var(--adm-primary))] hover:bg-[hsl(var(--adm-primary)/0.1)] transition-colors">
                   <Check className="h-3.5 w-3.5" />
                 </button>
               ) : (
                 <button onClick={() => { setEditId(cat._id); setEditName(cat.name); }}
-                  className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-primary))] transition-colors">
+                  className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-primary))] transition-colors">
                   <Pencil className="h-3.5 w-3.5" />
                 </button>
               )}
               <button onClick={() => setDeleteId(cat._id)}
-                className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors">
+                className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors">
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
             </div>
@@ -279,24 +279,24 @@ export default function GalleryPage() {
       <AdminCard className="mb-6">
         <div className="p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-wrap">
           <select value={filterCategory} onChange={(e) => { setFilterCategory(e.target.value); setPage(1); }}
-            className="h-10 rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]">
+            className="h-10 shrink-0 sm:w-[188px] rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]">
             <option value="">All Categories</option>
             {allCategories.map((c) => <option key={c} value={c}>{categoryLabel(c)}</option>)}
           </select>
           <select value={filterCity} onChange={(e) => { setFilterCity(e.target.value); setPage(1); }}
-            className="h-10 rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]">
+            className="h-10 shrink-0 sm:w-[188px] rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]">
             <option value="">All Cities</option>
             {cities.map((c) => <option key={c._id} value={c._id}>{c.name}</option>)}
           </select>
           <select value={filterFeatured} onChange={(e) => { setFilterFeatured(e.target.value); setPage(1); }}
-            className="h-10 rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]">
+            className="h-10 shrink-0 sm:w-[188px] rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]">
             <option value="">All Images</option>
             <option value="true">Featured Only</option>
           </select>
-          <div className="flex items-center gap-1.5 rounded-xl border border-[hsl(var(--adm-border))] p-1 ml-auto">
+          <div className="flex items-center gap-1.5 rounded-[8px] border border-[hsl(var(--adm-border))] p-1 ml-auto">
             {(["grid", "list"] as const).map((m) => (
               <button key={m} type="button" onClick={() => setViewMode(m)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${viewMode === m ? "bg-[hsl(var(--adm-primary))] text-white" : "text-[hsl(var(--adm-muted-foreground))]"}`}>
+                className={`rounded-[8px] px-3 py-1.5 text-xs font-medium transition-colors ${viewMode === m ? "bg-[hsl(var(--adm-brand))] text-[hsl(var(--adm-brand-foreground))]" : "text-[hsl(var(--adm-muted-foreground))]"}`}>
                 {m === "grid" ? "Grid" : "List"}
               </button>
             ))}
@@ -312,10 +312,10 @@ export default function GalleryPage() {
       {/* Gallery Grid */}
       {loading ? (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-          {[...Array(12)].map((_, i) => <div key={i} className="aspect-square rounded-2xl adm-skeleton" />)}
+          {[...Array(12)].map((_, i) => <div key={i} className="aspect-square rounded-[8px] adm-skeleton" />)}
         </div>
       ) : items.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-[hsl(var(--adm-border))] py-24">
+        <div className="flex flex-col items-center justify-center rounded-[8px] border border-dashed border-[hsl(var(--adm-border))] py-24">
           <Images className="h-16 w-16 text-[hsl(var(--adm-muted-foreground)/0.3)] mb-4" />
           <p className="text-lg font-semibold text-[hsl(var(--adm-foreground))]">No images yet</p>
           <p className="mt-1 text-sm text-[hsl(var(--adm-muted-foreground))]">Start building your gallery</p>
@@ -331,28 +331,28 @@ export default function GalleryPage() {
             <motion.div
               key={item._id}
               variants={{ hidden: { opacity: 0, scale: 0.95 }, show: { opacity: 1, scale: 1, transition: { duration: 0.25, ease: EASE } } }}
-              className="group relative aspect-square overflow-hidden rounded-2xl border border-[hsl(var(--adm-border)/0.4)]"
+              className="group relative aspect-square overflow-hidden rounded-[8px] border border-[hsl(var(--adm-border)/0.4)]"
             >
               <img src={item.src} alt={item.alt} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
               <div className="absolute inset-0 bg-black/0 transition-all group-hover:bg-black/50" />
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-                <button onClick={() => setPreviewItem(item)} className="rounded-full bg-black/70 p-2.5 hover:bg-black/90 transition-colors">
+                <button onClick={() => setPreviewItem(item)} className="rounded-[8px] bg-black/70 p-2.5 hover:bg-black/90 transition-colors">
                   <Eye className="h-4 w-4 text-white" />
                 </button>
-                <button onClick={() => openEdit(item)} className="rounded-full bg-black/70 p-2.5 hover:bg-black/90 transition-colors">
+                <button onClick={() => openEdit(item)} className="rounded-[8px] bg-black/70 p-2.5 hover:bg-black/90 transition-colors">
                   <GripVertical className="h-4 w-4 text-white" />
                 </button>
-                <button onClick={() => setDeleteId(item._id)} className="rounded-full bg-red-600/80 p-2.5 hover:bg-red-600 transition-colors">
+                <button onClick={() => setDeleteId(item._id)} className="rounded-[8px] bg-red-600/80 p-2.5 hover:bg-red-600 transition-colors">
                   <Trash2 className="h-4 w-4 text-white" />
                 </button>
               </div>
               <button onClick={() => toggleFeatured(item)} className="absolute top-2 right-2">
                 {item.featured
-                  ? <Star className="h-4 w-4 fill-[hsl(var(--adm-warning))] text-[hsl(var(--adm-warning))] drop-shadow" />
+                  ? <Star className="h-4 w-4 fill-[hsl(var(--adm-warning))] text-[hsl(var(--adm-warning))]" />
                   : <StarOff className="h-4 w-4 text-white/60 opacity-0 group-hover:opacity-100 transition-opacity" />}
               </button>
               <div className="absolute bottom-2 left-2">
-                <span className="rounded-full bg-black/50 px-2 py-0.5 text-[10px] text-white backdrop-blur-sm">{categoryLabel(item.category)}</span>
+                <span className="rounded-[8px] bg-black/50 px-2 py-0.5 text-[10px] text-white backdrop-blur-sm">{categoryLabel(item.category)}</span>
               </div>
             </motion.div>
           ))}
@@ -362,7 +362,7 @@ export default function GalleryPage() {
           <div className="divide-y divide-[hsl(var(--adm-border)/0.4)]">
             {items.map((item) => (
               <div key={item._id} className="flex items-center gap-4 px-5 py-3 hover:bg-[hsl(var(--adm-accent)/0.2)] transition-colors">
-                <img src={item.src} alt={item.alt} className="h-14 w-20 rounded-xl object-cover shrink-0 border border-[hsl(var(--adm-border)/0.4)]" />
+                <img src={item.src} alt={item.alt} className="h-14 w-20 rounded-[8px] object-cover shrink-0 border border-[hsl(var(--adm-border)/0.4)]" />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-[hsl(var(--adm-foreground))] truncate">{item.alt}</p>
                   <p className="text-xs text-[hsl(var(--adm-muted-foreground))] mt-0.5 truncate">{item.src}</p>
@@ -371,10 +371,10 @@ export default function GalleryPage() {
                 {item.city && <AdminBadge variant="outline">{(item.city as City).name}</AdminBadge>}
                 {item.featured && <AdminBadge variant="warning"><Star className="h-3 w-3" /> Featured</AdminBadge>}
                 <div className="flex items-center gap-1">
-                  <button onClick={() => openEdit(item)} className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-primary))] transition-colors">
+                  <button onClick={() => openEdit(item)} className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-accent))] hover:text-[hsl(var(--adm-primary))] transition-colors">
                     <GripVertical className="h-3.5 w-3.5" />
                   </button>
-                  <button onClick={() => setDeleteId(item._id)} className="rounded-lg p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors">
+                  <button onClick={() => setDeleteId(item._id)} className="rounded-[8px] p-1.5 text-[hsl(var(--adm-muted-foreground))] hover:bg-[hsl(var(--adm-destructive)/0.1)] hover:text-[hsl(var(--adm-destructive))] transition-colors">
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </div>
@@ -423,7 +423,7 @@ export default function GalleryPage() {
               <select
                 value={form.category}
                 onChange={(e) => { setForm((f) => ({ ...f, category: e.target.value })); setFormErrors((errs) => ({ ...errs, category: "" })); }}
-                className={`flex h-10 w-full rounded-md border px-3 text-sm text-[hsl(var(--adm-foreground))] bg-[hsl(var(--adm-background))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] ${formErrors.category ? "border-red-500" : "border-[hsl(var(--adm-input))]"}`}
+                className={`flex h-10 w-full rounded-[8px] border px-3 text-sm text-[hsl(var(--adm-foreground))] bg-[hsl(var(--adm-background))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))] ${formErrors.category ? "border-red-500" : "border-[hsl(var(--adm-input))]"}`}
               >
                 <option value="">Select category…</option>
                 {allCategories.map((c) => <option key={c} value={c}>{categoryLabel(c)}</option>)}
@@ -436,7 +436,7 @@ export default function GalleryPage() {
               <label className="text-sm font-medium text-[hsl(var(--adm-foreground))] mb-1.5 block">City</label>
               <select value={(form.city as City | null)?._id ?? ""}
                 onChange={(e) => setForm((f) => ({ ...f, city: cities.find((c) => c._id === e.target.value) ?? null }))}
-                className="flex h-10 w-full rounded-md border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]">
+                className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]">
                 <option value="">Select city…</option>
                 {cities.map((c) => <option key={c._id} value={c._id}>{c.name}</option>)}
               </select>
@@ -450,8 +450,8 @@ export default function GalleryPage() {
           </div>
           <div className="flex items-center gap-3">
             <button type="button" onClick={() => setForm((f) => ({ ...f, featured: !f.featured }))}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.featured ? "bg-[hsl(var(--adm-primary))]" : "bg-[hsl(var(--adm-muted))]"}`}>
-              <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${form.featured ? "translate-x-6" : "translate-x-1"}`} />
+              className={`relative inline-flex h-6 w-11 items-center rounded-[8px] transition-colors ${form.featured ? "bg-[hsl(var(--adm-brand))]" : "bg-[hsl(var(--adm-muted))]"}`}>
+              <span className={`inline-block h-4 w-4 rounded-[8px] bg-white transition-transform ${form.featured ? "translate-x-6" : "translate-x-1"}`} />
             </button>
             <div>
               <span className="text-sm font-medium text-[hsl(var(--adm-foreground))]">Featured Image</span>
@@ -481,13 +481,13 @@ export default function GalleryPage() {
             onClick={() => setPreviewItem(null)}>
             <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }}
               className="relative max-w-4xl w-full" onClick={(e) => e.stopPropagation()}>
-              <img src={previewItem.src} alt={previewItem.alt} className="max-h-[80vh] w-full rounded-2xl object-contain" />
+              <img src={previewItem.src} alt={previewItem.alt} className="max-h-[80vh] w-full rounded-[8px] object-contain" />
               <div className="mt-3 flex items-center justify-between">
                 <div>
                   <p className="font-medium text-white">{previewItem.alt}</p>
                   {previewItem.caption && <p className="text-sm text-white/60">{previewItem.caption}</p>}
                 </div>
-                <button onClick={() => setPreviewItem(null)} className="rounded-full bg-white/20 p-2 text-white hover:bg-white/30">
+                <button onClick={() => setPreviewItem(null)} className="rounded-[8px] bg-white/20 p-2 text-white hover:bg-white/30">
                   <X className="h-5 w-5" />
                 </button>
               </div>

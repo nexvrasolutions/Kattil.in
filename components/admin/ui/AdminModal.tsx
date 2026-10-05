@@ -69,10 +69,9 @@ export function AdminModal({
             <motion.div
               key="panel"
               className={[
-                "relative z-10 w-full overflow-hidden rounded-2xl border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))] shadow-xl",
+                "relative z-10 w-full overflow-hidden rounded-[8px] border border-[hsl(var(--adm-border))] bg-[hsl(var(--adm-card))]",
                 sizeClasses[size],
               ].join(" ")}
-              style={{ boxShadow: "0 24px 64px -12px hsl(var(--adm-primary)/0.12), 0 0 0 1px hsl(var(--adm-border)/0.6)" }}
               initial={{ opacity: 0, scale: 0.97, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.97, y: 10 }}
@@ -98,7 +97,7 @@ export function AdminModal({
                 </div>
                 <button
                   onClick={onClose}
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg hover:bg-[hsl(var(--adm-accent))] text-[hsl(var(--adm-muted-foreground))] hover:text-[hsl(var(--adm-foreground))] transition-colors"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[8px] hover:bg-[hsl(var(--adm-accent))] text-[hsl(var(--adm-muted-foreground))] hover:text-[hsl(var(--adm-foreground))] transition-colors"
                   aria-label="Close modal"
                 >
                   <X className="h-4 w-4" />
