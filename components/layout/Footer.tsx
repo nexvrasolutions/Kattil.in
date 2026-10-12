@@ -188,7 +188,7 @@ export default function Footer({
                   city: "Madurai",
                   address: "2nd St, Park Town, Bama Nagar, Madurai, Tamil Nadu 625017, India",
                   phone: "+91 7358127921",
-                  email: "sadhu_burlington@live.com",
+                  email: "kattiladmin@gmail.com",
                 }}
               />
             </motion.div>

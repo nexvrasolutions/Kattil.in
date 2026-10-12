@@ -183,12 +183,7 @@ export default function BlogDetailContent({
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, ease: EASE }}
             >
-              <Link
-                href="/blog"
-                className="inline-flex items-center gap-1.5 font-[Public_Sans] text-xs font-semibold uppercase tracking-[0.16em] text-white/80 hover:text-white transition-colors mb-4"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" /> Back to all stories
-              </Link>
+
             </motion.div>
 
             <motion.p

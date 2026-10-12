@@ -68,7 +68,7 @@ const FOOTER_FALLBACK: FooterProps = {
       city: "Madurai",
       address: "2nd St, Park Town, Bama Nagar, Madurai, Tamil Nadu 625017, India",
       phone: "+91 7358127921",
-      email: "sadhu_burlington@live.com",
+      email: "kattiladmin@gmail.com",
     },
   ],
 };
@@ -128,7 +128,7 @@ async function fetchFooterData(): Promise<{ footer: FooterProps; sidebar: Sideba
         FooterModel.updateOne(
           { _id: parsed._id },
           { $set: { footerLinks } }
-        ).catch(() => {});
+        ).catch(() => { });
       }
     }
 
@@ -185,7 +185,7 @@ async function fetchFooterData(): Promise<{ footer: FooterProps; sidebar: Sideba
       FooterModel.updateOne(
         { _id: parsed._id },
         { $set: { sidebarIcons: sidebar } }
-      ).catch(() => {});
+      ).catch(() => { });
     }
 
     return { footer, sidebar };
