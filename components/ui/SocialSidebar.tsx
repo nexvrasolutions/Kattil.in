@@ -53,10 +53,13 @@ function IconRenderer({ iconName, iconUrl, iconColor }: { iconName: string; icon
 
 export default function SocialSidebar({ icons }: { icons?: SidebarIconData[] }) {
   const pathname = usePathname();
-  const isHome = pathname === "/";
   const [hovered, setHovered] = useState<string | null>(null);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setOpenMenu(null);
+  }, [pathname]);
 
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
@@ -67,8 +70,6 @@ export default function SocialSidebar({ icons }: { icons?: SidebarIconData[] }) 
     document.addEventListener("mousedown", onDown);
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
-
-  if (!isHome) return null;
 
   const visibleIcons = (icons ?? [])
     .filter((ic) => ic.visible)

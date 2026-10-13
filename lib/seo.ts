@@ -24,7 +24,7 @@ export const hotelJsonLd = {
   logo: `${SITE_URL}/assets/logo.png`,
   image: `${SITE_URL}/assets/gallery.png`,
   telephone: "+917448749779",
-  email: "hostelsparrow@gmail.com",
+  email: "kattiladmin@gmail.com",
   description: DEFAULT_DESCRIPTION,
   priceRange: "₹₹",
   currenciesAccepted: "INR",

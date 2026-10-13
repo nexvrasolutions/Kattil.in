@@ -26,7 +26,7 @@ const CITY_CONFIGS: Record<string, CityConfig> = {
     defaultPropertyName: "Kattil Chennai",
     address: "274, 1st Main Road, Secretariat Colony, Chennai, Thoraipakkam, Tamil Nadu 600097",
     phone: "+91 63851 97921",
-    email: "sadhu_burlington@live.com",
+    email: "kattiladmin@gmail.com",
     mapSrc: "https://maps.google.com/maps?q=274%2C+1st+Main+Road%2C+Secretariat+Colony%2C+Thoraipakkam%2C+Chennai%2C+Tamil+Nadu+600097&t=m&z=16&ie=UTF8&iwloc=&output=embed",
   },
   kaniyakumari: {
@@ -35,7 +35,7 @@ const CITY_CONFIGS: Record<string, CityConfig> = {
     defaultPropertyName: "The Sparrow",
     address: "Main Road, Near Sunset Point, Kaniyakumari, Tamil Nadu 629702",
     phone: "+91 74487 49779",
-    email: "hostelsparrow@gmail.com",
+    email: "kattiladmin@gmail.com",
     mapSrc: "https://maps.google.com/maps?q=Kaniyakumari%2C+Tamil+Nadu+629702&t=m&z=16&ie=UTF8&iwloc=&output=embed",
   },
   kanniyakumari: {
@@ -44,7 +44,7 @@ const CITY_CONFIGS: Record<string, CityConfig> = {
     defaultPropertyName: "The Sparrow",
     address: "Main Road, Near Sunset Point, Kaniyakumari, Tamil Nadu 629702",
     phone: "+91 74487 49779",
-    email: "hostelsparrow@gmail.com",
+    email: "kattiladmin@gmail.com",
     mapSrc: "https://maps.google.com/maps?q=Kaniyakumari%2C+Tamil+Nadu+629702&t=m&z=16&ie=UTF8&iwloc=&output=embed",
   },
   coimbatore: {
@@ -53,7 +53,7 @@ const CITY_CONFIGS: Record<string, CityConfig> = {
     defaultPropertyName: "Kattil Coimbatore",
     address: "124, Race Course Road, Gopalapuram, Coimbatore, Tamil Nadu 641018",
     phone: "+91 74487 49779",
-    email: "hostelsparrow@gmail.com",
+    email: "kattiladmin@gmail.com",
     mapSrc: "https://maps.google.com/maps?q=Race+Course+Road%2C+Coimbatore%2C+Tamil+Nadu+641018&t=m&z=16&ie=UTF8&iwloc=&output=embed",
   },
   colachel: {
@@ -62,7 +62,7 @@ const CITY_CONFIGS: Record<string, CityConfig> = {
     defaultPropertyName: "Kattil Colachel",
     address: "Beach Road, Colachel, Tamil Nadu 629251",
     phone: "+91 74487 49779",
-    email: "hostelsparrow@gmail.com",
+    email: "kattiladmin@gmail.com",
     mapSrc: "https://maps.google.com/maps?q=Colachel%2C+Tamil+Nadu+629251&t=m&z=16&ie=UTF8&iwloc=&output=embed",
   },
   madurai: {
@@ -71,7 +71,7 @@ const CITY_CONFIGS: Record<string, CityConfig> = {
     defaultPropertyName: "Kattil Stay Madurai",
     address: "2nd St, Park Town, Bama Nagar, Madurai, Tamil Nadu 625017",
     phone: "+91 73581 27921",
-    email: "sadhu_burlington@live.com",
+    email: "kattiladmin@gmail.com",
     mapSrc: "https://maps.google.com/maps?q=2nd+St%2C+Park+Town%2C+Bama+Nagar%2C+Madurai%2C+Tamil+Nadu+625017&t=m&z=16&ie=UTF8&iwloc=&output=embed",
   },
 };
@@ -457,10 +457,10 @@ export const getPropertyDetailsData = cache(async function getPropertyDetailsDat
       adminGalleryPhotos.length > 0
         ? adminGalleryPhotos
         : destinationSlug === "madurai"
-        ? MADURAI_STATIC_GALLERY
-        : destinationSlug === "chennai"
-        ? CHENNAI_STATIC_GALLERY
-        : [];
+          ? MADURAI_STATIC_GALLERY
+          : destinationSlug === "chennai"
+            ? CHENNAI_STATIC_GALLERY
+            : [];
 
     // 2. Photos uploaded in Admin Panel under Properties
     const propertyPhotos: string[] = Array.isArray(property?.images)
@@ -476,8 +476,8 @@ export const getPropertyDetailsData = cache(async function getPropertyDetailsDat
       destinationSlug === "madurai"
         ? MADURAI_STATIC_GALLERY
         : destinationSlug === "chennai"
-        ? CHENNAI_STATIC_GALLERY
-        : [
+          ? CHENNAI_STATIC_GALLERY
+          : [
             "/assets/kattil-room-hero.webp",
             "/assets/deluxe-garden-suite.webp",
             "/assets/ac-double-room.webp",
@@ -488,16 +488,16 @@ export const getPropertyDetailsData = cache(async function getPropertyDetailsDat
       propertyPhotos.length > 0
         ? propertyPhotos
         : effectiveAdminGallery.length > 0
-        ? effectiveAdminGallery
-        : DEFAULT_PROPERTY_IMAGES;
+          ? effectiveAdminGallery
+          : DEFAULT_PROPERTY_IMAGES;
 
     // Gallery section shows property photos from Admin Panel first, or falls back to admin gallery / defaults
     const galleryImages =
       propertyPhotos.length > 0
         ? propertyPhotos
         : effectiveAdminGallery.length > 0
-        ? effectiveAdminGallery
-        : DEFAULT_PROPERTY_IMAGES;
+          ? effectiveAdminGallery
+          : DEFAULT_PROPERTY_IMAGES;
 
     const result: PropertyDetailsData = {
       _id: property ? String(property._id) : undefined,
@@ -535,24 +535,24 @@ export const getPropertyDetailsData = cache(async function getPropertyDetailsDat
     const staticPropertyFallback =
       fallbackDestinationSlug === "madurai"
         ? [
-            "/assets/madurai-gallery/image-1.jpeg",
-            "/assets/madurai-gallery/image-2.jpeg",
-            "/assets/madurai-gallery/image-3.jpeg",
-            "/assets/madurai-gallery/image-4.jpeg",
-            "/assets/madurai-gallery/image-5.jpeg",
-            "/assets/madurai-gallery/image-6.jpeg",
-            "/assets/madurai-gallery/image-7.jpeg",
-            "/assets/madurai-gallery/image-8.jpeg",
-            "/assets/madurai-gallery/image-9.jpeg",
-          ]
+          "/assets/madurai-gallery/image-1.jpeg",
+          "/assets/madurai-gallery/image-2.jpeg",
+          "/assets/madurai-gallery/image-3.jpeg",
+          "/assets/madurai-gallery/image-4.jpeg",
+          "/assets/madurai-gallery/image-5.jpeg",
+          "/assets/madurai-gallery/image-6.jpeg",
+          "/assets/madurai-gallery/image-7.jpeg",
+          "/assets/madurai-gallery/image-8.jpeg",
+          "/assets/madurai-gallery/image-9.jpeg",
+        ]
         : fallbackDestinationSlug === "chennai"
-        ? [
+          ? [
             "/assets/chennai-gallery/image-1.jpeg",
             "/assets/chennai-gallery/image-2.jpeg",
             "/assets/chennai-gallery/image-3.jpeg",
             "/assets/chennai-gallery/image-4.jpeg",
           ]
-        : [
+          : [
             "/assets/kattil-room-hero.webp",
             "/assets/deluxe-garden-suite.webp",
             "/assets/ac-double-room.webp",

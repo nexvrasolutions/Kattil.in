@@ -111,7 +111,7 @@ export default function AllDestinationsView({
       <section className="relative z-20 w-full py-16 md:py-24 bg-[#FAF8F5] rounded-t-[20px] md:rounded-t-[24px] overflow-hidden -mt-3 md:-mt-4">
         <div className="w-full max-w-[1920px] mx-auto px-3 md:px-5">
           <div className="px-5 md:px-8 lg:px-15">
-            <div className="flex flex-wrap items-center justify-start gap-6 sm:gap-7">
+            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-7">
               {destinations.map((dest, index) => {
                 const isKanya =
                   dest.slug === "kaniyakumari" ||

@@ -129,9 +129,6 @@ function PolicyRow({ policy, index }: { policy: (typeof policies)[0]; index: num
 }
 
 export default function RefundPolicyPage() {
-  const headerRef = useRef<HTMLDivElement>(null);
-  const headerInView = useInView(headerRef, { once: true });
-
   return (
     <>
       <Navbar />
@@ -181,17 +178,6 @@ export default function RefundPolicyPage() {
       {/* ── Policies ────────────────────────────────────────────────── */}
       <section className="relative z-20 bg-tertiary py-14 md:py-20 lg:py-28 rounded-t-[20px] md:rounded-t-[24px] overflow-hidden -mt-3 md:-mt-4">
         <div className="mx-auto max-w-480 px-5 md:px-8 lg:px-20">
-
-          {/* Divider */}
-          <div ref={headerRef}>
-            <motion.div
-              initial={{ scaleX: 0, opacity: 0 }}
-              animate={headerInView ? { scaleX: 1, opacity: 1 } : {}}
-              transition={{ duration: 0.8, ease: EASE }}
-              style={{ originX: 0 }}
-              className="h-px bg-primary/15 mb-10"
-            />
-          </div>
 
           {/* Policies */}
           <div className="bg-white rounded-2xl px-7 md:px-10 shadow-sm">

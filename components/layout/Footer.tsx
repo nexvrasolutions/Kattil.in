@@ -86,7 +86,7 @@ export default function Footer({
   const ref = useRef<HTMLElement>(null);
   useInView(ref, { once: true, margin: "-80px" });
 
-  const visibleSocial = socialLinks.filter((s) => s.visible);
+  const visibleSocial = socialLinks.filter((s) => s.visible && Boolean(s.url?.trim()));
   const sortedSections = [...footerLinks].sort((a, b) => a.order - b.order);
   const visibleLocations = locations?.filter((l) => l.address) ?? [];
 
@@ -146,8 +146,8 @@ export default function Footer({
                 {section.section}
               </h4>
               <ul className="space-y-3">
-                {[...section.links].sort((a, b) => a.order - b.order).map((link) => (
-                  <li key={link.label}>
+                {[...section.links].sort((a, b) => a.order - b.order).map((link, linkIdx) => (
+                  <li key={`${link.label}-${linkIdx}`}>
                     <Link
                       href={link.href}
                       target={link.newTab ? "_blank" : undefined}
@@ -209,11 +209,11 @@ export default function Footer({
                   bgColor: "linear-gradient(45deg,#833ab4,#fd1d1d,#fcb045)",
                   visible: true,
                 }
-              ]).map((social) => (
+              ]).map((social, idx) => (
                 <motion.a
-                  key={social.label}
+                  key={`${social.label || social.iconName || "social"}-${idx}`}
                   href={social.url}
-                  aria-label={social.label}
+                  aria-label={social.label || social.iconName || "Social link"}
                   target="_blank"
                   rel="noopener noreferrer"
                   whileHover={{ scale: 1.08 }}
@@ -222,7 +222,7 @@ export default function Footer({
                   style={{ background: social.bgColor || "linear-gradient(45deg,#833ab4,#fd1d1d,#fcb045)" }}
                 >
                   {social.iconImageUrl
-                    ? <img src={social.iconImageUrl} alt={social.label} className="h-5 w-5 object-contain" />
+                    ? <img src={social.iconImageUrl} alt={social.label || "Social link"} className="h-5 w-5 object-contain" />
                     : <SocialIconFallback name={social.iconName || "instagram"} />
                   }
                 </motion.a>

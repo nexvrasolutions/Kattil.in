@@ -15,7 +15,7 @@ const localBusinessJsonLd = {
   url: `${SITE_URL}/colachel`,
   image: `${SITE_URL}/assets/gallery.png`,
   telephone: "+917448749779",
-  email: "hostelsparrow@gmail.com",
+  email: "kattiladmin@gmail.com",
   description:
     "Kattil Colachel offers serene beachside hotel rooms and stays along the scenic coastline of Colachel, Tamil Nadu.",
   address: {

@@ -406,34 +406,34 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
 
                 {/* Premium Amenities */}
                 {data.amenities && data.amenities.length > 0 && (
-                <div className="mt-12">
-                  <h2 className="font-sans text-2xl md:text-[28px] font-semibold text-[#111827] mb-10">
-                    Premium Amenities
-                  </h2>
+                  <div className="mt-12">
+                    <h2 className="font-sans text-2xl md:text-[28px] font-semibold text-[#111827] mb-10">
+                      Premium Amenities
+                    </h2>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-8 gap-x-4">
-                    {data.amenities.map((item, aIdx) => {
-                      return (
-                        <motion.div
-                          key={aIdx}
-                          initial={{ opacity: 0, scale: 0.85 }}
-                          whileInView={{ opacity: 1, scale: 1 }}
-                          viewport={{ once: true, margin: "-40px" }}
-                          transition={{ duration: 0.45, delay: aIdx * 0.06, ease: EASE }}
-                          whileHover={{ y: -4, scale: 1.05, transition: { duration: 0.2 } }}
-                          className="flex flex-col items-center text-center cursor-default group"
-                        >
-                          <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#D2E6BC] flex items-center justify-center text-[#3a5535] shadow-xs group-hover:bg-[#c3dab0] transition-colors">
-                            <AmenityIcon name={item.icon} className="w-6 h-6 md:w-7 md:h-7 stroke-[1.75]" />
-                          </div>
-                          <span className="font-sans text-[12.5px] md:text-[13px] font-medium text-[#374151] mt-3">
-                            {item.name}
-                          </span>
-                        </motion.div>
-                      );
-                    })}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-8 gap-x-4">
+                      {data.amenities.map((item, aIdx) => {
+                        return (
+                          <motion.div
+                            key={aIdx}
+                            initial={{ opacity: 0, scale: 0.85 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true, margin: "-40px" }}
+                            transition={{ duration: 0.45, delay: aIdx * 0.06, ease: EASE }}
+                            whileHover={{ y: -4, scale: 1.05, transition: { duration: 0.2 } }}
+                            className="flex flex-col items-center text-center cursor-default group"
+                          >
+                            <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-[#D2E6BC] flex items-center justify-center text-[#3a5535] shadow-xs group-hover:bg-[#c3dab0] transition-colors">
+                              <AmenityIcon name={item.icon} className="w-6 h-6 md:w-7 md:h-7 stroke-[1.75]" />
+                            </div>
+                            <span className="font-sans text-[12.5px] md:text-[13px] font-medium text-[#374151] mt-3">
+                              {item.name}
+                            </span>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
                 )}
               </motion.div>
 
@@ -847,14 +847,14 @@ export default function PropertyDetailsView({ data }: { data: PropertyDetailsDat
 
                     {/* Email */}
                     <a
-                      href={`mailto:${data.email || "hostelsparrow@gmail.com"}`}
+                      href={`mailto:${data.email || "kattiladmin@gmail.com"}`}
                       className="flex items-center gap-3 text-sm md:text-[15px] font-medium text-gray-900 hover:text-[#526442] transition-colors"
                     >
                       <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-gray-800 shadow-xs">
                         <Mail className="w-4 h-4" />
                       </div>
                       <span>
-                        <strong>Email :</strong> {data.email || "hostelsparrow@gmail.com"}
+                        <strong>Email :</strong> {data.email || "kattiladmin@gmail.com"}
                       </span>
                     </a>
                   </div>

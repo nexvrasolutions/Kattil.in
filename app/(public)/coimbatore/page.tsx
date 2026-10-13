@@ -15,7 +15,7 @@ const localBusinessJsonLd = {
   url: `${SITE_URL}/coimbatore`,
   image: `${SITE_URL}/assets/gallery.png`,
   telephone: "+917448749779",
-  email: "hostelsparrow@gmail.com",
+  email: "kattiladmin@gmail.com",
   description:
     "Kattil Coimbatore offers premium stays and hotel rooms near Race Course, Coimbatore.",
   address: {

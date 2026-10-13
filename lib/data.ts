@@ -47,7 +47,7 @@ export const rooms = [
     size: "45",
     feature: "SHARED DORM",
     capacity: 6,
-    price: 682.50 ,
+    price: 682.50,
     image: "/assets/six-bed-dormitory.webp",
     description:
       "A comfortable shared dormitory with 6 beds, individual pod cooling, secure lockers, and high-speed Wi-Fi.",
@@ -266,7 +266,7 @@ export const locations = [
     label: "MADURAI",
     address: "2nd St, Park Town, Bama Nagar, Madurai, Tamil Nadu 625017, India",
     phone: "+91 7358127921",
-    email: "sadhu_burlington@live.com",
+    email: "kattiladmin@gmail.com",
     mapSrc:
       "https://maps.google.com/maps?q=2nd+St%2C+Park+Town%2C+Bama+Nagar%2C+Madurai%2C+Tamil+Nadu+625017%2C+India&t=m&z=16&ie=UTF8&iwloc=&output=embed",
   },
@@ -275,7 +275,7 @@ export const locations = [
     label: "CHENNAI",
     address: "274, 1st Main Road, Secretariat Colony, Chennai, Thoraipakkam, Tamil Nadu 600097",
     phone: "+91 6385197921",
-    email: "sadhu_burlington@live.com",
+    email: "kattiladmin@gmail.com",
     mapSrc:
       "https://maps.google.com/maps?q=274%2C+1st+Main+Road%2C+Secretariat+Colony%2C+Thoraipakkam%2C+Chennai%2C+Tamil+Nadu+600097&t=m&z=16&ie=UTF8&iwloc=&output=embed",
   },
@@ -344,8 +344,8 @@ export const locationRooms = {
       size: "45",
       feature: "PRIVATE TERRACE",
       capacity: 2,
-      price:  682.50,
-      external_url : 'https://live.ipms247.com/booking/roomwisedata.php?hid=kattil&roomtypeunkid=6154300000000000001',
+      price: 682.50,
+      external_url: 'https://live.ipms247.com/booking/roomwisedata.php?hid=kattil&roomtypeunkid=6154300000000000001',
       image:
         "/assets/six-bed-dormitory.webp",
       description:
@@ -361,9 +361,9 @@ export const locationRooms = {
       price: 18000,
       external_url: 'https://live.ipms247.com/booking/roomwisedata.php?hid=kattil&roomtypeunkid=6154300000000000002',
       image:
-      "/assets/ac-double-room.webp",
+        "/assets/ac-double-room.webp",
       description:
-      "Steeped in old-world grandeur, this suite pairs antique furnishings with modern comforts for a truly regal experience.",
+        "Steeped in old-world grandeur, this suite pairs antique furnishings with modern comforts for a truly regal experience.",
     },
     {
       id: "md3",
