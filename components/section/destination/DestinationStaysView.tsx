@@ -397,6 +397,8 @@ export default function DestinationStaysView({
                       hover:bg-[#162840]
                       transition-colors
                       shadow-sm
+                      whitespace-nowrap
+                      shrink-0
                     "
                   >
                     Contact Us

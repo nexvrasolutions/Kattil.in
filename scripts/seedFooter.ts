@@ -64,11 +64,18 @@ export async function seedFooter() {
       ];
     }
     if (!existing.socialLinks?.length) {
-      updates.socialLinks = [{
-        label: "Instagram", url: "https://www.instagram.com/kattilthehome",
-        iconName: "instagram", iconImageUrl: "",
-        bgColor: "linear-gradient(45deg,#833ab4,#fd1d1d,#fcb045)", visible: true,
-      }];
+      updates.socialLinks = [
+        {
+          label: "WhatsApp", url: "https://wa.me/917358127921",
+          iconName: "whatsapp", iconImageUrl: "",
+          bgColor: "#25D366", visible: true,
+        },
+        {
+          label: "Instagram", url: "https://www.instagram.com/kattilthehome",
+          iconName: "instagram", iconImageUrl: "",
+          bgColor: "linear-gradient(45deg,#833ab4,#fd1d1d,#fcb045)", visible: true,
+        },
+      ];
     }
     if (Object.keys(updates).length) {
       await Footer.findByIdAndUpdate(existing._id, updates);
@@ -114,11 +121,18 @@ export async function seedFooter() {
           ],
         },
       ],
-      socialLinks: [{
-        label: "Instagram", url: "https://www.instagram.com/kattilthehome",
-        iconName: "instagram", iconImageUrl: "",
-        bgColor: "linear-gradient(45deg,#833ab4,#fd1d1d,#fcb045)", visible: true,
-      }],
+      socialLinks: [
+        {
+          label: "WhatsApp", url: "https://wa.me/917358127921",
+          iconName: "whatsapp", iconImageUrl: "",
+          bgColor: "#25D366", visible: true,
+        },
+        {
+          label: "Instagram", url: "https://www.instagram.com/kattilthehome",
+          iconName: "instagram", iconImageUrl: "",
+          bgColor: "linear-gradient(45deg,#833ab4,#fd1d1d,#fcb045)", visible: true,
+        },
+      ],
       sidebarIcons: [
         {
           label: "WhatsApp", tooltip: "Chat on WhatsApp", iconName: "whatsapp", iconUrl: "",

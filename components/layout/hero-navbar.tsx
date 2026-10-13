@@ -984,11 +984,13 @@ export default function HeroNavbar({
                 relative
                 z-10
                 flex
+                flex-nowrap
                 items-center
                 justify-between
                 px-5
                 md:px-8
-                lg:px-15
+                lg:px-8
+                xl:px-15
                 h-[74px]
                 sm:h-[82px]
                 md:h-[90px]
@@ -998,7 +1000,7 @@ export default function HeroNavbar({
             >
               {/* LEFT NAVIGATION */}
 
-              <nav className="hidden lg:flex items-center gap-8 flex-1">
+              <nav className="hidden lg:flex items-center gap-6 xl:gap-8 flex-1 shrink-0">
                 {HERO_NAV_LINKS.map((link) => {
                   const isDestinations =
                     link.label === "Destinations";
@@ -1145,18 +1147,19 @@ export default function HeroNavbar({
 
               {/* RIGHT CTAs */}
 
-              <div className="hidden lg:flex items-center justify-end gap-6 flex-1">
+              <div className="hidden lg:flex items-center justify-end gap-6 flex-1 shrink-0">
 
 
                 <Link
                   href="/contact-us"
                   className="
-                    w-[122px]
+                    min-w-[122px]
                     h-[40px]
                     rounded-[8px]
                     border-[1px]
                     border-white
-                    px-6
+                    px-5
+                    sm:px-6
                     text-white
                     text-[14px]
                     leading-none
@@ -1164,6 +1167,8 @@ export default function HeroNavbar({
                     inline-flex
                     items-center
                     justify-center
+                    whitespace-nowrap
+                    shrink-0
                     transition-all
                     duration-300
                     hover:border-white
@@ -1379,7 +1384,7 @@ export default function HeroNavbar({
                     <Link
                       href="/contact-us"
                       onClick={() => setMobileOpen(false)}
-                      className="flex items-center justify-center w-full border border-white hover:border-white text-white rounded-[8px] py-3.5 text-[15px] font-semibold tracking-wide transition-all duration-300 font-sans hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-[0.99]"
+                      className="flex items-center justify-center w-full border border-white hover:border-white text-white rounded-[8px] py-3.5 text-[15px] font-semibold tracking-wide whitespace-nowrap transition-all duration-300 font-sans hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-[0.99]"
                     >
                       Contact Us
                     </Link>

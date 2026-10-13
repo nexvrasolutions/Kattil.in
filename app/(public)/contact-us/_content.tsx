@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Phone, Mail } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
 import { getGoogleMapsEmbedUrl } from "@/lib/utils/mapUtils";
-import type { LocationItem } from "./page";
+import type { LocationItem, HotelContactItem } from "./page";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -19,20 +19,171 @@ function formatLocationLabel(label: string) {
     .join(" ");
 }
 
+function HotelContactSection({
+  hotel,
+  cityName,
+  activeId,
+  index,
+}: {
+  hotel: HotelContactItem;
+  cityName: string;
+  activeId: string;
+  index: number;
+}) {
+  const [mapLoading, setMapLoading] = useState(false);
+  const embedUrl = getGoogleMapsEmbedUrl(
+    hotel.mapSrc,
+    hotel.address || `${cityName}, Tamil Nadu, India`
+  );
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6 lg:gap-8 items-stretch">
+      {/* Map */}
+      <div className="relative overflow-hidden rounded-2xl h-80 sm:h-96 lg:h-auto min-h-[360px] shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
+        {embedUrl ? (
+          <iframe
+            key={`${activeId}-${hotel.id}`}
+            src={embedUrl}
+            width="100%"
+            height="100%"
+            style={{ border: 0, display: "block" }}
+            allowFullScreen
+            loading="eager"
+            referrerPolicy="no-referrer-when-downgrade"
+            title={`${hotel.name || cityName} location map`}
+            onLoad={() => setMapLoading(false)}
+          />
+        ) : (
+          <div className="h-full w-full bg-primary/20 flex items-center justify-center">
+            <p className="font-sans text-white/40 text-sm">Map not available</p>
+          </div>
+        )}
+
+        <AnimatePresence>
+          {mapLoading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="absolute inset-0 bg-primary flex flex-col items-center justify-center gap-5"
+            >
+              <motion.img
+                src="/assets/logo.png"
+                alt="Loading"
+                className="h-12 md:h-14 object-contain"
+                style={{ filter: "brightness(0) invert(1)" }}
+                animate={{ opacity: [0.35, 1, 0.35], scale: [0.97, 1.03, 0.97] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <div className="flex gap-2">
+                {[0, 1, 2].map((i) => (
+                  <motion.div
+                    key={i}
+                    className="w-1.5 h-1.5 rounded-full bg-secondary/55"
+                    animate={{ opacity: [0.15, 1, 0.15], y: [0, -5, 0] }}
+                    transition={{ duration: 0.85, delay: i * 0.18, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Contact info card */}
+      <motion.div
+        key={`${activeId}-${hotel.id}`}
+        initial={{ opacity: 0, x: 10 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.35, ease: EASE, delay: index * 0.05 }}
+        className="relative overflow-hidden rounded-2xl p-7 sm:p-9 lg:p-10 flex flex-col justify-center gap-6 border border-white/5 shadow-[0_16px_40px_rgba(13,27,46,0.3)]"
+        style={{
+          backgroundColor: "#0d1b2e",
+          transform: "translateZ(0)",
+        }}
+      >
+        {/* Navbar texture overlay - Exact match to Navbar */}
+        <div
+          className="absolute inset-0 pointer-events-none z-0"
+          style={{
+            backgroundImage: "url('/assets/overlay.png')",
+            backgroundPosition: "center",
+            backgroundSize: "cover",
+            transform: "translateZ(0)",
+          }}
+        />
+
+        <div className="relative z-10 flex flex-col gap-7 sm:gap-8">
+          {hotel.address && (
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center shrink-0 mt-0.5">
+                <MapPin className="w-4.5 h-4.5 text-[#D2E6BC]" />
+              </div>
+              <div className="flex flex-col gap-1 min-w-0">
+                <span className="font-[Public_Sans] text-[14px] font-semibold uppercase text-[#D2E6BC]">
+                  Address
+                </span>
+                <p className="font-[Public_Sans] font-normal text-white text-[14px] sm:text-[14px] leading-[1.6]">
+                  {hotel.address}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {hotel.phone && (
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center shrink-0 mt-0.5">
+                <Phone className="w-4.5 h-4.5 text-[#D2E6BC]" />
+              </div>
+              <div className="flex flex-col gap-1 min-w-0">
+                <span className="font-[Public_Sans] text-[14px] font-semibold uppercase text-[#D2E6BC]">
+                  Phone
+                </span>
+                <a
+                  href={`tel:${hotel.phone.replace(/\s/g, "")}`}
+                  className="font-[Public_Sans] font-medium text-white text-[15px] sm:text-[15.5px] leading-[1.6] hover:text-[#D2E6BC] transition-colors duration-200"
+                >
+                  {hotel.phone}
+                </a>
+              </div>
+            </div>
+          )}
+
+          {hotel.email && (
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center shrink-0 mt-0.5">
+                <Mail className="w-4.5 h-4.5 text-[#D2E6BC]" />
+              </div>
+              <div className="flex flex-col gap-1 min-w-0">
+                <span className="font-[Public_Sans] text-[14px] font-semibold uppercase text-[#D2E6BC]">
+                  Email
+                </span>
+                <a
+                  href={`mailto:${hotel.email}`}
+                  className="font-[Public_Sans] font-medium text-white text-[15px] sm:text-[15.5px] leading-[1.6] hover:text-[#D2E6BC] transition-colors duration-200 break-all"
+                >
+                  {hotel.email}
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 export default function ContactContent({ locations }: { locations: LocationItem[] }) {
   usePageView();
   const validLocations = (locations ?? []).filter((l) => Boolean(l.label && l.label.trim()));
   const [activeId, setActiveId] = useState(validLocations[0]?.id ?? "");
-  const [mapLoading, setMapLoading] = useState(false);
-  const [mapKey, setMapKey] = useState(0);
 
   const active = validLocations.find((l) => l.id === activeId) ?? validLocations[0];
 
   const handleTabChange = (id: string) => {
     if (id === activeId) return;
-    setMapLoading(true);
     setActiveId(id);
-    setMapKey((k) => k + 1);
   };
 
   if (!active) {
@@ -45,6 +196,20 @@ export default function ContactContent({ locations }: { locations: LocationItem[
       </>
     );
   }
+
+  const hotelsToDisplay: HotelContactItem[] =
+    active.hotels && active.hotels.length > 0
+      ? active.hotels
+      : [
+          {
+            id: active._id || active.id,
+            name: active.label,
+            address: active.address || "",
+            phone: active.phone || "",
+            email: active.email || "",
+            mapSrc: active.mapSrc || "",
+          },
+        ];
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF8F5]">
@@ -63,8 +228,8 @@ export default function ContactContent({ locations }: { locations: LocationItem[
             className="w-full h-full bg-no-repeat"
             style={{
               backgroundImage: "url('/images/partners/hero-skyline.png')",
-              backgroundSize: "contain",
               backgroundPosition: "right bottom",
+              backgroundSize: "contain",
             }}
           />
         </motion.div>
@@ -120,10 +285,11 @@ export default function ContactContent({ locations }: { locations: LocationItem[
                         key={loc.id}
                         type="button"
                         onClick={() => handleTabChange(loc.id)}
-                        className={`font-[Public_Sans] text-[13px] sm:text-[13.5px] transition-all whitespace-nowrap cursor-pointer px-3.5 sm:px-4 py-1.5 rounded-[6px] ${isActive
-                          ? "bg-[#b4c7a5] text-[#22301c] font-semibold shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
-                          : "text-[#6b7280] hover:text-[#111827] font-medium hover:bg-[#eae8e3]"
-                          }`}
+                        className={`font-[Public_Sans] text-[13px] sm:text-[13.5px] transition-all whitespace-nowrap cursor-pointer px-3.5 sm:px-4 py-1.5 rounded-[6px] ${
+                          isActive
+                            ? "bg-[#b4c7a5] text-[#22301c] font-semibold shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
+                            : "text-[#6b7280] hover:text-[#111827] font-medium hover:bg-[#eae8e3]"
+                        }`}
                       >
                         {formattedName}
                       </button>
@@ -133,152 +299,22 @@ export default function ContactContent({ locations }: { locations: LocationItem[
               </motion.div>
             )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6 lg:gap-8 items-stretch">
-
-              {/* Map */}
-              <div className="relative overflow-hidden rounded-2xl h-80 sm:h-96 lg:h-auto min-h-[360px] shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
-                {(() => {
-                  const embedUrl = getGoogleMapsEmbedUrl(
-                    active.mapSrc,
-                    active.address || `${active.label}, Tamil Nadu, India`
-                  );
-                  return embedUrl ? (
-                    <iframe
-                      key={mapKey}
-                      src={embedUrl}
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0, display: "block" }}
-                      allowFullScreen
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                      title={`${active.label} location map`}
-                      onLoad={() => setMapLoading(false)}
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-primary/20 flex items-center justify-center">
-                      <p className="font-sans text-white/40 text-sm">Map not available</p>
-                    </div>
-                  );
-                })()}
-
-                <AnimatePresence>
-                  {mapLoading && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.25 }}
-                      className="absolute inset-0 bg-primary flex flex-col items-center justify-center gap-5"
-                    >
-                      <motion.img
-                        src="/assets/logo.png"
-                        alt="Loading"
-                        className="h-12 md:h-14 object-contain"
-                        style={{ filter: "brightness(0) invert(1)" }}
-                        animate={{ opacity: [0.35, 1, 0.35], scale: [0.97, 1.03, 0.97] }}
-                        transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-                      />
-                      <div className="flex gap-2">
-                        {[0, 1, 2].map((i) => (
-                          <motion.div
-                            key={i}
-                            className="w-1.5 h-1.5 rounded-full bg-secondary/55"
-                            animate={{ opacity: [0.15, 1, 0.15], y: [0, -5, 0] }}
-                            transition={{ duration: 0.85, delay: i * 0.18, repeat: Infinity, ease: "easeInOut" }}
-                          />
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* Contact info card */}
-              <motion.div
-                key={activeId}
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.35, ease: EASE }}
-                className="relative overflow-hidden rounded-2xl p-7 sm:p-9 lg:p-10 flex flex-col justify-center gap-6 border border-white/5 shadow-[0_16px_40px_rgba(13,27,46,0.3)]"
-                style={{
-                  backgroundColor: "#0d1b2e",
-                  transform: "translateZ(0)",
-                }}
-              >
-                {/* Navbar texture overlay - Exact match to Navbar */}
-                <div
-                  className="absolute inset-0 pointer-events-none z-0"
-                  style={{
-                    backgroundImage: "url('/assets/overlay.png')",
-                    backgroundPosition: "center",
-                    backgroundSize: "cover",
-                    transform: "translateZ(0)",
-                  }}
+            {/* Vertically stacked Hotel Contact Sections */}
+            <div className="space-y-12 sm:space-y-14 md:space-y-16">
+              {hotelsToDisplay.map((hotel, index) => (
+                <HotelContactSection
+                  key={`${active.id}-${hotel.id || index}`}
+                  hotel={hotel}
+                  cityName={active.label}
+                  activeId={activeId}
+                  index={index}
                 />
-
-                <div className="relative z-10 flex flex-col gap-7 sm:gap-8">
-                  {active.address && (
-                    <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center shrink-0 mt-0.5">
-                        <MapPin className="w-4.5 h-4.5 text-[#D2E6BC]" />
-                      </div>
-                      <div className="flex flex-col gap-1 min-w-0">
-                        <span className="font-[Public_Sans] text-[14px] font-semibold uppercase text-[#D2E6BC]">
-                          Address
-                        </span>
-                        <p className="font-[Public_Sans] font-normal text-white text-[14px] sm:text-[14px] leading-[1.6]">
-                          {active.address}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {active.phone && (
-                    <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center shrink-0 mt-0.5">
-                        <Phone className="w-4.5 h-4.5 text-[#D2E6BC]" />
-                      </div>
-                      <div className="flex flex-col gap-1 min-w-0">
-                        <span className="font-[Public_Sans] text-[14px] font-semibold uppercase text-[#D2E6BC]">
-                          Phone
-                        </span>
-                        <a
-                          href={`tel:${active.phone.replace(/\s/g, "")}`}
-                          className="font-[Public_Sans] font-medium text-white text-[15px] sm:text-[15.5px] leading-[1.6] hover:text-[#D2E6BC] transition-colors duration-200"
-                        >
-                          {active.phone}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-
-                  {active.email && (
-                    <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-full bg-white/10 border border-white/10 flex items-center justify-center shrink-0 mt-0.5">
-                        <Mail className="w-4.5 h-4.5 text-[#D2E6BC]" />
-                      </div>
-                      <div className="flex flex-col gap-1 min-w-0">
-                        <span className="font-[Public_Sans] text-[14px] font-semibold uppercase text-[#D2E6BC]">
-                          Email
-                        </span>
-                        <a
-                          href={`mailto:${active.email}`}
-                          className="font-[Public_Sans] font-medium text-white text-[15px] sm:text-[15.5px] leading-[1.6] hover:text-[#D2E6BC] transition-colors duration-200 break-all"
-                        >
-                          {active.email}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-
+              ))}
             </div>
+
           </div>
         </div>
       </section>
     </div>
   );
 }
-

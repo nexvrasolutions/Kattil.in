@@ -240,10 +240,10 @@ export default function Navbar() {
           </AnimatePresence>
 
           {/* ── Nav row (always visible) ─────────────────────────────────────── */}
-          <div ref={navRowRef} className="relative z-10 shrink-0 flex items-center justify-between h-[74px] sm:h-[82px] md:h-[90px] lg:h-[94px] px-5 md:px-8 lg:px-15">
+          <div ref={navRowRef} className="relative z-10 shrink-0 flex flex-nowrap items-center justify-between h-[74px] sm:h-[82px] md:h-[90px] lg:h-[94px] px-5 md:px-8 lg:px-8 xl:px-15">
 
             {/* Left navigation */}
-            <nav className="hidden lg:flex items-center gap-8 flex-1">
+            <nav className="hidden lg:flex items-center gap-6 xl:gap-8 flex-1 shrink-0">
               {[
                 { label: "Home", href: "/" },
                 { label: "Destinations", href: "/rooms" },
@@ -325,10 +325,10 @@ export default function Navbar() {
             </Link>
 
             {/* Right CTA */}
-            <div className="hidden lg:flex items-center justify-end gap-6 flex-1">
+            <div className="hidden lg:flex items-center justify-end gap-6 flex-1 shrink-0">
               <Link
                 href="/contact-us"
-                className="w-[122px] h-[40px] rounded-[8px] border border-white px-6 text-white text-[14px] leading-none font-medium inline-flex items-center justify-center transition-all duration-300 hover:border-white hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-95 font-sans"
+                className="min-w-[122px] h-[40px] rounded-[8px] border border-white px-5 sm:px-6 text-white text-[14px] leading-none font-medium inline-flex items-center justify-center whitespace-nowrap shrink-0 transition-all duration-300 hover:border-white hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-95 font-sans"
               >
                 Contact Us
               </Link>
@@ -471,7 +471,7 @@ export default function Navbar() {
                   <Link
                     href="/contact-us"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center justify-center w-full border border-white hover:border-white text-white rounded-[8px] py-3.5 text-[15px] font-semibold tracking-wide transition-all duration-300 font-sans hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-[0.99]"
+                    className="flex items-center justify-center w-full border border-white hover:border-white text-white rounded-[8px] py-3.5 text-[15px] font-semibold tracking-wide whitespace-nowrap transition-all duration-300 font-sans hover:bg-white hover:text-[#0d1b2e] shadow-sm active:scale-[0.99]"
                   >
                     Contact Us
                   </Link>

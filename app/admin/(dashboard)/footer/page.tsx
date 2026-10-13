@@ -132,7 +132,28 @@ export default function FooterPage() {
   /* ── Social helpers ───────────────────────────────────────────────────── */
   const addSocial = (name = "custom") => {
     const def = ICON_DEFAULTS[name] ?? ICON_DEFAULTS.custom;
-    setData((d) => ({ ...d, socialLinks: [...d.socialLinks, { label: ICON_LABELS[name] ?? "Custom", url: "", iconName: name, iconImageUrl: "", bgColor: def.bg, visible: true }] }));
+    const defaultUrl =
+      name === "whatsapp"
+        ? "https://wa.me/917358127921"
+        : name === "instagram"
+        ? "https://www.instagram.com/kattilthehome"
+        : name === "googlemaps"
+        ? "https://maps.app.goo.gl/2wWHgndMue4Lnkzw8"
+        : "";
+    setData((d) => ({
+      ...d,
+      socialLinks: [
+        ...d.socialLinks,
+        {
+          label: ICON_LABELS[name] ?? "Custom",
+          url: defaultUrl,
+          iconName: name,
+          iconImageUrl: "",
+          bgColor: def.bg,
+          visible: true,
+        },
+      ],
+    }));
   };
   const updSocial = (i: number, f: string, v: unknown) => setData((d) => { const s = [...d.socialLinks]; s[i] = { ...s[i], [f]: v }; return { ...d, socialLinks: s }; });
   const delSocial = (i: number) => setData((d) => ({ ...d, socialLinks: d.socialLinks.filter((_, x) => x !== i) }));

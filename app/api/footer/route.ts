@@ -45,6 +45,10 @@ const STATIC_FALLBACK = {
   ],
   socialLinks: [
     {
+      label: "WhatsApp", url: "https://wa.me/917358127921",
+      iconName: "whatsapp", iconImageUrl: "", bgColor: "#25D366", visible: true,
+    },
+    {
       label: "Instagram", url: "https://www.instagram.com/kattilthehome",
       iconName: "instagram", iconImageUrl: "", bgColor: "linear-gradient(45deg,#833ab4,#fd1d1d,#fcb045)", visible: true,
     },

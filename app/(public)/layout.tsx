@@ -61,6 +61,7 @@ const FOOTER_FALLBACK: FooterProps = {
     },
   ],
   socialLinks: [
+    { label: "WhatsApp", url: "https://wa.me/917358127921", iconName: "whatsapp", iconImageUrl: "", bgColor: "#25D366", visible: true },
     { label: "Instagram", url: "https://www.instagram.com/kattilthehome", iconName: "instagram", iconImageUrl: "", bgColor: "linear-gradient(45deg,#833ab4,#fd1d1d,#fcb045)", visible: true },
   ],
   locations: [
@@ -132,13 +133,63 @@ async function fetchFooterData(): Promise<{ footer: FooterProps; sidebar: Sideba
       }
     }
 
+    let rawSocialLinks =
+      (parsed.socialLinks as FooterProps["socialLinks"] | undefined) ?? FOOTER_FALLBACK.socialLinks;
+
+    let socialUpdated = false;
+    let socialLinks = Array.isArray(rawSocialLinks) ? [...rawSocialLinks] : [...FOOTER_FALLBACK.socialLinks];
+
+    const hasWhatsApp = socialLinks.some(
+      (s) => s.iconName?.toLowerCase() === "whatsapp" || s.label?.toLowerCase() === "whatsapp"
+    );
+
+    if (!hasWhatsApp) {
+      socialLinks = [
+        {
+          label: "WhatsApp",
+          url: "https://wa.me/917358127921",
+          iconName: "whatsapp",
+          iconImageUrl: "",
+          bgColor: "#25D366",
+          visible: true,
+        },
+        ...socialLinks,
+      ];
+      socialUpdated = true;
+    } else {
+      socialLinks = socialLinks.map((s) => {
+        if (s.iconName?.toLowerCase() === "whatsapp" || s.label?.toLowerCase() === "whatsapp") {
+          const needsFix = !s.url?.trim() || !s.label?.trim() || !s.bgColor;
+          if (needsFix) {
+            socialUpdated = true;
+            return {
+              ...s,
+              label: s.label?.trim() || "WhatsApp",
+              url: s.url?.trim() || "https://wa.me/917358127921",
+              iconName: "whatsapp",
+              bgColor: s.bgColor || "#25D366",
+              visible: true,
+            };
+          }
+        }
+        return s;
+      });
+    }
+
+    if (socialUpdated && parsed._id) {
+      FooterModel.updateOne(
+        { _id: parsed._id },
+        { $set: { socialLinks } }
+      ).catch(() => { });
+    }
+
     const footer: FooterProps = {
       logo: (parsed.logo as string) || FOOTER_FALLBACK.logo,
       headline: (parsed.headline as string) || FOOTER_FALLBACK.headline,
       description: (parsed.description as string) || "",
       copyright: (parsed.copyright as string) || FOOTER_FALLBACK.copyright,
       footerLinks,
-      socialLinks: (parsed.socialLinks as FooterProps["socialLinks"]) ?? FOOTER_FALLBACK.socialLinks,
+      socialLinks,
       locations: (parsed.locations as FooterProps["locations"])?.length
         ? (parsed.locations as FooterProps["locations"])
         : LOCATIONS_FALLBACK,

@@ -3,6 +3,10 @@
 import { useRef } from "react";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
+import { FaWhatsapp, FaInstagram, FaFacebook, FaLinkedin, FaYoutube, FaTelegram, FaPhone } from "react-icons/fa";
+import { SiGoogle } from "react-icons/si";
+import { MdEmail } from "react-icons/md";
+import { FaXTwitter } from "react-icons/fa6";
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
@@ -34,6 +38,20 @@ export interface FooterProps {
   locations?: FooterLocation[];
 }
 
+// ── Built-in icon map ─────────────────────────────────────────────────────────
+const ICON_MAP: Record<string, React.ElementType> = {
+  whatsapp:   FaWhatsapp,
+  instagram:  FaInstagram,
+  facebook:   FaFacebook,
+  linkedin:   FaLinkedin,
+  youtube:    FaYoutube,
+  telegram:   FaTelegram,
+  phone:      FaPhone,
+  mail:       MdEmail,
+  googlemaps: SiGoogle,
+  twitter:    FaXTwitter,
+};
+
 // ── Social icon text fallback ─────────────────────────────────────────────────
 function SocialIconFallback({ name }: { name: string }) {
   const map: Record<string, string> = {
@@ -41,6 +59,15 @@ function SocialIconFallback({ name }: { name: string }) {
     youtube: "YT", whatsapp: "WA", telegram: "TG", googlemaps: "G",
   };
   return <span className="text-[12px] font-bold text-white tracking-tight">{map[name?.toLowerCase()] ?? (name ? name.slice(0, 2).toUpperCase() : "IG")}</span>;
+}
+
+function SocialIconRenderer({ name, iconImageUrl, label }: { name: string; iconImageUrl?: string; label?: string }) {
+  if (iconImageUrl) {
+    return <img src={iconImageUrl} alt={label || name || "Social link"} className="h-5 w-5 object-contain" />;
+  }
+  const Icon = ICON_MAP[name?.toLowerCase()];
+  if (Icon) return <Icon size={20} color="#ffffff" />;
+  return <SocialIconFallback name={name} />;
 }
 
 // ── Location block — matches Head Office structure ───────────────────────────
@@ -202,13 +229,21 @@ export default function Footer({
             <div className="flex flex-wrap gap-3">
               {(visibleSocial.length > 0 ? visibleSocial : [
                 {
+                  label: "WhatsApp",
+                  url: "https://wa.me/917358127921",
+                  iconName: "whatsapp",
+                  iconImageUrl: "",
+                  bgColor: "#25D366",
+                  visible: true,
+                },
+                {
                   label: "Instagram",
                   url: "https://www.instagram.com/kattilthehome",
                   iconName: "instagram",
                   iconImageUrl: "",
                   bgColor: "linear-gradient(45deg,#833ab4,#fd1d1d,#fcb045)",
                   visible: true,
-                }
+                },
               ]).map((social, idx) => (
                 <motion.a
                   key={`${social.label || social.iconName || "social"}-${idx}`}
@@ -219,12 +254,13 @@ export default function Footer({
                   whileHover={{ scale: 1.08 }}
                   whileTap={{ scale: 0.96 }}
                   className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-white shadow-md transition-transform"
-                  style={{ background: social.bgColor || "linear-gradient(45deg,#833ab4,#fd1d1d,#fcb045)" }}
+                  style={{ background: social.bgColor || "#25D366" }}
                 >
-                  {social.iconImageUrl
-                    ? <img src={social.iconImageUrl} alt={social.label || "Social link"} className="h-5 w-5 object-contain" />
-                    : <SocialIconFallback name={social.iconName || "instagram"} />
-                  }
+                  <SocialIconRenderer
+                    name={social.iconName || social.label || "link"}
+                    iconImageUrl={social.iconImageUrl}
+                    label={social.label}
+                  />
                 </motion.a>
               ))}
             </div>
