@@ -32,6 +32,7 @@ interface PropertyForm {
   name: string;
   slug: string;
   city: string;
+  specificLocation: string;
   badge: string;
   category: "hotel" | "homestay" | "resort" | "hostel" | "deluxe" | "suite" | "standard";
   tagline: string;
@@ -62,6 +63,7 @@ const EMPTY: PropertyForm = {
   name: "",
   slug: "",
   city: "",
+  specificLocation: "",
   badge: "Private room",
   category: "homestay",
   tagline: "",
@@ -177,6 +179,7 @@ export default function PropertyFormPage() {
         name: d.name ?? "",
         slug: d.slug ?? "",
         city: d.city?._id ?? d.city ?? "",
+        specificLocation: d.specificLocation ?? "",
         badge: d.badge ?? "Private room",
         category: d.category ?? "homestay",
         tagline: d.tagline ?? "",
@@ -261,6 +264,7 @@ export default function PropertyFormPage() {
         name: form.name.trim(),
         slug: form.slug.trim() || undefined,
         cityId: form.city,
+        specificLocation: form.specificLocation.trim(),
         badge: form.badge.trim() || "Private room",
         category: form.category,
         tagline: form.tagline.trim() || undefined,
@@ -411,6 +415,19 @@ export default function PropertyFormPage() {
                     </option>
                   ))}
                 </select>
+              </FormField>
+
+              <FormField
+                label="Specific Location / Area"
+                hint="Locality, street, neighbourhood, or area name (e.g. 'Anni Nagar', 'Teynampet')"
+              >
+                <input
+                  type="text"
+                  value={form.specificLocation}
+                  onChange={(e) => setForm((f) => ({ ...f, specificLocation: e.target.value }))}
+                  placeholder="e.g. Anni Nagar"
+                  className="flex h-10 w-full rounded-[8px] border border-[hsl(var(--adm-input))] bg-[hsl(var(--adm-background))] px-3 text-sm text-[hsl(var(--adm-foreground))] placeholder:text-[hsl(var(--adm-muted-foreground))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--adm-ring))]"
+                />
               </FormField>
             </div>
 

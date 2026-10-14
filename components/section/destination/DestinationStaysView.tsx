@@ -26,6 +26,7 @@ export interface PropertyStay {
   offerPercentage?: number;
   city?: string;
   address?: string;
+  specificLocation?: string;
 }
 
 interface DestinationStaysViewProps {
@@ -74,6 +75,7 @@ export default function DestinationStaysView({
               offerPercentage: p.offerPercentage,
               city: (typeof p.city === "object" ? p.city?.name : p.city) || cityName,
               address: p.address,
+              specificLocation: p.specificLocation,
             })
           );
           setStays(mapped);

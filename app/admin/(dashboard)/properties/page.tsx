@@ -28,6 +28,7 @@ interface PropertyItem {
   name: string;
   slug: string;
   city: City | null;
+  specificLocation?: string;
   badge?: string;
   category?: string;
   images: string[];
@@ -448,7 +449,16 @@ export default function PropertiesPage() {
                       </td>
                       <td className="px-4 py-3">
                         {property.city ? (
-                          <span className="text-xs font-semibold text-[#000000]">{property.city.name}</span>
+                          <div className="flex flex-col">
+                            <span className="text-xs font-semibold text-[#000000]">{property.city.name}</span>
+                            {property.specificLocation && (
+                              <span className="text-[11px] text-[hsl(var(--adm-muted-foreground))]">
+                                {property.specificLocation}
+                              </span>
+                            )}
+                          </div>
+                        ) : property.specificLocation ? (
+                          <span className="text-xs font-semibold text-[#000000]">{property.specificLocation}</span>
                         ) : (
                           <span className="text-xs text-[hsl(var(--adm-muted-foreground))]">—</span>
                         )}

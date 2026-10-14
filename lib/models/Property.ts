@@ -15,6 +15,7 @@ export interface IProperty extends Document {
   name: string;
   slug: string;
   city?: mongoose.Types.ObjectId;
+  specificLocation?: string;
   badge?: string; // e.g. "Private room", "Homestay", "Hotel", "Boutique Stay"
   category?: string; // "hotel", "homestay", "resort", "hostel"
   tagline?: string;
@@ -54,6 +55,7 @@ const propertySchema = new Schema<IProperty>(
     name: { type: String, required: true, trim: true },
     slug: { type: String, required: true, trim: true, lowercase: true },
     city: { type: Schema.Types.ObjectId, ref: "City", required: false },
+    specificLocation: { type: String, trim: true, default: "" },
     badge: { type: String, default: "Private room" },
     category: {
       type: String,

@@ -108,6 +108,7 @@ export const getDestinationStaysData = cache(async function getDestinationStaysD
           offerPercentage: p.offerPercentage,
           city: (typeof p.city === "object" && p.city && "name" in p.city ? (p.city as any).name : "") || city?.name || "",
           address: p.address || "",
+          specificLocation: p.specificLocation || "",
         }));
       } else {
         properties = [];

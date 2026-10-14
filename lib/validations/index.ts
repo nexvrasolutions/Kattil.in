@@ -59,6 +59,7 @@ export const propertySchema = z.object({
   name: z.string().min(1, "Property name is required"),
   slug: z.string().optional(),
   cityId: z.string().min(1, "Destination city is required"),
+  specificLocation: z.string().optional(),
   badge: z.string().optional(),
   category: z
     .enum(["hotel", "homestay", "resort", "hostel", "deluxe", "suite", "standard"])

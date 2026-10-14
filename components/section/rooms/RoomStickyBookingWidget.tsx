@@ -15,6 +15,7 @@ export interface HotelOption {
   id: string;
   name: string;
   place: string;
+  specificLocation?: string;
   state?: string;
   slug: string;
   hotelValue: string;
@@ -199,6 +200,7 @@ export default function RoomStickyBookingWidget({
               id: `prop-${p._id || p.slug}`,
               name: p.name,
               place: cityName,
+              specificLocation: p.specificLocation?.trim() || undefined,
               state: "Tamil Nadu",
               slug: p.slug || citySlug,
               hotelValue: hotelVal,
@@ -595,7 +597,12 @@ export default function RoomStickyBookingWidget({
               <div className="flex items-center gap-2.5 overflow-hidden">
                 <Building2 className="w-4.5 h-4.5 text-[#0d1b2e]/70 shrink-0 stroke-[1.6]" />
                 <span className="text-[13.5px] font-medium text-gray-900 truncate font-sans">
-                  {selectedHotel.name}{selectedHotel.place ? ` (${selectedHotel.place})` : ""}
+                  {selectedHotel.name}{(() => {
+                    const loc = selectedHotel.specificLocation && selectedHotel.place
+                      ? `${selectedHotel.specificLocation}, ${selectedHotel.place}`
+                      : selectedHotel.specificLocation || selectedHotel.place;
+                    return loc ? ` (${loc})` : "";
+                  })()}
                 </span>
               </div>
             </div>

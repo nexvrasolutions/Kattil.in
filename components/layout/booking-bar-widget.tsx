@@ -15,11 +15,25 @@ export interface HotelPlaceItem {
   id: string;
   name: string; // e.g. "Kattil Chennai"
   place: string; // e.g. "Chennai"
+  specificLocation?: string; // e.g. "Anni Nagar"
   state: string; // e.g. "Tamil Nadu"
   slug: string;
   hotelValue: string;
   bookingEngineUrl?: string;
   hotelCount?: string;
+}
+
+export function getHotelLocationDisplay(hotel?: { specificLocation?: string; place?: string } | null): string {
+  if (!hotel) return "";
+  const specific = hotel.specificLocation?.trim();
+  const city = hotel.place?.trim();
+  if (specific && city) {
+    return `${specific}, ${city}`;
+  }
+  if (specific) {
+    return specific;
+  }
+  return city || "";
 }
 
 interface FpInstance {
@@ -248,6 +262,7 @@ export default function BookingBarWidget({
               id: `prop-${p._id || p.slug}`,
               name: p.name,
               place: cityName,
+              specificLocation: p.specificLocation?.trim() || undefined,
               state: "Tamil Nadu",
               slug: p.slug || citySlug,
               hotelValue: hotelVal,
@@ -341,9 +356,12 @@ export default function BookingBarWidget({
     if (!q) return list;
 
     return list.filter((item) => {
+      const locDisplay = getHotelLocationDisplay(item).toLowerCase();
       return (
         item.name.toLowerCase().includes(q) ||
         item.place.toLowerCase().includes(q) ||
+        (item.specificLocation && item.specificLocation.toLowerCase().includes(q)) ||
+        locDisplay.includes(q) ||
         item.state.toLowerCase().includes(q) ||
         item.hotelValue.toLowerCase().includes(q)
       );
@@ -762,7 +780,7 @@ export default function BookingBarWidget({
                         dropdownOpen
                           ? searchQuery
                           : selectedHotel
-                            ? `${selectedHotel.name} (${selectedHotel.place})`
+                            ? `${selectedHotel.name}${getHotelLocationDisplay(selectedHotel) ? ` (${getHotelLocationDisplay(selectedHotel)})` : ""}`
                             : ""
                       }
                       onChange={(e) => {
@@ -772,7 +790,7 @@ export default function BookingBarWidget({
                       onFocus={() => setDropdownOpen(true)}
                       placeholder={
                         dropdownOpen && selectedHotel
-                          ? `${selectedHotel.name} (${selectedHotel.place})`
+                          ? `${selectedHotel.name}${getHotelLocationDisplay(selectedHotel) ? ` (${getHotelLocationDisplay(selectedHotel)})` : ""}`
                           : "Search location or property"
                       }
                       className={`w-full min-w-0 bg-transparent outline-none border-none p-0 text-[14.5px] sm:text-[15px] md:text-[14px] lg:text-[14.5px] truncate placeholder-gray-400 font-sans ${selectedHotel && !dropdownOpen ? "text-gray-900 font-medium" : "text-gray-900"
@@ -915,7 +933,7 @@ export default function BookingBarWidget({
                                       {hotel.name}
                                     </span>
                                     <span className="text-[11px] sm:text-[11.5px] text-gray-500 truncate leading-tight mt-0.5">
-                                      {hotel.place}
+                                      {getHotelLocationDisplay(hotel)}
                                     </span>
                                   </div>
                                 </div>
