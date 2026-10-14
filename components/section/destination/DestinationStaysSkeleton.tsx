@@ -34,7 +34,7 @@ export default function DestinationStaysSkeleton({ cityName }: { cityName: strin
           <div className="px-5 md:px-8 lg:px-15">
             <div className="mb-8 md:mb-10 h-5 w-56 rounded bg-gray-200 animate-pulse" />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 sm:gap-8 md:gap-8 justify-items-center lg:justify-items-start">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-8 justify-items-center md:justify-items-start lg:justify-items-start">
               {Array.from({ length: 6 }).map((_, i) => (
                 <div
                   key={i}
