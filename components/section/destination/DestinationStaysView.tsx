@@ -401,7 +401,7 @@ export default function DestinationStaysView({
                       shrink-0
                     "
                   >
-                    Contact Us
+                    Contact
                   </Link>
 
                 </div>
