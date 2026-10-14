@@ -1135,9 +1135,8 @@ export default function HeroNavbar({
                   alt="Kattil — The Homely Reset"
                   className="
                     object-contain
-                    h-12
-                    md:h-14.5
-                    lg:h-17
+                    w-[83.81px]
+                    h-[68px]
                     transition-all
                     duration-300
                     drop-shadow-md

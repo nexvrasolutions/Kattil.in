@@ -226,7 +226,6 @@ export default function NotFound() {
             src="/assets/logo.png"
             alt="Kattil"
             className="h-10 md:h-12 object-contain"
-            style={{ filter: "brightness(0) invert(1)" }}
           />
         </Link>
       </motion.div>

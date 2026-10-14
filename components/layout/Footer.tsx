@@ -139,7 +139,7 @@ export default function Footer({
               }}
               className="inline-block cursor-pointer"
             >
-              <img src={logo} alt="Kattil" className="h-20 sm:h-24 lg:h-28 object-contain mb-5 hover:opacity-90 transition-opacity" />
+              <img src={logo} alt="Kattil" className="w-[138.05px] h-[112px] object-contain mb-5 hover:opacity-90 transition-opacity" />
             </Link>
           )}
           {headline && (

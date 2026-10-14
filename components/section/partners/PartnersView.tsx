@@ -57,19 +57,19 @@ const HOW_IT_WORKS_STEPS = [
 const PROPERTY_TYPES = [
   {
     title: "Hotels",
-    image: "/images/partners/property-hotel.png",
+    image: "/images/partners/Hotel.webp",
   },
   {
     title: "Resorts",
-    image: "/images/partners/property-hotel.png",
+    image: "/images/partners/Resorts.webp",
   },
   {
     title: "Guesthouses",
-    image: "/images/partners/property-hotel.png",
+    image: "/images/partners/Guest-house.webp",
   },
   {
     title: "Villas",
-    image: "/images/partners/property-hotel.png",
+    image: "/images/partners/Vilas.webp",
   },
 ];
 
@@ -464,14 +464,14 @@ export default function PartnersView() {
                 >
                   Partner With Us
                 </motion.a>
-
                 <motion.a
-
                   whileTap={{ scale: 0.98 }}
-                  href="tel:+917448749779"
+                  href="/images/partners/broucher.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="h-[40px] px-6 rounded-[6px] border border-[#0e273c] text-[#0e273c] font-sans text-[14px] font-semibold hover:bg-[#0e273c]/5 transition-colors inline-flex items-center justify-center leading-none"
                 >
-                  View Brochure
+                  View Broucher
                 </motion.a>
               </div>
             </motion.div>

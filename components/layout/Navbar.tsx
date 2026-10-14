@@ -320,7 +320,7 @@ export default function Navbar() {
               <img
                 src="/assets/logo.png"
                 alt="Kattil — The Homely Reset"
-                className="object-contain h-12 md:h-14.5 lg:h-17 transition-all duration-300 drop-shadow-md"
+                className="object-contain w-[83.81px] h-[68px] transition-all duration-300 drop-shadow-md"
               />
             </Link>
 

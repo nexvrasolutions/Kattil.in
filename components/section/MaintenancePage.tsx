@@ -9,7 +9,7 @@ export default function MaintenancePage({ message }: { message?: string }) {
   return (
     <div className="min-h-screen flex items-center justify-center px-6 py-20 bg-[#FAF8F5]">
       <div className="py-16 px-6 text-center bg-white rounded-[8px] border border-gray-100 max-w-xl mx-auto">
-        <img src="/assets/logo.png" alt="Kattil" className="h-10 object-contain mx-auto mb-8" />
+        <img src="/assets/logo-dark.png" alt="Kattil" className="h-10 object-contain mx-auto mb-8" />
 
         <div className="w-12 h-12 rounded-full bg-amber-50 flex items-center justify-center mx-auto mb-4">
           <Construction className="w-6 h-6 text-amber-600" />
